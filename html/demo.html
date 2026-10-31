@@ -22,8 +22,9 @@
       <div class="opts g2" id="etPick"><button class="opt" data-et="normal" aria-pressed="true">Etapa: normal</button><button class="opt" data-et="vuelvo" aria-pressed="false">Vuelvo de una pausa</button><button class="opt" data-et="molestia" aria-pressed="false">Con molestia en el hombro</button><button class="opt" data-et="menor" aria-pressed="false">Menor de 18</button><button class="opt" data-et="60" aria-pressed="false" style="grid-column:1 / -1">60 o más</button></div>
       <div class="opts g2" id="slPick"><button class="opt" data-sl="0" aria-pressed="true">Sala: normal</button><button class="opt" data-sl="1" aria-pressed="false">Sala: noche llena</button><button class="opt" data-sg="0" aria-pressed="true">Con señal</button><button class="opt" data-sg="1" aria-pressed="false">Sin señal</button></div>
       <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="segBien">Simular segundo Bien</button><button class="btn ghost sm" id="noEnt">Simular que no llegó la entrada</button></div>
+      <button class="btn ghost sm" id="verPrim">Ver primera vez (onboarding)</button>
       <button class="btn ghost sm" id="limRemo">Simular dos "Al límite" seguidos en remo</button>
-      <span class="small muted" style="line-height:1.4">Arranco, Vuelvo, la molestia y menores: la carga sugerida no sube (en menores va la del profe). Con molestia, la pregunta del día pasa a "¿Cómo está tu hombro hoy?"; el aviso del teléfono sigue diciendo "¿Cómo venís hoy?". Menores: "Con algo para cuidar" lleva al profe y no guarda nada. 60 o más: letra más grande y las repeticiones antes que los kilos. Progreso según la experiencia, el onboarding, la pantalla bloqueada y "Decímelo" llegan en las próximas versiones.</span></div>
+      <span class="small muted" style="line-height:1.4">Arranco, Vuelvo, la molestia y menores: la carga sugerida no sube (en menores va la del profe). Con molestia, la pregunta del día pasa a "¿Cómo está tu hombro hoy?"; el aviso del teléfono sigue diciendo "¿Cómo venís hoy?". Menores: "Con algo para cuidar" lleva al profe y no guarda nada. 60 o más: letra más grande y las repeticiones antes que los kilos. "Ver primera vez": el onboarding de Entrenar (nunca en medio de una sesión; "Después vemos" lo reofrece una sola vez en Hoy). Progreso según la experiencia, la pantalla bloqueada y "Decímelo" llegan en las próximas versiones.</span></div>
     <div class="dmsec"><span class="lbl">Métrica</span>
       <div class="opts g3" id="varPick"><button class="varopt" data-var="P" aria-pressed="false"><b>1</b><svg class="batico" viewBox="0 0 57.3 110.3" aria-hidden="true"><use href="#vBat"/></svg><small>Tus pilas VIVA</small></button><button class="varopt" data-var="R" aria-pressed="false"><b>2</b><small>Tu ritmo VIVA</small></button><button class="varopt" data-var="F" aria-pressed="true"><b>2+3</b><small>Tu ritmo VIVA con VIVA Flow</small></button></div>
       <span class="small muted" id="varZonas" style="line-height:1.4"></span></div>
@@ -69,7 +70,7 @@
       <div class="opts g2" data-group="gancho"><button class="opt" aria-pressed="true">Gratis</button><button class="opt" aria-pressed="false">Mitad de precio</button></div></div>
     <div class="dmsec"><span class="lbl">Ejemplos</span>
       <button class="btn ghost sm" id="venceDemo">Ver plan que vence en 3 días</button>
-      <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="deudaToggle">Ver ejemplo con saldo pendiente</button><!--sin-gestion--></div></div>
+      <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="deudaToggle">Ver ejemplo con saldo pendiente</button><button class="btn ghost sm" data-go="gestion">Ver lo que ve Viva</button></div></div>
   </div>
 </div>
 

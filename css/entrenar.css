@@ -82,3 +82,27 @@
 .cisem{gap:8px}.cisem .eqsvg{max-height:92px}
 .cilog,.ciq{gap:10px}
 .cinext{display:flex;flex-direction:column;gap:2px}
+/* v44 · Onboarding de Entrenar */
+.obody{padding-top:14px;gap:18px}
+.obtop{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.obdots{display:flex;gap:6px}
+.obdots i{width:22px;height:4px;border-radius:2px;background:var(--line2)}
+.obdots i.on{background:var(--lime);box-shadow:0 0 6px rgba(64,196,255,.6)}
+.obq{font-size:28px;line-height:1.05}
+.obsub{margin:-8px 0 0;color:var(--muted);font-size:15px;line-height:1.45}
+.oblist{display:flex;flex-direction:column;gap:10px}
+.oblist .objopt{min-height:62px}
+.obmeta{display:flex;align-items:center;justify-content:center;gap:26px;padding:6px 0}
+.obmeta b{font-family:var(--display);font-size:84px;line-height:1;font-stretch:75%;min-width:64px;text-align:center}
+.obmeta button{width:56px;height:56px;border-radius:50%;border:1.5px solid var(--lime);background:transparent;color:var(--txt);font-size:28px;line-height:1}
+.obmeta button:disabled{opacity:.3}
+.obres{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line2)}
+.obres div{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line2);font-size:15px}
+.obres span{color:var(--muted)}
+.obres b{text-align:right}
+.obsec{align-self:center;min-height:48px;font-size:15px}
+.obcons{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;border:1px solid var(--line2);background:var(--panel)}
+.honb{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:14px;border:1px solid var(--line2);font-size:14px;line-height:1.35}
+.honb span{flex:1}
+.honb .link{min-height:44px;padding:0 4px;font-size:14px;font-weight:700}
+.obody .wktit{white-space:normal;line-height:1.15}

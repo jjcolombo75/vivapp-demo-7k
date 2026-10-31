@@ -592,6 +592,7 @@
     $('#hCuida').hidden = !CUIDA; if (CUIDA) $('#hCuida').textContent = CUIDA === 'Hombro' && PEOR ? 'Hoy tu hombro descansa: sacamos el remo y el jalón y sumamos 8 minutos de cardio.' : CUIDA === 'Hombro' ? 'Hoy cuidamos tu hombro: cambiamos el jalón por remo con apoyo de pecho y la carga no sube.' : CUIDA === 'Otra' ? 'Hoy cuidamos lo que nos contaste: si algo molesta, pará y avisale a tu profe.' : 'Hoy cuidamos ' + zonaTxt(CUIDA) + ': evitamos los ejercicios que la cargan.';
     const nota = ETAPA === 'vuelvo' ? '<p class="sv">' + SV_BOLT + '<span>Volviste ⚡ Arrancamos al 80% de lo que hacías.</span></p>' : NOENT && MOM !== 'sesion' ? '<span class="small muted">Todavía no vimos tu entrada. Podés empezar igual: la visita se suma cuando llegue.</span>' : '';
     $('#hNota').innerHTML = nota; $('#hNota').hidden = !nota;
+    obHoy();
     $('#hCorto').innerHTML = CORTO ? 'Volver a la versión completa' : '¿Poco tiempo? <b>Hacé la versión de 30 min</b>'; $('#hCorto').hidden = MOM === 'sesion';
     const b = $('#hEmpezar'), ses = MOM === 'sesion';
     b.parentElement.hidden = !!pausa;
@@ -790,4 +791,110 @@
     const cq = e.target.closest('[data-cq]'); if (cq) { if (cq.dataset.cq === 'si') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina; lo ve tu profe solo si vos querés, y se borra cuando lo das por resuelto.</span><div class="grid2" style="gap:8px"><button class="btn sm" data-guardar="1">Guardar</button><button class="btn ghost sm" data-noguardar="1">No guardar</button></div>'; $('#salaSheet').hidden = false; } else { CUIDA = null; renderEntHoy(); toast('Listo, era por hoy'); } cq.closest('.ciq').innerHTML = '<span class="small muted">Gracias.</span>'; return; }
     if (e.target.closest('#ciShare')) openStory({ type:'ach', a:{ big:'42,5', unit:'KG EN REMO ⚡', cap:'mi récord en remo sentado', feedT:'Récord en remo' }, noSede:true });
   });
-
+//#bloque 305
+  // ===== v44 · Onboarding de Entrenar (instrucción, sección 9; propuesta 4 bis) =====
+  // Se propone completo la primera vez y decide el socio. Cada pregunta se puede saltear. "Después vemos" lo reofrece una sola vez (en Hoy).
+  // Sin peso ni altura: el cuerpo entra por el Índice FIT. Edad y género vienen de EVO. Nunca en medio de una sesión.
+  var OB = { step:'inv', obj:[], zonaAbierta:false, zona:null, meta:3, later:0, reofrecer:false, hecho:false, res:{} };
+  var OB_STEPS = ['obj', 'exp', 'cui', 'meta'];
+  var OB_EXP = [['arranco', 'Recién arranco', 'Nunca entrené o hace mucho que no'], ['habitual', 'Entreno hace un tiempo', 'Ya conozco las máquinas'], ['avanzado', 'Entreno hace años', 'Sé armar mi rutina']];
+  var OB_ZONAS = ['Hombro', 'Codo', 'Muñeca', 'Espalda', 'Cadera', 'Rodilla', 'Tobillo', 'Otra'];
+  var OB_BOLT = '<svg class="vbolt" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg>';
+  function obAbrir(){
+    if (MOM === 'sesion') { toast('Nunca en medio de una sesión: primero cerrala'); return; }
+    OB.step = 'inv'; OB.obj = []; OB.zonaAbierta = false; OB.zona = null; OB.meta = 3; OB.res = {};
+    obRender(); go('onbE');
+  }
+  function obTop(){
+    const i = OB_STEPS.indexOf(OB.step);
+    return '<div class="obtop"><button class="iconbtn" data-ob="back" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>' +
+      '<span class="obdots" aria-label="Pregunta ' + (i + 1) + ' de 4">' + OB_STEPS.map((s, k) => '<i class="' + (k <= i ? 'on' : '') + '"></i>').join('') + '</span>' +
+      '<button class="link" data-ob="skip" style="padding:0 4px">Saltear</button></div>';
+  }
+  function obRender(){
+    const b = $('#obBody'), f = $('#obFoot'); let h = '', ft = '';
+    if (OB.step === 'inv') {
+      h = '<div style="height:24px"></div><span class="wktit"><span class="sig">' + firma('Armemos tu entrenamiento') + '</span></span>' +
+        '<p class="sv big">' + OB_BOLT + '<span>Cuatro preguntas, menos de un minuto. Con esto Lucas, tu profe, ajusta tu rutina.</span></p>' +
+        '<p class="obsub" style="margin:0">Sin peso ni medidas. Podés saltear cualquier pregunta.</p>';
+      ft = '<button class="accbtn on" data-ob="dale"><span>Dale</span></button><button class="link obsec" data-ob="later" style="width:100%">Después vemos</button>';
+    } else if (OB.step === 'obj') {
+      const L = OBJS.filter(o => !(esMenor() && o[0] === 'ver'));
+      h = obTop() + '<span class="h2 obq">¿Qué buscás?</span><p class="obsub">Elegí hasta dos. La primera es la principal.</p>' +
+        '<div class="oblist">' + L.map(o => { const i = OB.obj.indexOf(o[0]);
+          return '<button class="objopt" data-obo="' + o[0] + '" aria-pressed="' + (i >= 0) + '"><span style="font-weight:700;font-size:16px">' + o[1] + '</span><small>' + o[2] + '</small>' + (i === 0 ? '<em>Principal</em>' : i === 1 ? '<em>Segundo</em>' : '') + '</button>'; }).join('') + '</div>';
+      ft = '<button class="accbtn' + (OB.obj.length ? ' on' : '') + '" data-ob="next"' + (OB.obj.length ? '' : ' disabled') + '><span>Seguir</span></button>';
+    } else if (OB.step === 'exp') {
+      h = obTop() + '<span class="h2 obq">¿Cuánto venís entrenando?</span><p class="obsub">Así sabemos cuánto explicarte y cuándo subir la carga.</p>' +
+        '<div class="oblist">' + OB_EXP.map(x => '<button class="objopt" data-obx="' + x[0] + '" aria-pressed="' + (OB.res.exp === x[0]) + '"><span style="font-weight:700;font-size:16px">' + x[1] + '</span><small>' + x[2] + '</small></button>').join('') + '</div>';
+    } else if (OB.step === 'cui') {
+      if (esMenor()) {
+        h = obTop() + '<span class="h2 obq">¿Hay algo que tengamos que cuidar?</span><p class="obsub">Una lesión, un dolor o algo que te molesta. Si hay algo, contáselo a tu profe: Lucas te arma la sesión.</p>' +
+          '<div class="oblist"><button class="objopt" data-obc="no"><span style="font-weight:700;font-size:16px">No, nada</span></button><button class="objopt" data-obc="profe"><span style="font-weight:700;font-size:16px">Sí, quiero contarle a mi profe</span><small>No guardamos nada en la app</small></button></div>';
+      } else if (OB.zona) {
+        h = obTop() + '<span class="h2 obq">' + (OB.zona === 'Otra' ? 'Lo cuidamos' : 'Cuidamos ' + zonaTxt(OB.zona)) + '</span><div class="obcons"><span class="h2" style="font-size:22px">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina; lo ve tu profe solo si vos querés, y se borra cuando lo das por resuelto.</span>' +
+          '<div class="grid2" style="gap:8px"><button class="btn sm" data-obg="1">Guardar</button><button class="btn ghost sm" data-obg="0">No guardar</button></div></div>';
+      } else {
+        h = obTop() + '<span class="h2 obq">¿Hay algo que tengamos que cuidar?</span><p class="obsub">Una lesión, un dolor o una zona que te molesta.</p>' +
+          (OB.zonaAbierta
+            ? '<div class="opts g2" id="obZ">' + OB_ZONAS.map(z => '<button class="opt" data-obz="' + z + '" style="min-height:52px">' + z + '</button>').join('') + '</div><button class="link lime" data-obc="profe" style="min-height:44px">Prefiero hablarlo con mi profe</button>'
+            : '<div class="oblist"><button class="objopt" data-obc="no"><span style="font-weight:700;font-size:16px">No, nada</span></button><button class="objopt" data-obc="si"><span style="font-weight:700;font-size:16px">Sí, hay algo</span><small>Elegís la zona; la rutina la evita</small></button></div>');
+      }
+    } else if (OB.step === 'meta') {
+      const n = OB.meta;
+      h = obTop() + '<span class="h2 obq">¿Nos ponemos una meta?</span>' +
+        '<div class="obmeta"><button data-obm="-1" aria-label="Una vez menos"' + (n <= 2 ? ' disabled' : '') + '>−</button><b>' + n + '</b><button data-obm="1" aria-label="Una vez más"' + (n >= 5 ? ' disabled' : '') + '>+</button></div>' +
+        '<p class="sv big">' + OB_BOLT + '<span>Venir ' + n + ' veces por semana. Con 4 semanas así es tu Mes cumplido y encendés tu cartel ⚡</span></p>' +
+        '<p class="obsub" style="margin:0">La cambiás cuando quieras.</p>';
+      ft = '<button class="accbtn on" data-ob="next"><span>Dale</span></button>';
+    } else if (OB.step === 'fin') {
+      const r = OB.res, o = r.obj && r.obj.length ? r.obj.map(k => OBJS.find(x => x[0] === k)[1]).join(' · ') : 'Lo vemos con tu profe';
+      const ex = r.exp ? OB_EXP.find(x => x[0] === r.exp)[1] : 'Lo vemos con tu profe';
+      const cu = r.cui === 'no' ? 'Nada' : r.cui === 'profe' ? 'Lo hablás con Lucas' : r.cui === 'guardado' ? zonaTxt(r.zona).replace(/^tu /, '').replace(/^./, c => c.toUpperCase()) : r.cui === 'hoy' ? 'Solo hoy' : 'Sin responder';
+      const d = rutinas[actual].dias[rutinas[actual].next];
+      h = '<div style="height:24px"></div><span class="wktit"><span class="sig">' + firma('Tu rutina está lista') + '</span></span>' +
+        '<p class="sv big">' + OB_BOLT + '<span>Hoy toca el Día ' + d.k + ', ' + d.n.toLowerCase() + '. Ya tiene en cuenta lo que nos contaste.</span></p>' +
+        '<div class="obres"><div><span>Buscás</span><b>' + o + '</b></div><div><span>Experiencia</span><b>' + ex + '</b></div><div><span>Cuidamos</span><b>' + cu + '</b></div><div><span>Tu meta</span><b>' + (r.meta ? r.meta + ' por semana' : META_SEM + ' por semana') + '</b></div></div>' +
+        '<p class="obsub" style="margin:0">Lucas la revisa con vos en la sala.</p>';
+      ft = '<button class="accbtn on" data-ob="ver"><span>Ver tu rutina</span></button>';
+    }
+    b.innerHTML = h; f.innerHTML = ft; f.hidden = !ft; b.scrollTop = 0;
+  }
+  function obNext(){
+    const i = OB_STEPS.indexOf(OB.step);
+    if (OB.step === 'obj' && OB.obj.length) { OBJ = OB.obj.slice(); OB.res.obj = OBJ.slice(); }
+    if (OB.step === 'meta') { const antes = META_SEM; META_SEM = OB.meta; OB.res.meta = OB.meta; if (antes !== META_SEM) renderForma(); }
+    OB.step = i < OB_STEPS.length - 1 ? OB_STEPS[i + 1] : 'fin';
+    if (OB.step === 'fin') obFin(); obRender();
+  }
+  function obFin(){
+    OB.hecho = true; OB.reofrecer = false;
+    try { renderForma(); renderSemanaDet(); renderAcc(); renderHoy(); renderToday(); } catch (e) {}
+  }
+  $('#obBody').addEventListener('click', e => {
+    const a = e.target.closest('[data-ob]');
+    if (a && a.dataset.ob === 'back') { const i = OB_STEPS.indexOf(OB.step); if (OB.step === 'cui' && (OB.zona || OB.zonaAbierta)) { OB.zona = null; OB.zonaAbierta = false; } else OB.step = i <= 0 ? 'inv' : OB_STEPS[i - 1]; obRender(); return; }
+    if (a && a.dataset.ob === 'skip') { if (OB.step === 'obj') OB.obj = []; if (OB.step === 'cui') { OB.zona = null; OB.zonaAbierta = false; } if (OB.step === 'meta') OB.meta = META_SEM; OB_STEPS.indexOf(OB.step) === 3 ? (OB.step = 'fin', obFin()) : (OB.step = OB_STEPS[OB_STEPS.indexOf(OB.step) + 1]); obRender(); return; }
+    const o = e.target.closest('[data-obo]'); if (o) { const k = o.dataset.obo, i = OB.obj.indexOf(k); if (i >= 0) OB.obj.splice(i, 1); else { if (OB.obj.length >= 2) OB.obj.pop(); OB.obj.push(k); } obRender(); return; }
+    const x = e.target.closest('[data-obx]'); if (x) { EXP = x.dataset.obx; OB.res.exp = EXP; $$('#expPick [data-exp]').forEach(y => y.setAttribute('aria-pressed', y.dataset.exp === EXP)); x.setAttribute('aria-pressed', 'true'); setTimeout(obNext, 220); return; }
+    const c = e.target.closest('[data-obc]'); if (c) { const k = c.dataset.obc;
+      if (k === 'si') { OB.zonaAbierta = true; obRender(); return; }
+      OB.res.cui = k; if (k === 'profe') toast('Listo. Lucas lo charla con vos en la sala ⚡'); obNext(); return; }
+    const z = e.target.closest('[data-obz]'); if (z) { OB.zona = z.dataset.obz; obRender(); return; }
+    const g = e.target.closest('[data-obg]'); if (g) {
+      if (g.dataset.obg === '1') { MOLESTIA = { zona:OB.zona, bien:0 }; OB.res.cui = 'guardado'; OB.res.zona = OB.zona; ETAPA = 'molestia'; $('.app').dataset.etapa = ETAPA; $$('#etPick [data-et]').forEach(y => y.setAttribute('aria-pressed', y.dataset.et === 'molestia')); try { chkReset(); } catch (e2) {} toast('Guardado. Te vamos a preguntar cómo está ' + zonaTxt(OB.zona)); }
+      else { OB.res.cui = 'hoy'; CUIDA = OB.zona; toast('No lo guardamos. Hoy lo cuidamos igual'); }
+      OB.zona = null; OB.zonaAbierta = false; obNext(); return; }
+    const m = e.target.closest('[data-obm]'); if (m) { OB.meta = Math.max(2, Math.min(5, OB.meta + +m.dataset.obm)); obRender(); return; }
+  });
+  $('#obFoot').addEventListener('click', e => {
+    const a = e.target.closest('[data-ob]'); if (!a || a.disabled) return; const k = a.dataset.ob;
+    if (k === 'dale') { OB.step = 'obj'; obRender(); }
+    else if (k === 'next') obNext();
+    else if (k === 'later') { OB.later++; OB.reofrecer = OB.later === 1; toast(OB.reofrecer ? 'Dale. Te lo volvemos a ofrecer una sola vez' : 'Listo, no te lo preguntamos más'); go('hoy'); }
+    else if (k === 'ver') go('hoy');
+  });
+  function obHoy(){ const el = $('#hOnb'); if (el) el.hidden = !(OB.reofrecer && !OB.hecho && MOM !== 'sesion'); }
+  $('#hOnbSi').addEventListener('click', () => { OB.reofrecer = false; obAbrir(); OB.step = 'obj'; obRender(); });
+  $('#hOnbNo').addEventListener('click', () => { OB.reofrecer = false; OB.later = 2; obHoy(); toast('Listo. Tu objetivo lo podés elegir en Tu semana'); });
+  $('#verPrim').addEventListener('click', () => { $('#demoSheet').hidden = true; OB.hecho = false; OB.later = 0; OB.reofrecer = false; obAbrir(); });
