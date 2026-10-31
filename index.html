@@ -2721,7 +2721,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
     $('#todayMeta').textContent = (r.tipo === 'profe' ? 'Prof. Lucas' : 'Generada con IA') + ' · ' + tot + ' min';
     let prog = [0, 0, 0];
     if (mm === 'sesion') try { let dn = 0, all = 0; d.ex.forEach((k, i) => { const n = lib[k].sets.length; all += n; dn += ses.done[i] ? ses.done[i].filter(x => x).length : 0; }); prog = [1, all ? dn / all : 0, 0]; } catch (_) {}
-    let col = 'var(--z3)'; try { col = eqFlow ? 'var(--zflow)' : eqCol; } catch (_) {}
+    const col = 'var(--lime)'; // cian = acción: lo que vas a hacer hoy
     $('#todayPlan').style.setProperty('--pc', col);
     $('#todayPlan').innerHTML = P.map((x, i) => '<span class="tdp" style="flex:' + x[1] + '"><span class="bar tdb' + (mm === 'sesion' ? ' live' : '') + '"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span><span class="tdl"><b>' + x[0] + '</b> ' + x[2] + '</span></span>').join('');
     $('#todayPlan').setAttribute('aria-label', 'Tu sesión: ' + P.map(x => x[0] + ' ' + x[2]).join(', ') + '.');
