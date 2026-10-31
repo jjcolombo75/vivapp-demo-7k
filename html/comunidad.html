@@ -1,0 +1,187 @@
+<!--#h10-->
+<!-- 16. SOCIAL CLUB -->
+<section class="scr" id="social" hidden aria-label="Comunidad">
+  <div class="body" style="padding-top:28px;gap:14px">
+    <div class="between">
+      <h1 class="h1">Comunidad VIVA</h1>
+      <div style="display:flex;gap:8px">
+        <button class="themebtn" data-go="matches" aria-label="Conexiones y mensajes" style="position:relative">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>
+          <span class="dotn" id="mBadge">2</span>
+        </button>
+        <button class="themebtn" data-go="socialPerfil" aria-label="Tu perfil social"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" style="grid-template-columns:repeat(4,minmax(0,1fr))" id="smode">
+      <button role="tab" aria-selected="true" data-smode="desafios">Sedes</button>
+      <button role="tab" aria-selected="false" data-smode="logros">Logros</button>
+      <button role="tab" aria-selected="false" data-smode="entrenar">Gente</button>
+      <button role="tab" aria-selected="false" data-smode="eventos">Eventos</button>
+    </div>
+
+    <!-- LA SEDE DEL MES -->
+    <div class="stack" id="desafBox" style="gap:14px">
+      <div class="card sedeMes" style="border-color:var(--dat);gap:12px">
+        <div class="between"><span class="lbl">La sede del mes</span><span class="small muted" id="chLeft">Quedan 9 días</span></div>
+        <span class="h2" style="font-size:34px" id="chalName">Octubre</span>
+        <span class="small muted" style="line-height:1.45">Gana la sede con más socios que cierran el mes con <strong style="color:var(--txt)">Mes cumplido</strong> (4 semanas cumplidas). Premio para toda la sede: <strong style="color:var(--txt)">una noche con DJ en la sala</strong>.</span>
+        <div class="stack" id="sedeRank" style="gap:10px"></div>
+        <div class="note lime" id="chMine"></div>
+      </div>
+      <span class="lbl">Meses anteriores</span>
+      <div class="list">
+        <div><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Septiembre · Sarmiento, tu sede</span><span class="small muted">36% de sus socios con Mes cumplido · noche con DJ</span></span><span class="pill ok">GANÓ</span></div>
+        <div><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Agosto · López y Planes</span><span class="small muted">33% de sus socios con Mes cumplido</span></span></div>
+      </div>
+      <p class="small muted" style="margin:0;text-align:center;line-height:1.45">Se muestran solo los totales por sede: nadie ve quién cumplió. Cuentan las entradas por molinete. Costanera y Santa Ana se suman cuando registren entradas.</p>
+    </div>
+
+    <!-- LOGROS -->
+    <div class="stack" id="logrosBox" hidden style="gap:14px">
+      <div class="card" style="gap:4px">
+        <span class="lbl">Tus logros para compartir</span>
+        <span class="small muted" style="line-height:1.45">Los arma la app con tus entrenamientos. Vos elegís cuáles se ven en el muro o en tus historias.</span>
+        <div id="myAch"></div>
+      </div>
+      <button class="promo" data-go="evolucion">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span class="stack" style="gap:0;flex:1"><span style="font-size:14px;font-weight:700">Tus fotos</span><span class="small muted">Tu progreso en fotos · privadas</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <div class="between"><span class="lbl">En Viva esta semana</span><span class="small muted">Sin comentarios, solo aplausos</span></div>
+      <div class="opts g2" id="feedFil"><button class="opt" data-ff="todos" aria-pressed="true" style="min-height:40px">Todos</button><button class="opt" data-ff="sig" aria-pressed="false" style="min-height:40px">Siguiendo</button></div>
+      <div class="stack" id="feed" style="gap:10px"></div>
+    </div>
+
+    <div class="stack" id="deckBox" hidden style="gap:12px">
+      <div class="card" id="genteOff" style="gap:12px">
+        <span class="h2" style="font-size:28px">Gente de Viva</span>
+        <span class="muted" style="line-height:1.45">Conocé a otros socios para entrenar, hacer amigos o, si querés, algo más. Vos elegís qué buscás y quién te ve.</span>
+        <div class="list" style="padding:0 14px">
+          <div><span class="dot" style="background:var(--dat)"></span><span class="small" style="flex:1">Solo socios con plan activo y mayores de 18, verificados con su ficha.</span></div>
+          <div><span class="dot" style="background:var(--dat)"></span><span class="small" style="flex:1">Nadie ve cuándo estás en el gimnasio.</span></div>
+          <div><span class="dot" style="background:var(--dat)"></span><span class="small" style="flex:1">"Me interesa conocerte" es privado: la otra persona solo se entera si también le interesa.</span></div>
+          <div><span class="dot" style="background:var(--dat)"></span><span class="small" style="flex:1">Podés pausar tu perfil o bloquear a alguien cuando quieras.</span></div>
+        </div>
+        <span class="small muted" style="font-weight:700">¿Qué buscás? Podés elegir más de una</span>
+        <div class="mopts" id="intOpts"><button class="opt" data-int="entrenar" aria-pressed="true">Entrenar juntos</button><button class="opt" data-int="amigos" aria-pressed="false">Hacer amigos</button><button class="opt" data-int="conocer" aria-pressed="false">Abierto a conocer a alguien</button></div>
+        <label class="check" for="gDes"><input type="checkbox" id="gDes"><span>Acepto las normas de convivencia y que Viva use estos datos solo para Gente.</span></label>
+        <button class="btn" id="gOn">Activar mi perfil</button>
+      </div>
+      <div class="stack" id="genteOnBox" hidden style="gap:12px">
+        <div class="between"><span class="small" id="myInt">Buscás: entrenar juntos</span><button class="link lime" data-go="socialPerfil" style="padding:0;font-size:14px">Editar</button></div>
+        <div class="opts" id="sedeFil" style="gap:6px">
+          <button class="opt" data-fil="todas" aria-pressed="true" style="min-height:40px;font-size:13px">Todas las sedes</button>
+          <button class="opt" data-fil="mia" aria-pressed="false" style="min-height:40px;font-size:13px">Tu sede</button>
+        </div>
+        <div class="note" id="deckNote" hidden style="font-size:13px"></div>
+        <div class="stack" id="gente" style="gap:12px"></div>
+        <p class="small muted" style="margin:0;text-align:center;line-height:1.45">Solo ves a quienes buscan lo mismo que vos.</p>
+      </div>
+    </div>
+
+    <div class="stack" id="eventsBox" hidden style="gap:12px">
+      <span class="lbl">Próximos</span>
+      <div class="card">
+        <div class="between"><span class="pill ok">SÁB 10:00</span><span class="small muted">Sarmiento</span></div>
+        <span class="h2" style="font-size:26px">Funcional en dúo</span>
+        <span class="small muted">Clase en parejas para conocer gente. 12 anotados de 20.</span>
+        <button class="btn sm" data-toast="Te anotaste a Funcional en dúo">Anotarme</button>
+      </div>
+      <div class="card">
+        <div class="between"><span class="pill ok">JUE 20:30</span><span class="small muted">López y Planes</span></div>
+        <span class="h2" style="font-size:26px">Spinning Night</span>
+        <span class="small muted">Spinning con luces y DJ. 18 anotados de 25.</span>
+        <button class="btn ghost sm" data-toast="Te anotaste a Spinning Night">Anotarme</button>
+      </div>
+      <span class="lbl">Fuiste a</span>
+      <div class="card">
+        <span class="h2" style="font-size:24px">After Train · 11/10</span>
+        <span class="small muted">Conocé a las 6 personas que también fueron y buscan compañeros para entrenar.</span>
+        <button class="btn ghost sm" id="verAsist">Ver asistentes</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 17. MATCHES -->
+<section class="scr" id="matches" hidden aria-label="Matches">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" data-go="social" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Comunidad</span></div>
+    <h1 class="h1">Conexiones</h1>
+    <div class="hrow" id="newMatches"></div>
+    <span class="lbl">Mensajes</span>
+    <div class="list" id="convList"></div>
+  </div>
+</section>
+
+<!-- 18. CHAT -->
+<section class="scr" id="chat" hidden aria-label="Chat">
+  <div class="chathead">
+    <button class="iconbtn" data-go="matches" aria-label="Volver" style="margin-left:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <span class="av sm" id="chAv">S</span>
+    <span class="stack" style="gap:0;flex:1;min-width:0"><span style="font-weight:700" id="chName">Sofía</span><span class="small muted" id="chSub">Citas · Sarmiento</span></span>
+    <button class="iconbtn" id="chMenuBtn" aria-label="Opciones" style="margin-left:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+  </div>
+  <div class="chmenu" id="chMenu" hidden>
+    <button id="chUnmatch">Quitar de mis compañeros</button>
+    <button id="chBlock">Bloquear</button>
+    <button id="chReport" style="color:var(--pink-txt)">Denunciar</button>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="quick">
+    <button class="qchip" id="qInv">Invitar a entrenar</button>
+    <button class="qchip" id="qDuo">Entrenamiento en dúo</button>
+    <button class="qchip" id="qEvt">Ir a un evento</button>
+    <button class="qchip" id="qRut">Rutina compartida</button>
+  </div>
+  <form class="composer" id="composer">
+    <input class="input" id="msgIn" placeholder="Escribí un mensaje" autocomplete="off" aria-label="Mensaje">
+    <button class="sendb" aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </form>
+  <div class="sheet" id="invSheet" hidden>
+    <div class="sheetin">
+      <span class="h2" style="font-size:26px">Invitar a entrenar</span>
+      <div class="field"><label for="invDia">Día</label><select class="input" id="invDia"><option>Hoy</option><option selected>Mañana</option><option>Sábado</option></select></div>
+      <div class="grid2" style="gap:10px">
+        <div class="field"><label for="invHora">Hora</label><select class="input" id="invHora"><option>08:00</option><option>12:00</option><option selected>19:00</option><option>20:30</option></select></div>
+        <div class="field"><label for="invSede">Sede</label><select class="input" id="invSede"><option selected>Sarmiento</option><option>López y Planes</option><option>Corrientes</option><option>Alberdi</option><option>Santa Ana</option></select></div>
+      </div>
+      <div class="grid2" style="gap:10px"><button class="btn ghost sm" id="invCancel" type="button">Cancelar</button><button class="btn sm" id="invSend" type="button">Enviar invitación</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- 19. MI PERFIL SOCIAL -->
+<section class="scr" id="socialPerfil" hidden aria-label="Tu perfil en Comunidad">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" data-go="social" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Comunidad</span></div>
+    <h1 class="h1 sig"><b>Tu</b> <i>perfil</i></h1>
+    <div class="photos">
+      <span class="ph main" style="background:linear-gradient(160deg,#5b6ea8,#1c2238)">M</span>
+      <span class="ph add" aria-label="Agregar foto">+</span>
+      <span class="ph add" aria-label="Agregar foto">+</span>
+    </div>
+    <div class="note lime"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Perfil verificado con la foto de tu ficha de socia.</span></div>
+    <div class="list">
+      <div><span style="flex:1">Martina, 29 · Sarmiento</span><span class="small muted">Desde tu ficha</span></div>
+      <label class="swrow" for="swGente"><span class="stack" style="gap:2px;flex:1"><span>Aparecer en Gente</span><span class="small muted">Otros socios pueden ver tu perfil</span></span><input type="checkbox" class="sw" id="swGente"></label>
+      <div style="flex-direction:column;align-items:stretch"><span class="small muted" style="font-weight:700">Qué buscás</span><div class="mopts" id="perfInt"><button class="opt" data-int="entrenar" aria-pressed="true">Entrenar juntos</button><button class="opt" data-int="amigos" aria-pressed="false">Hacer amigos</button><button class="opt" data-int="conocer" aria-pressed="false">Abierto a conocer a alguien</button></div></div>
+      <label class="swrow" for="swAch"><span class="stack" style="gap:2px;flex:1"><span>Sugerirme logros para compartir</span><span class="small muted">Nunca se publica nada sin que lo toques vos</span></span><input type="checkbox" class="sw" id="swAch" checked></label>
+    </div>
+    <button class="btn ghost sm" data-toast="Tu perfil quedó pausado: nadie te ve en Gente">Pausar mi perfil</button>
+    <span class="small muted" style="text-align:center">Solo socios con plan activo y mayores de 18 años.</span>
+  </div>
+</section>
+
+<!--#h12-->
+<!-- Pantalla de match -->
+<div class="overlay" id="matchOv" hidden role="dialog" aria-label="Nuevo compañero">
+  <span class="h1" style="color:var(--dat);font-size:46px" id="mvTitle">¡A entrenar!</span>
+  <span class="muted" id="mvTxt">A Joaquín y a vos les interesa entrenar juntos.</span>
+  <div style="display:flex;align-items:center"><span class="av lg" style="background:linear-gradient(160deg,#5b6ea8,#1c2238)">M</span><span class="av lg" id="mvAv" style="margin-left:-18px">S</span></div>
+  <button class="btn sm" style="max-width:280px" id="mvMsg">Enviar mensaje</button>
+  <button class="link" id="mvKeep">Seguir viendo</button>
+</div>
+

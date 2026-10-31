@@ -1,0 +1,21 @@
+/* ===== v37 · Esquinas iluminadas (cian abajo a la izquierda, magenta arriba a la derecha), opción de demo ===== */
+.esqFondo{position:absolute;inset:0;z-index:-1;pointer-events:none;display:none;background:radial-gradient(90% 42% at 100% 0%,rgba(244,0,160,.24),rgba(244,0,160,0) 72%),radial-gradient(95% 40% at 0% 92%,rgba(7,176,242,.24),rgba(7,176,242,0) 72%)}
+.app[data-esq="fondo"] .esqFondo,.app[data-esq="ambos"] .esqFondo{display:block}
+.app[data-mode="light"] .esqFondo{background:radial-gradient(90% 42% at 100% 0%,rgba(244,0,160,.10),rgba(244,0,160,0) 72%),radial-gradient(95% 40% at 0% 92%,rgba(7,176,242,.11),rgba(7,176,242,0) 72%)}
+.ecj{position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;display:none;background:radial-gradient(75% 70% at 100% 0%,rgba(244,0,160,.20),rgba(244,0,160,0) 70%),radial-gradient(75% 70% at 0% 100%,rgba(7,176,242,.22),rgba(7,176,242,0) 70%)}
+.app[data-esq="cajas"] .ecj,.app[data-esq="ambos"] .ecj{display:block}
+.app[data-esq="cajas"] .tcjBox,.app[data-esq="ambos"] .tcjBox{isolation:isolate}
+.app[data-mode="light"] .ecj{background:radial-gradient(75% 70% at 100% 0%,rgba(244,0,160,.09),rgba(244,0,160,0) 70%),radial-gradient(75% 70% at 0% 100%,rgba(7,176,242,.10),rgba(7,176,242,0) 70%)}
+/* ===== v35 · Tu mural VIVA en Inicio; trama en las pantallas de marca ===== */
+.bgviva{position:relative;isolation:isolate}
+.tramaV{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.app[data-mode="light"] .tramaV rect{fill:url(#patTileK)}
+.mhome{gap:10px}
+.mhwall{display:block;width:100%;padding:0;border:none;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);cursor:pointer}
+.mhwall svg{display:block;width:100%;height:auto}
+.mhrow{display:flex;flex-direction:column;gap:2px}
+.mhrow #mhTxt{color:var(--muted);line-height:1.4}
+.mhrow #mhTxt strong{color:var(--txt)}
+/* v35b · "Tu semana" un escalón por debajo de "Tu ritmo VIVA": misma firma, en blanco */
+.wktit{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-size:19px;line-height:1;text-transform:uppercase;color:var(--txt);white-space:nowrap}
+.wktit .sig i{letter-spacing:.01em}

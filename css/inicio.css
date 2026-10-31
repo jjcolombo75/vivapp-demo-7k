@@ -1,0 +1,160 @@
+/* ===== v38 · Inicio como tablero de hoy (claude/ficha-seccion-inicio.md) ===== */
+.boltglow.tflat,.boltglow.tup{opacity:.85}
+/* Encabezado: chip de la sede con la ocupación en una línea */
+.sedechip{display:flex;align-items:center;gap:7px;min-height:44px;padding:4px 11px 4px 9px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:inherit;text-align:left;cursor:pointer;flex-shrink:0}
+.sedechip .scs{display:flex;flex-direction:column;gap:1px;line-height:1.15}
+.sedechip .scn{font-size:13px;font-weight:600}
+.sedechip .sco{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted)}
+.sedechip .sco i{width:7px;height:7px;border-radius:4px;background:var(--dat)}
+.sedechip .sco i.mid{background:var(--orange)}.sedechip .sco i.high{background:#ff7a45}.sedechip .sco i.full{background:var(--pink)}
+.app[data-mom="sala"] .sedechip .sco,.app[data-mom="sesion"] .sedechip .sco{display:none}
+/* Tu ritmo más compacto: la aguja un poco más chica, menos aire */
+#formaCard{gap:10px!important}
+#formaCard .gauge{max-width:272px;margin:0 auto;display:block}
+#formaCard .fhito{font-size:40px}
+#formaCard .wkq{padding-top:10px;gap:4px}
+#formaCard .eqsvg{max-height:92px}
+#formaCard .fgoal{margin-top:-2px}
+/* Tu mes: 4 segmentos, uno por semana */
+.mescard{gap:8px!important}
+.mesnm{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-left:10px;font-family:var(--body)}
+.mesbar{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;width:100%;padding:4px 0;border:none;background:none;cursor:pointer}
+.mseg{position:relative;height:20px;border-radius:7px;display:flex;align-items:center;justify-content:center;border:1.2px solid color-mix(in srgb,var(--mc) 38%,transparent);background:color-mix(in srgb,var(--mc) 8%,transparent)}
+.mseg.half{background:color-mix(in srgb,var(--mc) 42%,transparent);border-color:color-mix(in srgb,var(--mc) 70%,transparent)}
+.mseg.full{background:var(--mc);border-color:var(--mc)}
+.app:not([data-mode="light"]) .mseg.full{box-shadow:0 0 10px color-mix(in srgb,var(--mc) 70%,transparent),0 0 2px var(--mc)}
+.mseg.flow.full{background:var(--zflow);border-color:transparent}
+.mseg.flow.half{background:var(--zflow);opacity:.5;border-color:transparent}
+.mseg svg{width:9px;height:14px}
+.mseg svg path{fill:#06080c}
+.mestxt{line-height:1.4}
+/* Botón fijo de la acción del momento: encendido pero quieto */
+.accbar{flex-shrink:0;padding:8px max(18px, env(safe-area-inset-left, 0px)) 10px}
+.accbtn{width:100%;min-height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;font:inherit;font-size:18px;font-weight:800;letter-spacing:.01em;cursor:pointer;background:transparent;color:var(--lime);border:1.5px solid color-mix(in srgb,var(--lime) 60%,transparent)}
+.accbtn.on{color:var(--txt);border:2px solid var(--lime);background:rgba(7,176,242,.07);box-shadow:0 0 0 1px rgba(64,196,255,.25),0 0 16px rgba(64,196,255,.5),inset 0 0 12px rgba(64,196,255,.22);text-shadow:0 0 8px rgba(64,196,255,.55)}
+.app[data-btn="rellenos"] .accbtn.on,.app[data-mode="light"] .accbtn.on{background:var(--lime);color:#04131a;border-color:var(--lime);box-shadow:none;text-shadow:none}
+.app[data-mode="light"] .accbtn:not(.on){color:#00748a;border-color:#00748a}
+/* Opción de demo: la acción en el centro de la barra (es Entrenar; en la sala, Empezar) */
+.nav .navacc{position:relative;margin-top:-30px;gap:3px;min-width:70px;color:var(--muted)}
+.nav .navacc .nai{width:58px;height:58px;border-radius:29px;display:flex;align-items:center;justify-content:center;background:var(--nav);border:1.5px solid color-mix(in srgb,var(--lime) 55%,transparent);color:var(--lime)}
+.nav .navacc .nai svg{width:24px;height:24px}
+.nav .navacc.on .nai{border:2px solid var(--lime);color:var(--txt);box-shadow:0 0 16px rgba(64,196,255,.55),inset 0 0 10px rgba(64,196,255,.25)}
+.nav .navacc.on .nal{color:var(--lime);font-weight:700}
+.nav .navacc[aria-current="page"] .nal{color:var(--lime);font-weight:700}
+.app[data-mode="light"] .nav .navacc.on .nai,.app[data-btn="rellenos"] .nav .navacc.on .nai{background:var(--lime);color:#04131a;box-shadow:none}
+
+#formaCard [data-msub]{display:none}
+#formaCard .fhit{margin-top:-10px}
+#formaCard .fwrap{gap:8px}
+#formaCard .gauge{max-width:248px}
+#formaCard .fhito{font-size:38px}
+#formaCard .eqsvg{max-height:none}
+#formaCard .fgoal{font-size:14px;line-height:1.35}
+.mescard .between .link{margin:-12px 0}
+.tdname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#todayCard{gap:6px!important}
+#todayCard .hoyrow{margin-top:6px}
+#fitBox.nov .fitmark::after{content:attr(data-x);}
+#fitBox.nov{position:relative}
+#fitBox.nov::before{content:attr(data-nov);position:absolute;top:-9px;left:14px;padding:2px 8px;border-radius:8px;background:var(--dat);color:#06080c;font-size:11px;font-weight:800;letter-spacing:.02em}
+.app[data-accbar="1"] .demofab{bottom:166px}
+#inicio .title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:380px){#inicio .title{font-size:21px}}
+#inicio .body > .between > .stack{min-width:0}
+
+/* ===== v39 ===== */
+/* Tu sede: fila propia con la leyenda, la sede y la ocupación */
+.sederow{display:flex;align-items:center;gap:10px;width:100%;min-height:54px;padding:7px 10px 7px 12px;margin-top:-4px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:inherit;text-align:left;cursor:pointer}
+.sederow .srs{display:flex;flex-direction:column;gap:2px;line-height:1.1;min-width:0}
+.sederow .srk{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sederow .srn{font-size:16px;font-weight:700;white-space:nowrap}
+.sederow .sro{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.sederow .srm{display:flex;gap:3px}
+.sederow .srm i{width:13px;height:6px;border-radius:2px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.sederow .srm i.on{background:var(--oc);box-shadow:0 0 6px var(--oc)}
+.sederow .sro[data-lv="full"] .srm i.on{box-shadow:0 0 6px rgba(255,48,178,.6)}
+.sederow .srt{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.sederow .srt b{color:var(--txt);font-weight:700}
+.sederow .srch{color:var(--muted);flex-shrink:0}
+.app[data-mom="sala"] .sederow .sro,.app[data-mom="sesion"] .sederow .sro{display:none}
+/* Hoja de ocupación */
+.occrow{display:grid;grid-template-columns:minmax(0,1fr) 112px 40px;gap:10px;align-items:center;font-size:15px}
+.occrow.nod{grid-template-columns:minmax(0,1fr) auto}
+.occrow .ocn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.occrow .ocn em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lime);margin-left:4px}
+.occrow .ocb{display:block;height:8px;border-radius:4px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.occrow .ocb i{display:block;height:100%;border-radius:4px;background:var(--oc);box-shadow:0 0 8px color-mix(in srgb,var(--z2) 0%,transparent),0 0 7px rgba(255,255,255,.08)}
+.occrow .ocp{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.occleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.occleg span{display:flex;align-items:center;gap:6px}.occleg i{width:14px;height:6px;border-radius:2px}
+.occhow{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:0 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--lime) 45%,transparent);background:transparent;color:var(--txt);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.occhow b{color:var(--lime)}
+.occhow .srch{color:var(--lime);transition:transform .2s}.occhow.open .srch{transform:rotate(180deg)}
+.occsedes{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.occsedes .opt{flex:0 0 auto;width:auto;padding:0 14px;min-height:40px;font-size:13px}
+.ocsvg{width:100%;display:block;overflow:visible}
+.ocsvg .ocx{font-size:10px;fill:var(--muted);font-family:var(--body)}
+.ocsvg .ocnow{font-size:10px;fill:var(--txt);font-weight:700;font-family:var(--body)}
+/* Tu mes con luces como las de Tu semana */
+.mesbar{display:block!important;padding:2px 0!important}
+.mssvg{width:100%;display:block;overflow:visible}
+.mssvg .rl-slot{fill:rgba(0,0,0,.38);stroke:rgba(255,255,255,.07);stroke-width:1}
+/* Botón Empezar: jerarquía con halo (respira, luz cian que gira o espectro que gira) */
+@property --aa{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes accSpin{to{--aa:360deg}}
+@keyframes accBreathe{0%,100%{box-shadow:0 0 0 1px rgba(64,196,255,.25),0 0 8px rgba(64,196,255,.3),inset 0 0 8px rgba(64,196,255,.15)}50%{box-shadow:0 0 0 1px rgba(64,196,255,.5),0 0 28px rgba(64,196,255,.9),inset 0 0 16px rgba(64,196,255,.35)}}
+.accbar{position:relative;isolation:isolate}
+.nav{isolation:isolate}
+.accbtn.go,.navacc.go .nai{position:relative}
+.app[data-ah="respira"] .accbtn.go,.app[data-ah="respira"] .navacc.go .nai{animation:accBreathe 2.4s ease-in-out infinite}
+.app[data-ah="gira"] .accbtn.go,.app[data-ah="gira"] .navacc.go .nai{border:2px solid transparent;box-shadow:none;background:linear-gradient(#0b1119,#0b1119) padding-box,conic-gradient(from var(--aa),rgba(7,176,242,.3) 0deg,rgba(7,176,242,.3) 190deg,#07b0f2 280deg,#e8faff 318deg,#07b0f2 340deg,rgba(7,176,242,.3) 360deg) border-box;animation:accSpin 3s linear infinite}
+.app[data-ah="espectro"] .accbtn.go,.app[data-ah="espectro"] .navacc.go .nai{border:2px solid transparent;box-shadow:none;background:linear-gradient(#0b1119,#0b1119) padding-box,conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a) border-box;animation:accSpin 4s linear infinite}
+.app[data-ah="gira"] .accbtn.go::after,.app[data-ah="gira"] .navacc.go .nai::after,.app[data-ah="espectro"] .accbtn.go::after,.app[data-ah="espectro"] .navacc.go .nai::after{content:"";position:absolute;inset:-4px;border-radius:inherit;z-index:-1;filter:blur(11px);opacity:.95;pointer-events:none;animation:accSpin 3s linear infinite}
+.app[data-ah="gira"] .accbtn.go::after,.app[data-ah="gira"] .navacc.go .nai::after{background:conic-gradient(from var(--aa),transparent 0deg,transparent 200deg,#07b0f2 285deg,#9be7ff 318deg,#07b0f2 345deg,transparent 360deg)}
+.app[data-ah="espectro"] .accbtn.go::after,.app[data-ah="espectro"] .navacc.go .nai::after{background:conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a);opacity:.75;animation-duration:4s}
+.app[data-ah="gira"] .accbtn.go,.app[data-ah="espectro"] .accbtn.go{text-shadow:0 0 10px rgba(64,196,255,.6)}
+/* Una sola animación: mientras gira o respira Empezar, el tubo del tramo queda quieto */
+.app[data-mom="sala"]:not([data-ah="quieto"]) .gauge .tube.tz .halo,.app[data-mom="sala"]:not([data-ah="quieto"]) .gauge .tube.tz .halo2,.app[data-mom="sala"]:not([data-ah="quieto"]) .vumeter .tube.tz .halo,.app[data-mom="sala"]:not([data-ah="quieto"]) .vumeter .tube.tz .halo2{animation:none!important}
+
+/* ===== v40 ===== */
+/* Tu sede arriba a la derecha: caja chica con medidor de color (4 rayitas que crecen, como señal) */
+.sedebox{margin-left:auto;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-height:50px;max-width:150px;padding:6px 11px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:inherit;text-align:left;cursor:pointer}
+.sedebox .sbk{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1}
+.sedebox .sbr{display:flex;align-items:flex-end;gap:7px;min-width:0}
+.sedebox .sbn{font-size:14.5px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sedebox .sbm{display:flex;align-items:flex-end;gap:2px;height:14px;flex-shrink:0}
+.sedebox .sbm i{width:3.5px;border-radius:1px;background:rgba(255,255,255,.14)}
+.sedebox .sbm i:nth-child(1){height:5px}.sedebox .sbm i:nth-child(2){height:8px}.sedebox .sbm i:nth-child(3){height:11px}.sedebox .sbm i:nth-child(4){height:14px}
+.sedebox .sbm i.on{background:var(--oc);box-shadow:0 0 5px var(--oc)}
+.sedebox .sbm[data-lv="full"] i.on{background:var(--zflow);box-shadow:0 0 5px rgba(255,48,178,.6)}
+.app[data-mom="sala"] .sedebox .sbm,.app[data-mom="sesion"] .sedebox .sbm{display:none}
+/* Índice FIT bajo el título "Tu evolución" */
+#fitBox.fitbox{flex-direction:column;align-items:stretch;gap:8px;padding:12px 12px 12px 16px}
+#fitBox.nov::before{display:none}
+#fitBox .fbhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#fitBox .fbnov:empty{display:none}
+#fitBox .fbnov{padding:2px 8px;border-radius:8px;background:var(--dat);color:#06080c;font-size:11px;font-weight:800;letter-spacing:.02em;white-space:nowrap}
+#fitBox .fbrow{display:flex;align-items:center;gap:12px}
+#fitBox .fbrow .fbtrend{flex:1;min-width:0}
+.fitpromo .fptit{margin-bottom:4px}
+/* Tu rutina: la letra del día y la sesión en tres partes */
+.tdrow{display:flex;align-items:center;gap:12px}
+.tdday{flex-shrink:0;width:52px;height:52px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;border:1.5px solid color-mix(in srgb,var(--lime) 70%,transparent);box-shadow:0 0 10px rgba(64,196,255,.25),inset 0 0 8px rgba(64,196,255,.12)}
+.tdday small{font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tdday b{font-family:var(--display);font-stretch:75%;font-weight:800;font-size:28px;color:var(--txt);text-shadow:0 0 8px rgba(64,196,255,.6)}
+.tdname{font-size:18px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tdplan{display:flex;gap:6px;margin-top:4px}
+.tdp{display:flex;flex-direction:column;gap:5px;min-width:0}
+.tdp:first-child,.tdp:last-child{min-width:84px}
+.tdp .tdb{height:10px;border-radius:3px;background:color-mix(in srgb,var(--pc) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 40%,transparent)}
+.tdp .tdb>i{background:var(--pc)!important;box-shadow:0 0 8px var(--pc)}
+.tdp .tdl{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tdp .tdl b{color:var(--txt);font-weight:600}
+#todayCard .hoyrow{margin-top:4px}
+/* Barras como ecualizador en toda la app: la barra es una ranura de LEDs y el avance enciende LEDs */
+.app[data-barras="eq"] .bar,.app[data-barras="eq"] .occ,.app[data-barras="eq"] .ocb{height:10px!important;border-radius:3px;background:rgba(0,0,0,.4) repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 6px,transparent 6px 8px)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)!important;overflow:hidden}
+.app[data-barras="eq"] .occ.sm{height:8px!important}
+.app[data-barras="eq"] .bar>i,.app[data-barras="eq"] .occ>i,.app[data-barras="eq"] .ocb>i{border-radius:0!important;-webkit-mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px);mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px)}
+.app[data-barras="eq"] .tdp .tdb{background:color-mix(in srgb,var(--pc) 10%,rgba(0,0,0,.4)) repeating-linear-gradient(90deg,color-mix(in srgb,var(--pc) 22%,transparent) 0 6px,transparent 6px 8px)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 30%,transparent)!important}
+.app[data-barras="eq"] .segs i,.app[data-barras="eq"] .segs16 i{border-radius:1.5px}
+

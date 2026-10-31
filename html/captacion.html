@@ -1,0 +1,391 @@
+<!--#h01-->
+<!-- 1. INGRESO -->
+<section class="scr bgviva" id="login" aria-label="Ingreso">
+  <svg class="tramaV" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#patTileW)"/></svg>
+  <div class="body" style="padding-top:28px">
+    <div class="top">
+      <button class="iconbtn" id="loginBack" hidden aria-label="Volver" style="width:auto;padding:0 12px 0 4px;gap:6px;color:var(--muted)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Volver
+      </button>
+      <div class="spacer"></div>
+      <button class="toplink" id="lSocioTop">Soy socio · Ingresar</button>
+      <div class="dots" id="lDots" aria-hidden="true"><i class="on"></i><i id="dot2"></i><i id="dot3"></i></div>
+    </div>
+    <div class="stack" style="gap:2px;margin-top:8px">
+      <svg class="sello" viewBox="0 0 257.6 289.3" role="img" aria-label="Viva Fit House"><use href="#vSello"/></svg>
+    </div>
+
+    <div class="stack" id="step0" style="gap:18px;flex:1">
+      <div class="stack" style="gap:12px">
+        <span class="lbl" style="color:var(--dat)">La experiencia Viva</span>
+        <h1 class="h1 heroT">Creá tu rutina a medida</h1>
+        <p class="muted" style="margin:0;line-height:1.5;font-size:16px">Y empezá a entrenar con un profe que te acompaña. Sentite bien.</p>
+        <button class="btn" id="leadStart"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>Crear mi rutina gratis</button>
+        <span class="small muted" style="text-align:center">5 preguntas · sin registrarte · 1 minuto</span>
+      </div>
+      <div class="card" style="gap:12px">
+        <span class="lbl">Cómo funciona</span>
+        <div class="hsteps">
+          <div><span class="n">1</span><span class="stack" style="gap:2px"><span style="font-weight:700">Contestá 5 preguntas</span><span class="small muted">Tu objetivo, tu tiempo y tu experiencia. La rutina aparece al instante.</span></span></div>
+          <div><span class="n">2</span><span class="stack" style="gap:2px"><span style="font-weight:700" id="hsTrial">Probala gratis con un profe</span><span class="small muted">Elegís un horario tranquilo. Un profe te recibe y la ajusta a vos.</span></span></div>
+          <div><span class="n">3</span><span class="stack" style="gap:2px"><span style="font-weight:700">Asociate y seguí <span data-mtu>tu forma</span></span><span class="small muted">Entrás con tu cara por el molinete y ves cómo mejorás día a día.</span></span></div>
+        </div>
+      </div>
+      <div class="card" style="gap:10px">
+        <div class="between"><span class="lbl">¿Cuánta gente hay ahora?</span><span class="live"><i></i>En vivo</span></div>
+        <div id="lOcc"></div>
+        <span class="small muted">5 sedes en Resistencia. Elegí una hora tranquila para tu primera vez.</span>
+      </div>
+      <button class="choice" id="lPpu">
+        <span class="cico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span>
+        <span class="stack" style="gap:4px;flex:1"><span class="h2" style="font-size:24px">Entrená hoy, sin plan</span><span class="small muted" style="line-height:1.45">Pagás un ingreso. El precio depende de cuánta gente hay.</span><span class="small" style="color:var(--dat);font-weight:700" id="lDesde">Desde $5.000 ahora</span></span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <div class="between" style="padding:4px 2px"><span class="muted">¿Ya sos socio?</span><button class="btn ghost sm" id="lSocio" style="width:auto;padding:0 22px">Ingresar</button></div>
+    </div>
+
+    <div class="stack" id="step1" hidden style="gap:20px;flex:1">
+      <div class="stack" style="gap:8px">
+        <h1 class="title" id="s1Title">Ingresá con tu teléfono</h1>
+        <p class="muted" style="margin:0;line-height:1.5" id="s1Txt">Te mandamos un código por WhatsApp. Lo hacés una sola vez: después la app entra directo.</p>
+      </div>
+      <div class="field"><label for="tel">Teléfono celular</label>
+        <div style="display:flex;gap:8px">
+          <span class="input" style="width:auto;display:flex;align-items:center;color:var(--muted);flex-shrink:0">+54 9</span>
+          <input class="input" id="tel" type="tel" inputmode="tel" value="362 412-4821" autocomplete="tel-national">
+        </div>
+      </div>
+      <button class="btn" data-step="2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"/></svg>
+        Enviarme código por WhatsApp
+      </button>
+    </div>
+
+    <div class="stack" id="step2" hidden style="gap:20px;flex:1">
+      <div class="stack" style="gap:8px">
+        <h1 class="title">Revisá tu WhatsApp</h1>
+        <p class="muted" style="margin:0;line-height:1.5">Te mandamos un código de 6 dígitos al <span id="telShow">362 412-4821</span>.</p>
+      </div>
+      <div class="field"><label for="c1">Código</label>
+        <div class="code">
+          <input id="c1" maxlength="1" inputmode="numeric" value="4" aria-label="Dígito 1"><input id="c2" maxlength="1" inputmode="numeric" value="8" aria-label="Dígito 2"><input id="c3" maxlength="1" inputmode="numeric" value="2" aria-label="Dígito 3"><input id="c4" maxlength="1" inputmode="numeric" value="7" aria-label="Dígito 4"><input id="c5" maxlength="1" inputmode="numeric" value="1" aria-label="Dígito 5"><input id="c6" maxlength="1" inputmode="numeric" value="9" aria-label="Dígito 6">
+        </div>
+      </div>
+      <button class="btn" id="validar">Validar código</button>
+      <button class="link">Reenviar código en 0:45</button>
+      <div class="spacer"></div>
+      <p class="small muted" style="margin:0;text-align:center;line-height:1.5">La próxima vez que abras la app vas a entrar directo con tu cuenta.</p>
+    </div>
+
+    <div class="stack" id="step3" hidden style="gap:16px;flex:1">
+      <div class="stack" style="gap:8px">
+        <h1 class="title">Creá tu cuenta</h1>
+        <p class="muted" style="margin:0;line-height:1.5">No encontramos una cuenta con ese teléfono. Solo necesitamos tu nombre.</p>
+      </div>
+      <div class="grid2" style="gap:10px">
+        <div class="field"><label for="rNom">Nombre</label><input class="input" id="rNom" value="Juan" autocomplete="given-name"></div>
+        <div class="field"><label for="rApe">Apellido</label><input class="input" id="rApe" value="Ramírez" autocomplete="family-name"></div>
+      </div>
+      <div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Teléfono verificado: <strong id="telOk">362 412-4821</strong></span></div>
+      <div class="note muted"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>El DNI y el deslinde te los pedimos recién cuando vayas a entrar a entrenar.</span></div>
+      <button class="btn" id="crearCuenta">Crear cuenta</button>
+    </div>
+  </div>
+</section>
+
+<!--#h06-->
+<!-- 9. INICIO SIN PLAN -->
+<section class="scr" id="nuevo" hidden aria-label="Inicio sin plan">
+  <div class="body" style="padding-top:28px">
+    <div class="stack" style="gap:2px">
+      <span class="small muted">Bienvenido a Viva</span>
+      <h1 class="title">Hola, <span id="nName">Juan</span></h1>
+    </div>
+
+    <div class="card" id="nTrial" hidden style="border-color:var(--dat)"></div>
+    <div class="card" id="nRut" hidden></div>
+    <button class="choice hot" id="nLead">
+      <span class="cico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg></span>
+      <span class="stack" style="gap:4px;flex:1"><span class="h2" style="font-size:26px">Creá tu rutina a medida</span><span class="small muted" style="line-height:1.45">Gratis. Un profe de Viva la revisa y te la ajusta.</span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+
+    <button class="passbar" id="nPase" hidden data-go="pase">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v1M14 20h1M18 18h3v3"/></svg>
+      <span class="stack" style="gap:0;flex:1;text-align:left"><span style="font-weight:700">Tenés un pase activo</span><span class="small" id="nPaseTxt">Sarmiento · quedan 30:00 para entrar</span></span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+
+    <div class="stack" style="gap:6px">
+      <span class="lbl">Todavía no tenés un plan activo</span>
+      <p class="muted" style="margin:0;line-height:1.5">Elegí cómo querés entrenar.</p>
+    </div>
+
+    <button class="choice" data-go="planes">
+      <span class="cico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+      <span class="stack" style="gap:4px;flex:1">
+        <span class="h2" style="font-size:28px">Comprar un plan</span>
+        <span class="small muted" style="line-height:1.45">Entrená todos los días, armá tus rutinas y encendé tu mural VIVA.</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+
+    <button class="choice hot" data-go="ppu">
+      <span class="cico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span>
+      <span class="stack" style="gap:4px;flex:1">
+        <span class="h2" style="font-size:28px">Pagar por uso</span>
+        <span class="small muted" style="line-height:1.45">Un ingreso. El precio depende de cuánta gente hay en la sede ahora.</span>
+        <span class="small" style="color:var(--dat);font-weight:700" id="nDesde">Desde $5.000 ahora</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+
+    <button class="promo" data-go="onboarding">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M6 16l4-4 3 3 5-6"/></svg>
+      <span class="stack" style="gap:0;flex:1"><span style="font-size:14px;font-weight:700">Tus primeras 4 semanas en Viva</span><span class="small muted">Metas chicas y un profe que te acompaña</span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <div class="spacer"></div>
+    <button class="link" id="logout">Salir (volver al ingreso de la demo)</button>
+  </div>
+</section>
+
+<!-- 10. PLANES -->
+<section class="scr" id="planes" hidden aria-label="Planes">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" data-go="nuevo" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button></div>
+    <h1 class="h1">Planes</h1>
+    <div class="note lime" id="plNudge" hidden></div>
+    <div class="card">
+      <div class="between"><span class="h2" style="font-size:26px">Mensual libre</span><span class="pill ok">MÁS ELEGIDO</span></div>
+      <span class="small muted">Todas las sedes, todos los días.</span>
+      <div class="between"><span class="num" style="font-size:30px">[PRECIO]</span><button class="btn sm" style="width:auto;min-height:44px" data-plan="Mensual libre">Elegir</button></div>
+    </div>
+    <div class="card">
+      <span class="h2" style="font-size:26px">Mensual 3 veces por semana</span>
+      <span class="small muted">Tu sede, hasta 3 ingresos por semana.</span>
+      <div class="between"><span class="num" style="font-size:30px">[PRECIO]</span><button class="btn ghost sm" style="width:auto;min-height:44px" data-plan="Mensual 3 veces por semana">Elegir</button></div>
+    </div>
+    <div class="card">
+      <span class="h2" style="font-size:26px">Trimestral libre</span>
+      <span class="small muted">Tres meses en todas las sedes.</span>
+      <div class="between"><span class="num" style="font-size:30px">[PRECIO]</span><button class="btn ghost sm" style="width:auto;min-height:44px" data-plan="Trimestral libre">Elegir</button></div>
+    </div>
+    <span class="small muted" style="text-align:center">Planes y precios de ejemplo, salen de EVO.</span>
+  </div>
+</section>
+
+<!-- 11. PAGO POR USO -->
+<section class="scr" id="ppu" hidden aria-label="Pago por uso">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" data-go="nuevo" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button></div>
+    <div class="stack" style="gap:8px">
+      <h1 class="h1">Pago por uso</h1>
+      <p class="muted" style="margin:0;line-height:1.5">El precio cambia según cuánta gente hay en cada sede en este momento. Elegí dónde querés entrenar.</p>
+      <span class="live"><i></i>En vivo · actualizado hace <span id="ppuAgo">0</span> s</span>
+    </div>
+    <div class="stack" id="ppuList" style="gap:10px"></div>
+    <span class="small muted" style="text-align:center">Cuanta menos gente hay, más barato el ingreso.</span>
+  </div>
+</section>
+
+<!-- 12. COTIZACIÓN -->
+<section class="scr" id="cotiza" hidden aria-label="Cotización del pase">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" data-go="ppu" aria-label="Volver a sedes"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Pago por uso</span></div>
+    <h1 class="h1" id="cSede">Sarmiento</h1>
+    <div class="card">
+      <div class="between"><span class="lbl">Precio ahora</span><span class="live"><i></i>En vivo</span></div>
+      <span class="num" style="font-size:60px" id="cPrice">$5.000</span>
+      <div class="stack" style="gap:8px">
+        <div class="between small"><span class="muted">Ocupación de la sede</span><span><strong id="cOcc">35%</strong> · <span id="cLvl">Baja</span></span></div>
+        <span class="occ"><i id="cBar" style="width:35%"></i><b style="left:40%"></b><b style="left:70%"></b><b style="left:90%"></b></span>
+      </div>
+      <span class="small muted">El precio se mantiene una vez que pagás.</span>
+      <div class="note lime" id="cSaldo" hidden></div>
+    </div>
+    <div class="list">
+      <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span style="flex:1;font-size:14px">Tenés <strong><span class="vent">30</span> minutos</strong> para entrar desde que pagás.</span></div>
+      <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><span style="flex:1;font-size:14px">Si no llegás a entrar, <strong>no perdés nada</strong>: el monto queda como saldo a favor para otro día.</span></div>
+      <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v1M14 20h1M18 18h3v3"/></svg><span style="flex:1;font-size:14px">Entrás con tu cara por el molinete. <strong>La primera vez</strong>, pasá por recepción para registrarla.</span></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="payBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h13v4M3 7v10a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2zM16 14h.01"/></svg>
+      <span id="payTxt">Pagar $5.000 con Mercado Pago</span>
+    </button>
+    <span class="small muted" style="text-align:center">Se abre Mercado Pago para que confirmes el pago.</span>
+  </div>
+</section>
+
+<!-- 13. PASE ACTIVO -->
+<section class="scr" id="pase" hidden aria-label="Pase por uso">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" data-go="nuevo" aria-label="Volver al inicio"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Pase por uso</span></div>
+    <h1 class="h1" id="pSede">Sarmiento</h1>
+
+    <div class="passcard" id="pActivo">
+      <span class="okbig" style="width:96px;height:96px;border-radius:48px"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg></span>
+      <span class="num" style="font-size:52px;color:var(--dat)" id="pCount">30:00</span>
+      <span class="small muted" style="text-align:center;line-height:1.45">para entrar · el molinete te reconoce. Si es tu primera vez, pasá por recepción.</span>
+      <span class="bar" style="width:100%"><i id="pBar" style="width:100%"></i></span>
+    </div>
+
+    <div class="passcard" id="pDentro" hidden>
+      <span class="okbig"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span>
+      <span class="h2" style="font-size:32px">Ingresaste</span>
+      <span class="muted" id="pDentroTxt">Sarmiento · 19:14. ¡Buen entrenamiento!</span>
+    </div>
+
+    <div class="passcard" id="pVencido" hidden>
+      <span class="okbig" style="background:var(--pink-bg);color:var(--pink-txt)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+      <span class="h2" style="font-size:32px">No llegaste a entrar</span>
+      <span class="muted" style="text-align:center;line-height:1.45" id="pVencTxt">Pasaron los 30 minutos. Lo que pagaste quedó como saldo a favor para tu próximo ingreso.</span>
+      <button class="btn sm" data-go="ppu">Usar mi saldo a favor</button>
+    </div>
+
+    <div class="list">
+      <div><span class="muted" style="flex:1">Pagado</span><span style="font-weight:700" id="pPaid">$5.000</span></div>
+      <div><span class="muted" style="flex:1">Pagado a las</span><span style="font-weight:700" id="pAt">19:02</span></div>
+      <div><span class="muted" style="flex:1">Entrar antes de las</span><span style="font-weight:700" id="pUntil">19:32</span></div>
+    </div>
+
+    <button class="btn" data-go="ppuHome">Ir a inicio</button>
+    <div class="demo" id="pDemo">
+      <span class="lbl">Modo demo</span>
+      <div class="grid2" style="gap:8px">
+        <button class="btn ghost sm" id="simIngreso">Simular ingreso por molinete</button>
+        <button class="btn ghost sm" id="simVence">Ver qué pasa si no llego</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14. INICIO PAGO POR USO -->
+<section class="scr" id="ppuHome" hidden aria-label="Inicio pago por uso">
+  <div class="body" style="padding-top:28px">
+    <div class="between">
+      <div class="stack" style="gap:2px"><span class="small muted" id="phHoy">Hoy</span><h1 class="title">Hola, <span id="phName">Juan</span></h1></div>
+      <span class="pill" style="margin-left:auto;background:var(--dat-bg);color:var(--dat)">PAGO POR USO</span>
+    </div>
+
+    <div class="card" id="phPase"></div>
+    <div class="card" id="phNudge" hidden style="border-color:var(--dat)"></div>
+
+    <div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Tu acceso a la app está habilitado hasta las <strong>23:59 de hoy</strong>.</span></div>
+
+    <div class="grid2">
+      <div class="tile"><span class="lbl">Ingresos del mes</span><span class="num" style="font-size:34px" id="phCount">0</span><span class="small muted">pagados por uso</span></div>
+      <div class="tile"><span class="lbl">Gastado en el mes</span><span class="num" style="font-size:34px" id="phSum">$0</span><span class="small muted" id="phMes">octubre</span></div>
+    </div>
+
+    <div class="card">
+      <div class="between"><span style="font-weight:700">Mejores horarios</span><span class="small muted" id="phSede">López y Planes</span></div>
+      <span class="small muted" style="margin-top:-6px">Precio promedio por horario en las últimas 4 semanas</span>
+      <div class="hchart" id="phChart" role="img" aria-label="Precio promedio por horario"></div>
+      <div class="hlabels" id="phLabels"></div>
+      <div class="note lime"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><path d="M12 3v18M17 8l-5-5-5 5"/></svg><span id="phTip">Lo más barato: de 9 a 16 h.</span></div>
+    </div>
+
+    <div class="stack" style="gap:10px">
+      <span class="lbl">Tus consumos</span>
+      <div class="list" id="phList"></div>
+    </div>
+    <button class="promo" data-go="onboarding">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M6 16l4-4 3 3 5-6"/></svg>
+      <span class="stack" style="gap:0;flex:1"><span style="font-size:14px;font-weight:700">Tus primeras 4 semanas en Viva</span><span class="small muted">Metas chicas y un profe que te acompaña</span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <button class="link lime" data-go="planes">¿Venís seguido? Mirá los planes</button>
+  </div>
+</section>
+
+<!-- 15. ENTRENAMIENTOS PAGO POR USO -->
+<section class="scr" id="ppuTrain" hidden aria-label="Entrenamientos">
+  <div class="body" style="padding-top:28px">
+    <h1 class="h1">Entrenamientos</h1>
+    <p class="muted" style="margin:0;line-height:1.5">Con pago por uso entrenás con rutinas generadas con IA según el equipamiento de tu sede.</p>
+    <div class="stack" id="ptList" style="gap:16px"></div>
+    <div class="spacer"></div>
+    <button class="btn" data-go="ia">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>
+      Generar rutina con IA
+    </button>
+  </div>
+</section>
+
+<!-- 21. GUARDAR RUTINA (embudo) -->
+<section class="scr" id="guardar" hidden aria-label="Guardar mi rutina">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" id="gBack" aria-label="Volver a mi rutina"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Tu rutina</span></div>
+    <h1 class="h1" style="font-size:36px">Guardala y que un profe la revise</h1>
+    <p class="muted" style="margin:0;line-height:1.5">Después de tu primera visita, un profe de Viva la ajusta a vos y te avisa por WhatsApp.</p>
+    <div class="field"><label for="gNom">Tu nombre</label><input class="input" id="gNom" value="Juan" autocomplete="given-name"></div>
+    <div class="field"><label for="gTel">Teléfono celular</label>
+      <div style="display:flex;gap:8px"><span class="input" style="width:auto;display:flex;align-items:center;color:var(--muted);flex-shrink:0">+54 9</span><input class="input" id="gTel" type="tel" inputmode="tel" value="362 455-1093" autocomplete="tel-national"></div>
+    </div>
+    <div class="note muted"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>No te pedimos DNI, mail ni datos de pago.</span></div>
+    <div class="spacer"></div>
+    <button class="btn" id="gSend"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"/></svg>Enviarme el código por WhatsApp</button>
+  </div>
+</section>
+
+<!-- 22. PRIMER ENTRENAMIENTO GRATIS -->
+<section class="scr" id="prueba" hidden aria-label="Primer entrenamiento gratis">
+  <div class="body" style="padding-top:28px">
+    <span class="pill ok" style="align-self:flex-start">RUTINA GUARDADA</span>
+    <h1 class="h1" id="pruH1">Probala gratis</h1>
+    <p class="muted" style="margin:0;line-height:1.5" id="pruTxt">Tu primer entrenamiento en Viva no se paga (uno por persona). Te recibe un profe con 15 minutos de bienvenida. Te sugerimos los horarios con menos gente.</p>
+    <div class="stack" id="slotList" style="gap:10px"></div>
+    <div class="spacer"></div>
+    <button class="btn" id="trialOk">Reservar mi entrenamiento gratis</button>
+    <button class="link" id="trialSkip">Ahora no</button>
+  </div>
+</section>
+
+<!-- 22b. ALTA DE SOCIO -->
+<section class="scr bgviva" id="alta" hidden aria-label="Ya sos socio">
+  <svg class="tramaV" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#patTileW)"/></svg>
+  <div class="body" style="padding-top:36px">
+    <svg class="sello" viewBox="0 0 257.6 289.3" role="img" aria-label="Viva Fit House"><use href="#vSello"/></svg>
+    <span class="tagi"><span>Welcome to the club</span></span>
+    <h1 class="h1" style="font-size:48px">¡Ya sos socio de Viva!</h1>
+    <span class="muted" id="altaPlan">Mensual libre · todas las sedes</span>
+    <div class="list">
+      <div><span class="okbig" style="width:40px;height:40px;border-radius:20px;flex-shrink:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg></span><span style="flex:1;font-size:14px">Entrás con tu cara por el molinete, en cualquier sede. Ya la registramos en tu primera visita.</span></div>
+      <div><span class="avatar" style="width:40px;height:40px;font-size:13px;flex-shrink:0">LP</span><span style="flex:1;font-size:14px">Tu rutina ya la ajustó Prof. Lucas. Te acompaña tus primeras 4 semanas.</span></div>
+    </div>
+    <div class="card" style="gap:12px">
+      <span class="lbl" id="altaLbl">Tu ritmo VIVA arranca hoy</span>
+      <div class="stack" style="gap:6px"><span class="fhito" style="color:var(--z1)" id="altaZ">Tranqui</span><span class="small muted"><strong style="color:var(--txt)" id="altaF">2</strong> de 100</span><span class="small muted" id="altaTxt" style="line-height:1.45"></span></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="altaGo">Ir a tu inicio</button>
+    <button class="btn ghost sm" data-go="onboarding">Ver tus primeras 4 semanas</button>
+  </div>
+</section>
+
+<!--#h13-->
+<!-- Hoja de pago -->
+<div class="overlay" id="mpSheet" hidden role="dialog" aria-label="Pago">
+  <div class="stack" id="mpWait" style="align-items:center;gap:14px">
+    <div class="spin" aria-hidden="true"></div>
+    <span style="font-weight:700;font-size:18px">Abriendo Mercado Pago…</span>
+    <span class="small muted">Confirmá el pago en la app de Mercado Pago</span>
+  </div>
+  <div class="stack" id="mpOk" hidden style="align-items:center;gap:12px">
+    <span class="okbig"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span>
+    <span style="font-weight:700;font-size:20px">Pago aprobado</span>
+    <span class="small muted" id="mpOkTxt">Acreditado en Viva Fit House · $5.000</span>
+  </div>
+</div>
+
+<!--#h15-->
+<div class="overlay" id="qrOverlay" hidden role="dialog" aria-label="Tu primer ingreso">
+  <span class="okbig" style="width:96px;height:96px;border-radius:48px"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg></span>
+  <span class="lbl" id="qrLbl">Tu primer ingreso</span>
+  <span style="font-size:22px;font-weight:700" id="qrName">Juan</span>
+  <span class="muted" id="qrTxt" style="max-width:300px;line-height:1.5">Presentate en recepción con tu DNI. Te sacamos una foto y desde ese momento entrás con tu cara por el molinete, en cualquier sede.</span>
+  <button class="btn ghost sm" style="max-width:220px" id="qrClose">Entendido</button>
+</div>
+

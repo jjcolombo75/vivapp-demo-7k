@@ -1,0 +1,102 @@
+<!--#h02-->
+<!-- 2. INICIO -->
+<section class="scr" id="inicio" hidden aria-label="Inicio">
+  <div class="body" style="padding-top:28px">
+    <div class="between">
+      <div class="stack" style="gap:2px">
+        <span class="small muted" id="hoy">Domingo 18 de octubre</span>
+        <h1 class="title">Hola, Martina</h1>
+      </div>
+      <button class="sedebox" id="sedeChip" aria-haspopup="dialog"><span class="sbk">Tu sede</span><span class="sbr"><span class="sbm" id="sedeOcc" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="sbn">Sarmiento</span></span></button>
+    </div>
+
+    <div class="card" id="formaCard" style="gap:14px">
+      <div class="between"><span class="stack" style="gap:3px"><span class="mtitle sig" data-mname><b>Tu</b> <i>ritmo VIVA</i></span><span class="small muted" data-msub>Sube cada vez que venís</span></span><button class="link lime" id="formaHow" style="min-height:44px;padding:0;font-size:13px">Ver detalle</button></div>
+      <button class="fhit" id="formaHit" aria-label="Ver el detalle de la métrica"><div class="fwrap" id="formaViz"></div></button>
+      <button class="flowshare" id="flowShare" hidden><svg class="bolt-ico" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg> Contalo en tus historias</button>
+      <button class="fitbadge" id="fitBadge" hidden></button>
+      
+      <div class="wkq" id="wkBox" aria-live="polite"></div>
+      <div class="fgoal" id="formaGoal"></div>
+      
+      
+    </div>
+    <div class="card mescard" id="mesCard">
+      <div class="between"><span class="wktit"><span class="sig"><b>Tu</b> <i>mes</i></span><span class="mesnm" id="mesNm">OCTUBRE</span></span><button class="link lime" id="mesVer" style="min-height:44px;padding:0;font-size:14px;white-space:nowrap">Ver tu mural</button></div>
+      <button class="mesbar" id="mesBar"></button>
+      <span class="small mestxt" id="mesTxt"></span>
+    </div>
+    <button class="card fitbox" id="fitBox" hidden>
+      <span class="fbhead"><span class="wktit"><span class="sig"><b>Tu</b> <i>evolución</i></span></span><span class="fbnov" id="fitNov"></span></span>
+      <span class="fbrow"><span class="fitmark">Índice <b>FIT</b></span>
+      <span class="fbtrend" id="fitTrend"></span>
+      <span class="btn sm fbgo" aria-hidden="true">Ver</span></span>
+    </button>
+    <div class="card fitpromo" id="fitPromo" hidden>
+      <div class="fpbody"><span class="wktit fptit"><span class="sig"><b>Tu</b> <i>evolución</i></span></span><span class="fitmark">Índice <b>FIT</b></span><p id="fitPromoTxt">Lo que la balanza no te cuenta.</p><button class="fpwhat" id="fitPromoWhat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>¿Qué es?</button></div>
+      <button class="btn sm fpgo" id="fitPromoGo">Pedí tu InBody ⚡</button>
+      <button class="fpx" id="fitPromoNo" aria-label="Ahora no"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <div class="card" id="todayCard">
+      <div class="between"><span class="wktit" id="todayLbl"><span class="sig"><b>Tu</b> <i>rutina</i></span></span><button class="link lime" data-go="rutinas" id="todayCambiar" style="min-height:44px;margin:-12px 0;padding:0;font-size:14px">Cambiar</button><span class="small muted" id="todayBy" hidden>Prof. Lucas</span></div>
+      <div class="tdrow"><span class="tdday" aria-hidden="true"><small>Día</small><b id="todayLetter">B</b></span>
+        <span class="stack" style="gap:3px;min-width:0"><span class="tdname" id="todayName">Espalda y bíceps</span>
+        <span class="small muted" id="todayMeta">Prof. Lucas · 3 ejercicios · 45 min</span></span></div>
+      <div class="tdplan" id="todayPlan"></div>
+      <div class="stack" style="gap:4px" hidden>
+        <span class="small" hidden style="color:var(--dat);font-weight:700" id="todayWhy">Elegida según tu recuperación: tus piernas todavía descansan del lunes.</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="todayTags" hidden></div>
+      <div class="hoyrow" id="hoyRow"></div>
+      <div class="stack" id="prepAsk" hidden style="gap:10px"></div>
+      <button class="btn neonbtn" id="startToday" hidden aria-label="Empezar entrenamiento"><span class="stdtxt"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Empezar entrenamiento</span><svg class="cartel" viewBox="0 0 300 62" aria-hidden="true"><defs><linearGradient id="cartelGrad" x1="0" x2="1"><stop offset="0" stop-color="#ffe94a"/><stop offset=".5" stop-color="#07b0f2"/><stop offset="1" stop-color="#f400a0"/></linearGradient><linearGradient id="cartelGradL" x1="0" x2="1"><stop offset="0" stop-color="#8a6a00"/><stop offset=".5" stop-color="#00748a"/><stop offset="1" stop-color="#b0127a"/></linearGradient><filter id="cartelGlow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="340" height="102"><feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b1"/><feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b2"/><feMerge><feMergeNode in="b1"/><feMergeNode in="b1"/><feMergeNode in="b2"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><text x="150" y="50" text-anchor="middle">EMPEZAR</text></svg></button>
+      
+    </div>
+
+    <button class="card planaviso" id="planAviso" data-go="plan" hidden>
+      <span class="paico" aria-hidden="true">!</span>
+      <span class="stack" style="gap:2px;flex:1;min-width:0"><span class="lbl">Tu plan</span><span id="paTxt" style="font-weight:700;line-height:1.35"></span></span>
+      <span aria-hidden="true" style="font-size:20px;color:var(--muted)">›</span>
+    </button>
+
+    <div class="card" id="nextCls" hidden style="gap:8px"></div>
+
+    
+    <div class="card" id="npsCard" style="gap:12px">
+      <div class="between"><span class="lbl">Una pregunta cada 3 meses</span><button class="link" id="npsLater" style="min-height:36px;padding:0;font-size:13px">Ahora no</button></div>
+      <span style="font-weight:700;font-size:17px;line-height:1.35" id="npsQ">Del 0 al 10, ¿qué tan probable es que recomiendes Viva a un amigo?</span>
+      <div class="npsg" id="npsOpts"></div>
+      <div class="stack" id="npsMore" hidden style="gap:10px">
+        <input class="input" id="npsTxt" placeholder="¿Querés contarnos por qué? (opcional)" style="height:48px;font-size:15px">
+        <button class="btn sm" id="npsSend">Enviar</button>
+      </div>
+    </div>
+
+    <button class="promo" id="clubPromo" data-go="beneficios">
+      <svg class="clubbolt" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18v4H3zM5 13v8h14v-8M12 9v12M12 9C10 5 6 5 6 7.5S12 9 12 9zM12 9c2-4 6-4 6-1.5S12 9 12 9z"/></svg>
+      <span style="flex:1;font-size:14px" id="promoTxt">Club Viva: beneficios en más de 1.000 comercios</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+  <div class="accbar" id="accBar" hidden><button class="accbtn" id="accBtn"></button></div>
+</section>
+
+<!-- ENTRENAR · HOY (versión 41) -->
+<!--#h18-->
+<div class="sheet" id="occSheet" hidden role="dialog" aria-labelledby="occTitle">
+  <div class="sheetin" style="max-height:90%;overflow-y:auto">
+    <div class="between"><span class="h2" style="font-size:26px" id="occTitle">¿Cuánta gente hay?</span><button class="link" id="occX" style="min-height:44px">Cerrar</button></div>
+    <div class="between" style="margin-top:-6px"><span class="lbl">Ahora</span><span class="live"><i></i>En vivo</span></div>
+    <div class="stack" id="occList" style="gap:12px"></div>
+    <div class="occleg" aria-hidden="true"><span><i style="background:var(--z1)"></i>Poca gente</span><span><i style="background:var(--z2)"></i>Moderada</span><span><i style="background:var(--z3)"></i>Mucha</span><span><i style="background:var(--zflow)"></i>Completa</span></div>
+    <button class="occhow" id="occHow" aria-expanded="false" aria-controls="occChart"><span>¿Cuándo conviene ir? <b>Mirá la gente por hora</b></span><svg class="srch" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="stack" id="occChart" hidden style="gap:12px">
+      <div class="opts g3" id="occDia"><button class="opt" data-od="lv" aria-pressed="true">Lun a vie</button><button class="opt" data-od="sa" aria-pressed="false">Sábado</button><button class="opt" data-od="do" aria-pressed="false">Domingo</button></div>
+      <div class="occsedes" id="occSedes"></div>
+      <div id="occSvg"></div>
+      <span class="small" id="occTip" style="line-height:1.45"></span>
+    </div>
+    <span class="small muted" style="line-height:1.45">Estimado con las entradas por molinete de las últimas 4 semanas. Costanera y Santa Ana todavía no registran entradas.</span>
+  </div>
+</div>

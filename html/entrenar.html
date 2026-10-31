@@ -1,0 +1,325 @@
+<!--#h03-->
+<section class="scr" id="hoy" hidden aria-label="Entrenar: hoy">
+  <div class="body" style="padding-top:28px">
+    <h1 class="h1">Entrenar</h1>
+    <div class="tabs" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="true">Hoy</button><button role="tab" aria-selected="false" data-go="progreso">Progreso</button></div>
+    <div class="card" id="hoyCard" style="gap:12px">
+      <div class="between"><span class="wktit" id="hTit"><span class="sig"><b>Tu</b> <i>rutina</i></span></span><button class="link lime" data-go="rutinas" style="min-height:44px;margin:-12px 0;padding:0;font-size:14px">Cambiar</button></div>
+      <div class="tdrow"><span class="tdday" aria-hidden="true"><small>Día</small><b id="hLetter">B</b></span><span class="stack" style="gap:3px;min-width:0"><span class="tdname" id="hName"></span><span class="small muted" id="hMeta"></span></span></div>
+      <div class="hparts" id="hParts"></div>
+      <div class="hprofe" id="hProfe"></div>
+      <div class="hcuida" id="hCuida" hidden></div>
+      <div class="hnota" id="hNota" hidden></div>
+      <button class="hrec" data-go="rutinas">Elegida según tu recuperación<span aria-hidden="true"> ›</span></button>
+    </div>
+    <button class="hcorto" id="hCorto"></button>
+  </div>
+  <div class="accbar"><button class="accbtn" id="hEmpezar"></button></div>
+</section>
+
+<!-- MODO SALA (versión 41): un ejercicio por pantalla, un toque por ejercicio -->
+<section class="scr" id="sala" hidden aria-label="Tu sesión">
+  <div class="salatop"><button class="salamenu" id="salaMenu" aria-label="Menú de la sesión"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button><div class="salaprog" id="salaProg" aria-hidden="true"></div><span class="salapos" id="salaPos"></span></div>
+  <div class="salabody" id="salaBody"></div>
+  <div class="salafoot"><button class="salalisto" id="salaListo">Listo</button></div>
+</section>
+
+<!-- CIERRE DE LA SESIÓN (versión 41): una pantalla y una pregunta -->
+<section class="scr" id="cierre" hidden aria-label="Cierre de la sesión">
+  <div class="body cierrebody" id="cierreBody"></div>
+</section>
+
+<!-- 3. RUTINAS -->
+<section class="scr" id="rutinas" hidden aria-label="Tus rutinas">
+  <div class="body" style="padding-top:28px">
+    <button class="link lime" data-go="hoy" style="align-self:flex-start;padding:0;min-height:40px;margin-bottom:-8px">‹ Volver a hoy</button>
+    <h1 class="h1">Tus rutinas</h1>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="act">Activas</button>
+      <button role="tab" aria-selected="false" data-tab="hist">Historial</button>
+    </div>
+
+    <div class="stack" id="tab-act" style="gap:12px">
+      <div class="card" id="recCard" style="gap:12px">
+        <div class="between"><span class="lbl">Tu cuerpo hoy</span><span class="small muted">Según tus últimos entrenamientos</span></div>
+        <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;align-items:center">
+          <svg id="recMap" viewBox="0 0 160 150" role="img" aria-label="Mapa de recuperación muscular"></svg>
+          <div class="stack" style="gap:8px">
+            <span class="small" style="display:flex;gap:8px;align-items:flex-start"><span class="dot" style="background:var(--dat);margin-top:4px"></span><span><strong>Listos:</strong> espalda, bíceps, hombros, pecho</span></span>
+            <span class="small" style="display:flex;gap:8px;align-items:flex-start"><span class="dot" style="background:var(--orange);margin-top:4px"></span><span><strong>Recuperándose:</strong> piernas y glúteos (lunes)</span></span>
+            <span class="small" style="display:flex;gap:8px;align-items:flex-start"><span class="dot" style="background:var(--pink);margin-top:4px"></span><span><strong>Cansado:</strong> nada hoy</span></span>
+          </div>
+        </div>
+        <div class="note lime">Hoy te conviene el Día B · Espalda y bíceps.</div>
+      </div>
+      <div class="card" id="corrCard" style="gap:10px">
+        <div class="between"><span class="lbl">Correcciones de tu profe</span><span class="small muted">Prof. Lucas</span></div>
+        <div class="stack" id="corrList" style="gap:8px"></div>
+        <span class="small muted">Mientras entrenás, tocá "Mandale un video a tu profe" y te responde en 48 h.</span>
+      </div>
+      <p class="small muted" style="margin:0">Elegí cuál de tus rutinas activas querés seguir ahora.</p>
+      <div class="stack" id="rutList" style="gap:16px"></div>
+    </div>
+
+    <div class="list" id="tab-hist" hidden>
+      <div><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Fuerza base · 3 días</span><span class="small muted">Prof. Lucas · jun a ago</span></span><span class="small muted">Finalizada</span></div>
+      <div><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Adaptación · 3 días</span><span class="small muted">Prof. Carla · abr a may</span></span><span class="small muted">Finalizada</span></div>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn" data-go="ia">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>
+      Generar rutina con IA
+    </button>
+  </div>
+</section>
+
+<!-- 4. GENERAR CON IA -->
+<section class="scr" id="ia" hidden aria-label="Generar rutina con IA">
+  <div class="body" style="padding-top:20px">
+    <div class="top">
+      <button class="iconbtn" id="iaBack" aria-label="Volver a mis rutinas"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <span class="pill ia" style="background:none;padding:0;font-size:13px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>RUTINA CON IA</span>
+    </div>
+
+    <div class="stack" id="iaForm" style="gap:18px;flex:1">
+      <h1 class="h1" style="font-size:36px" id="iaH1">Contanos cómo querés entrenar</h1>
+      <p class="muted" id="iaSub" hidden style="margin:-8px 0 0;line-height:1.5">Gratis y sin registrarte. Comenzá la experiencia Viva.</p>
+      <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">Objetivo</span>
+        <div class="opts" data-group="obj"><button class="opt" aria-pressed="true">Ganar músculo</button><button class="opt" aria-pressed="false">Bajar grasa</button><button class="opt" aria-pressed="false">Fuerza</button><button class="opt" aria-pressed="false">Salud general</button></div></div>
+      <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">Nivel</span>
+        <div class="opts g3" data-group="nivel"><button class="opt" aria-pressed="false">Principiante</button><button class="opt" aria-pressed="true">Intermedio</button><button class="opt" aria-pressed="false">Avanzado</button></div></div>
+      <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">Días por semana</span>
+        <div class="opts g5" data-group="dias"><button class="opt" aria-pressed="false">2</button><button class="opt" aria-pressed="false">3</button><button class="opt" aria-pressed="true">4</button><button class="opt" aria-pressed="false">5</button><button class="opt" aria-pressed="false">6</button></div></div>
+      <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">Tiempo por sesión</span>
+        <div class="opts g3" data-group="tiempo"><button class="opt" aria-pressed="false">45 min</button><button class="opt" aria-pressed="true">60 min</button><button class="opt" aria-pressed="false">75 min</button></div></div>
+      <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">¿Alguna molestia?</span>
+        <div class="opts" data-group="lesion"><button class="opt" aria-pressed="true">Ninguna</button><button class="opt" aria-pressed="false">Rodilla</button><button class="opt" aria-pressed="false">Espalda baja</button><button class="opt" aria-pressed="false">Hombro</button></div></div>
+      <div class="spacer"></div>
+      <button class="btn" id="genBtn">Generar mi rutina</button>
+    </div>
+
+    <div class="loading" id="iaLoading" hidden>
+      <div class="spin" aria-hidden="true"></div>
+      <span style="font-weight:700">Armando tu rutina…</span>
+      <span class="small muted">Según tu objetivo, nivel y tiempo disponible</span>
+    </div>
+
+    <div class="stack" id="iaResult" hidden style="gap:14px;flex:1">
+      <div class="stack" style="gap:6px">
+        <span class="small muted">Tu rutina está lista</span>
+        <h1 class="h1" style="font-size:36px" id="resTitle">Ganar músculo · 4 días</h1>
+        <span class="small muted" id="resSub">Nivel intermedio · 60 min por sesión · 8 semanas</span>
+      </div>
+      <div class="list" id="resDays"></div>
+      <div class="note" id="resLesion" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <span id="resLesionTxt"></span>
+      </div>
+      <div class="note muted" id="iaAviso"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>Al activarla, tu profe recibe un aviso.</div>
+      <div class="stack" id="leadPrev" hidden style="gap:12px">
+        <div class="card" style="gap:10px">
+          <div class="between"><span class="lbl">Vista previa · Día A</span><span class="small muted">Máquinas de Sarmiento</span></div>
+          <span class="h2" style="font-size:26px" id="lpName">Tren inferior</span>
+          <div id="lpList"></div>
+          <button class="btn light sm" id="lpTry"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Ver el Día A paso a paso</button>
+        </div>
+        <button class="btn" id="lpSave">Guardala y pedí que un profe la revise</button>
+        <span class="small muted" style="text-align:center">Solo te pedimos tu nombre y tu teléfono.</span>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" id="activarBtn">Activar rutina</button>
+      <button class="link" id="rehacerBtn">Cambiar respuestas</button>
+    </div>
+  </div>
+</section>
+
+<!-- 5. ENTRENANDO -->
+<section class="scr" id="entrenando" hidden aria-label="Entrenando ahora">
+  <div class="body" style="padding-top:20px;gap:14px">
+    <div class="top">
+      <button class="iconbtn" id="exMin" aria-label="Minimizar entrenamiento"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="stack" style="gap:0;flex:1"><span class="small muted" id="exDay">Día B · Espalda y bíceps</span><span class="num" style="font-size:26px" id="clock">32:14</span></div>
+      <span class="pill ia" id="exPrev" hidden>VISTA PREVIA</span><span class="small muted" id="exCount">Ejercicio 3 de 7</span>
+    </div>
+    <div class="prog" id="prog" aria-hidden="true"></div>
+
+    <div class="anim">
+      <div class="animfig">
+        <div id="fig3d" role="img" aria-label="Maniquí 3D del ejercicio con los músculos que trabajan. Arrastrá para girarlo."></div>
+        <div class="figoff" id="figOff"><span class="h2" style="font-size:24px">Mirá cómo se hace</span><button class="btn sm" id="fig3dOn" style="width:auto;padding:0 20px">Ver en 3D</button><span class="small muted">Usa unos 600 KB de datos</span></div>
+        <span class="cue" id="cue" hidden>Arrastrá para girar · tocá Play</span>
+        <span class="repn" id="repN" hidden>Rep 0</span>
+        <button class="animplay2" id="animPlay" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg><span>Play</span></button>
+      </div>
+      <div class="animside">
+        <svg id="bodymap" viewBox="0 0 160 150" role="img" aria-label="Mapa de músculos trabajados">
+          <g>
+            <circle class="sil" cx="37" cy="12" r="8"/>
+            <rect class="sil" x="24" y="26" width="26" height="50" rx="9"/>
+            <rect class="sil" x="26" y="72" width="22" height="12" rx="5"/>
+            <ellipse class="m" data-m="hombros" cx="22" cy="32" rx="6" ry="6"/><ellipse class="m" data-m="hombros" cx="52" cy="32" rx="6" ry="6"/>
+            <ellipse class="m" data-m="pecho" cx="31" cy="38" rx="6.5" ry="5.5"/><ellipse class="m" data-m="pecho" cx="43" cy="38" rx="6.5" ry="5.5"/>
+            <ellipse class="m" data-m="biceps" cx="17" cy="48" rx="4" ry="9"/><ellipse class="m" data-m="biceps" cx="57" cy="48" rx="4" ry="9"/>
+            <ellipse class="m" data-m="antebrazo" cx="14" cy="68" rx="3.5" ry="9"/><ellipse class="m" data-m="antebrazo" cx="60" cy="68" rx="3.5" ry="9"/>
+            <rect class="m" data-m="abdomen" x="31" y="46" width="12" height="25" rx="3"/>
+            <ellipse class="m" data-m="cuads" cx="31" cy="98" rx="6" ry="15"/><ellipse class="m" data-m="cuads" cx="43" cy="98" rx="6" ry="15"/>
+            <ellipse class="sil" cx="31" cy="128" rx="4" ry="11"/><ellipse class="sil" cx="43" cy="128" rx="4" ry="11"/>
+            <text x="37" y="148" text-anchor="middle" class="bmt">Frente</text>
+          </g>
+          <g>
+            <circle class="sil" cx="117" cy="12" r="8"/>
+            <rect class="sil" x="104" y="26" width="26" height="50" rx="9"/>
+            <polygon class="m" data-m="trapecio" points="108,26 126,26 121,38 113,38"/>
+            <ellipse class="m" data-m="hombros" cx="102" cy="32" rx="6" ry="6"/><ellipse class="m" data-m="hombros" cx="132" cy="32" rx="6" ry="6"/>
+            <polygon class="m" data-m="dorsales" points="106,40 116,40 116,64 108,58"/><polygon class="m" data-m="dorsales" points="128,40 118,40 118,64 126,58"/>
+            <ellipse class="m" data-m="triceps" cx="97" cy="48" rx="4" ry="9"/><ellipse class="m" data-m="triceps" cx="137" cy="48" rx="4" ry="9"/>
+            <ellipse class="sil" cx="94" cy="68" rx="3.5" ry="9"/><ellipse class="sil" cx="140" cy="68" rx="3.5" ry="9"/>
+            <ellipse class="m" data-m="gluteos" cx="111" cy="80" rx="6.5" ry="6.5"/><ellipse class="m" data-m="gluteos" cx="123" cy="80" rx="6.5" ry="6.5"/>
+            <ellipse class="m" data-m="isquios" cx="111" cy="101" rx="5.5" ry="13"/><ellipse class="m" data-m="isquios" cx="123" cy="101" rx="5.5" ry="13"/>
+            <ellipse class="sil" cx="111" cy="128" rx="4" ry="11"/><ellipse class="sil" cx="123" cy="128" rx="4" ry="11"/>
+            <text x="117" y="148" text-anchor="middle" class="bmt">Espalda</text>
+          </g>
+        </svg>
+        <span class="small" style="font-weight:700;line-height:1.3" id="musTxt">Dorsales</span>
+        <span class="legend"><i class="lp"></i>Principal <i class="ls"></i>Secundario</span>
+      </div>
+    </div>
+
+    <div class="stack" style="gap:4px">
+      <h1 class="h2" style="font-size:32px" id="exName">Remo con barra</h1>
+      <span class="small muted" id="exTip">Espalda alta y dorsales · Tip del profe: espalda neutra, tirá hacia el ombligo.</span>
+    </div>
+    <button class="btn ghost sm" id="vidBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/></svg>Mandale un video a tu profe</button>
+    <input type="file" id="vidFile" accept="video/*" capture="environment" hidden>
+    <div class="note lime" id="exSug">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><path d="M7 17L17 7M9 7h8v8"/></svg>
+      <span id="exSugTxt">Probá 42,5 kg: la última vez completaste todas las repeticiones.</span>
+    </div>
+
+    <div class="sets" id="sets"></div>
+
+    <div class="rest" id="rest">
+      <div class="stack" style="gap:0;flex:1"><span class="lbl">Descanso</span><span class="num" style="font-size:30px" id="restT">1:30</span></div>
+      <button id="restMinus">−15 s</button><button id="restPlus">+15 s</button>
+    </div>
+
+    <div class="grid2" style="gap:10px">
+      <button class="btn ghost sm" id="nextEx">Siguiente</button>
+      <button class="btn sm" id="finish">Terminar</button>
+    </div>
+  </div>
+</section>
+
+<!-- Hojas del entrenamiento -->
+<div class="sheet fitsheet" id="fitSheet" hidden role="dialog" aria-labelledby="fsQTitle">
+  <div class="sheetin">
+    <div class="between"><h2 class="h2" id="fsQTitle" style="font-weight:400">Índice <span style="font-weight:700;color:var(--dat)">FIT</span></h2><button class="fpx" id="fitSheetX" aria-label="Cerrar" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="fsec"><h3>Lo que la balanza no te cuenta.</h3><p>La balanza te dice cuánto pesás. El Índice FIT te muestra de qué estás hecho: cuánto músculo y cuánta grasa, y cómo cambian mientras entrenás.</p></div>
+    <div class="fsec"><h3>Cómo se mide.</h3><p>Con InBody, un equipo de bioimpedancia: te parás descalzo, agarrás las manijas y en un minuto tenés tu resultado. No duele y no sentís nada.</p></div>
+    <div class="fsec"><h3>Cómo funciona.</h3><p>Tu primera medición es tu punto de partida. Desde la segunda, el Índice FIT te compara solo con vos: nunca con tablas ni con otros socios. Te mostramos la tendencia entre mediciones, porque una sola puede variar según lo que comiste o tomaste.</p></div>
+    <div class="fsec"><div class="between"><h3>Para que salga bien.</h3><span class="src">Provisorio</span></div><p>No comas ni entrenes en las 2 horas anteriores, y vení con ropa liviana. Si usás marcapasos u otro dispositivo electrónico implantado, o estás embarazada, consultalo antes en recepción.</p></div>
+    <div class="fsec"><h3>Tus datos son tuyos.</h3><p>Tu medición la ven solo vos y la nutricionista de Viva. Si querés, también tu profe.</p></div>
+    <button class="btn" id="fitSheetGo">Pedí tu InBody ⚡</button>
+  </div>
+</div>
+<div class="sheet" id="setSheet" hidden role="dialog" aria-labelledby="ssTitle">
+  <div class="sheetin">
+    <div class="stack" style="gap:2px"><span class="lbl" id="ssEx">Remo con barra</span><span class="h2" style="font-size:28px" id="ssTitle">Serie 2</span></div>
+    <div class="stack" style="gap:8px">
+      <label class="small muted" for="ssKg" id="ssKgLbl" style="font-weight:700">Peso (kg)</label>
+      <div class="stepper"><button type="button" class="stb" data-step-kg="-2.5" aria-label="Restar 2,5 kg">−</button><input class="input stin" id="ssKg" inputmode="decimal" autocomplete="off"><button type="button" class="stb" data-step-kg="2.5" aria-label="Sumar 2,5 kg">+</button></div>
+    </div>
+    <div class="stack" style="gap:8px">
+      <label class="small muted" for="ssReps" id="ssRepsLbl" style="font-weight:700">Repeticiones</label>
+      <div class="stepper"><button type="button" class="stb" data-step-reps="-1" aria-label="Restar una">−</button><input class="input stin" id="ssReps" inputmode="numeric" autocomplete="off"><button type="button" class="stb" data-step-reps="1" aria-label="Sumar una">+</button></div>
+    </div>
+    <span class="small muted" id="ssPrev">La vez anterior: 40 kg × 10</span>
+    <div class="grid2" style="gap:10px"><button type="button" class="btn ghost sm" id="ssSave">Guardar</button><button type="button" class="btn sm" id="ssDone">Guardar y marcar hecha</button></div>
+  </div>
+</div>
+
+<div class="sheet" id="missSheet" hidden role="dialog" aria-labelledby="msTitle">
+  <div class="sheetin">
+    <span class="h2" style="font-size:28px" id="msTitle">Te quedaron 2 series sin marcar</span>
+    <span class="muted" style="line-height:1.45">¿Qué pasó? Lo usamos para que la IA ajuste tu próxima rutina.</span>
+    <div class="stack" style="gap:8px" id="msOpts">
+      <button type="button" class="msopt" data-motivo="cansancio">No pude completarlas</button>
+      <button type="button" class="msopt" data-motivo="tiempo">Me faltó tiempo</button>
+      <button type="button" class="msopt" data-motivo="dolor">Tuve una molestia o dolor</button>
+      <button type="button" class="msopt" data-motivo="maquina">La máquina estaba ocupada o rota</button>
+      <button type="button" class="msopt" data-motivo="olvido">Las hice, me olvidé de marcarlas</button>
+    </div>
+    <button type="button" class="link" id="msBack">Volver al ejercicio</button>
+  </div>
+</div>
+
+<div class="sheet" id="feelSheet" hidden role="dialog" aria-labelledby="fsTitle">
+  <div class="sheetin">
+    <span class="h2" style="font-size:28px" id="fsTitle">¿Cómo te sentiste hoy?</span>
+    <span class="muted" style="line-height:1.45" id="fsSub">Un toque. Lo ve tu profe para acompañarte mejor.</span>
+    <div class="feel" id="feelOpts"></div>
+    <div class="opts g3" id="microOpts" hidden><button class="opt" data-micro="si">Sí</button><button class="opt" data-micro="mas">Más o menos</button><button class="opt" data-micro="no">No</button></div>
+    <span class="small muted" style="text-align:center">Una sola pregunta por visita.</span>
+    <button type="button" class="link" id="feelSkip">Ahora no</button>
+  </div>
+</div>
+
+<div class="sheet" id="pausaSheet" hidden role="dialog" aria-labelledby="psTitle">
+  <div class="sheetin">
+    <span class="h2" style="font-size:28px" id="psTitle">Pausar mi plan</span>
+    <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">¿Por qué?</span><div class="opts" data-group="pmot"><button class="opt" aria-pressed="true">Vacaciones</button><button class="opt" aria-pressed="false">Lesión o salud</button><button class="opt" aria-pressed="false">Trabajo</button><button class="opt" aria-pressed="false">Otro</button></div></div>
+    <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">¿Cuántos días?</span><div class="opts g3" data-group="pdias"><button class="opt" aria-pressed="false">7 días</button><button class="opt" aria-pressed="true">15 días</button><button class="opt" aria-pressed="false">30 días</button></div></div>
+    <div class="note lime" id="psInfo"></div>
+    <div class="grid2" style="gap:10px"><button type="button" class="btn ghost sm" id="psCancel">Cancelar</button><button type="button" class="btn sm" id="psOk">Pausar</button></div>
+  </div>
+</div>
+
+<div class="sheet" id="fichaSheet" hidden role="dialog" aria-labelledby="fcTitle">
+  <div class="sheetin">
+    <span class="h2" style="font-size:28px" id="fcTitle">Antes de tu primer ingreso</span>
+    <span class="muted" style="line-height:1.45">Te lo pedimos una sola vez, porque vas a hacer actividad física en la sede.</span>
+    <div class="grid2" style="gap:10px">
+      <div class="field"><label for="fDni">DNI</label><input class="input" id="fDni" inputmode="numeric" placeholder="35123456"></div>
+      <div class="field"><label for="fNac">Nacimiento</label><input class="input" id="fNac" type="date" style="font-size:15px"></div>
+    </div>
+    <label class="check" for="fDes"><input type="checkbox" id="fDes"><span>Acepto el <button type="button" class="inlink" data-toast="Acá se abre el texto del deslinde">deslinde de responsabilidad</button> y declaro estar apto para hacer actividad física.</span></label>
+    <div class="grid2" style="gap:10px"><button type="button" class="btn ghost sm" id="fCancel">Cancelar</button><button type="button" class="btn sm" id="fOk">Listo</button></div>
+  </div>
+</div>
+
+<!--#h08-->
+<!-- 24. CLASES -->
+<section class="scr" id="clases" hidden aria-label="Clases">
+  <div class="body" style="padding-top:28px">
+    <h1 class="h1">Entrenamiento</h1>
+    <div class="tabs" role="tablist" aria-label="Entrenamiento" style="grid-template-columns:repeat(3,minmax(0,1fr))"><button role="tab" aria-selected="false" data-go="rutinas">Rutinas</button><button role="tab" aria-selected="true">Clases</button><button role="tab" aria-selected="false" data-go="progreso">Progreso</button></div>
+    <div class="stack" id="myRes" style="gap:8px"></div>
+    <div class="chips" id="clsDays"></div>
+    <div class="opts" id="clsFil" style="gap:6px"><button class="opt" data-cfil="mia" aria-pressed="true" style="min-height:40px;font-size:13px">Tu sede</button><button class="opt" data-cfil="todas" aria-pressed="false" style="min-height:40px;font-size:13px">Todas las sedes</button></div>
+    <div class="stack" id="clsList" style="gap:10px"></div>
+    <span class="small muted" style="text-align:center;line-height:1.45">Podés cancelar hasta 2 h antes. Si una clase está llena, tocá Avisarme: te mandamos un mensaje si se libera un lugar.</span>
+  </div>
+</section>
+
+<!--#h19-->
+<div class="sheet" id="salaSheet" hidden role="dialog" aria-label="Opciones de la sesión"><div class="sheetin" id="salaSheetIn" style="max-height:88%;overflow-y:auto"></div></div>
+<div class="sheet" id="cardioSheet" hidden role="dialog" aria-labelledby="cdTitle">
+  <div class="sheetin">
+    <div class="between"><span class="h2" style="font-size:26px" id="cdTitle">Cardio de afuera</span><button class="link" id="cdX" style="min-height:44px">Cerrar</button></div>
+    <span class="muted" style="margin-top:-6px;line-height:1.45">Caminaste, pedaleaste o saliste a correr: sumalo a tu semana.</span>
+    <div class="stack" style="gap:8px"><span class="small muted">¿Cuánto tiempo?</span>
+      <div class="opts g4" id="cdMin"><button class="opt" data-min="15">15'</button><button class="opt" data-min="30" aria-pressed="true">30'</button><button class="opt" data-min="45">45'</button><button class="opt" data-min="60">60'</button></div></div>
+    <div class="stack" style="gap:8px"><span class="small muted">¿Qué hiciste?</span>
+      <div class="opts g4" id="cdTipo"><button class="opt" data-t="caminar" aria-pressed="true" style="font-size:14px">Caminar</button><button class="opt" data-t="bici" style="font-size:14px">Bici</button><button class="opt" data-t="correr" style="font-size:14px">Correr</button><button class="opt" data-t="otro" style="font-size:14px">Otro</button></div></div>
+    <button class="btn" id="cdGo">Sumar a mi semana</button>
+  </div>
+</div>
+<div class="sheet" id="objSheet" hidden role="dialog" aria-labelledby="obTitle">
+  <div class="sheetin" style="max-height:88%;overflow-y:auto">
+    <div class="between"><span class="h2" style="font-size:26px" id="obTitle">Tu objetivo</span><button class="link" id="obX" style="min-height:44px">Cerrar</button></div>
+    <span class="muted" style="margin-top:-6px;line-height:1.45">Elegí hasta dos. El primero que tocás es el principal: con ese tu profe arma tu semana.</span>
+    <div class="stack" style="gap:8px" id="obOpts"></div>
+    <button class="btn" id="obGo">Listo</button>
+  </div>
+</div>

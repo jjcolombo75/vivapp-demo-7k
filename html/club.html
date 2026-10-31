@@ -1,0 +1,153 @@
+<!--#h05-->
+<!-- 7. PLAN -->
+<section class="scr" id="plan" hidden aria-label="Tu plan">
+  <div class="body" style="padding-top:28px">
+    <h1 class="h1 sig"><b>Tu</b> <i>plan</i></h1>
+    <div class="alert" id="deudaBox" hidden>
+      <div style="display:flex;align-items:center;gap:8px;color:var(--pink-txt);font-weight:700;font-size:14px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Tenés un saldo pendiente
+      </div>
+      <span style="font-size:14px;line-height:1.45">El débito automático del 01/10 fue rechazado. Regularizá para seguir entrando sin problemas.</span>
+      <div class="between"><span class="num" style="font-size:30px">[MONTO]</span><button class="btn sm" style="width:auto;background:var(--pink);min-height:44px" data-toast="Pago registrado">Pagar ahora</button></div>
+    </div>
+    <div class="card">
+      <div class="between"><span class="lbl">Plan actual</span><span class="pill ok" id="estadoPill">AL DÍA</span></div>
+      <div class="stack" style="gap:4px"><span class="h2" style="font-size:32px">Mensual libre</span><span class="small muted">Sede Sarmiento · acceso a todas las sedes</span></div>
+      <div class="stack" style="gap:8px">
+        <div class="between small"><span class="muted" id="planVenc">Vence el 28/10</span><span style="font-weight:700">10 días</span></div>
+        <span class="bar" style="height:8px"><i style="width:67%"></i></span>
+      </div>
+      <div class="note">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg>
+        <span class="stack" style="gap:0;flex:1"><span style="font-size:14px;font-weight:500">Débito automático</span><span class="small muted" style="font-size:12px">Visa terminada en 4417</span></span>
+        <button class="link lime" style="font-size:14px">Cambiar</button>
+      </div>
+    </div>
+    <div class="grid2" style="gap:10px">
+      <button class="btn sm" data-toast="Te llevamos al pago de la renovación">Renovar plan</button>
+      <button class="btn ghost sm">Cambiar de plan</button>
+    </div>
+    <div class="note lime" id="pausaNote" hidden></div>
+    <button class="btn ghost sm" id="pausaBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Pausar mi plan</button>
+    <span class="small muted" style="text-align:center;margin-top:-8px" id="pausaHint">Vacaciones, lesión o trabajo: hasta 30 días por año, sin costo.</span>
+    <div class="stack" style="gap:10px">
+      <span class="lbl">Últimos pagos</span>
+      <div class="list">
+        <div><span class="stack" style="gap:0;flex:1"><span style="font-weight:500">Septiembre</span><span class="small muted" style="font-size:12px">01/09 · Débito automático</span></span><span style="font-weight:700">[MONTO]</span></div>
+        <div><span class="stack" style="gap:0;flex:1"><span style="font-weight:500">Agosto</span><span class="small muted" style="font-size:12px">01/08 · Débito automático</span></span><span style="font-weight:700">[MONTO]</span></div>
+        <div><span class="stack" style="gap:0;flex:1"><span style="font-weight:500">Julio</span><span class="small muted" style="font-size:12px">03/07 · Transferencia</span></span><span style="font-weight:700">[MONTO]</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. CLUB VIVA -->
+<section class="scr" id="beneficios" hidden aria-label="Club Viva">
+  <div class="body" style="padding-top:28px">
+    <h1 class="h1">Club Viva</h1>
+    <button class="promo" data-ben="11" style="border-color:var(--lime);border-style:solid">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/></svg>
+      <span class="stack" style="gap:2px;flex:1"><span style="font-size:15px;font-weight:700">Invitá a un amigo</span><span class="small muted" style="line-height:1.4">Si se asocia, vos recibís $10.000 y tu amigo paga la mitad de su primera cuota.</span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <div class="card ahorro">
+      <span class="stack" style="gap:2px;flex:1"><span class="lbl">Tu ahorro con Club VIVA</span><span><span class="num">$48.600</span></span><span class="small muted">en lo que va del año, con tus códigos en comercios</span></span>
+      <span class="src">Dato simulado</span>
+    </div>
+
+    <div class="alert" id="clubPausa" hidden>
+      <div style="display:flex;align-items:center;gap:8px;color:var(--pink-txt);font-weight:700;font-size:14px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Tu club está pausado
+      </div>
+      <span style="font-size:14px;line-height:1.45">Con el plan vencido o con saldo pendiente no podés usar los beneficios. Tus semanas, tu mural y tus premios se mantienen.</span>
+      <button class="btn sm" style="background:var(--pink);min-height:44px" data-go="plan">Regularizar mi plan</button>
+    </div>
+
+    <div class="tabs" role="tablist" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <button role="tab" aria-selected="true" data-ctab="desc">Descuentos</button>
+      <button role="tab" aria-selected="false" data-ctab="premios">Tus premios</button>
+      <button role="tab" aria-selected="false" data-ctab="canjes">Canjes</button>
+    </div>
+
+    <!-- DESCUENTOS -->
+    <div class="stack" id="ctab-desc" style="gap:22px">
+      <div class="stack" style="gap:8px">
+        <div class="bnr" id="bnr"></div>
+        <div class="bdots" id="bdots" aria-hidden="true"></div>
+      </div>
+
+      <div class="stack" style="gap:12px">
+        <span class="sect">Recomendados</span>
+        <div class="hrow" id="recRow"></div>
+      </div>
+
+      <div class="stack" style="gap:12px">
+        <div class="sechead"><span class="sect">Explorá cupones por categoría</span></div>
+        <div class="catrow" id="cats"></div>
+      </div>
+
+      <div class="stack" style="gap:12px" id="campBox">
+        <div class="sechead"><span class="sect">¡Día de la Madre!</span><button class="ulink" id="campMore">Ver más</button></div>
+        <div class="hrow" id="campRow"></div>
+      </div>
+
+      <div class="stack" style="gap:12px" id="gridBox">
+        <div class="sechead"><span class="sect" id="gridTitle">Todos los descuentos</span><button class="ulink" id="gridAll" hidden>Ver todos</button></div>
+        <div style="position:relative">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;left:14px;top:15px"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input class="input" id="buscar" type="search" placeholder="Buscar comercio o descuento" aria-label="Buscar descuentos" style="height:48px;font-size:15px;padding-left:42px">
+        </div>
+        <div class="bgrid" id="benList"></div>
+      </div>
+    </div>
+
+    <!-- TUS PREMIOS -->
+    <div class="stack" id="ctab-premios" hidden style="gap:14px">
+      <div class="card" style="gap:4px;padding-block:6px" id="premList"></div>
+      <span class="small muted" style="line-height:1.45;text-align:center">Los premios se ganan con semanas cumplidas (las entradas por molinete) y se retiran en recepción de cualquier sede.</span>
+    </div>
+
+    <!-- MIS CANJES -->
+    <div class="stack" id="ctab-canjes" hidden style="gap:12px">
+      <div class="list" id="canjesList"></div>
+      <span class="small muted" style="text-align:center">Los códigos vencen 24 horas después de generarlos.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 8b. DETALLE DE BENEFICIO -->
+<section class="scr" id="beneficio" hidden aria-label="Detalle del beneficio">
+  <div class="body" style="padding-top:20px">
+    <div class="top">
+      <button class="iconbtn" data-go="beneficios" aria-label="Volver al club"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <span class="small muted" id="dCat">Indumentaria y deporte</span>
+    </div>
+    <div class="dhero" id="dHero"></div>
+    <div class="stack" style="gap:6px">
+      <span class="lbl" id="dCom">Deportes Norte</span>
+      <h1 class="h1" style="font-size:38px" id="dTit">15% en indumentaria</h1>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="dBadges"></div>
+    </div>
+    <p class="muted" style="margin:0;line-height:1.5" id="dDesc"></p>
+    <div class="list">
+      <div><span class="muted" style="flex:1">Vigencia</span><span style="font-weight:700" id="dVig"></span></div>
+      <div><span class="muted" style="flex:1">Usos</span><span style="font-weight:700" id="dUsos"></span></div>
+      <div><span class="muted" style="flex:1">Dirección</span><span style="font-weight:700" id="dDir">[Dirección del comercio]</span></div>
+    </div>
+    <div class="note" id="dLock" hidden style="color:var(--orange)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <span id="dLockTxt"></span>
+    </div>
+
+    <div class="codebox" id="dCode" hidden>
+      <span class="lbl" style="color:inherit;opacity:.7">Tu código</span>
+      <span class="code-big" id="dCodeTxt">VIVA-7K2P</span>
+      <span class="small" style="opacity:.75">Vence en 24 horas · el comercio lo carga en su web para validarlo</span>
+      <button class="btn sm" style="background:var(--ink);color:var(--paper)" id="copyBtn">Copiar código</button>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn" id="canjearBtn">Canjear beneficio</button>
+  </div>
+</section>
+

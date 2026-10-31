@@ -1,0 +1,186 @@
+<!--#h04-->
+<!-- 6. PROGRESO -->
+<section class="scr" id="progreso" hidden aria-label="Progreso">
+  <div class="body" style="padding-top:28px">
+    <h1 class="h1">Entrenar</h1>
+    <div class="tabs" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="false" data-go="hoy">Hoy</button><button role="tab" aria-selected="true">Progreso</button></div>
+    <div class="grid3" id="progTiles">
+      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px" id="mesCount">14</span><span class="small muted">entrenamientos en octubre</span></div>
+      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px;color:var(--dat)" id="semAcum">10</span><span class="small muted">semanas cumplidas</span></div>
+      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px">58</span><span class="small muted">min promedio por sesión</span></div>
+    </div>
+    <div class="card" id="sesSum" hidden style="gap:12px;border-color:var(--dat)">
+      <div class="between"><span class="lbl">Tu entrenamiento de hoy</span><span class="pill ok">GUARDADO</span></div>
+      <div class="pbreak" id="sesSumGrid"></div>
+      <div class="note lime" id="sesForma" hidden></div>
+      <span class="small muted" id="sesKcal" style="line-height:1.45"></span>
+    </div>
+    <div class="card muralCard" id="muralCard">
+      <div class="between"><span class="mtitle sig" style="font-size:26px"><b>Tu</b> <i>mural VIVA</i></span><button class="link lime" id="muralLista" style="min-height:44px;padding:0;font-size:14px">Ver como lista</button></div>
+      <span class="muralNext" id="muralNext"></span>
+      <div class="mural" id="mural"></div>
+      <div class="list mlist" id="muralList" hidden></div>
+      <button class="btn ghost sm" id="muralShare">Compartir mi mural</button>
+      <span class="small muted" style="line-height:1.45">Cada Mes cumplido enciende un cartel con el color de tu ritmo al cerrar el mes; cada ficha, una pieza de la pared de Viva. Lo que lográs no se apaga.</span>
+    </div>
+    <div class="card">
+      <div class="between"><span style="font-weight:700">Entrenamientos por semana</span><span class="small muted">Meta: 4</span></div>
+      <div class="chart" role="img" aria-label="Últimas 8 semanas: 2, 3, 2, 4, 4, 3, 4 y 3 entrenamientos">
+        <span class="goal"></span>
+        <i style="height:50px"></i><i style="height:75px"></i><i style="height:50px"></i><i class="hit" style="height:100px"></i><i class="hit" style="height:100px"></i><i style="height:75px"></i><i class="hit" style="height:100px"></i><i class="now" style="height:75px"></i>
+      </div>
+      <div class="axis"><span>S35</span><span>S36</span><span>S37</span><span>S38</span><span>S39</span><span>S40</span><span>S41</span><span>Hoy</span></div>
+    </div>
+    <div class="card">
+      <div class="between"><span style="font-weight:700">Avance por ejercicio</span><span class="small muted" id="avUnit">Peso máximo por sesión</span></div>
+      <div class="chips" id="avChips"></div>
+      <svg id="avChart" viewBox="0 0 320 170" role="img" aria-label="Avance del ejercicio" style="width:100%;height:auto;display:block"></svg>
+      <div class="between small"><span class="muted" id="avFrom">Desde el 15/09</span><span id="avDelta" style="font-weight:700;color:var(--dat)">+2,5 kg</span></div>
+      <span class="small muted" id="av1rm" style="line-height:1.45"></span>
+    </div>
+    <div class="card" id="cargaCard" style="gap:12px">
+      <div class="between"><span style="font-weight:700">Carga de la semana</span><span class="small muted">Kilos levantados</span></div>
+      <div class="between" style="align-items:flex-end"><span class="stack" style="gap:2px"><span class="num" style="font-size:34px" id="cargaSem">0</span><span class="small muted" id="cargaProm"></span></span><span class="pill ok" id="cargaPill">NORMAL</span></div>
+      <span class="occ" aria-hidden="true"><i id="cargaBar" style="width:50%"></i></span>
+      <span class="small muted" id="cargaTxt" style="line-height:1.45"></span>
+    </div>
+    <div class="card" style="gap:6px">
+      <div class="between"><span style="font-weight:700">Descanso por músculo</span><span class="small muted">Según lo que entrenaste</span></div>
+      <div id="restList"></div>
+    </div>
+    <div class="stack" style="gap:10px">
+      <span class="lbl">Récords personales</span>
+      <div class="list" id="recList"></div>
+    </div>
+  </div>
+</section>
+
+<!--#h07-->
+<!-- 23. PRIMERAS 4 SEMANAS -->
+<!-- TU FORMA · DETALLE -->
+<section class="scr" id="semana" hidden aria-label="Tu semana">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" data-go="inicio" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Inicio</span></div>
+    <h1 class="h1 sig"><b>Tu</b> <i>semana</i></h1>
+    <span class="muted" style="margin-top:-8px">Cuántas veces viniste y cómo entrenaste. Arranca de nuevo cada lunes.</span>
+    <div class="card" id="swResumen" hidden style="gap:12px"></div>
+    <div class="card" style="gap:0;padding-block:6px" id="swBars"></div>
+    <button class="btn ghost sm" id="swCardio">Sumar cardio de afuera</button>
+    <div class="card" style="gap:10px">
+      <span class="lbl">Tu meta y por qué</span>
+      <span style="line-height:1.5" id="swPorque"></span>
+      <button class="link lime" id="swObj" style="align-self:flex-start;padding:0">Cambiar mi objetivo</button>
+    </div>
+    <div class="card" style="gap:12px">
+      <div class="between"><span class="lbl">Las últimas 8 semanas</span><span class="src">Ejemplo</span></div>
+      <div class="swhist" id="swHist"></div>
+      <div class="swleg"><span><i class="co"></i>Completa ⚡</span><span><i class="cu"></i>Cumplida</span><span><i></i>Sin marca</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="scr" id="forma" hidden aria-label="Tu forma">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" data-go="inicio" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Inicio</span></div>
+    <h1 class="h1 sig" data-mname><b>Tu</b> <i>ritmo VIVA</i></h1>
+    <span class="muted" id="fdSub" style="margin-top:-8px">Cuán seguido venís, comparado con tu meta</span>
+    <div class="note" id="fdPausa" hidden></div>
+    <div class="card" id="fdHead" style="gap:12px"></div>
+    <div class="card" style="gap:12px">
+      <div class="between"><span class="lbl">Tu meta</span><span class="small muted" id="fdPlan">Plan Mensual libre</span></div>
+      <span style="font-size:15px;line-height:1.45">¿Cuántas veces por semana querés venir?</span>
+      <div class="opts g4" id="fdMeta" role="group" aria-label="Veces por semana"><button class="opt" data-m="2">2</button><button class="opt" data-m="3">3</button><button class="opt" data-m="4">4</button><button class="opt" data-m="5">5</button></div>
+      <span class="small muted" id="fdMetaTxt" style="line-height:1.45"></span>
+    </div>
+    <div class="card" style="gap:2px">
+      <span class="lbl" style="margin-bottom:4px">Los tramos</span>
+      <div id="fdZonas"></div>
+    </div>
+    <div class="card" style="gap:2px">
+      <span class="lbl" style="margin-bottom:4px">Cómo funciona</span>
+      <div id="fdHow"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FIT · MEDICIÓN INBODY (voluntaria) -->
+<section class="scr" id="fit" hidden aria-label="Índice FIT, tu medición">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" id="fitBack" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Volver</span></div>
+    <h1 class="h1">Índice <span style="color:var(--dat)">FIT</span></h1>
+    <span class="muted" style="margin-top:-8px;line-height:1.45">Tu medición InBody, comparada siempre con vos. Es voluntaria.</span>
+    <div class="card" id="fitBody" style="gap:12px"></div>
+    <div class="card" style="gap:2px">
+      <span class="lbl" style="margin-bottom:4px">Cómo funciona</span>
+      <div class="howrow"><span style="color:var(--dat);font-weight:700;width:30px;flex-shrink:0;text-align:center">1</span><span><b>Tu primera medición es tu punto de partida</b>No hay nota ni veredicto: es desde donde arrancás.</span></div>
+      <div class="howrow"><span style="color:var(--dat);font-weight:700;width:30px;flex-shrink:0;text-align:center">2</span><span><b>Desde la segunda, te comparás con vos</b>Músculo y grasa contra tu punto de partida. Nunca contra una tabla general ni contra otros socios.</span></div>
+      <div class="howrow"><span style="color:var(--dat);font-weight:700;width:30px;flex-shrink:0;text-align:center">~</span><span><b>Lo que cuenta es la tendencia</b>Una medición sola puede variar por el agua o la comida. Por eso miramos cómo cambia entre mediciones.</span></div>
+    </div>
+    <button class="btn" data-toast="Te avisamos cuando haya un turno de medición">Pedir turno de medición</button>
+  </div>
+</section>
+
+<section class="scr" id="onboarding" hidden aria-label="Tus primeras 4 semanas">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" id="onbBack" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Bienvenida</span></div>
+    <h1 class="h1">Tus primeras 4 semanas</h1>
+    <p class="muted" style="margin:0;line-height:1.5">Metas chicas para que entrenar se vuelva costumbre. Tu profe te acompaña en cada paso.</p>
+    <span class="segs" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>
+    <div class="stack" style="gap:10px">
+      <div class="wk cur"><span class="n">1</span><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Arrancá</span><span class="small muted">Tu entrenamiento gratis y uno más.</span></span><span class="pill ok">EN CURSO</span></div>
+      <div class="wk"><span class="n">2</span><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700" id="onbPaso2">Agarrá ritmo</span><span class="small muted">2 entrenamientos. Tu profe te escribe para ver cómo vas.</span></span></div>
+      <div class="wk"><span class="n">3</span><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Probá algo nuevo</span><span class="small muted">Una sesión de cardio guiado o una máquina que todavía no usaste, con tu profe.</span></span></div>
+      <div class="wk"><span class="n">4</span><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Tu primer mes, a la vista</span><span class="small muted">Cada semana que cumplís tu meta enciende una marca. Con 4, tu primer cartel en el mural.</span></span></div>
+    </div>
+    <div class="card" style="gap:10px">
+      <div style="display:flex;gap:10px;align-items:center"><span class="avatar">LP</span><span class="stack" style="gap:0"><span style="font-weight:700">Prof. Lucas Pérez</span><span class="small muted">Te acompaña este mes</span></span></div>
+      <div class="msg them" style="max-width:100%">¡Hola! Soy Lucas. Ya vi tu rutina y le hice dos ajustes. En la semana 2 te escribo para ver cómo te sentís. Cualquier molestia, avisame.</div>
+    </div>
+    <div class="note lime">Si venís 8 veces en tus primeras 4 semanas, tu InBody de punto de partida es gratis.</div>
+  </div>
+</section>
+
+<!--#h11-->
+<!-- 20. TUS FOTOS (privado; antes "Tu evolución", que pasó a ser el título del Índice FIT) -->
+<section class="scr" id="evolucion" hidden aria-label="Tus fotos">
+  <div class="body" style="padding-top:20px">
+    <div class="top"><button class="iconbtn" id="evBack" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span class="small muted">Logros</span></div>
+    <h1 class="h1 sig"><b>Tus</b> <i>fotos</i></h1>
+    <div class="note lime"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span><strong>Privado.</strong> Estas fotos las ves solo vos. Nunca aparecen en el muro salvo que elijas compartir una.</span></div>
+    <div class="list">
+      <label class="swrow" for="swProfe"><span class="stack" style="gap:2px;flex:1"><span>Que mi profe Lucas las vea</span><span class="small muted">Lo ayuda a ajustar tu rutina</span></span><input type="checkbox" class="sw" id="swProfe"></label>
+    </div>
+    <div class="between"><span class="lbl">Por fecha</span><span class="small muted">Tocá dos para comparar</span></div>
+    <div class="evgrid" id="evGrid"></div>
+    <input type="file" id="evFile" accept="image/*" hidden>
+    <div class="card" id="evCmp" hidden>
+      <div class="between"><span class="lbl">Comparación</span><span class="small" style="font-weight:700;color:var(--dat)" id="evSpan">8 semanas</span></div>
+      <div class="cmp" id="evCmpImgs"></div>
+      <button class="btn sm" id="evShare">Compartir esta comparación</button>
+      <span class="small muted" style="text-align:center">Se arma la imagen y vos decidís si la publicás.</span>
+    </div>
+    <div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Te avisamos cada 4 semanas para sacar una nueva. Tip: mismo lugar, misma luz, misma ropa.</span></div>
+  </div>
+</section>
+
+<!-- Historia para compartir -->
+<div class="overlay" id="storyOv" hidden role="dialog" aria-label="Compartir en historias">
+  <span class="lbl">Tu historia</span>
+  <canvas id="storyCv" class="storyprev" width="1080" height="1920" role="img" aria-label="Vista previa de la historia"></canvas>
+  <div class="stack" style="gap:8px;width:100%;max-width:300px">
+    <button class="btn sm" id="stShare"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>Compartir en Instagram</button>
+    <button class="link" id="stClose">Cerrar</button>
+  </div>
+  <span class="small muted" style="max-width:300px">Se abre Instagram con la historia lista. Mencioná a @vivafithouse.</span>
+</div>
+
+<!--#h20-->
+<div class="overlay cartelOv" id="cartelOv" hidden role="dialog" aria-label="Mes cumplido">
+  <div class="cwall" id="cartelWall"></div>
+  <span class="tagi m cbig" id="cartelTag"><span>¡Mes cumplido!</span></span>
+  <span class="ctxt" id="cartelTxt"></span>
+  <div class="note cben" id="cartelBen" hidden></div>
+  <button class="flowshare" id="cartelShare"><svg class="bolt-ico" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg> Contalo en tus historias</button>
+  <button class="link lime" id="cartelMural" style="min-height:44px">Ver tu mural</button>
+  <button class="link" id="cartelX" style="min-height:44px">Cerrar</button>
+</div>
