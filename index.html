@@ -1127,6 +1127,75 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
 .app[data-barras="eq"] .bar>i,.app[data-barras="eq"] .occ>i,.app[data-barras="eq"] .ocb>i{border-radius:0!important;-webkit-mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px);mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px)}
 .app[data-barras="eq"] .tdp .tdb{background:color-mix(in srgb,var(--pc) 10%,rgba(0,0,0,.4)) repeating-linear-gradient(90deg,color-mix(in srgb,var(--pc) 22%,transparent) 0 6px,transparent 6px 8px)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 30%,transparent)!important}
 .app[data-barras="eq"] .segs i,.app[data-barras="eq"] .segs16 i{border-radius:1.5px}
+
+/* ===== v41 · Entrenar: Hoy, modo sala y cierre ===== */
+.hparts .tdplan{margin-top:0}
+.hpb{background:none;border:none;padding:6px 0 2px;text-align:left;color:inherit;font:inherit;cursor:pointer;border-radius:8px}
+.hpb.open .tdl b{color:var(--lime)}
+.hlist{list-style:none;margin:6px 0 0;padding:10px 12px;border-radius:12px;background:var(--panel2);display:flex;flex-direction:column;gap:8px}
+.hlist li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;font-size:14px}
+.hlist li span{color:var(--muted);text-align:right}
+.hlist li em{grid-column:1/-1;font-style:normal;font-size:12px;color:var(--muted)}
+.hprofe{font-size:14px;line-height:1.4;color:var(--txt)}
+.hprofe b{font-weight:700}
+.hcuida{font-size:13.5px;line-height:1.4;color:var(--muted);padding-left:10px;border-left:2px solid var(--line2)}
+.hrec{align-self:flex-start;background:none;border:none;padding:0;min-height:36px;color:var(--muted);font:inherit;font-size:13.5px;cursor:pointer}
+.hcorto{align-self:center;background:none;border:none;color:var(--muted);font:inherit;font-size:14px;min-height:44px;cursor:pointer}
+.hcorto b{color:var(--lime)}
+#hoy .accbtn:not(.on){color:var(--lime)}
+/* Modo sala: legible a un brazo de distancia, sin desplazarse */
+#sala{background:var(--bg)}
+.salatop{display:grid;grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto auto;gap:6px 10px;align-items:center;padding:max(14px,env(safe-area-inset-top,0px)) 18px 8px}
+.salamenu{grid-row:1/3;width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--panel);color:var(--txt);display:flex;align-items:center;justify-content:center}
+.salaprog{display:flex;gap:5px}
+.salaprog .sp{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.salaprog .sp:nth-child(1){flex:8}.salaprog .sp:nth-child(2){flex:24}.salaprog .sp:nth-child(3){flex:12}
+.salaprog .sp i{display:block;height:100%;background:var(--lime);box-shadow:0 0 6px var(--lime)}
+.salapos{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.salabody{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:6px 18px 10px}
+.salafoot{padding:6px 18px max(16px,env(safe-area-inset-bottom,0px))}
+.salalisto{width:100%;min-height:64px;border-radius:18px;border:none;background:var(--lime);color:#04131a;font:inherit;font-size:22px;font-weight:800;letter-spacing:.02em;box-shadow:0 0 18px rgba(64,196,255,.45)}
+.sv{display:flex;gap:10px;align-items:flex-start;margin:0;font-size:15px;line-height:1.4;color:var(--txt)}
+.sv .vbolt{width:13px;height:20px;flex-shrink:0;color:var(--yel);filter:drop-shadow(0 0 4px rgba(255,233,74,.6));margin-top:1px}
+.sv.big{font-size:19px;font-weight:600;line-height:1.4}
+.schk{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.schq{font-weight:700;font-size:16px}
+.sname{margin:0;font-family:var(--display);font-stretch:75%;font-weight:800;font-size:30px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em}
+.sact{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.sact li{display:flex;justify-content:space-between;gap:10px;padding:14px 2px;border-bottom:1px solid var(--line);font-size:17px}
+.sact li span{color:var(--muted)}
+.smaq{position:relative;height:150px;border-radius:16px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.maqsvg{height:120px}
+.sfoto{position:absolute;top:8px;left:10px;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.szona{font-size:14px;color:var(--muted);margin-top:-4px}
+.sload{font-family:var(--display);font-stretch:75%;font-weight:600;font-size:30px;line-height:1;color:var(--txt)}
+.sload b{font-weight:800;font-size:48px;color:var(--txt);text-shadow:0 0 12px rgba(64,196,255,.35)}
+.shint{margin:0;font-size:14px;line-height:1.4;color:var(--muted)}
+.sdots{display:flex;align-items:center;gap:10px}
+.sdot{width:48px;height:48px;border-radius:24px;border:1.5px solid var(--line2);background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:16px}
+.sdot.on{border-color:var(--lime);background:rgba(7,176,242,.15);color:var(--txt);box-shadow:0 0 8px rgba(64,196,255,.4)}
+.sdots .link{margin-left:auto;min-height:44px;padding:0}
+.srow{display:flex;align-items:center;gap:14px;margin-top:auto}
+.srow .btn{width:auto;padding:0 18px;min-height:48px}
+.srow .link{min-height:48px;padding:0}
+.srest{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0}
+.srt{font-family:var(--display);font-stretch:75%;font-weight:800;font-size:64px;line-height:1;color:var(--txt)}
+@media (prefers-reduced-motion: no-preference){.srest .srt{animation:restPulse 2s ease-in-out infinite}}
+@keyframes restPulse{50%{text-shadow:0 0 18px rgba(64,196,255,.6)}}
+.scmb{display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;min-height:64px;padding:12px 14px;border-radius:14px;border:1px solid var(--line2);background:var(--panel);color:var(--txt);font:inherit;cursor:pointer}
+.scmb b{font-size:17px}.scmb span{font-size:13.5px;color:var(--muted)}
+.sadjrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sadj{display:flex;align-items:center;gap:8px}
+.sadj .opt{width:44px;min-height:44px;padding:0;font-size:20px}
+.sadj b{min-width:70px;text-align:center}
+.app[data-scr="sala"] .demofab{bottom:auto;top:66px;left:auto;right:12px}
+.app[data-scr="sala"] .coachfab{display:none!important}
+/* Cierre */
+.cierrebody{padding-top:max(36px,env(safe-area-inset-top,0px))!important;gap:14px!important}
+.cierrebody .cbig{align-self:flex-start}
+.cisem{gap:8px}.cisem .eqsvg{max-height:92px}
+.cilog,.ciq{gap:10px}
+.cinext{display:flex;flex-direction:column;gap:2px}
 /* ===== v37 · Esquinas iluminadas (cian abajo a la izquierda, magenta arriba a la derecha), opción de demo ===== */
 .esqFondo{position:absolute;inset:0;z-index:-1;pointer-events:none;display:none;background:radial-gradient(90% 42% at 100% 0%,rgba(244,0,160,.24),rgba(244,0,160,0) 72%),radial-gradient(95% 40% at 0% 92%,rgba(7,176,242,.24),rgba(7,176,242,0) 72%)}
 .app[data-esq="fondo"] .esqFondo,.app[data-esq="ambos"] .esqFondo{display:block}
@@ -1337,11 +1406,41 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
   <div class="accbar" id="accBar" hidden><button class="accbtn" id="accBtn"></button></div>
 </section>
 
+<!-- ENTRENAR · HOY (versión 41) -->
+<section class="scr" id="hoy" hidden aria-label="Entrenar: hoy">
+  <div class="body" style="padding-top:28px">
+    <h1 class="h1">Entrenar</h1>
+    <div class="tabs" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="true">Hoy</button><button role="tab" aria-selected="false" data-go="progreso">Progreso</button></div>
+    <div class="card" id="hoyCard" style="gap:12px">
+      <div class="between"><span class="wktit" id="hTit"><span class="sig"><b>Tu</b> <i>rutina</i></span></span><button class="link lime" data-go="rutinas" style="min-height:44px;margin:-12px 0;padding:0;font-size:14px">Cambiar</button></div>
+      <div class="tdrow"><span class="tdday" aria-hidden="true"><small>Día</small><b id="hLetter">B</b></span><span class="stack" style="gap:3px;min-width:0"><span class="tdname" id="hName"></span><span class="small muted" id="hMeta"></span></span></div>
+      <div class="hparts" id="hParts"></div>
+      <div class="hprofe" id="hProfe"></div>
+      <div class="hcuida" id="hCuida" hidden></div>
+      <button class="hrec" data-go="rutinas">Elegida según tu recuperación<span aria-hidden="true"> ›</span></button>
+    </div>
+    <button class="hcorto" id="hCorto"></button>
+  </div>
+  <div class="accbar"><button class="accbtn" id="hEmpezar"></button></div>
+</section>
+
+<!-- MODO SALA (versión 41): un ejercicio por pantalla, un toque por ejercicio -->
+<section class="scr" id="sala" hidden aria-label="Tu sesión">
+  <div class="salatop"><button class="salamenu" id="salaMenu" aria-label="Menú de la sesión"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button><div class="salaprog" id="salaProg" aria-hidden="true"></div><span class="salapos" id="salaPos"></span></div>
+  <div class="salabody" id="salaBody"></div>
+  <div class="salafoot"><button class="salalisto" id="salaListo">Listo</button></div>
+</section>
+
+<!-- CIERRE DE LA SESIÓN (versión 41): una pantalla y una pregunta -->
+<section class="scr" id="cierre" hidden aria-label="Cierre de la sesión">
+  <div class="body cierrebody" id="cierreBody"></div>
+</section>
+
 <!-- 3. RUTINAS -->
 <section class="scr" id="rutinas" hidden aria-label="Tus rutinas">
   <div class="body" style="padding-top:28px">
-    <h1 class="h1">Entrenamiento</h1>
-    <div class="tabs" role="tablist" aria-label="Entrenamiento"><button role="tab" aria-selected="true">Rutinas</button><button role="tab" aria-selected="false" data-go="progreso">Progreso</button></div>
+    <button class="link lime" data-go="hoy" style="align-self:flex-start;padding:0;min-height:40px;margin-bottom:-8px">‹ Volver a hoy</button>
+    <h1 class="h1">Tus rutinas</h1>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="act">Activas</button>
       <button role="tab" aria-selected="false" data-tab="hist">Historial</button>
@@ -1599,8 +1698,8 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
 <!-- 6. PROGRESO -->
 <section class="scr" id="progreso" hidden aria-label="Progreso">
   <div class="body" style="padding-top:28px">
-    <h1 class="h1">Entrenamiento</h1>
-    <div class="tabs" role="tablist" aria-label="Entrenamiento"><button role="tab" aria-selected="false" data-go="rutinas">Rutinas</button><button role="tab" aria-selected="true">Progreso</button></div>
+    <h1 class="h1">Entrenar</h1>
+    <div class="tabs" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="false" data-go="hoy">Hoy</button><button role="tab" aria-selected="true">Progreso</button></div>
     <div class="grid3" id="progTiles">
       <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px" id="mesCount">14</span><span class="small muted">entrenamientos en octubre</span></div>
       <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px;color:var(--dat)" id="semAcum">10</span><span class="small muted">semanas cumplidas</span></div>
@@ -2409,7 +2508,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
 
 <nav class="nav" id="nav" hidden aria-label="Principal">
   <button data-go="inicio"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Inicio</button>
-  <button data-go="rutinas"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg>Entrenar</button>
+  <button data-go="hoy"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg>Entrenar</button>
   <button data-go="beneficios"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18v4H3zM5 13v8h14v-8M12 9v12M12 9C10 5 6 5 6 7.5S12 9 12 9zM12 9c2-4 6-4 6-1.5S12 9 12 9z"/></svg>Club</button>
   <button class="navacc" id="navAcc" hidden><span class="nai"></span><span class="nal">Entrenar</span></button>
   <button data-go="social"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M16 14.2a5.5 5.5 0 0 1 5.5 5.8"/></svg>Comunidad</button>
@@ -2514,6 +2613,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
     <span class="small muted" style="line-height:1.45">Estimado con las entradas por molinete de las últimas 4 semanas. Costanera y Santa Ana todavía no registran entradas.</span>
   </div>
 </div>
+<div class="sheet" id="salaSheet" hidden role="dialog" aria-label="Opciones de la sesión"><div class="sheetin" id="salaSheetIn" style="max-height:88%;overflow-y:auto"></div></div>
 <div class="sheet" id="cardioSheet" hidden role="dialog" aria-labelledby="cdTitle">
   <div class="sheetin">
     <div class="between"><span class="h2" style="font-size:26px" id="cdTitle">Cardio de afuera</span><button class="link" id="cdX" style="min-height:44px">Cerrar</button></div>
@@ -2552,7 +2652,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
   let modo = 'socio';
-  const withNav = ['inicio','rutinas','progreso','beneficios','social','plan'];
+  const withNav = ['inicio','hoy','rutinas','progreso','beneficios','social','plan'];
   let curScr = 'login', prevScr = 'login';
 
   function go(id){
@@ -2563,11 +2663,12 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
     $('#nav2').hidden = !ppuIds.includes(id);
     if (withNav.includes(id)) modo = 'socio'; if (ppuIds.includes(id)) modo = 'ppu';
     $$('#nav2 button').forEach(b => { if (b.dataset.go === id) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
-    $$('#nav button').forEach(b => { if (b.dataset.go === (['progreso','clases'].includes(id) ? 'rutinas' : id)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+    $$('#nav button').forEach(b => { if (b.dataset.go === (['progreso','clases','rutinas','ia','entrenando'].includes(id) ? 'hoy' : id)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
     const body = $('#'+id+' .body'); if (body) body.scrollTop = 0;
     if (id === 'entrenando') startClock();
     if (id === 'inicio' && typeof semMarcarVisto === 'function') semMarcarVisto();
     if (typeof renderAcc === 'function' && typeof MOM !== 'undefined') { renderAcc(); avisosLater(); }
+    $('.app').dataset.scr = id; if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy();
   }
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }
@@ -2720,7 +2821,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
     const nEx = d.ex.length, P = [['Activación', 8, "8'"], ['Fuerza', nEx * 8, nEx + ' ejercicios'], ['Cardio', 12, "12'"]], tot = P.reduce((a, x) => a + x[1], 0);
     $('#todayMeta').textContent = (r.tipo === 'profe' ? 'Prof. Lucas' : 'Generada con IA') + ' · ' + tot + ' min';
     let prog = [0, 0, 0];
-    if (mm === 'sesion') try { let dn = 0, all = 0; d.ex.forEach((k, i) => { const n = lib[k].sets.length; all += n; dn += ses.done[i] ? ses.done[i].filter(x => x).length : 0; }); prog = [1, all ? dn / all : 0, 0]; } catch (_) {}
+    if (mm === 'sesion') try { if (SALA) prog = salaProg(); else prog = [1, 1 / 3, 0]; } catch (_) {}
     const col = 'var(--lime)'; // cian = acción: lo que vas a hacer hoy
     $('#todayPlan').style.setProperty('--pc', col);
     $('#todayPlan').innerHTML = P.map((x, i) => '<span class="tdp" style="flex:' + x[1] + '"><span class="bar tdb' + (mm === 'sesion' ? ' live' : '') + '"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span><span class="tdl"><b>' + x[0] + '</b> ' + x[2] + '</span></span>').join('');
@@ -2851,6 +2952,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
   let ses = { rid:'profe', di:1, idx:0, done:[[true,true,false,false]], vals:[], prs:{}, motivos:[] };
   let editSet = null, pendiente = null;
   function startDay(rid, di, pv){
+    if (!pv && modo === 'socio' && typeof salaStart === 'function') { actual = rid; rutinas[rid].next = di; salaStart(); return; }
     preview = !!pv; $('#exPrev').hidden = !preview; $('#clock').textContent = '0:00';
     $('#finish').textContent = preview ? (leadSaved ? 'Listo' : 'Guardar mi rutina') : 'Terminar';
     ses = { rid:rid, di:di, idx:0, done:[], vals:[], prs:{}, motivos:[] };
@@ -5040,6 +5142,222 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
   }
 
 
+  const SV_BOLT = '<svg class="vbolt" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg>';
+
+  // ===== v41 · Entrenar (claude/instruccion-prototipo-entrenar.md): Hoy, modo sala y cierre =====
+  // Datos de la demo con la forma de EVO (ejercicios y cargas a validar por los profes de Viva)
+  const ACT_B = [['Movilidad de hombros con banda', '10 por lado'], ['Escápulas en la pared', '12'], ['Bisagra de cadera', '10'], ['Plancha', '20 s']];
+  const SALA_B = {
+    act:{ min:8, items:ACT_B },
+    fue:[
+      { k:'remo', n:'Remo sentado', maq:'remo', zona:'Zona espalda · al fondo, a la izquierda', sr:3, rep:12, kg:42.5, prev:40, alt:[{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' }, { n:'Remo en polea baja', zona:'Zona poleas · junto a la columna', kg:40, maq:'polea' }] },
+      { k:'jalon', n:'Jalón al pecho', maq:'jalon', zona:'Zona espalda · al fondo, al centro', sr:3, rep:12, kg:45, prev:45, alt:[{ n:'Jalón con agarre neutro', zona:'Zona espalda · al fondo, al centro', kg:42.5, maq:'jalon' }, { n:'Dominadas asistidas', zona:'Zona espalda · contra la pared', kg:null, maq:'jalon' }], hombro:{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' } },
+      { k:'curl', n:'Curl de bíceps en máquina', maq:'curl', zona:'Zona brazos · junto a los espejos', sr:3, rep:12, kg:20, prev:20, alt:[{ n:'Curl con mancuernas', zona:'Zona peso libre', kg:10, maq:'curl' }, { n:'Curl en polea', zona:'Zona poleas · junto a la columna', kg:15, maq:'polea' }] }
+    ],
+    car:{ maq:'Cinta', min:12, txt:'caminata en subida', zona:'Zona cardio · frente a las ventanas' }
+  };
+  const ALT_G = { sentadilla:['Prensa de piernas', 'Sentadilla en máquina Smith'], puente:['Hip thrust en máquina', 'Puente a una pierna'], plancha:['Plancha con rodillas apoyadas', 'Dead bug en colchoneta'], press:['Press de hombros en máquina', 'Press con mancuernas sentado'] };
+  var SALA = null, CORTO = false, CUIDA = null;
+  const fmtKg = v => (Math.round(v * 10) / 10).toString().replace('.', ',');
+  function salaPlan(){
+    const r = rutinas[actual], d = r.dias[r.next];
+    let P = actual === 'profe' && d.k === 'B' ? JSON.parse(JSON.stringify(SALA_B)) : {
+      act:{ min:8, items:ACT_B },
+      fue:d.ex.map(k => { const st = lib[k].sets[0], kg = parseFloat(String(st[1]).replace(',', '.')); return { k:k, n:lib[k].n, maq:'generic', zona:'Zona musculación', sr:lib[k].sets.length, rep:parseInt(String(st[2]), 10) || 12, kg:isNaN(kg) ? null : kg, prev:null, seg:esTiempo(k), alt:(ALT_G[k] || []).map(n => ({ n:n, zona:'Zona musculación', kg:null, maq:'generic' })) }; }),
+      car:{ maq:'Cinta', min:12, txt:'caminata en subida', zona:'Zona cardio · frente a las ventanas' } };
+    if (CORTO) { P.act = { min:5, items:P.act.items.slice(0, 2) }; P.fue = P.fue.slice(0, 2); P.car.min = 8; }
+    if (CUIDA === 'Hombro') P.fue = P.fue.map(f => f.hombro ? Object.assign({}, f.hombro, { k:f.k + 'H', sr:f.sr, rep:f.rep, prev:null, alt:[], cambiado:f.n }) : Object.assign(f, { kg:f.prev || f.kg }));
+    return P;
+  }
+  const planMin = P => P.act.min + P.fue.length * 8 + P.car.min;
+  function salaProg(){ if (!SALA) return [0, 0, 0]; const n = SALA.F.length; return [SALA.actDone ? 1 : 0, n ? SALA.F.filter(f => f.done).length / n : 0, SALA.carDone ? 1 : 0]; }
+  // ---- Hoy ----
+  let hOpen = -1;
+  function renderEntHoy(){
+    const r = rutinas[actual], d = r.dias[r.next], P = salaPlan(), tot = planMin(P);
+    $('#hLetter').textContent = d.k; $('#hName').textContent = d.n;
+    $('#hMeta').textContent = (r.tipo === 'profe' ? 'Prof. Lucas' : 'Generada con IA') + ' · ' + tot + ' min' + (CORTO ? ' · versión corta' : '');
+    $('#hTit').innerHTML = '<span class="sig">' + firma(MOM === 'sesion' ? 'Tu sesión' : 'Tu rutina') + '</span>';
+    const prog = MOM === 'sesion' ? salaProg() : [0, 0, 0];
+    const parts = [['Activación', P.act.min, P.act.min + "'", P.act.items.map(x => '<li><b>' + x[0] + '</b><span>' + x[1] + '</span></li>').join('')],
+      ['Fuerza', P.fue.length * 8, P.fue.length + ' ejercicios', P.fue.map(f => '<li><b>' + f.n + '</b><span>' + f.sr + ' × ' + f.rep + (f.kg ? ' · ' + fmtKg(f.kg) + ' kg' : '') + '</span><em>' + f.zona + '</em></li>').join('')],
+      ['Cardio', P.car.min, P.car.min + "'", '<li><b>' + P.car.maq + ' · ' + P.car.min + ' min</b><span>' + P.car.txt + '</span><em>' + P.car.zona + '</em></li>']];
+    $('#hParts').innerHTML = '<div class="tdplan">' + parts.map((x, i) => '<button class="tdp hpb' + (hOpen === i ? ' open' : '') + '" data-hp="' + i + '" style="flex:' + x[1] + '" aria-expanded="' + (hOpen === i) + '"><span class="bar tdb"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span><span class="tdl"><b>' + x[0] + '</b> ' + x[2] + '</span></button>').join('') + '</div>' +
+      (hOpen >= 0 ? '<ul class="hlist">' + parts[hOpen][3] + '</ul>' : '');
+    $('#hParts').style.setProperty('--pc', 'var(--lime)');
+    $('#hProfe').innerHTML = d.k === 'B' && actual === 'profe' ? '<b>Lucas:</b> en el remo, bajá un punto el asiento.' : '';
+    $('#hProfe').hidden = !$('#hProfe').innerHTML;
+    $('#hCuida').hidden = !CUIDA; if (CUIDA) $('#hCuida').textContent = CUIDA === 'Hombro' ? 'Hoy cuidamos tu hombro: cambiamos el jalón por remo con apoyo de pecho y la carga no sube.' : 'Hoy cuidamos tu ' + CUIDA.toLowerCase() + ': evitamos los ejercicios que la cargan.';
+    $('#hCorto').innerHTML = CORTO ? 'Volver a la versión completa' : '¿Poco tiempo? <b>Hacé la versión de 30 min</b>'; $('#hCorto').hidden = MOM === 'sesion';
+    const b = $('#hEmpezar'), ses = MOM === 'sesion';
+    b.parentElement.hidden = !!pausa;
+    b.className = 'accbtn' + (MOM === 'sala' ? ' on go' : ses ? ' on' : '');
+    b.innerHTML = (ses ? ICO_SES : ICO_PLAY).replace('<svg ', '<svg width="20" height="20" ') + '<span>' + (ses ? 'Volver a tu sesión' : 'Empezar · Día ' + d.k) + '</span>';
+  }
+  $('#hParts').addEventListener('click', e => { const b = e.target.closest('[data-hp]'); if (!b) return; const i = +b.dataset.hp; hOpen = hOpen === i ? -1 : i; renderEntHoy(); });
+  $('#hCorto').addEventListener('click', () => { CORTO = !CORTO; renderEntHoy(); renderToday(); toast(CORTO ? 'Versión de 30 minutos: las tres partes, más cortas' : 'Volviste a la versión completa'); });
+  $('#hEmpezar').addEventListener('click', () => { if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else salaStart(); });
+  // ---- Modo sala ----
+  function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => ({ sets:Array(f.sr).fill(false), done:false, salteado:false, kg:f.kg, reps:Array(f.sr).fill(f.rep), swap:null })), carDone:false, carMin:P.car.min, t0:Date.now(), saludo:true, chk:false, rest:0, crono:0 }; }
+  function salaStart(){
+    if (MOM !== 'sala' && MOM !== 'sesion') setMom('sala', true);
+    SALA = salaNew(); SALA.chk = !prep.done;
+    MOM = 'sesion'; syncMomPick();
+    try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { if (SALA) SALA.lock = l; }).catch(() => {}); } catch (_) {}
+    renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy();
+    renderSala(); go('sala');
+  }
+  // Estado "sesión abierta" de la demo: activación y el primer ejercicio hechos
+  function salaDemo(){ SALA = salaNew(); SALA.actDone = true; SALA.F[0].done = true; SALA.F[0].sets = SALA.F[0].sets.map(() => true); SALA.step = 2; SALA.saludo = false; }
+  const steps = () => ['act'].concat(SALA.F.map((_, i) => 'f' + i), ['car']);
+  const curF = () => { const st = steps()[SALA.step]; return st[0] === 'f' ? +st.slice(1) : -1; };
+  const fx = i => { const f = SALA.P.fue[i], F = SALA.F[i]; return F.swap ? Object.assign({}, f, F.swap, { prev:null }) : f; };
+  // Ilustración de línea de la máquina (en producción: la foto de la máquina Harmony de la sede)
+  function maqSvg(kind){
+    const st = 'fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+    const M = {
+      remo:'<path d="M30 120h150M50 120V70h40M90 70v50M120 120V40M120 40h40v80M40 60h50M150 55l-45 20"/><circle cx="105" cy="75" r="6"/>',
+      jalon:'<path d="M40 125h140M110 125V20M110 20H70M70 20v10M50 32h50M60 100h50M60 100v25M70 85h30"/><circle cx="110" cy="60" r="7"/>',
+      curl:'<path d="M40 125h140M70 125V80h50v45M60 70h70l15-25M120 80l20-15M140 40l15 10"/><circle cx="148" cy="44" r="6"/>',
+      polea:'<path d="M50 125h120M150 125V20M150 30l-50 70M60 110h40M100 100l-15 10"/><circle cx="150" cy="30" r="7"/>',
+      cinta:'<path d="M25 115l130-18M30 125l135-18M155 97V40l15-6M150 45h30M40 112l-5 12M150 98l5 12"/>',
+      generic:'<path d="M40 125h140M60 125V60h100v65M60 80h100M110 60V30"/><circle cx="110" cy="30" r="6"/>'
+    };
+    return '<svg class="maqsvg" viewBox="0 0 210 140" aria-hidden="true"><g ' + st + '>' + (M[kind] || M.generic) + '</g></svg>';
+  }
+  function renderSala(){
+    if (!SALA) return;
+    const S = SALA, st = steps()[S.step], P = S.P, prog = salaProg();
+    $('#salaProg').innerHTML = ['Activación', 'Fuerza', 'Cardio'].map((n, i) => '<span class="sp' + (prog[i] >= 1 ? ' full' : '') + '"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span>').join('');
+    const fi = curF();
+    $('#salaPos').textContent = st === 'act' ? 'Activación' : st === 'car' ? 'Cardio' : 'Fuerza · ' + (fi + 1) + ' de ' + S.F.length;
+    const voz = t => '<p class="sv">' + SV_BOLT + '<span>' + t + '</span></p>';
+    let h = '';
+    if (S.saludo && st === 'act') h += voz('Llegaste a Sarmiento ⚡ Hoy toca el Día ' + rutinas[actual].dias[rutinas[actual].next].k + ': arrancamos con ' + P.act.min + ' minutos de activación.');
+    if (S.chk && st === 'act') h += '<div class="schk"><span class="schq">¿Cómo venís hoy?</span><div class="opts g2" id="sChk"><button class="opt" data-ck="todo">Con todo</button><button class="opt" data-ck="normal">Normal</button><button class="opt" data-ck="sinen">Sin energía</button><button class="opt" data-ck="cuidar">Con algo para cuidar</button></div><button class="link" data-ck="skip" style="min-height:36px;padding:0;font-size:13px">Saltear</button></div>';
+    if (st === 'act') {
+      h += '<h2 class="sname">Activación · ' + P.act.min + "'</h2><ul class=\"sact\">" + P.act.items.map(x => '<li><b>' + x[0] + '</b><span>' + x[1] + '</span></li>').join('') + '</ul>';
+    } else if (st === 'car') {
+      const C = P.car, m = Math.floor(S.crono / 60), sg = S.crono % 60;
+      h += '<div class="smaq">' + maqSvg('cinta') + '<span class="sfoto">Foto de la sede</span></div><span class="szona">' + C.zona + '</span>' +
+        '<h2 class="sname">' + C.maq + ' · ' + C.txt + '</h2><div class="sload"><b>' + S.carMin + '</b> min</div>' +
+        '<p class="shint">Intensidad: podés hablar, pero no cantar.</p>' +
+        '<div class="srow"><button class="btn ghost sm" id="sCrono">' + (S.cronoOn ? 'Pausar' : 'Arrancar') + ' cronómetro · ' + m + ':' + String(sg).padStart(2, '0') + '</button><button class="link lime" id="sAjCar">Ajustar</button></div>';
+    } else {
+      const f = fx(fi), F = S.F[fi];
+      h += '<div class="smaq">' + maqSvg(f.maq) + '<span class="sfoto">Foto de la sede</span></div><span class="szona">' + f.zona + '</span>' +
+        '<h2 class="sname">' + f.n + '</h2>' +
+        '<div class="sload">' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' s' : '') + (F.kg ? ' · <b>' + fmtKg(F.kg) + '</b> kg' : '') + '</div>';
+      if (f.prev && F.kg > f.prev && !F.swap) h += voz('La vez pasada hiciste ' + fmtKg(f.prev) + ' kg completo: hoy probá ' + fmtKg(F.kg) + ' ⚡');
+      if (f.cambiado) h += '<p class="shint">Hoy en lugar de ' + f.cambiado.toLowerCase() + ', para cuidar tu hombro.</p>';
+      if (S.rest > 0) {
+        h += '<div class="srest" role="timer"><span class="srt">' + Math.floor(S.rest / 60) + ':' + String(S.rest % 60).padStart(2, '0') + '</span><span class="small muted">' + (F.sets.indexOf(false) >= 0 ? 'Siguiente: serie ' + (F.sets.indexOf(false) + 1) + ' de ' + f.sr : 'Siguiente: ' + (fi + 1 < S.F.length ? fx(fi + 1).n : 'el cardio')) + '</span><button class="link lime" id="sSkipRest">Saltear descanso</button></div>';
+      } else {
+        h += '<div class="sdots"><span class="small muted">Series</span>' + F.sets.map((x, j) => '<button class="sdot' + (x ? ' on' : '') + '" data-set="' + j + '" aria-label="Serie ' + (j + 1) + (x ? ', hecha' : '') + '">' + (j + 1) + '</button>').join('') + '<button class="link lime" id="sAjustar">Ajustar</button></div>';
+      }
+      h += '<div class="srow"><button class="btn ghost sm" id="sCambiar">Cambiar</button><button class="link" id="sComo">Ver cómo se hace</button></div>';
+    }
+    $('#salaBody').innerHTML = h;
+    $('#salaListo').textContent = st === 'car' ? 'Listo · terminar' : 'Listo';
+  }
+  function salaListo(){
+    const S = SALA, st = steps()[S.step]; S.saludo = false; S.chk = false; S.rest = 0;
+    WK.reg = true;
+    if (st === 'act') { S.actDone = true; WK.act++; }
+    else if (st === 'car') { S.carDone = true; WK.car += S.carMin; S.cronoOn = false; renderForma(); return salaCerrar(); }
+    else { const F = S.F[curF()]; F.sets = F.sets.map(() => true); F.done = true; if (S.F.every(x => x.done || x.salteado) && !S.fueSumada) { S.fueSumada = true; WK.fue++; } }
+    S.step = Math.min(steps().length - 1, S.step + 1);
+    renderForma(); renderToday(); renderSala(); $('#salaBody').scrollTop = 0;
+  }
+  $('#salaListo').addEventListener('click', salaListo);
+  let restT = null, cronoT = null;
+  $('#salaBody').addEventListener('click', e => {
+    const S = SALA; if (!S) return;
+    const ck = e.target.closest('[data-ck]');
+    if (ck) { const v = ck.dataset.ck;
+      if (v === 'cuidar') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">¿Qué querés cuidar hoy?</span><span class="muted" style="line-height:1.45">Hoy armamos la sesión sin cargar esa zona. Es solo por hoy, salvo que nos pidas recordarlo.</span><div class="opts g2" id="sZona">' + ['Hombro', 'Codo', 'Muñeca', 'Espalda', 'Cadera', 'Rodilla', 'Tobillo', 'Otra'].map(z => '<button class="opt" data-z="' + z + '">' + z + '</button>').join('') + '</div><button class="link lime" data-z="profe" style="min-height:44px">Prefiero hablarlo con mi profe</button>'; $('#salaSheet').hidden = false; return; }
+      if (v !== 'skip') { const x = { todo:20, normal:13, sinen:5 }[v]; prep.resp = { pSueno:x, pDolor:20, pEnergia:x }; prep.skip = false; calcPrep(); if (v === 'sinen' && !CORTO) toast('¿Poco tiempo o pocas pilas? En Hoy tenés la versión de 30 min'); }
+      S.chk = false; renderSala(); return; }
+    const sd = e.target.closest('[data-set]');
+    if (sd) { const F = S.F[curF()], j = +sd.dataset.set; F.sets[j] = !F.sets[j]; if (F.sets[j] && F.sets.indexOf(false) >= 0) { S.rest = 90; clearInterval(restT); restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } SALA.rest--; if (curScr === 'sala') renderSala(); }, 1000); } renderSala(); return; }
+    if (e.target.closest('#sSkipRest')) { S.rest = 0; clearInterval(restT); renderSala(); return; }
+    if (e.target.closest('#sAjustar')) return salaAjustar();
+    if (e.target.closest('#sAjCar')) { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Minutos de cardio</span><div class="sadj"><button class="opt" data-cm="-5">−5</button><b id="sCarMin">' + S.carMin + ' min</b><button class="opt" data-cm="5">+5</button></div><button class="btn" data-close>Listo</button>'; $('#salaSheet').hidden = false; return; }
+    if (e.target.closest('#sCrono')) { S.cronoOn = !S.cronoOn; clearInterval(cronoT); if (S.cronoOn) cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } SALA.crono++; if (curScr === 'sala') renderSala(); }, 1000); renderSala(); return; }
+    if (e.target.closest('#sCambiar')) return salaCambiar();
+    if (e.target.closest('#sComo')) { toast('Abre el video de tu profe o el maniquí 3D de este ejercicio'); return; }
+  });
+  // Deslizar a la derecha vuelve al ejercicio anterior
+  let tx = null;
+  $('#salaBody').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive:true });
+  $('#salaBody').addEventListener('touchend', e => { if (tx === null || !SALA) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (dx > 70 && SALA.step > 0) { SALA.step--; SALA.rest = 0; renderSala(); } else if (dx < -70 && SALA.step < steps().length - 1) { SALA.step++; SALA.rest = 0; renderSala(); } });
+  function salaAjustar(){
+    const F = SALA.F[curF()], f = fx(curF());
+    $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">' + f.n + '</span><span class="small muted">Corregí solo lo que cambió. Sin teclado.</span>' +
+      F.reps.map((r, j) => '<div class="sadjrow"><span class="small muted">Serie ' + (j + 1) + '</span>' + (F.kg ? '<span class="sadj"><button class="opt" data-ak="-2.5">−</button><b>' + fmtKg(F.kg) + ' kg</b><button class="opt" data-ak="2.5">+</button></span>' : '') + '<span class="sadj"><button class="opt" data-ar="' + j + ':-1">−</button><b>' + r + ' rep</b><button class="opt" data-ar="' + j + ':1">+</button></span></div>').join('') +
+      '<button class="btn" data-close>Listo</button>';
+    $('#salaSheet').hidden = false;
+  }
+  function salaCambiar(){
+    const f = fx(curF());
+    $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">¿Qué pasa con ' + f.n.toLowerCase() + '?</span>' +
+      '<button class="scmb" data-cm2="ocupada"><b>Está ocupada</b><span>Te damos otra de tu sede que trabaja lo mismo</span></button>' +
+      '<button class="scmb" data-cm2="molesta"><b>Me molesta</b><span>Una alternativa que no carga esa zona</span></button>' +
+      '<button class="scmb" data-cm2="nose"><b>No sé cómo se hace</b><span>El video de tu profe, o que te ayude en la sala</span></button>' +
+      '<button class="link" data-cm2="saltear" style="min-height:44px">Saltear este ejercicio</button>';
+    $('#salaSheet').hidden = false;
+  }
+  $('#salaSheet').addEventListener('click', e => {
+    const S = SALA, close = () => { $('#salaSheet').hidden = true; renderSala(); renderEntHoy(); };
+    if (e.target.id === 'salaSheet' || e.target.closest('[data-close]')) return close();
+    const z = e.target.closest('[data-z]');
+    if (z) { if (z.dataset.z === 'profe') { toast('Listo. Lucas sabe que querés hablarlo ⚡'); } else { CUIDA = z.dataset.z; if (S) { const keep = S; const N = salaNew(); N.step = keep.step; N.actDone = keep.actDone; N.saludo = false; SALA = N; } toast(CUIDA === 'Hombro' ? 'Cambiamos el jalón por remo con apoyo de pecho' : 'Hoy evitamos lo que carga tu ' + CUIDA.toLowerCase()); } if (S) S.chk = false; if (SALA) SALA.chk = false; return close(); }
+    const ak = e.target.closest('[data-ak]'); if (ak) { const F = S.F[curF()]; F.kg = Math.max(0, F.kg + +ak.dataset.ak); return salaAjustar(); }
+    const ar = e.target.closest('[data-ar]'); if (ar) { const [j, d] = ar.dataset.ar.split(':').map(Number), F = S.F[curF()]; F.reps[j] = Math.max(1, F.reps[j] + d); return salaAjustar(); }
+    const cm = e.target.closest('[data-cm]'); if (cm) { S.carMin = Math.max(5, S.carMin + +cm.dataset.cm); $('#sCarMin').textContent = S.carMin + ' min'; return; }
+    const c2 = e.target.closest('[data-cm2]');
+    if (c2) { const f = fx(curF()), base = S.P.fue[curF()], v = c2.dataset.cm2;
+      if (v === 'ocupada') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Otras de tu sede</span><span class="small muted">Trabajan lo mismo. Es solo por hoy y el registro sigue.</span>' + base.alt.map((a, i) => '<button class="scmb" data-alt="' + i + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button>').join(''); return; }
+      if (v === 'molesta') { const a = base.alt[base.alt.length - 1]; $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Probá con esta</span><button class="scmb" data-alt="' + (base.alt.length - 1) + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button><p class="shint">Si duele, pará: no hace falta forzar.</p><span style="font-weight:700">¿Le avisamos a tu profe?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-avisa="1">Avisale a Lucas</button><button class="btn ghost sm" data-close>No, gracias</button></div>'; return; }
+      if (v === 'nose') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">' + f.n + '</span><button class="btn ghost" data-como="1">Ver cómo se hace</button><button class="btn sm" data-avisa="1">Pedile ayuda a tu profe</button>'; return; }
+      if (v === 'saltear') { const F = S.F[curF()]; F.salteado = true; if (S.F.every(x => x.done || x.salteado) && !S.fueSumada && S.F.some(x => x.done)) { S.fueSumada = true; WK.fue++; } S.step = Math.min(steps().length - 1, S.step + 1); toast('Salteado. Seguimos'); renderForma(); return close(); } }
+    const al = e.target.closest('[data-alt]'); if (al) { const F = S.F[curF()], a = S.P.fue[curF()].alt[+al.dataset.alt]; F.swap = a; F.kg = a.kg; toast('Listo: hoy hacés ' + a.n.toLowerCase()); return close(); }
+    if (e.target.closest('[data-avisa]')) { toast('Listo. Lucas sabe que estás en ' + fx(curF()).n.toLowerCase() + ' ⚡'); return close(); }
+    if (e.target.closest('[data-como]')) { toast('Abre el video de tu profe o el maniquí 3D'); return close(); }
+    if (e.target.closest('[data-fin]')) { $('#salaSheet').hidden = true; return salaCerrar(); }
+  });
+  $('#salaMenu').addEventListener('click', () => { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Tu sesión</span><button class="btn ghost" data-close>Seguir entrenando</button><button class="btn ghost" data-fin="1">Terminar acá</button><span class="small muted" style="line-height:1.45">Guardamos lo que marcaste. Si la dejás abierta, se cierra sola a las 3 horas.</span>'; $('#salaSheet').hidden = false; });
+  // ---- Cierre: una pantalla y una pregunta ----
+  function salaCerrar(){
+    const S = SALA; if (!S) return;
+    clearInterval(restT); clearInterval(cronoT); try { if (S.lock) S.lock.release(); } catch (_) {}
+    const prog = salaProg(), completa = prog.every(x => x >= 1), r = rutinas[actual], d = r.dias[r.next];
+    const min = Math.round(planMin(S.P) * (completa ? 1.05 : 0.6));
+    const remo = S.P.fue.findIndex(f => f.k === 'remo'), rec = remo >= 0 && S.F[remo].done && !S.F[remo].swap && S.F[remo].kg > (S.P.fue[remo].prev || 99);
+    if (rec) { const h = hist.remo; if (h) { const last = h[h.length - 1]; if (last[0] === hoyLbl) last[1] = S.F[remo].kg; else h.push([hoyLbl, S.F[remo].kg]); } }
+    r.next = (r.next + 1) % r.dias.length; const nx = r.dias[r.next];
+    hoyEntreno = true; visHoy = true; MOM = 'despues'; sesHecha = true; syncMomPick();
+    renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy(); renderRoutines();
+    const lect = completa ? 'Sesión completa en ' + min + ' minutos.' + (rec ? ' En remo subiste a ' + fmtKg(S.F[remo].kg) + ' kg ⚡' : ' ⚡')
+      : 'Guardamos lo que hiciste ⚡ ' + [S.actDone ? 'la activación' : '', S.F.filter(f => f.done).length ? S.F.filter(f => f.done).length + (S.F.filter(f => f.done).length === 1 ? ' ejercicio' : ' ejercicios') + ' de fuerza' : ''].filter(Boolean).join(' y ') + '.';
+    renderSemana(); const sv = $('#wkBox .eqsvg'), comp = semCompleta(), cump = semCumplida();
+    $('#cierreBody').innerHTML = '<span class="tagi m cbig"><span>' + (completa ? '¡Listo!' : 'Guardado') + '</span></span>' +
+      '<p class="sv big">' + SV_BOLT + '<span>' + lect + '</span></p>' +
+      '<div class="card cisem"><div class="between"><span class="wktit"><span class="sig"><b>Tu</b> <i>semana</i></span>' + (comp ? '<span class="tagi sm"><span>Completa</span></span>' : cump ? '<span class="wkleg2">· Cumplida</span>' : '') + '</span></div>' + (sv ? sv.outerHTML : '') + '</div>' +
+      (rec ? '<div class="card cilog"><span style="font-weight:700">Récord en remo sentado: ' + fmtKg(S.F[remo].kg) + ' kg ⚡</span><button class="flowshare" id="ciShare"><svg class="bolt-ico" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg> Contalo en tus historias</button></div>' : '') +
+      (CUIDA && CUIDA !== 'profe' ? '<div class="card ciq"><span style="font-weight:700">¿Querés que tengamos en cuenta tu ' + CUIDA.toLowerCase() + ' las próximas veces?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-cq="si">Sí, tenelo en cuenta</button><button class="btn ghost sm" data-cq="no">No, era por hoy</button></div></div>'
+        : '<div class="card ciq"><span style="font-weight:700">¿Cómo estuvo?</span><div class="opts g3" id="ciFeel"><button class="opt" data-fl="liviana">Liviana</button><button class="opt" data-fl="justa">Justa</button><button class="opt" data-fl="limite">Al límite</button></div></div>') +
+      '<div class="cinext"><span class="small muted">Tu próxima</span><span style="font-weight:700;font-size:17px">Día ' + nx.k + ' · ' + nx.n.toLowerCase() + '</span></div>' +
+      '<button class="btn" data-go="inicio">Volver a tu inicio</button>';
+    SALA = null;
+    go('cierre');
+  }
+  $('#cierreBody').addEventListener('click', e => {
+    const fl = e.target.closest('[data-fl]'); if (fl) { $$('#ciFeel .opt').forEach(x => x.setAttribute('aria-pressed', x === fl)); toast(fl.dataset.fl === 'limite' ? 'Anotado. Si se repite, la próxima no sube la carga' : 'Anotado ⚡'); return; }
+    const cq = e.target.closest('[data-cq]'); if (cq) { if (cq.dataset.cq === 'si') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina; lo ve tu profe solo si vos querés, y se borra cuando lo das por resuelto.</span><div class="grid2" style="gap:8px"><button class="btn sm" data-close>Guardar</button><button class="btn ghost sm" data-close>No guardar</button></div>'; $('#salaSheet').hidden = false; } else { CUIDA = null; renderEntHoy(); toast('Listo, era por hoy'); } cq.closest('.ciq').innerHTML = '<span class="small muted">Gracias.</span>'; return; }
+    if (e.target.closest('#ciShare')) openStory({ type:'ach', a:{ big:'42,5', unit:'KG EN REMO ⚡', cap:'mi récord en remo sentado', feedT:'Récord en remo' }, noSede:true });
+  });
+
   // ===== v38 · Inicio por momentos (claude/ficha-seccion-inicio.md, 2.1 y 3) =====
   var MOM = 'antes', ACC_POS = 'abajo', visHoy = false, sesHecha = false, FIT_NOV = 'medicion', PREM_N = PREM_N || 0, PLAN_AV = !!PLAN_AV, avT = null;
   const ICO_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>';
@@ -5054,29 +5372,32 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
     if (conVis && !visHoy) { WK.vis++; visHoy = true; }
     if (!conVis && visHoy) { WK.vis = Math.max(0, WK.vis - 1); visHoy = false; }
     hoyEntreno = conVis; sesHecha = false; MOM = k; syncMomPick();
+    if (k !== 'sesion' && k !== 'despues') SALA = null;
+    if (k === 'sesion' && !SALA) salaDemo();
     if (!quiet) { renderForma(); renderHoy(); renderToday(); renderAcc(); avisosLater(); }
+    if (typeof renderEntHoy === 'function') renderEntHoy();
   }
   function renderAcc(){
     const r = rutinas[actual], dk = 'Día ' + r.dias[r.next].k;
     let lbl = null, cls = '', ico = '';
     if (!pausa) {
-      if (MOM === 'antes') { lbl = 'Hoy toca ' + dk + ' ⚡'; }
+      if (MOM === 'antes') { lbl = 'Ver tu rutina'; }
       else if (MOM === 'sala') { lbl = 'Empezar · ' + dk; cls = 'on go'; ico = ICO_PLAY; }
       else if (MOM === 'sesion') { lbl = 'Volver a tu sesión'; cls = 'on'; ico = ICO_SES; }
     }
     const cen = ACC_POS === 'centro';
     $('#accBar').hidden = !lbl || cen;
     if (lbl) { const b = $('#accBtn'); b.className = 'accbtn ' + cls; b.innerHTML = ico.replace('<svg ', '<svg width="20" height="20" ') + '<span>' + lbl + '</span>'; b.setAttribute('aria-label', lbl.replace(' ⚡', '')); }
-    const na = $('#navAcc'), tab = $('#nav [data-go="rutinas"]');
+    const na = $('#navAcc'), tab = $('#nav [data-go="hoy"]');
     na.hidden = !cen; tab.hidden = cen;
     const on = MOM === 'sala' || MOM === 'sesion';
     na.className = 'navacc' + (on ? ' on' : '') + (MOM === 'sala' ? ' go' : '');
     na.querySelector('.nai').innerHTML = MOM === 'sala' ? ICO_PLAY : MOM === 'sesion' ? ICO_SES : ICO_ENT;
     na.querySelector('.nal').textContent = MOM === 'sala' ? 'Empezar' : MOM === 'sesion' ? 'Tu sesión' : 'Entrenar';
     $('.app').dataset.accbar = !$('#accBar').hidden && curScr === 'inicio' ? '1' : '0';
-    if (['rutinas', 'progreso', 'ia', 'entrenando'].includes(curScr)) na.setAttribute('aria-current', 'page'); else na.removeAttribute('aria-current');
+    if (['hoy', 'rutinas', 'progreso', 'ia', 'entrenando', 'sala', 'cierre'].includes(curScr)) na.setAttribute('aria-current', 'page'); else na.removeAttribute('aria-current');
   }
-  function accGo(){ if (MOM === 'sala') startDay(actual, rutinas[actual].next); else if (MOM === 'sesion') go('entrenando'); else go('rutinas'); }
+  function accGo(){ if (MOM === 'sala') salaStart(); else if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else go('hoy'); }
   $('#accBtn').addEventListener('click', accGo);
   $('#navAcc').addEventListener('click', accGo);
   $('#momPick').addEventListener('click', e => {
