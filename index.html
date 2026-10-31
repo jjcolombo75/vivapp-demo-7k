@@ -1085,6 +1085,48 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
 .app[data-ah="gira"] .accbtn.go,.app[data-ah="espectro"] .accbtn.go{text-shadow:0 0 10px rgba(64,196,255,.6)}
 /* Una sola animación: mientras gira o respira Empezar, el tubo del tramo queda quieto */
 .app[data-mom="sala"]:not([data-ah="quieto"]) .gauge .tube.tz .halo,.app[data-mom="sala"]:not([data-ah="quieto"]) .gauge .tube.tz .halo2,.app[data-mom="sala"]:not([data-ah="quieto"]) .vumeter .tube.tz .halo,.app[data-mom="sala"]:not([data-ah="quieto"]) .vumeter .tube.tz .halo2{animation:none!important}
+
+/* ===== v40 ===== */
+/* Tu sede arriba a la derecha: caja chica con medidor de color (4 rayitas que crecen, como señal) */
+.sedebox{margin-left:auto;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-height:50px;max-width:150px;padding:6px 11px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:inherit;text-align:left;cursor:pointer}
+.sedebox .sbk{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1}
+.sedebox .sbr{display:flex;align-items:flex-end;gap:7px;min-width:0}
+.sedebox .sbn{font-size:14.5px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sedebox .sbm{display:flex;align-items:flex-end;gap:2px;height:14px;flex-shrink:0}
+.sedebox .sbm i{width:3.5px;border-radius:1px;background:rgba(255,255,255,.14)}
+.sedebox .sbm i:nth-child(1){height:5px}.sedebox .sbm i:nth-child(2){height:8px}.sedebox .sbm i:nth-child(3){height:11px}.sedebox .sbm i:nth-child(4){height:14px}
+.sedebox .sbm i.on{background:var(--oc);box-shadow:0 0 5px var(--oc)}
+.sedebox .sbm[data-lv="full"] i.on{background:var(--zflow);box-shadow:0 0 5px rgba(255,48,178,.6)}
+.app[data-mom="sala"] .sedebox .sbm,.app[data-mom="sesion"] .sedebox .sbm{display:none}
+/* Índice FIT bajo el título "Tu evolución" */
+#fitBox.fitbox{flex-direction:column;align-items:stretch;gap:8px;padding:12px 12px 12px 16px}
+#fitBox.nov::before{display:none}
+#fitBox .fbhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#fitBox .fbnov:empty{display:none}
+#fitBox .fbnov{padding:2px 8px;border-radius:8px;background:var(--dat);color:#06080c;font-size:11px;font-weight:800;letter-spacing:.02em;white-space:nowrap}
+#fitBox .fbrow{display:flex;align-items:center;gap:12px}
+#fitBox .fbrow .fbtrend{flex:1;min-width:0}
+.fitpromo .fptit{margin-bottom:4px}
+/* Tu rutina: la letra del día y la sesión en tres partes */
+.tdrow{display:flex;align-items:center;gap:12px}
+.tdday{flex-shrink:0;width:52px;height:52px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;border:1.5px solid color-mix(in srgb,var(--lime) 70%,transparent);box-shadow:0 0 10px rgba(64,196,255,.25),inset 0 0 8px rgba(64,196,255,.12)}
+.tdday small{font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tdday b{font-family:var(--display);font-stretch:75%;font-weight:800;font-size:28px;color:var(--txt);text-shadow:0 0 8px rgba(64,196,255,.6)}
+.tdname{font-size:18px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tdplan{display:flex;gap:6px;margin-top:4px}
+.tdp{display:flex;flex-direction:column;gap:5px;min-width:0}
+.tdp:first-child,.tdp:last-child{min-width:84px}
+.tdp .tdb{height:10px;border-radius:3px;background:color-mix(in srgb,var(--pc) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 40%,transparent)}
+.tdp .tdb>i{background:var(--pc)!important;box-shadow:0 0 8px var(--pc)}
+.tdp .tdl{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tdp .tdl b{color:var(--txt);font-weight:600}
+#todayCard .hoyrow{margin-top:4px}
+/* Barras como ecualizador en toda la app: la barra es una ranura de LEDs y el avance enciende LEDs */
+.app[data-barras="eq"] .bar,.app[data-barras="eq"] .occ,.app[data-barras="eq"] .ocb{height:10px!important;border-radius:3px;background:rgba(0,0,0,.4) repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 6px,transparent 6px 8px)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)!important;overflow:hidden}
+.app[data-barras="eq"] .occ.sm{height:8px!important}
+.app[data-barras="eq"] .bar>i,.app[data-barras="eq"] .occ>i,.app[data-barras="eq"] .ocb>i{border-radius:0!important;-webkit-mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px);mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px)}
+.app[data-barras="eq"] .tdp .tdb{background:color-mix(in srgb,var(--pc) 10%,rgba(0,0,0,.4)) repeating-linear-gradient(90deg,color-mix(in srgb,var(--pc) 22%,transparent) 0 6px,transparent 6px 8px)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 30%,transparent)!important}
+.app[data-barras="eq"] .segs i,.app[data-barras="eq"] .segs16 i{border-radius:1.5px}
 /* ===== v37 · Esquinas iluminadas (cian abajo a la izquierda, magenta arriba a la derecha), opción de demo ===== */
 .esqFondo{position:absolute;inset:0;z-index:-1;pointer-events:none;display:none;background:radial-gradient(90% 42% at 100% 0%,rgba(244,0,160,.24),rgba(244,0,160,0) 72%),radial-gradient(95% 40% at 0% 92%,rgba(7,176,242,.24),rgba(7,176,242,0) 72%)}
 .app[data-esq="fondo"] .esqFondo,.app[data-esq="ambos"] .esqFondo{display:block}
@@ -1215,8 +1257,8 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
         <span class="small muted" id="hoy">Domingo 18 de octubre</span>
         <h1 class="title">Hola, Martina</h1>
       </div>
-      </div>
-    <button class="sederow" id="sedeChip" aria-haspopup="dialog"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span class="srs"><span class="srk">Tu sede</span><span class="srn">Sarmiento</span></span><span class="sro" id="sedeOcc"><span class="srm"><i></i><i></i><i></i><i></i></span><span class="srt"></span></span><svg class="srch" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button class="sedebox" id="sedeChip" aria-haspopup="dialog"><span class="sbk">Tu sede</span><span class="sbr"><span class="sbm" id="sedeOcc" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="sbn">Sarmiento</span></span></button>
+    </div>
 
     <div class="card" id="formaCard" style="gap:14px">
       <div class="between"><span class="stack" style="gap:3px"><span class="mtitle sig" data-mname><b>Tu</b> <i>ritmo VIVA</i></span><span class="small muted" data-msub>Sube cada vez que venís</span></span><button class="link lime" id="formaHow" style="min-height:44px;padding:0;font-size:13px">Ver detalle</button></div>
@@ -1235,21 +1277,24 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
       <span class="small mestxt" id="mesTxt"></span>
     </div>
     <button class="card fitbox" id="fitBox" hidden>
-      <span class="fitmark">Índice <b>FIT</b></span>
+      <span class="fbhead"><span class="wktit"><span class="sig"><b>Tu</b> <i>evolución</i></span></span><span class="fbnov" id="fitNov"></span></span>
+      <span class="fbrow"><span class="fitmark">Índice <b>FIT</b></span>
       <span class="fbtrend" id="fitTrend"></span>
-      <span class="btn sm fbgo" aria-hidden="true">Ver</span>
+      <span class="btn sm fbgo" aria-hidden="true">Ver</span></span>
     </button>
     <div class="card fitpromo" id="fitPromo" hidden>
-      <div class="fpbody"><span class="fitmark">Índice <b>FIT</b></span><p id="fitPromoTxt">Lo que la balanza no te cuenta.</p><button class="fpwhat" id="fitPromoWhat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>¿Qué es?</button></div>
+      <div class="fpbody"><span class="wktit fptit"><span class="sig"><b>Tu</b> <i>evolución</i></span></span><span class="fitmark">Índice <b>FIT</b></span><p id="fitPromoTxt">Lo que la balanza no te cuenta.</p><button class="fpwhat" id="fitPromoWhat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>¿Qué es?</button></div>
       <button class="btn sm fpgo" id="fitPromoGo">Pedí tu InBody ⚡</button>
       <button class="fpx" id="fitPromoNo" aria-label="Ahora no"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
 
     <div class="card" id="todayCard">
       <div class="between"><span class="wktit" id="todayLbl"><span class="sig"><b>Tu</b> <i>rutina</i></span></span><button class="link lime" data-go="rutinas" id="todayCambiar" style="min-height:44px;margin:-12px 0;padding:0;font-size:14px">Cambiar</button><span class="small muted" id="todayBy" hidden>Prof. Lucas</span></div>
-      <div class="stack" style="gap:4px">
-        <span class="h2 tdname" style="font-size:22px" id="todayName">Día B · Espalda y bíceps</span>
-        <span class="small muted" id="todayMeta">3 ejercicios · 45 min aprox.</span>
+      <div class="tdrow"><span class="tdday" aria-hidden="true"><small>Día</small><b id="todayLetter">B</b></span>
+        <span class="stack" style="gap:3px;min-width:0"><span class="tdname" id="todayName">Espalda y bíceps</span>
+        <span class="small muted" id="todayMeta">Prof. Lucas · 3 ejercicios · 45 min</span></span></div>
+      <div class="tdplan" id="todayPlan"></div>
+      <div class="stack" style="gap:4px" hidden>
         <span class="small" hidden style="color:var(--dat);font-weight:700" id="todayWhy">Elegida según tu recuperación: tus piernas todavía descansan del lunes.</span>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap" id="todayTags" hidden></div>
@@ -2162,7 +2207,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
       <span class="lbl">Meses anteriores</span>
       <div class="list">
         <div><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Septiembre · Sarmiento, tu sede</span><span class="small muted">36% de sus socios con Mes cumplido · noche con DJ</span></span><span class="pill ok">GANÓ</span></div>
-        <div><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Agosto · López y Planes</span><span class="small muted">33% de sus socios con Mes completo</span></span></div>
+        <div><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">Agosto · López y Planes</span><span class="small muted">33% de sus socios con Mes cumplido</span></span></div>
       </div>
       <p class="small muted" style="margin:0;text-align:center;line-height:1.45">Se muestran solo los totales por sede: nadie ve quién cumplió. Cuentan las entradas por molinete. Costanera y Santa Ana se suman cuando registren entradas.</p>
     </div>
@@ -2411,6 +2456,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
       <div class="opts g2" id="cajaPick"><button class="opt" data-cajas="off" aria-pressed="true">Apagadas</button><button class="opt" data-cajas="on" aria-pressed="false">Encendidas</button></div>
       <div class="opts g2" id="tonoPick"><button class="opt" data-tono="actual" aria-pressed="true">Contraste actual</button><button class="opt" data-tono="tono" aria-pressed="false">Más contraste</button><button class="opt" data-tono="filete" aria-pressed="false">Filete fino</button><button class="opt" data-tono="ambos" aria-pressed="false">Contraste + filete</button></div>
       <div class="opts g3" id="tramaPick"><button class="opt" data-trama="no" aria-pressed="true">Sin trama</button><button class="opt" data-trama="fondo" aria-pressed="false">Trama en el fondo</button><button class="opt" data-trama="cajas" aria-pressed="false">Trama en las cajas</button></div>
+      <div class="opts g2" id="barrasPick"><button class="opt" data-barras="eq" aria-pressed="true">Barras: ecualizador</button><button class="opt" data-barras="lisas" aria-pressed="false">Barras: lisas</button></div>
       <div class="opts g2" id="esqPick"><button class="opt" data-esq="no" aria-pressed="true">Sin esquinas</button><button class="opt" data-esq="fondo" aria-pressed="false">Esquinas en el fondo</button><button class="opt" data-esq="cajas" aria-pressed="false">Esquinas en las cajas</button><button class="opt" data-esq="ambos" aria-pressed="false">Esquinas en los dos</button></div>
       <span class="small muted" style="line-height:1.4">Las esquinas son la luz cian y magenta de las pantallas de ingreso, más suave. La trama es el patrón oficial de Viva, muy tenue. El manual pide Inicio y las pantallas de uso diario planas: probala con texto largo antes de elegirla.</span></div>
     <div class="dmsec"><span class="lbl">Coach IA (futuro)</span>
@@ -2669,14 +2715,23 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
     $('#todayLbl').innerHTML = '<span class="sig">' + firma(mm === 'sesion' ? 'Tu sesión' : prox || mm === 'despues' ? 'Tu próxima rutina' : 'Tu rutina') + '</span>';
     $('#todayCambiar').hidden = mm === 'sesion';
     $('#todayBy').textContent = r.tipo === 'profe' ? 'Prof. Lucas' : 'Generada con IA';
-    $('#todayName').textContent = 'Día ' + d.k + ' · ' + d.n;
-    $('#todayMeta').textContent = (r.tipo === 'profe' ? 'Prof. Lucas' : 'Generada con IA') + ' · ' + d.ex.length + ' ejercicios';
+    $('#todayLetter').textContent = d.k; $('#todayName').textContent = d.n;
+    // La sesión en tres partes (simulada: la prescribe el profe en EVO; activación y cardio según el objetivo)
+    const nEx = d.ex.length, P = [['Activación', 8, "8'"], ['Fuerza', nEx * 8, nEx + ' ejercicios'], ['Cardio', 12, "12'"]], tot = P.reduce((a, x) => a + x[1], 0);
+    $('#todayMeta').textContent = (r.tipo === 'profe' ? 'Prof. Lucas' : 'Generada con IA') + ' · ' + tot + ' min';
+    let prog = [0, 0, 0];
+    if (mm === 'sesion') try { let dn = 0, all = 0; d.ex.forEach((k, i) => { const n = lib[k].sets.length; all += n; dn += ses.done[i] ? ses.done[i].filter(x => x).length : 0; }); prog = [1, all ? dn / all : 0, 0]; } catch (_) {}
+    let col = 'var(--z3)'; try { col = eqFlow ? 'var(--zflow)' : eqCol; } catch (_) {}
+    $('#todayPlan').style.setProperty('--pc', col);
+    $('#todayPlan').innerHTML = P.map((x, i) => '<span class="tdp" style="flex:' + x[1] + '"><span class="bar tdb' + (mm === 'sesion' ? ' live' : '') + '"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span><span class="tdl"><b>' + x[0] + '</b> ' + x[2] + '</span></span>').join('');
+    $('#todayPlan').setAttribute('aria-label', 'Tu sesión: ' + P.map(x => x[0] + ' ' + x[2]).join(', ') + '.');
     $('#todayTags').innerHTML = d.ex.map(k => '<span class="tag">' + lib[k].n + '</span>').join('');
   }
   $('#startToday').addEventListener('click', () => startDay(actual, rutinas[actual].next));
   // Cajas apagadas (por defecto) o encendidas
   $('.app').dataset.cajas = 'off';
-  ['tono', 'trama', 'esq'].forEach(k => $('#' + k + 'Pick').addEventListener('click', e => { const b = e.target.closest('[data-' + k + ']'); if (!b) return; $('.app').dataset[k] = b.dataset[k]; $$('#' + k + 'Pick [data-' + k + ']').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+  $('.app').dataset.barras = 'eq';
+  ['tono', 'trama', 'esq', 'barras'].forEach(k => $('#' + k + 'Pick').addEventListener('click', e => { const b = e.target.closest('[data-' + k + ']'); if (!b) return; $('.app').dataset[k] = b.dataset[k]; $$('#' + k + 'Pick [data-' + k + ']').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
   // Trama en las cajas: una capa de vectores detrás del contenido de cada caja (también en las que se dibujan después)
   const TBOX = '.card,.tile,.promo,.choice,.gcard,.slide,.passcard,.list,.post,.pcard,.ben,.cup,.sede,.wk,.slot,.rest';
   const esqOn = () => /^(cajas|ambos)$/.test($('.app').dataset.esq || '');
@@ -2690,6 +2745,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
       el.classList.add('tcjBox'); el.insertAdjacentHTML('afterbegin', '<svg class="tcj" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#patTileC)"/></svg>'); });
   }
   let tramaT = null; new MutationObserver(() => { if ($('.app').dataset.trama === 'cajas' || esqOn()) { clearTimeout(tramaT); tramaT = setTimeout(tramaCajas, 60); } }).observe($('.app'), { childList:true, subtree:true });
+  $('#barrasPick').addEventListener('click', () => setTimeout(() => { if (typeof renderOccChart === 'function' && !$('#occChart').hidden) renderOccChart(); }, 0));
   ['#tramaPick', '#esqPick'].forEach(q => $(q).addEventListener('click', () => setTimeout(tramaCajas, 0)));
   $('#cajaPick').addEventListener('click', e => { const b = e.target.closest('[data-cajas]'); if (!b) return; $('.app').dataset.cajas = b.dataset.cajas; $$('#cajaPick [data-cajas]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
   // Coach IA (futuro): solo como opción de demo
@@ -3905,8 +3961,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
     // Fila de Inicio: Tu sede · la sede · la ocupación
     const so = $('#sedeOcc');
     if (so) { so.style.setProperty('--oc', occBg(k)); so.dataset.lv = k;
-      so.querySelectorAll('.srm i').forEach((i, n) => i.classList.toggle('on', n < OCC_N[k]));
-      so.querySelector('.srt').innerHTML = '<b>' + OCC_T[k] + '</b> · ' + mine.occ + '%';
+      so.querySelectorAll('i').forEach((i, n) => i.classList.toggle('on', n < OCC_N[k]));
       $('#sedeChip').setAttribute('aria-label', 'Tu sede: ' + miSede + '. ' + OCC_T[k] + ' ahora, ' + mine.occ + '%. Ver todas las sedes y la gente por hora.'); }
     // Lista de sedes
     $('#occList').innerHTML = OCC_S.map(x => {
@@ -3926,6 +3981,13 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
     [40, 70].forEach(t => { const y = base - (base - top) * t / 100; g += '<line x1="0" x2="' + W + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="var(--line)" stroke-dasharray="3 4"/>'; });
     H.forEach(([h, v], i) => {
       const q = occLv(v), x = 4 + i * bw + bw * .18, w = bw * .64, y = base - (base - top) * v / 100, c = OCC_C[q], cur = occDia === hoyT && h === hNow;
+      if ($('.app').dataset.barras === 'eq') {
+        const SH = 4.2, SG = 1.8, nOn = Math.max(1, Math.round((base - y) / (SH + SG))), nAll = Math.round((base - top) / (SH + SG));
+        for (let q2 = 0; q2 < nAll; q2++) { const yy = base - (q2 + 1) * (SH + SG) + SG, on = q2 < nOn;
+          g += on ? '<rect x="' + x.toFixed(1) + '" y="' + yy.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + SH + '" rx="1" fill="' + c + '" opacity=".5" filter="url(#ocGl)"/><rect x="' + x.toFixed(1) + '" y="' + yy.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + SH + '" rx="1" fill="' + c + '"/>'
+                  : '<rect x="' + x.toFixed(1) + '" y="' + yy.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + SH + '" rx="1" fill="#fff" opacity=".05"/>'; }
+        if (cur) g += '<rect x="' + (x - 2).toFixed(1) + '" y="' + (y - 2).toFixed(1) + '" width="' + (w + 4).toFixed(1) + '" height="' + (base - y + 3).toFixed(1) + '" rx="3" fill="none" stroke="#fff" stroke-width="1.4"/>';
+      } else
       g += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + (base - y).toFixed(1) + '" rx="2.5" fill="' + c + '" opacity=".55" filter="url(#ocGl)"/>' +
            '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + (base - y).toFixed(1) + '" rx="2.5" fill="' + c + '"' + (cur ? ' stroke="#fff" stroke-width="1.6"' : ' opacity=".9"') + '/>';
       if (cur) g += '<text x="' + (x + w / 2).toFixed(1) + '" y="' + (y - 5).toFixed(1) + '" text-anchor="middle" class="ocnow">ahora</text>';
@@ -5050,7 +5112,7 @@ svg[stroke-linecap="round"][stroke-width="1.8"],svg[stroke-linecap="round"][stro
       const vis = ok && shown < 2; el.hidden = !vis;
       if (vis) { shown++; if (last.nextElementSibling !== el) last.insertAdjacentElement('afterend', el); last = el; }
     });
-    const fbx = $('#fitBox'); fbx.classList.toggle('nov', !!FIT_NOV); fbx.dataset.nov = nIB === 1 ? 'tu punto de partida' : 'medición nueva';
+    const fbx = $('#fitBox'); fbx.classList.toggle('nov', !!FIT_NOV); $('#fitNov').textContent = FIT_NOV ? (nIB === 1 ? 'tu punto de partida' : 'medición nueva') : '';
   }
   setSmode('desafios'); renderMatches(); renderEvol(); renderCorr(); renderGente(); syncInt();
   renderOcc(); renderClases(); renderPlan(); renderNuevo(); renderFit(); renderForma(); renderHoy(); renderCarga(); renderRest(); renderLanding();
