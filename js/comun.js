@@ -21,7 +21,7 @@
     if (id === 'entrenando') startClock();
     if (id === 'inicio' && typeof semMarcarVisto === 'function') semMarcarVisto();
     if (typeof renderAcc === 'function' && typeof MOM !== 'undefined') { renderAcc(); avisosLater(); }
-    $('.app').dataset.scr = id; if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy();
+    $('.app').dataset.scr = id; if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy(); if (id === 'progreso') renderProg();
   }
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }
@@ -32,9 +32,17 @@
   let tt;
   function toast(msg){ const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(tt); tt = setTimeout(() => el.hidden = true, 2200); }
 
-  // Fecha real
+  // ===== Calendario de la demo: la FECHA se fija acá y todo lo demás se deriva (la hora es la real del teléfono) =====
+  // Miércoles 18/11/2026: tercera semana del mes, dos semanas cumplidas cerradas (Tu mes 2 de 4) y Mes cumplido todavía alcanzable.
+  function ahora(){ const r = new Date(); return new Date(2026, 10, 18, r.getHours(), r.getMinutes(), r.getSeconds(), r.getMilliseconds()); }
+  function diaAtras(n){ const d = ahora(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return d; }
+  function dmLbl(d){ return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); }
+  function mesTxt(i){ return ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][((i % 12) + 12) % 12]; }
+  function diasDesde(lbl){ const p = lbl.split('/').map(Number), h = ahora(); h.setHours(12, 0, 0, 0); const d = new Date(h.getFullYear(), p[1] - 1, p[0], 12); if (d > h) d.setFullYear(d.getFullYear() - 1); return Math.round((h - d) / 864e5); }
+
+  // Fecha de la demo
   try {
-    const d = new Date();
+    const d = ahora();
     const s = d.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' });
     $('#hoy').textContent = s.charAt(0).toUpperCase() + s.slice(1);
   } catch(_){}
@@ -67,13 +75,13 @@
   // Posición visual (0 a 100): los cuatro tramos ocupan el mismo largo y, dentro de cada uno, la posición es proporcional al número
   const posV = v => { const zs = zonas(), n = zs.length; let i = 0; zs.forEach((q, k) => { if (v >= q[0]) i = k; }); const a = zs[i][0], b = i < n - 1 ? zs[i + 1][0] : 100; return (i + Math.max(0, Math.min(1, (v - a) / (b - a)))) * 100 / n; };
   const REFv = () => META_SEM / 7;
-  const cerrado = new Map([[11, 'Feriado']]); // días atrás con la sede cerrada (calendario de la base propia): la forma se congela
-  const todayWd = new Date().getDay();
+  const cerrado = new Map([[37, 'Feriado']]); // días atrás con la sede cerrada (calendario de la base propia): la forma se congela
+  const todayWd = ahora().getDay();
   const entrenoDia = new Set(); // días atrás con ingreso (simulado como si viniera de entries)
   for (let d = 120; d >= 1; d--) {
     const wd = ((todayWd - d) % 7 + 7) % 7;
     if (d >= 45 && d <= 56) continue; // 12 días de vacaciones: la forma cae y se ve
-    if ([1, 3, 5].includes(wd) || (wd === 6 && d < 21 && d % 2 === 0)) entrenoDia.add(d);
+    if ([1, 3, 5].includes(wd) || (wd === 6 && d < 21)) entrenoDia.add(d);
   }
   cerrado.forEach((v, d) => entrenoDia.delete(d));
   let hoyEntreno = false, fFmt = 'aguja';
@@ -399,7 +407,7 @@
     const off = (todayWd + 6) % 7, out = [];
     for (let w = 8; w >= 1; w--) {
       let n = 0; for (let c = 0; c < 7; c++) { const d = off + 1 + (w - 1) * 7 + c; if (entrenoDia.has(d)) n++; }
-      const lunes = new Date(Date.now() - (off + w * 7) * 864e5), cu = n >= META_SEM;
+      const lunes = new Date(+ahora() - (off + w * 7) * 864e5), cu = n >= META_SEM;
       out.push({ n:n, cu:cu, co:cu && (w % 3 !== 2), f:lunes.getDate() + '/' + (lunes.getMonth() + 1) });
     }
     return out;

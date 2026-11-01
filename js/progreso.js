@@ -42,8 +42,8 @@
 //#bloque 130
   // ===== La sede del mes: % de socios con Mes completo por sede (agregado; en producción, de las entradas por molinete) =====
   const sedesMes = [ ['Sarmiento', 34], ['López y Planes', 31], ['Alberdi', 27] ];
-  const diasRestantes = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate() - d.getDate(); };
-  const mesNombre = () => meses[new Date().getMonth()];
+  const diasRestantes = () => { const d = ahora(); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate() - d.getDate(); };
+  const mesNombre = () => meses[ahora().getMonth()];
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const fmt1 = v => String(Math.round(v * 10) / 10).replace('.', ',');
   const misEntrenos = () => +$('#mesCount').textContent || 0;
@@ -53,6 +53,7 @@
     const left = diasRestantes();
     $('#chLeft').textContent = left === 0 ? 'Último día' : left === 1 ? 'Queda 1 día' : 'Quedan ' + left + ' días';
     $('#chalName').textContent = cap(mesNombre());
+    { const m0 = ahora().getMonth(); $('#mesAnt1').textContent = cap(mesTxt(m0 - 1)) + ' · Sarmiento, tu sede'; $('#mesAnt2').textContent = cap(mesTxt(m0 - 2)) + ' · López y Planes'; }
     const sorted = sedesMes.slice().sort((a, b) => b[1] - a[1]), pos = sorted.findIndex(x => x[0] === miSede);
     $('#sedeRank').innerHTML = sorted.map((x, i) => '<div class="rank' + (x[0] === miSede ? ' me' : '') + '"><span>' + (i + 1) + '. ' + x[0] + '</span><span class="occ"><i style="width:' + x[1] * 2 + '%"></i></span><b>' + x[1] + '%</b></div>').join('') +
       '<span class="small muted">De cada sede, cuántos socios van camino a su Mes cumplido. ' + (pos === 0 ? miSede + ' va primera.' : miSede + ' va ' + (pos + 1) + 'ª.') + '</span>';
@@ -69,7 +70,7 @@
     { n:'Joaquín', sede:'Sarmiento', c:['#4f7d3a','#152410'], t:'12 semanas cumplidas', s:'Encendió su rayo en el mural', when:'Hace 2 h', claps:18 },
     { n:'Carla', sede:'Alberdi', c:['#9a4f8a','#2c1028'], t:'Primer mes cumplido', s:'Cumplió su primer mes en Viva', when:'Hace 5 h', claps:31 },
     { n:'Diego', sede:'Sarmiento', c:['#7a7a3a','#262610'], t:'Récord en sentadilla', s:'Superó su mejor marca personal', when:'Ayer', claps:12 },
-    { n:'Florencia', sede:'Sarmiento', c:['#3a6a9a','#0f2034'], t:'Mes cumplido de septiembre', s:'4 semanas cumplidas', when:'Ayer', claps:22 },
+    { n:'Florencia', sede:'Sarmiento', c:['#3a6a9a','#0f2034'], t:'Mes cumplido de ' + mesTxt(ahora().getMonth() - 1), s:'4 semanas cumplidas', when:'Ayer', claps:22 },
     { n:'Joaquín', sede:'Sarmiento', c:['#4f7d3a','#152410'], t:'Terminó el Día B · Espalda', s:'6 ejercicios · 52 min · se sintió genial', when:'Hace 1 h', claps:7 },
     { n:'Martín', sede:'López y Planes', c:['#3a8a7a','#0e2a24'], t:'Terminó Boxeo recreativo', s:'Clase de 45 min · Prof. Martín', when:'Hace 3 h', claps:5 }
   ];
@@ -80,9 +81,9 @@
     if (prKeys.length) {
       const k = prKeys[prKeys.length - 1], u = unidad(k);
       pr = { id:'pr-' + k, t:'Récord en ' + lib[k].n, s:'Hoy · ' + fmtN(ses.prs[k]) + ' ' + u, big:fmtN(ses.prs[k]), unit:u === 'kg' ? 'KG' : 'SEGUNDOS', cap:'nuevo récord en ' + lib[k].n.toLowerCase(), feedT:'Récord en ' + lib[k].n };
-    } else pr = { id:'pr-jalon', t:'Récord en Jalón al pecho', s:'45 kg · +5 kg desde septiembre', big:'45', unit:'KG', cap:'récord en jalón al pecho', feedT:'Récord en Jalón al pecho' };
+    } else pr = { id:'pr-jalon', t:'Récord en Jalón al pecho', s:'45 kg · +5 kg desde ' + mesTxt(+hist.jalon[0][0].split('/')[1] - 1), big:'45', unit:'KG', cap:'récord en jalón al pecho', feedT:'Récord en Jalón al pecho' };
     return [
-      { id:'racha', ico:'5', t:'5 semanas cumplidas', s:'Cumpliste tu meta 5 semanas desde septiembre', big:'5', unit:'SEMANAS', cap:'cumplidas, sin vueltas a cero', feedT:'5 semanas cumplidas' },
+      { id:'racha', ico:'5', t:'5 semanas cumplidas', s:'Cumpliste tu meta 5 semanas desde ' + mesTxt(diaAtras(35).getMonth()), big:'5', unit:'SEMANAS', cap:'cumplidas, sin vueltas a cero', feedT:'5 semanas cumplidas' },
       { id:'mes-' + mine, ico:String(mine), t:entr(mine) + ' en ' + mes, s:'Tu mejor mes desde que estás en Viva', big:String(mine), unit:'ENTRENAMIENTOS', cap:'en ' + mes + '. Constancia ante todo.', feedT:entr(mine) + ' en ' + mes },
       pr
     ];
@@ -124,7 +125,7 @@
   const evFotos = [ { d:'23/07', c:['#39424f','#161b24'] }, { d:'20/08', c:['#3f4958','#161b24'] }, { d:'17/09', c:['#465163','#161b24'] }, { d:'15/10', c:['#4d596e','#161b24'] } ];
   let evSel = [0, 3];
   const silSvg = '<svg width="58%" viewBox="0 0 40 80" fill="#fff" aria-hidden="true"><circle cx="20" cy="9" r="7"/><path d="M8 20h24l-3 28h-4l-1 30h-8l-1-30h-4z"/></svg>';
-  const parseDM = s => { const [d, m] = s.split('/').map(Number); return new Date(new Date().getFullYear(), m - 1, d); };
+  const parseDM = s => { const [d, m] = s.split('/').map(Number); return new Date(ahora().getFullYear(), m - 1, d); };
   const semanasEntre = (a, b) => { const w = Math.max(1, Math.round(Math.abs(parseDM(b) - parseDM(a)) / 6048e5)); return w + (w === 1 ? ' semana' : ' semanas'); };
   function evTile(f, i, lbl){
     return '<button class="evph" data-ev="' + i + '" aria-pressed="' + (lbl ? 'true' : 'false') + '" aria-label="Foto del ' + f.d + (lbl ? ', ' + lbl : '') + '" style="background:' + (f.src ? '#000' : 'linear-gradient(160deg,' + f.c[0] + ',' + f.c[1] + ')') + '">' +
@@ -146,7 +147,7 @@
   });
   $('#evFile').addEventListener('change', e => {
     const f = e.target.files && e.target.files[0]; if (!f) return;
-    const d = new Date(), lbl = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+    const d = ahora(), lbl = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
     evFotos.push({ d:lbl, c:['#4d596e','#161b24'], src:URL.createObjectURL(f) });
     evSel = [0, evFotos.length - 1]; e.target.value = ''; renderEvol(); toast('Foto guardada en tu álbum privado');
   });
@@ -254,7 +255,7 @@
   ];
   const SORP = { semcomp:['estallido','Primera Semana completa'], record:['brazo','Primer récord en tu objetivo'], sede:['pin','Primera vez en otra sede'], afuera:['zapatilla','Primer cardio de afuera'], inbody:['reloj','Primer InBody'] };
   // Estado de la socia para el mural (simulado; en producción sale de las semanas cumplidas verificadas)
-  const HOY_D = new Date(), semAtras = w => new Date(HOY_D.getTime() - w * 7 * 864e5);
+  const HOY_D = ahora(), semAtras = w => new Date(HOY_D.getTime() - w * 7 * 864e5);
   const mesAtras = k => { const d = new Date(HOY_D.getFullYear(), HOY_D.getMonth() - k, 1); return { m:d.getMonth(), y:d.getFullYear() }; };
   const MURALES = {
     nueva: () => ({ sem:0, alta:new Date(HOY_D.getTime() - 3 * 864e5), meses:[], sorp:[], prevMes:0 }),
@@ -421,3 +422,50 @@
   $('#cartelMural').addEventListener('click', () => { $('#cartelOv').hidden = true; renderMural(); go('progreso'); });
   $('#cartelShare').addEventListener('click', () => { const ev = muralEventos().find(x => x.id === $('#cartelOv').dataset.ev); if (ev) shareEv(ev); });
 
+
+//#bloque 335
+  // ===== T1 · Progreso según la experiencia (Arranco · Habitual · Avanzado; menores como Arranco) =====
+  // Fuentes: entries (entrenamientos, semanas), duración de la sesión en la app (minutos), registro de series (primeras veces, avance, récords, volumen).
+  var PROG_MIN = 0;
+  function expProg(){ return (typeof esMenor === 'function' && esMenor()) ? 'arranco' : (typeof EXP === 'string' ? EXP : 'habitual'); }
+  const durDia = d => 48 + (d * 37) % 19; // simulado: minutos de cada sesión registrada
+  function primerasVeces(){
+    const L = Object.keys(hist).map(k => ({ t:'Primera vez en ' + lib[k].n, f:hist[k][0][0] }));
+    if (MUR && MUR.sem > 0) L.push({ t:'Primera semana cumplida', f:dmLbl(new Date(MUR.alta.getTime() + 7 * 864e5)) });
+    return L.map(x => Object.assign(x, { dd:diasDesde(x.f) })).sort((a, b) => a.dd - b.dd);
+  }
+  function avancePalabras(){
+    const hoyPrimero = k => hist[k][hist[k].length - 1][0] === hoyLbl ? 0 : 1;
+    return Object.keys(hist).sort((a, b) => hoyPrimero(a) - hoyPrimero(b)).map(k => {
+      const h = hist[k], a = h[0][1], b = h[h.length - 1][1]; if (b <= a) return null;
+      const w = Math.max(1, Math.round(diasDesde(h[0][0]) / 7)), cuando = w < 8 ? w + (w === 1 ? ' semana' : ' semanas') : Math.round(w / 4.3) + ' meses';
+      return 'En ' + lib[k].n + ' pasaste de ' + (a ? fmtN(a) : 'peso corporal') + ' a ' + fmtN(b) + (esTiempo(k) ? ' segundos' : ' kg') + ' en ' + cuando + '.';
+    }).filter(Boolean);
+  }
+  function renderSemanas(){
+    const off = (todayWd + 6) % 7; let c = hoyEntreno ? 1 : 0;
+    for (let d = 1; d <= off; d++) if (entrenoDia.has(d)) c++;
+    const W = semWeeks().slice(1).map(x => ({ n:x.n, f:x.f })).concat([{ n:c, f:'Esta', now:true }]);
+    $('#wkChart').innerHTML = '<span class="goal"></span>' + W.map(x => '<i class="' + (x.now ? 'now' : x.n >= META_SEM ? 'hit' : '') + '" style="height:' + Math.max(4, Math.min(118, Math.round(x.n / META_SEM * 100))) + 'px"></i>').join('');
+    $('#wkChart').setAttribute('aria-label', 'Últimas 8 semanas: ' + W.map(x => x.n).join(', ') + ' entrenamientos. Meta: ' + META_SEM + ' por semana');
+    $('#wkAxis').innerHTML = W.map(x => '<span>' + x.f + '</span>').join('');
+    $('#wkMeta').textContent = 'Meta: ' + META_SEM;
+  }
+  function renderProg(){
+    const x = expProg(), hoy = ahora(), dm = hoy.getDate(); let n = 0, mins = 0;
+    for (let d = 1; d < dm; d++) if (entrenoDia.has(d)) { n++; mins += durDia(d); }
+    if (hoyEntreno) { n++; mins += PROG_MIN || 55; }
+    $('#mesCount').textContent = n; $('#mesLbl').textContent = 'entrenamientos en ' + mesTxt(hoy.getMonth());
+    const pv = primerasVeces();
+    if (x === 'arranco') { $('#tile3n').textContent = pv.length; $('#tile3l').textContent = pv.length === 1 ? 'primera vez' : 'primeras veces'; }
+    else { $('#tile3n').textContent = n ? Math.round(mins / n) : '—'; $('#tile3l').textContent = 'min por sesión'; }
+    renderSemanas();
+    $('#bienCard').hidden = x === 'avanzado'; $('#palCard').hidden = x !== 'habitual';
+    $('#avCard').hidden = x !== 'avanzado'; $('#recBox').hidden = x !== 'avanzado'; $('#volCard').hidden = x !== 'avanzado';
+    $('#bienTxt').textContent = 'Este mes viniste ' + n + (n === 1 ? ' vez' : ' veces') + '. Lo estás haciendo bien ⚡';
+    $('#pvList').innerHTML = pv.slice(0, 4).map(p => '<div><span style="flex:1;font-weight:500">' + p.t + '</span><span class="small muted">' + (p.dd === 0 ? 'Hoy' : p.f) + '</span></div>').join('');
+    const ap = avancePalabras();
+    $('#palList').innerHTML = ap.length ? ap.slice(0, 4).map(t => '<div><span style="flex:1;line-height:1.4">' + t + '</span></div>').join('') : '<div><span class="muted" style="flex:1">Cuando registres tus series, acá ves cuánto avanzás.</span></div>';
+    if (x === 'avanzado') renderCarga();
+  }
+  renderProg();

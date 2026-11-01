@@ -106,7 +106,7 @@
     const s = sedesPPU.find(x => x.id === selSede), pr = precio(s.occ); if (pr === null) return;
     const usa = Math.min(saldo, pr), apagar = pr - usa;
     const activar = () => {
-      saldo -= usa; const now = new Date();
+      saldo -= usa; const now = ahora();
       pase = { sede:s.n, paid:pr, at:now, until:new Date(now.getTime() + cfg.ventana * 60000), estado:'activo' };
       consumos.unshift({ d:now, sede:s.n, monto:apagar }); paintPase(); go('pase');
     };
@@ -135,7 +135,7 @@
   }
   function tickPase(){
     if (!pase || pase.estado !== 'activo') return;
-    const left = Math.max(0, Math.round((pase.until - Date.now()) / 1000));
+    const left = Math.max(0, Math.round((pase.until - +ahora()) / 1000));
     const t = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
     $('#pCount').textContent = t;
     $('#pBar').style.width = (left / (cfg.ventana * 60) * 100).toFixed(1) + '%';
@@ -143,14 +143,14 @@
     if (left === 0) vencer();
   }
   $('#simIngreso').addEventListener('click', () => {
-    pase.estado = 'dentro'; pase.inAt = new Date(); $('#pDentroTxt').textContent = pase.sede + ' · ' + hhmm(new Date()) + '. ¡Buen entrenamiento!';
+    pase.estado = 'dentro'; pase.inAt = ahora(); $('#pDentroTxt').textContent = pase.sede + ' · ' + hhmm(ahora()) + '. ¡Buen entrenamiento!';
     paintPase(); toast('Molinete habilitado');
   });
-  $('#simVence').addEventListener('click', () => { pase.until = new Date(); vencer(); });
+  $('#simVence').addEventListener('click', () => { pase.until = ahora(); vencer(); });
   renderPPU();
 
   // ===== Inicio y entrenamientos de pago por uso =====
-  const diasAtras = (n, h, m) => { const d = new Date(); d.setDate(d.getDate() - n); d.setHours(h, m, 0, 0); return d; };
+  const diasAtras = (n, h, m) => { const d = ahora(); d.setDate(d.getDate() - n); d.setHours(h, m, 0, 0); return d; };
   const consumos = [
     { d:diasAtras(3, 18, 40), sede:'López y Planes', monto:6500 },
     { d:diasAtras(7, 10, 5), sede:'Sarmiento', monto:5000 },
@@ -162,16 +162,16 @@
 
   function renderPpuHome(){
     $('#phName').textContent = $('#nName').textContent;
-    try { const s = new Date().toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' }); $('#phHoy').textContent = s.charAt(0).toUpperCase() + s.slice(1); } catch(_){}
+    try { const s = ahora().toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' }); $('#phHoy').textContent = s.charAt(0).toUpperCase() + s.slice(1); } catch(_){}
     // Estado del pase de hoy
     let h = '';
     if (!pase) h = '<span class="lbl">Sin pase hoy</span><button class="btn sm" data-go="ppu">Pagar un ingreso</button>';
     else if (pase.estado === 'activo') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill ok">ACTIVO</span></div><span class="h2" style="font-size:28px">Entrá antes de las ' + hhmm(pase.until) + '</span><button class="btn sm" data-go="pase">Ver mi pase</button>';
-    else if (pase.estado === 'dentro') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill ok">USADO</span></div><span class="h2" style="font-size:28px">Ingresaste a las ' + hhmm(pase.inAt || new Date()) + '</span><span class="small muted">¡Buen entrenamiento! Tu rutina está en la pestaña Entrenamientos.</span>';
+    else if (pase.estado === 'dentro') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill ok">USADO</span></div><span class="h2" style="font-size:28px">Ingresaste a las ' + hhmm(pase.inAt || ahora()) + '</span><span class="small muted">¡Buen entrenamiento! Tu rutina está en la pestaña Entrenamientos.</span>';
     else h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill" style="background:var(--panel2);color:var(--muted)">SIN USAR</span></div><span class="h2" style="font-size:26px">Tenés ' + money(saldo) + ' de saldo a favor</span><span class="small muted">No llegaste a entrar a tiempo: no perdiste nada.</span><button class="btn sm" data-go="ppu">Usar mi saldo</button>';
     $('#phPase').innerHTML = h;
     // Estadísticas del mes
-    const now = new Date(), mes = consumos.filter(c => c.d.getMonth() === now.getMonth() && c.d.getFullYear() === now.getFullYear());
+    const now = ahora(), mes = consumos.filter(c => c.d.getMonth() === now.getMonth() && c.d.getFullYear() === now.getFullYear());
     $('#phCount').textContent = mes.length;
     $('#phSum').textContent = money(mes.reduce((a, c) => a + c.monto, 0));
     $('#phMes').textContent = meses[now.getMonth()];
@@ -241,7 +241,7 @@
   });
 
   // Primer entrenamiento gratis, en un horario con poca gente
-  const diaLbl = n => { if (n === 0) return 'Hoy'; if (n === 1) return 'Mañana'; const d = new Date(Date.now() + n * 864e5), w = d.toLocaleDateString('es-AR', { weekday:'long' }); return w.charAt(0).toUpperCase() + w.slice(1) + ' ' + d.getDate(); };
+  const diaLbl = n => { if (n === 0) return 'Hoy'; if (n === 1) return 'Mañana'; const d = new Date(+ahora() + n * 864e5), w = d.toLocaleDateString('es-AR', { weekday:'long' }); return w.charAt(0).toUpperCase() + w.slice(1) + ' ' + d.getDate(); };
   const slots = [ { dia:'Mañana', h:'14:00', sede:'Sarmiento', nota:'Poca gente · ideal para arrancar', lv:'low' }, { dia:'Mañana', h:'10:30', sede:'Santa Ana', nota:'Poca gente', lv:'low' }, { dia:diaLbl(3), h:'15:00', sede:'López y Planes', nota:'Gente moderada', lv:'mid' } ];
   let slotSel = 0;
   const okIco = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>';
@@ -258,7 +258,7 @@
   $('#trialSkip').addEventListener('click', () => { renderNuevo(); go('nuevo'); });
 
   let planOffer = false;
-  const vence48 = () => { const d = new Date(Date.now() + 2 * 864e5); return d.toLocaleDateString('es-AR', { weekday:'long', day:'numeric' }); };
+  const vence48 = () => { const d = new Date(+ahora() + 2 * 864e5); return d.toLocaleDateString('es-AR', { weekday:'long', day:'numeric' }); };
   function renderNuevo(){
     const t = $('#nTrial'); t.hidden = !trial;
     if (trial && trial.hecho) t.innerHTML = '<div class="between"><span class="lbl">Tu primera visita</span><span class="pill ok">HECHA</span></div><span class="h2" style="font-size:28px">¡Gracias por venir, ' + $('#nName').textContent + '!</span>' +

@@ -14,7 +14,7 @@
   const occLv = o => o >= cfg.tope ? 'full' : o >= 70 ? 'high' : o >= 40 ? 'mid' : 'low';
   const OCC_C = { low:'var(--z1)', mid:'var(--z2)', high:'var(--z3)', full:'url(#ocFlow)' }, OCC_N = { low:1, mid:2, high:3, full:4 };
   const OCC_T = { low:'Poca gente', mid:'Gente moderada', high:'Mucha gente', full:'Completa' };
-  let occHow = false, occDia = (() => { const d = new Date().getDay(); return d === 6 ? 'sa' : d === 0 ? 'do' : 'lv'; })(), occSede = miSede;
+  let occHow = false, occDia = (() => { const d = ahora().getDay(); return d === 6 ? 'sa' : d === 0 ? 'do' : 'lv'; })(), occSede = miSede;
   const occBg = k => k === 'full' ? 'var(--zflow)' : OCC_C[k];
   function renderOcc(){
     const mine = OCC_S.find(x => x.n === miSede), k = occLv(mine.occ);
@@ -36,7 +36,7 @@
     const sd = OCC_S.find(x => x.n === occSede), H = OCC_H[occDia].map(([h, v]) => [h, Math.min(99, Math.round(v * sd.f))]);
     $('#occSedes').innerHTML = OCC_S.filter(x => x.occ !== null).map(x => '<button class="opt" data-os="' + x.n + '" aria-pressed="' + (x.n === occSede) + '">' + x.n + '</button>').join('');
     $$('#occDia [data-od]').forEach(b => b.setAttribute('aria-pressed', b.dataset.od === occDia));
-    const W = 340, Hh = 150, top = 14, base = 118, n = H.length, bw = (W - 8) / n, now = new Date(), hoyT = (d => d === 6 ? 'sa' : d === 0 ? 'do' : 'lv')(now.getDay()), hNow = now.getHours();
+    const W = 340, Hh = 150, top = 14, base = 118, n = H.length, bw = (W - 8) / n, now = ahora(), hoyT = (d => d === 6 ? 'sa' : d === 0 ? 'do' : 'lv')(now.getDay()), hNow = now.getHours();
     let g = '<defs><linearGradient id="ocFlow" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient><filter id="ocGl" x="-50%" y="-20%" width="200%" height="140%"><feGaussianBlur stdDeviation="2.4"/></filter></defs>';
     [40, 70].forEach(t => { const y = base - (base - top) * t / 100; g += '<line x1="0" x2="' + W + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="var(--line)" stroke-dasharray="3 4"/>'; });
     H.forEach(([h, v], i) => {
@@ -244,28 +244,19 @@
     chkAnswer(v); toast('Respondido desde el aviso');
   });
 
+  // Volumen por músculo (Avanzado): series registradas en los últimos 7 días. Sin promedio ni déficit: sirve para repartir el trabajo.
   function renderCarga(){
-    const prom = Math.round(cargaHist.slice(0, 4).reduce((a, b) => a + b, 0) / 4), cur = cargaHist[4], pct = Math.round((cur / prom - 1) * 100);
-    $('#cargaSem').textContent = cur.toLocaleString('es-AR') + ' kg';
-    $('#cargaProm').textContent = 'Tu promedio: ' + prom.toLocaleString('es-AR') + ' kg por semana';
-    $('#cargaBar').style.width = Math.min(100, Math.round(cur / (prom * 1.5) * 100)) + '%';
-    const alto = pct > 30, bajo = pct < -40;
-    $('#cargaPill').textContent = alto ? 'ALTA' : bajo ? 'BAJA' : 'NORMAL'; $('#cargaPill').className = 'pill ' + (alto ? 'warn' : 'ok');
-    $('#cargaTxt').textContent = alto ? 'Vas ' + pct + '% arriba de tu promedio. Subir de golpe aumenta el riesgo de molestias: dale un día de descanso.'
-      : pct < 0 ? 'Vas ' + Math.abs(pct) + '% abajo de tu promedio y todavía quedan días. Suma cada serie que registrás.'
-      : 'Vas ' + pct + '% arriba de tu promedio: estás progresando sin pasarte.';
-  }
-  function renderRest(){
-    const grupos = [['Piernas y glúteos', 'cuads', 'lunes'], ['Espalda', 'dorsales', 'sábado'], ['Pecho y hombros', 'pecho', 'jueves'], ['Brazos', 'biceps', 'sábado'], ['Abdomen', 'abdomen', 'jueves']];
-    $('#restList').innerHTML = grupos.map(([n, k, d]) => { const st = recState[k] || 'ok', pc = st === 'hi' ? 25 : st === 'mid' ? 60 : 100;
-      return '<div class="restrow"><span style="width:130px;font-size:14px;font-weight:500">' + n + '</span><span class="bar"><i style="width:' + pc + '%;background:' + (pc === 100 ? 'var(--dat)' : 'var(--orange)') + '"></i></span><span class="small muted" style="width:86px;text-align:right">' + (pc === 100 ? 'Listo' : 'Listo mañana') + '</span></div>'; }).join('') +
-      '<span class="small muted" style="line-height:1.45;margin-top:4px">Estimado con los días desde que entrenaste cada músculo y cuánto trabajaste. Si te sigue doliendo, esperá un día más.</span>';
+    const g = {};
+    Object.keys(hist).forEach(k => hist[k].forEach(e => { if (diasDesde(e[0]) <= 7) g[lib[k].grupo] = (g[lib[k].grupo] || 0) + lib[k].sets.length; }));
+    const L = Object.keys(g).map(k => [k, g[k]]).sort((a, b) => b[1] - a[1]), mx = L.length ? L[0][1] : 1;
+    $('#volList').innerHTML = !L.length ? '<span class="small muted">Cuando registres tus series, acá ves cómo repartís el trabajo.</span>' : L.map(([n, v]) =>
+      '<div class="restrow"><span style="width:150px;font-size:14px;font-weight:500;line-height:1.25">' + n + '</span><span class="bar"><i style="width:' + Math.round(v / mx * 100) + '%;background:var(--dat)"></i></span><span class="small muted" style="width:70px;text-align:right">' + v + ' series</span></div>').join('');
   }
   function showSum(sum){
     const kgTxt = sum.kg ? Math.round(sum.kg).toLocaleString('es-AR') + ' kg' : '—';
-    $('#sesSumGrid').innerHTML = '<span><b>' + sum.min + ' min</b>Duración</span><span><b>' + sum.series + ' de ' + sum.total + '</b>Series</span><span><b>' + kgTxt + '</b>Levantados</span>';
-    const lo = Math.max(5, Math.round(3.5 * 70 * sum.min / 60 / 5) * 5), hi = Math.max(lo + 5, Math.round(6 * 70 * sum.min / 60 / 5) * 5);
-    $('#sesKcal').textContent = !sum.series ? 'No registraste series hoy. Tocá el tilde de cada serie para ver cuánto levantaste y estimar las calorías.' : 'Gastaste entre ' + lo + ' y ' + hi + ' kcal aprox. (estimado para 70 kg; cargá tu peso en tu perfil para afinarlo). Ningún cálculo de calorías es exacto, ni siquiera el de un reloj.';
+    PROG_MIN = sum.min;
+    $('#sesSumGrid').innerHTML = '<span><b>' + sum.min + ' min</b>Duración</span><span><b>' + sum.series + ' de ' + sum.total + '</b>Series</span>' + (expProg() === 'arranco' ? '' : '<span><b>' + kgTxt + '</b>Levantados</span>');
+    $('#sesKcal').textContent = !sum.series ? 'No registraste series hoy. Tocá el tilde de cada serie y acá ves lo que hiciste.' : '';
     const prev = hoyEntreno; hoyEntreno = false; const f0 = serie().slice(-1)[0].f; hoyEntreno = true; const f1 = serie().slice(-1)[0].f; hoyEntreno = prev;
     const zt = zonas()[zonas().length - 1][0];
     $('#sesForma').hidden = false; $('#sesForma').innerHTML = '<span><strong>' + (V().flow && f1 >= zt && f0 < zt ? '¡Estás en VIVA Flow! ⚡' : V().up(f0, f1)) + '</strong> Cuenta porque viniste, entrenes liviano o pesado.</span>';
@@ -354,5 +345,5 @@
     const fbx = $('#fitBox'); fbx.classList.toggle('nov', !!FIT_NOV); $('#fitNov').textContent = FIT_NOV ? (nIB === 1 ? 'tu punto de partida' : 'medición nueva') : '';
   }
   setSmode('desafios'); renderMatches(); renderEvol(); renderCorr(); renderGente(); syncInt();
-  renderOcc(); renderClases(); renderPlan(); renderNuevo(); renderFit(); renderForma(); renderHoy(); renderCarga(); renderRest(); renderLanding();
+  renderOcc(); renderClases(); renderPlan(); renderNuevo(); renderFit(); renderForma(); renderHoy(); renderCarga(); renderLanding();
 

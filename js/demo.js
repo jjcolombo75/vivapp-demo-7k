@@ -132,7 +132,7 @@
 //#bloque 310
   // ===== v42 · Panel de demo, Entrenar =====
   function entDemo(dest, msg){ $('#demoSheet').hidden = true; renderAcc(); renderHoy(); renderEntHoy(); renderToday(); if (dest) go(dest); if (msg) toast(msg); }
-  $('#expPick').addEventListener('click', e => { const b = e.target.closest('[data-exp]'); if (!b) return; EXP = b.dataset.exp; $$('#expPick [data-exp]').forEach(x => x.setAttribute('aria-pressed', x === b)); SALA && salaRehacer(); entDemo('hoy', { arranco:'Arranco: la carga no sube en las primeras 4 semanas', habitual:'Habitual', avanzado:'Avanzado' }[EXP]); });
+  $('#expPick').addEventListener('click', e => { const b = e.target.closest('[data-exp]'); if (!b) return; EXP = b.dataset.exp; renderProg(); $$('#expPick [data-exp]').forEach(x => x.setAttribute('aria-pressed', x === b)); SALA && salaRehacer(); entDemo('hoy', { arranco:'Arranco: la carga no sube en las primeras 4 semanas', habitual:'Habitual', avanzado:'Avanzado' }[EXP]); });
   $('#etPick').addEventListener('click', e => {
     const b = e.target.closest('[data-et]'); if (!b) return; ETAPA = b.dataset.et; $('.app').dataset.etapa = ETAPA;
     $$('#etPick [data-et]').forEach(x => x.setAttribute('aria-pressed', x === b));

@@ -4,11 +4,6 @@
   <div class="body" style="padding-top:28px">
     <h1 class="h1">Entrenar</h1>
     <div class="tabs" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="false" data-go="hoy">Hoy</button><button role="tab" aria-selected="true">Progreso</button></div>
-    <div class="grid3" id="progTiles">
-      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px" id="mesCount">14</span><span class="small muted">entrenamientos en octubre</span></div>
-      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px;color:var(--dat)" id="semAcum">10</span><span class="small muted">semanas cumplidas</span></div>
-      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px">58</span><span class="small muted">min promedio por sesión</span></div>
-    </div>
     <div class="card" id="sesSum" hidden style="gap:12px;border-color:var(--dat)">
       <div class="between"><span class="lbl">Tu entrenamiento de hoy</span><span class="pill ok">GUARDADO</span></div>
       <div class="pbreak" id="sesSumGrid"></div>
@@ -23,32 +18,38 @@
       <button class="btn ghost sm" id="muralShare">Compartir mi mural</button>
       <span class="small muted" style="line-height:1.45">Cada Mes cumplido enciende un cartel con el color de tu ritmo al cerrar el mes; cada ficha, una pieza de la pared de Viva. Lo que lográs no se apaga.</span>
     </div>
-    <div class="card">
-      <div class="between"><span style="font-weight:700">Entrenamientos por semana</span><span class="small muted">Meta: 4</span></div>
-      <div class="chart" role="img" aria-label="Últimas 8 semanas: 2, 3, 2, 4, 4, 3, 4 y 3 entrenamientos">
-        <span class="goal"></span>
-        <i style="height:50px"></i><i style="height:75px"></i><i style="height:50px"></i><i class="hit" style="height:100px"></i><i class="hit" style="height:100px"></i><i style="height:75px"></i><i class="hit" style="height:100px"></i><i class="now" style="height:75px"></i>
-      </div>
-      <div class="axis"><span>S35</span><span>S36</span><span>S37</span><span>S38</span><span>S39</span><span>S40</span><span>S41</span><span>Hoy</span></div>
+    <div class="grid3" id="progTiles">
+      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px" id="mesCount">0</span><span class="small muted" id="mesLbl">entrenamientos en noviembre</span></div>
+      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px;color:var(--dat)" id="semAcum">10</span><span class="small muted">semanas cumplidas</span></div>
+      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px" id="tile3n">—</span><span class="small muted" id="tile3l">min por sesión</span></div>
     </div>
     <div class="card">
+      <div class="between"><span style="font-weight:700">Entrenamientos por semana</span><span class="small muted" id="wkMeta">Meta: 4</span></div>
+      <div class="chart" id="wkChart" role="img" aria-label="Últimas 8 semanas"></div>
+      <div class="axis" id="wkAxis"></div>
+    </div>
+    <div class="card" id="bienCard" style="gap:10px">
+      <span style="font-weight:700" id="bienTxt">Lo estás haciendo bien ⚡</span>
+      <span class="lbl">Tus primeras veces</span>
+      <div class="list" id="pvList"></div>
+    </div>
+    <div class="card" id="palCard" style="gap:10px">
+      <div class="between"><span style="font-weight:700">Tu avance</span><span class="small muted">Según lo que registrás</span></div>
+      <div class="list" id="palList"></div>
+    </div>
+    <div class="card" id="avCard">
       <div class="between"><span style="font-weight:700">Avance por ejercicio</span><span class="small muted" id="avUnit">Peso máximo por sesión</span></div>
       <div class="chips" id="avChips"></div>
       <svg id="avChart" viewBox="0 0 320 170" role="img" aria-label="Avance del ejercicio" style="width:100%;height:auto;display:block"></svg>
       <div class="between small"><span class="muted" id="avFrom">Desde el 15/09</span><span id="avDelta" style="font-weight:700;color:var(--dat)">+2,5 kg</span></div>
       <span class="small muted" id="av1rm" style="line-height:1.45"></span>
     </div>
-    <div class="card" id="cargaCard" style="gap:12px">
-      <div class="between"><span style="font-weight:700">Carga de la semana</span><span class="small muted">Kilos levantados</span></div>
-      <div class="between" style="align-items:flex-end"><span class="stack" style="gap:2px"><span class="num" style="font-size:34px" id="cargaSem">0</span><span class="small muted" id="cargaProm"></span></span><span class="pill ok" id="cargaPill">NORMAL</span></div>
-      <span class="occ" aria-hidden="true"><i id="cargaBar" style="width:50%"></i></span>
-      <span class="small muted" id="cargaTxt" style="line-height:1.45"></span>
+    <div class="card" id="volCard" style="gap:6px">
+      <div class="between"><span style="font-weight:700">Volumen por músculo</span><span class="small muted">Últimos 7 días</span></div>
+      <div id="volList"></div>
+      <span class="small muted" style="line-height:1.45;margin-top:4px">Series que registraste. Sirve para repartir el trabajo entre músculos: no hay un número correcto.</span>
     </div>
-    <div class="card" style="gap:6px">
-      <div class="between"><span style="font-weight:700">Descanso por músculo</span><span class="small muted">Según lo que entrenaste</span></div>
-      <div id="restList"></div>
-    </div>
-    <div class="stack" style="gap:10px">
+    <div class="stack" id="recBox" style="gap:10px">
       <span class="lbl">Récords personales</span>
       <div class="list" id="recList"></div>
     </div>

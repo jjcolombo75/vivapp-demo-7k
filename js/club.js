@@ -158,10 +158,13 @@
 
 //#bloque 180
   // ===== Pausar el plan =====
-  const HOY0 = new Date(); HOY0.setHours(0, 0, 0, 0);
+  const HOY0 = ahora(); HOY0.setHours(0, 0, 0, 0);
   let VENCE = new Date(HOY0.getTime() + 18 * 864e5); // demo: al día; el panel lo lleva a 3 días
   const ddmm = d => String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
   let pausa = null;
+  // Últimos pagos: un mes antes de cada vencimiento (en producción, los recibos del socio en EVO)
+  $('#pagosList').innerHTML = [1, 2, 3].map(k => { const d = new Date(VENCE.getFullYear(), VENCE.getMonth() - k, VENCE.getDate()), m = mesTxt(d.getMonth());
+    return '<div><span class="stack" style="gap:0;flex:1"><span style="font-weight:500">' + m.charAt(0).toUpperCase() + m.slice(1) + '</span><span class="small muted" style="font-size:12px">' + ddmm(d) + ' · ' + (k === 3 ? 'Transferencia' : 'Débito automático') + '</span></span><span style="font-weight:700">[MONTO]</span></div>'; }).join('');
   const psDias = () => parseInt(val('pdias'), 10);
   function updPs(){
     const n = psDias(), nv = new Date(VENCE.getTime() + n * 864e5);
@@ -176,6 +179,7 @@
   function renderPlan(){
     const nv = pausa ? new Date(VENCE.getTime() + pausa.n * 864e5) : VENCE;
     $('#planVenc').textContent = 'Vence el ' + ddmm(nv); renderAvisoPlan();
+    { const dd = Math.max(0, Math.round((nv - HOY0) / 864e5)); $('#planDias').textContent = dd === 1 ? '1 día' : dd + ' días'; $('#planBar').style.width = Math.min(100, Math.round(dd / 30 * 100)) + '%'; }
     $('#pausaNote').hidden = !pausa;
     if (pausa) $('#pausaNote').textContent = 'Pausado del ' + ddmm(pausa.desde) + ' al ' + ddmm(pausa.hasta) + ' (' + pausa.mot.toLowerCase() + '). Tus semanas, tu mes y tus fichas quedan congelados: no perdés nada.';
     $('#pausaBtn').lastChild.textContent = pausa ? 'Reanudar mi plan ahora' : 'Pausar mi plan';
@@ -187,7 +191,7 @@
   $('#pausaSheet').addEventListener('click', e => { if (e.target.id === 'pausaSheet') { $('#pausaSheet').hidden = true; return; } updPs(); });
   $('#psCancel').addEventListener('click', () => $('#pausaSheet').hidden = true);
   $('#psOk').addEventListener('click', () => {
-    const n = psDias(), desde = new Date(Date.now() + 864e5);
+    const n = psDias(), desde = new Date(+ahora() + 864e5);
     pausa = { n, mot:val('pmot'), desde, hasta:new Date(desde.getTime() + (n - 1) * 864e5) };
     $('#pausaSheet').hidden = true; renderPlan(); toast('Plan pausado por ' + n + ' días');
   });

@@ -54,16 +54,18 @@
   // ===== Sesión de entrenamiento: carga de kg y repeticiones =====
   const num = t => { const v = parseFloat(String(t).replace(',', '.')); return isNaN(v) ? null : v; };
   const fmtN = v => v == null ? '—' : String(Math.round(v * 10) / 10).replace('.', ',');
-  const hoyLbl = (() => { const d = new Date(); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); })();
+  const hoyLbl = (() => { const d = ahora(); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); })();
   // Historial de ejemplo: mejor marca por sesión (kg; en plancha, segundos)
+  // Días atrás de cada sesión, alineados con los ingresos simulados: B (espalda) miércoles, A (piernas) viernes, C (hombros) lunes
+  const hs = (dias, vals) => dias.map((d, i) => [dmLbl(diaAtras(d)), vals[i]]), dB = [35, 28, 21, 14, 7], dA = [33, 26, 19, 12, 5], dC = [30, 23, 16, 9, 2];
   const hist = {
-    remo:[['15/09',37.5],['22/09',40],['29/09',40],['06/10',40],['13/10',40]],
-    jalon:[['15/09',40],['22/09',42.5],['29/09',45],['06/10',45],['13/10',45]],
-    curl:[['15/09',8],['22/09',8],['29/09',10],['06/10',10],['13/10',10]],
-    sentadilla:[['16/09',12],['23/09',14],['30/09',14],['07/10',14],['14/10',14]],
-    press:[['17/09',6],['24/09',8],['01/10',8],['08/10',8],['15/10',8]],
-    puente:[['16/09',0],['23/09',0],['30/09',5],['07/10',10],['14/10',10]],
-    plancha:[['16/09',25],['23/09',30],['30/09',30],['07/10',35],['14/10',35]]
+    remo:hs([63].concat(dB), [35, 37.5, 40, 40, 40, 40]),
+    jalon:hs(dB, [40, 42.5, 45, 45, 45]),
+    curl:hs(dB, [8, 8, 10, 10, 10]),
+    sentadilla:hs(dA, [12, 14, 14, 14, 14]),
+    press:hs(dC, [6, 8, 8, 8, 8]),
+    puente:hs(dA, [0, 0, 5, 10, 10]),
+    plancha:hs(dA, [25, 30, 30, 35, 35])
   };
   const esTiempo = k => k === 'plancha';
   const unidad = k => esTiempo(k) ? 's' : 'kg';
@@ -195,8 +197,7 @@
     const sum = { min: Math.max(1, Math.round(secs / 60)), series: 0, total: 0, kg: 0 };
     rutinas[ses.rid].dias[ses.di].ex.forEach((k, i) => { if (!ses.vals[i]) { sum.total += lib[k].sets.length; return; } sum.total += lib[k].sets.length; ses.vals[i].forEach((v, j) => { if (ses.done[i] && ses.done[i][j]) { sum.series++; if (!esTiempo(k)) sum.kg += (v.kg || 0) * (v.reps || 0); } }); });
     if (modo !== 'ppu') { cargaHist[cargaHist.length - 1] += sum.kg; showSum(sum); if (!visHoy) { visHoy = true; } semSesion(); hoyEntreno = true; MOM = 'despues'; sesHecha = true; syncMomPick(); renderForma(); renderHoy(); renderAcc(); }
-    stopRest(); renderRoutines(); renderToday(); renderAvance(); renderRecords(); renderCarga();
-    $('#mesCount').textContent = String(+$('#mesCount').textContent + 1);
+    stopRest(); renderRoutines(); renderToday(); renderAvance(); renderRecords(); renderProg();
     if (modo === 'ppu') renderPpuTrain(); else renderDesafios();
     go(modo === 'ppu' ? 'ppuTrain' : 'progreso'); toast(feelMsg || (modo !== 'ppu' && Object.keys(ses.prs).length ? '¡Récord! Compartilo en Logros' : 'Entrenamiento guardado')); feelMsg = null;
   }
@@ -603,7 +604,7 @@
   $('#hCorto').addEventListener('click', () => { CORTO = !CORTO; renderEntHoy(); renderToday(); toast(CORTO ? 'Versión de 30 minutos: las tres partes, más cortas' : 'Volviste a la versión completa'); });
   $('#hEmpezar').addEventListener('click', () => { if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else salaStart(); });
   // ---- Modo sala ----
-  function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => ({ sets:Array(f.sr).fill(false), done:false, salteado:false, kg:f.kg, reps:Array(f.sr).fill(f.rep), swap:null })), carDone:false, carMin:P.car.min, t0:Date.now(), saludo:true, chk:false, rest:0, crono:0 }; }
+  function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => ({ sets:Array(f.sr).fill(false), done:false, salteado:false, kg:f.kg, reps:Array(f.sr).fill(f.rep), swap:null })), carDone:false, carMin:P.car.min, t0:+ahora(), saludo:true, chk:false, rest:0, crono:0 }; }
   function salaStart(){
     if (MOM !== 'sala' && MOM !== 'sesion' && !NOENT) setMom('sala', true);
     SALA = salaNew(); SALA.chk = !prep.done;
@@ -766,7 +767,7 @@
     CIERRE_K = S.P.fue.filter((f, i) => S.F[i].done && !S.F[i].swap).map(f => f.k);
     r.next = (r.next + 1) % r.dias.length; const nx = r.dias[r.next];
     if (!NOENT) { hoyEntreno = true; visHoy = true; } MOM = 'despues'; sesHecha = true; syncMomPick();
-    renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy(); renderRoutines();
+    renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy(); renderRoutines(); PROG_MIN = min; renderAvance(); renderRecords(); renderProg();
     const lect = completa && (EXP === 'arranco' || esMenor()) ? 'Hiciste tu tercera sesión completa. Lo estás haciendo bien ⚡'
       : completa ? 'Sesión completa en ' + min + ' minutos.' + (rec ? ' En remo subiste a ' + fmtKg(S.F[remo].kg) + ' kg ⚡' : ' ⚡')
       : 'Guardamos lo que hiciste ⚡ ' + [S.actDone ? 'la activación' : '', S.F.filter(f => f.done).length ? S.F.filter(f => f.done).length + (S.F.filter(f => f.done).length === 1 ? ' ejercicio' : ' ejercicios') + ' de fuerza' : ''].filter(Boolean).join(' y ') + '.';
@@ -876,7 +877,7 @@
     if (a && a.dataset.ob === 'back') { const i = OB_STEPS.indexOf(OB.step); if (OB.step === 'cui' && (OB.zona || OB.zonaAbierta)) { OB.zona = null; OB.zonaAbierta = false; } else OB.step = i <= 0 ? 'inv' : OB_STEPS[i - 1]; obRender(); return; }
     if (a && a.dataset.ob === 'skip') { if (OB.step === 'obj') OB.obj = []; if (OB.step === 'cui') { OB.zona = null; OB.zonaAbierta = false; } if (OB.step === 'meta') OB.meta = META_SEM; OB_STEPS.indexOf(OB.step) === 3 ? (OB.step = 'fin', obFin()) : (OB.step = OB_STEPS[OB_STEPS.indexOf(OB.step) + 1]); obRender(); return; }
     const o = e.target.closest('[data-obo]'); if (o) { const k = o.dataset.obo, i = OB.obj.indexOf(k); if (i >= 0) OB.obj.splice(i, 1); else { if (OB.obj.length >= 2) OB.obj.pop(); OB.obj.push(k); } obRender(); return; }
-    const x = e.target.closest('[data-obx]'); if (x) { EXP = x.dataset.obx; OB.res.exp = EXP; $$('#expPick [data-exp]').forEach(y => y.setAttribute('aria-pressed', y.dataset.exp === EXP)); x.setAttribute('aria-pressed', 'true'); setTimeout(obNext, 220); return; }
+    const x = e.target.closest('[data-obx]'); if (x) { EXP = x.dataset.obx; OB.res.exp = EXP; renderProg(); $$('#expPick [data-exp]').forEach(y => y.setAttribute('aria-pressed', y.dataset.exp === EXP)); x.setAttribute('aria-pressed', 'true'); setTimeout(obNext, 220); return; }
     const c = e.target.closest('[data-obc]'); if (c) { const k = c.dataset.obc;
       if (k === 'si') { OB.zonaAbierta = true; obRender(); return; }
       OB.res.cui = k; if (k === 'profe') toast('Listo. Lucas lo charla con vos en la sala ⚡'); obNext(); return; }
