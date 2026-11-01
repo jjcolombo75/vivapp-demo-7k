@@ -487,9 +487,9 @@
   const SALA_B = {
     act:{ min:8, items:ACT_B },
     fue:[
-      { k:'remo', n:'Remo sentado', maq:'remo', zona:'Zona espalda · al fondo, a la izquierda', sr:3, rep:12, kg:42.5, prev:40, alt:[{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' }, { n:'Remo en polea baja', zona:'Zona poleas · junto a la columna', kg:40, maq:'polea' }] },
-      { k:'jalon', n:'Jalón al pecho', maq:'jalon', zona:'Zona espalda · al fondo, al centro', sr:3, rep:12, kg:45, prev:45, alt:[{ n:'Jalón con agarre neutro', zona:'Zona espalda · al fondo, al centro', kg:42.5, maq:'jalon' }, { n:'Dominadas asistidas', zona:'Zona espalda · contra la pared', kg:null, maq:'jalon' }], hombro:{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' } },
-      { k:'curl', n:'Curl de bíceps en máquina', maq:'curl', zona:'Zona brazos · junto a los espejos', sr:3, rep:12, kg:20, prev:20, alt:[{ n:'Curl con mancuernas', zona:'Zona peso libre', kg:10, maq:'curl' }, { n:'Curl en polea', zona:'Zona poleas · junto a la columna', kg:15, maq:'polea' }] }
+      { k:'remo', n:'Remo sentado', maq:'remo', zona:'Zona espalda · al fondo, a la izquierda', sr:3, rep:12, kg:42.5, prev:40, t:270, alt:[{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' }, { n:'Remo en polea baja', zona:'Zona poleas · junto a la columna', kg:40, maq:'polea' }] },
+      { k:'jalon', n:'Jalón al pecho', maq:'jalon', zona:'Zona espalda · al fondo, al centro', sr:3, rep:12, kg:45, prev:45, t:270, alt:[{ n:'Jalón con agarre neutro', zona:'Zona espalda · al fondo, al centro', kg:42.5, maq:'jalon' }, { n:'Dominadas asistidas', zona:'Zona espalda · contra la pared', kg:null, maq:'jalon' }], hombro:{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' } },
+      { k:'curl', n:'Curl de bíceps en máquina', maq:'curl', zona:'Zona brazos · junto a los espejos', sr:3, rep:12, kg:20, prev:20, t:240, alt:[{ n:'Curl con mancuernas', zona:'Zona peso libre', kg:10, maq:'curl' }, { n:'Curl en polea', zona:'Zona poleas · junto a la columna', kg:15, maq:'polea' }] }
     ],
     car:{ maq:'Cinta', min:12, txt:'caminata en subida', zona:'Zona cardio · frente a las ventanas' }
   };
@@ -592,7 +592,7 @@
     $('#hProfe').hidden = !$('#hProfe').innerHTML;
     $('#hCuida').hidden = !CUIDA; if (CUIDA) $('#hCuida').textContent = CUIDA === 'Hombro' && PEOR ? 'Hoy tu hombro descansa: sacamos el remo y el jalón y sumamos 8 minutos de cardio.' : CUIDA === 'Hombro' ? 'Hoy cuidamos tu hombro: cambiamos el jalón por remo con apoyo de pecho y la carga no sube.' : CUIDA === 'Otra' ? 'Hoy cuidamos lo que nos contaste: si algo molesta, pará y avisale a tu profe.' : 'Hoy cuidamos ' + zonaTxt(CUIDA) + ': evitamos los ejercicios que la cargan.';
     const nota = ETAPA === 'vuelvo' ? '<p class="sv">' + SV_BOLT + '<span>Volviste ⚡ Arrancamos al 80% de lo que hacías.</span></p>' : NOENT && MOM !== 'sesion' ? '<span class="small muted">Todavía no vimos tu entrada. Podés empezar igual: la visita se suma cuando llegue.</span>' : '';
-    $('#hNota').innerHTML = nota; $('#hNota').hidden = !nota;
+    const fat = fatigaTxt(), nota2 = (fat ? '<p class="sv">' + SV_BOLT + '<span>' + fat + '</span></p>' : '') + nota; $('#hNota').innerHTML = nota2; $('#hNota').hidden = !nota2; descansoHrec();
     obHoy();
     $('#hCorto').innerHTML = CORTO ? 'Volver a la versión completa' : '¿Poco tiempo? <b>Hacé la versión de 30 min</b>'; $('#hCorto').hidden = MOM === 'sesion';
     const b = $('#hEmpezar'), ses = MOM === 'sesion';
@@ -604,7 +604,7 @@
   $('#hCorto').addEventListener('click', () => { CORTO = !CORTO; renderEntHoy(); renderToday(); toast(CORTO ? 'Versión de 30 minutos: las tres partes, más cortas' : 'Volviste a la versión completa'); });
   $('#hEmpezar').addEventListener('click', () => { if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else salaStart(); });
   // ---- Modo sala ----
-  function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => ({ sets:Array(f.sr).fill(false), done:false, salteado:false, kg:f.kg, reps:Array(f.sr).fill(f.rep), swap:null })), carDone:false, carMin:P.car.min, t0:+ahora(), saludo:true, chk:false, rest:0, crono:0 }; }
+  function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => ({ sets:Array(f.sr).fill(false), done:false, salteado:false, kg:f.kg, reps:Array(f.sr).fill(f.rep), swap:null })), carDone:false, carMin:P.car.min, t0:+ahora(), saludo:true, chk:false, rest:0, crono:0, el:0, vence:false, repreg:false, pausa:false, mtStep:null, hito:'' }; }
   function salaStart(){
     if (MOM !== 'sala' && MOM !== 'sesion' && !NOENT) setMom('sala', true);
     SALA = salaNew(); SALA.chk = !prep.done;
@@ -612,6 +612,7 @@
     try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { if (SALA) SALA.lock = l; }).catch(() => {}); } catch (_) {}
     renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy();
     renderSala(); go('sala');
+    hablar(mtSaludo());
   }
   // Estado "sesión abierta" de la demo: activación y el primer ejercicio hechos
   function salaDemo(){ SALA = salaNew(); SALA.actDone = true; SALA.F[0].done = true; SALA.F[0].sets = SALA.F[0].sets.map(() => true); SALA.step = 2; SALA.saludo = false; }
@@ -636,12 +637,12 @@
     const S = SALA, st = steps()[S.step], P = S.P, prog = salaProg();
     $('#salaProg').innerHTML = ['Activación', 'Fuerza', 'Cardio'].map((n, i) => '<span class="sp' + (prog[i] >= 1 ? ' full' : '') + '"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span>').join('');
     const fi = curF();
-    $('#salaPos').textContent = st === 'act' ? 'Activación' : st === 'car' ? 'Cardio' : 'Fuerza · ' + (fi + 1) + ' de ' + S.F.length;
+    $('#salaPos').textContent = st === 'act' ? 'Activación' : st === 'car' ? 'Cardio' : 'Fuerza · ' + (fi + 1) + ' de ' + S.F.length; mtPos(st);
     const voz = t => '<p class="sv">' + SV_BOLT + '<span>' + t + '</span></p>';
     let h = '';
     if (SIN_SENAL) h += '<p class="snosig"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/></svg>Sin señal: guardamos todo y lo subimos después.</p>';
     const dk = rutinas[actual].dias[rutinas[actual].next].k;
-    if (S.saludo && st === 'act') h += voz((NOENT ? 'Arrancamos ⚡' : 'Llegaste a Sarmiento ⚡') + (ETAPA === 'vuelvo' ? ' Volviste: hoy vamos al 80% de lo que hacías.' : ' Hoy toca el Día ' + dk + ': arrancamos con ' + P.act.min + ' minutos de activación.'));
+    if (S.saludo && st === 'act' && !S.vence) h += voz(mtSaludo());
     if (S.chk && st === 'act') h += chkHtml(true);
     else if (st === 'act') h += chkFuHtml();
     if (st === 'act') {
@@ -672,8 +673,10 @@
       }
       h += '<div class="srow"><button class="btn ghost sm" id="sCambiar">Cambiar</button><button class="link" id="sComo">Ver cómo se hace</button></div>';
     }
+    h = mtHtml(st) + h;
     $('#salaBody').innerHTML = h;
     $('#salaListo').textContent = st === 'car' ? 'Listo · terminar' : 'Listo';
+    mtFoot();
   }
   function salaListo(){
     const S = SALA, st = steps()[S.step]; S.saludo = false; S.chk = false; S.rest = 0;
@@ -695,11 +698,11 @@
       if (v === 'otra') { renderSala(); return salaCambiarOcupada(); }
       renderSala(); return; }
     const sd = e.target.closest('[data-set]');
-    if (sd) { const F = S.F[curF()], j = +sd.dataset.set; F.sets[j] = !F.sets[j]; if (F.sets[j] && F.sets.indexOf(false) >= 0) { S.rest = 90; clearInterval(restT); restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } SALA.rest--; if (curScr === 'sala') renderSala(); }, 1000); } renderSala(); return; }
+    if (sd) { const F = S.F[curF()], j = +sd.dataset.set; F.sets[j] = !F.sets[j]; if (F.sets[j] && F.sets.indexOf(false) >= 0) { S.rest = 90; clearInterval(restT); restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); } renderSala(); return; }
     if (e.target.closest('#sSkipRest')) { S.rest = 0; clearInterval(restT); renderSala(); return; }
     if (e.target.closest('#sAjustar')) return salaAjustar();
     if (e.target.closest('#sAjCar')) { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Minutos de cardio</span><div class="sadj"><button class="opt" data-cm="-5">−5</button><b id="sCarMin">' + S.carMin + ' min</b><button class="opt" data-cm="5">+5</button></div><button class="btn" data-close>Listo</button>'; $('#salaSheet').hidden = false; return; }
-    if (e.target.closest('#sCrono')) { S.cronoOn = !S.cronoOn; clearInterval(cronoT); if (S.cronoOn) cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } SALA.crono++; if (curScr === 'sala') renderSala(); }, 1000); renderSala(); return; }
+    if (e.target.closest('#sCrono')) { S.cronoOn = !S.cronoOn; clearInterval(cronoT); if (S.cronoOn) cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); renderSala(); return; }
     if (e.target.closest('#sCambiar')) return salaCambiar();
     if (e.target.closest('#sComo')) { toast('Abre el video de tu profe o el maniquí 3D de este ejercicio'); return; }
   });
@@ -781,6 +784,7 @@
         : '<div class="card ciq"><span style="font-weight:700">¿Cómo estuvo?</span><div class="opts g3" id="ciFeel"><button class="opt" data-fl="liviana">Liviana</button><button class="opt" data-fl="justa">Justa</button><button class="opt" data-fl="limite">Al límite</button></div></div>') +
       '<div class="cinext"><span class="small muted">Tu próxima</span><span style="font-weight:700;font-size:17px">Día ' + nx.k + ' · ' + nx.n.toLowerCase() + '</span></div>' +
       '<button class="btn" data-go="inicio">Volver a tu inicio</button>';
+    hablar(completa ? 'Sesión completa ⚡ Encendiste tu semana.' : 'Guardamos lo que hiciste ⚡');
     SALA = null;
     go('cierre');
   }
@@ -899,3 +903,145 @@
   $('#hOnbSi').addEventListener('click', () => { OB.reofrecer = false; obAbrir(); OB.step = 'obj'; obRender(); });
   $('#hOnbNo').addEventListener('click', () => { OB.reofrecer = false; OB.later = 2; obHoy(); toast('Listo. Tu objetivo lo podés elegir en Tu semana'); });
   $('#verPrim').addEventListener('click', () => { $('#demoSheet').hidden = true; OB.hecho = false; OB.later = 0; OB.reofrecer = false; obAbrir(); });
+//#bloque 306
+  // ===== v46 · T7 El acompañante (docs/tickets/T7-el-acompanante.md) =====
+  // Quien lleva la sesión es este motor determinista: rutina, tiempos, registro "como estaba indicado" y plantillas.
+  // El modelo de lenguaje sería solo intérprete de lo que el socio dice (en la demo, frases pretranscriptas), siempre con confirmación.
+  // Al vencer el tiempo de un paso, propone el siguiente; a los 5 minutos repregunta una sola vez; NUNCA avanza solo (decisión de Juanjo, 1/11).
+  var VOZ = false, AURIC = true, MANUAL = false, RAPIDO = true, DECI = 'reps', DSEG = 2;
+  var MT_REPREG = 300;
+  var mtVel = () => RAPIDO ? 10 : 1;  // reloj de la demo: real o rápido ×10
+  // Tiempo esperado (s): el que define el profe por ejercicio (t) o el valor por defecto series × reps × 3 s + descansos de 60 s + 30 s
+  var tEx = f => f.t || (f.sr * (f.seg ? f.rep : f.rep * 3) + (f.sr - 1) * 60 + 30);
+  function mtDur(st){ const P = SALA.P; if (st === 'act') return P.act.min * 60; if (st === 'car') return SALA.carMin * 60; return tEx(fx(+st.slice(1))); }
+  const ART = { dominadas:'las', sentadilla:'la', prensa:'la', plancha:'la', cinta:'la', bici:'la', elíptica:'la' };
+  function pasoCorto(st){ if (st === 'act') return 'la activación'; const w = (st === 'car' ? SALA.P.car.maq : fx(+st.slice(1)).n).split(' ')[0].toLowerCase(); return (ART[w] || 'el') + ' ' + w; }
+  const exTxt = i => { const f = fx(i), F = SALA.F[i]; return f.n.toLowerCase() + ', ' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' segundos' : '') + (F.kg ? ' con ' + fmtKg(F.kg) + ' kg' : ''); };
+  function mtProx(){ const S = SALA, nx = steps()[S.step + 1]; if (!nx) return ''; if (nx === 'car') return 'Sigue ' + S.P.car.maq.toLowerCase() + ' · ' + S.carMin + ' min'; const i = +nx.slice(1), F = S.F[i]; return 'Sigue ' + fx(i).n.toLowerCase() + (F.kg ? ' · ' + fmtKg(F.kg) + ' kg' : ''); }
+  function mtPropTxt(st){ return st === 'car' ? '¿Terminaste ' + pasoCorto(st) + '? Tocá Listo y cerramos ⚡' : '¿Listo con ' + pasoCorto(st) + '? ' + mtProx(); }
+  function mtRepTxt(st){ return '¿Seguís con ' + pasoCorto(st) + '? Cuando termines, tocá Listo.'; }
+  // ---- Descanso y fatiga (regla de Juanjo, 1/11): Arranco y Habitual. Parámetros de demo; E3 verifica la evidencia ----
+  const DESC_MUS = { B:'Tus piernas descansan', C:'Tu espalda descansa' };
+  function descansoTxt(){ if (EXP === 'avanzado' || actual !== 'profe') return ''; return DESC_MUS[rutinas[actual].dias[rutinas[actual].next].k] || ''; }
+  function descansoHrec(){ const el = document.querySelector('.hrec'); if (!el) return; const ds = descansoTxt(), d = rutinas[actual].dias[rutinas[actual].next]; el.innerHTML = (ds ? ds + ': hoy ' + d.n.toLowerCase() : 'Elegida según tu recuperación') + '<span aria-hidden="true"> ›</span>'; }
+  // Nunca "no vengas" a quien viene menos que su meta: el descanso total se propone solo con la semana ya cumplida
+  function fatigaTxt(){ return EXP !== 'avanzado' && DSEG >= 5 && semCumplida() && MOM !== 'sesion' ? 'Venís ' + DSEG + ' días seguidos y ya cumpliste tu semana ⚡ Mañana y pasado, descanso: tu cuerpo también entrena descansando.' : ''; }
+  function mtSaludo(){
+    const P = SALA.P, d = rutinas[actual].dias[rutinas[actual].next], ds = descansoTxt();
+    return (NOENT ? 'Arrancamos ⚡' : 'Llegaste a Sarmiento ⚡') + (ETAPA === 'vuelvo' ? ' Volviste: hoy vamos al 80% de lo que hacías.' : ' Hoy toca el Día ' + d.k + (ds ? ' y ' + ds.charAt(0).toLowerCase() + ds.slice(1) : '') + ': arrancamos con ' + P.act.min + ' minutos de activación.');
+  }
+  // ---- La voz (escalón 1): plantillas, síntesis del teléfono, solo con auriculares. Sin síntesis, solo texto ----
+  const vozTxt = t => String(t).replace(/<[^>]+>/g, '').replace(/⚡/g, '').replace(/(\d+),5/g, '$1 y medio').replace(/(\d+) × (\d+)/g, '$1 series de $2').replace(/\bkg\b/g, 'kilos').replace(/\bmin\b/g, 'minutos').replace(/·/g, ',').replace(/\s+/g, ' ').trim();
+  var vozES = null;
+  function vozElegir(){ try { const vs = speechSynthesis.getVoices(); vozES = vs.find(v => /^es[-_](AR|UY)/i.test(v.lang)) || vs.find(v => /^es[-_](419|US|MX)/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null; } catch (_) {} }
+  try { if (window.speechSynthesis) { vozElegir(); speechSynthesis.onvoiceschanged = vozElegir; } } catch (_) {}
+  const vozHay = () => { try { return !!window.speechSynthesis; } catch (_) { return false; } };
+  function hablar(t){ if (!(VOZ && AURIC && vozHay()) || !t) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(vozTxt(t)); u.lang = vozES ? vozES.lang : 'es-AR'; if (vozES) u.voice = vozES; u.rate = 1; speechSynthesis.speak(u); } catch (_) {} }
+  const callar = () => { try { speechSynthesis.cancel(); } catch (_) {} };
+  // ---- Cambio de paso (cualquiera sea el modo: toque, Decímelo, pantalla bloqueada o deslizar) ----
+  function mtCambio(S){
+    const sts = steps(), a = S.mtStep, b = S.step, vencio = S.vence;
+    S.mtStep = b; S.el = 0; S.vence = false; S.repreg = false; S.hito = '';
+    if (a === null || a === undefined || b <= a) return;
+    const sa = sts[a], sb = sts[b];
+    if (sb === 'car' && !MANUAL) cronoArrancar();
+    let rec = '';
+    if (sa[0] === 'f') { const i = +sa.slice(1), F = S.F[i], f = fx(i); if (F.done && !F.swap && f.prev && F.kg > f.prev && EXP !== 'arranco' && !esMenor()) rec = 'Récord en ' + f.n.toLowerCase() + ' ⚡'; }
+    S.hito = rec;
+    if (sb === 'car') { hablar((rec ? rec + ' ' : '') + 'Te queda el cardio y terminás: ' + S.carMin + ' min de ' + S.P.car.maq.toLowerCase() + ', ' + S.P.car.txt + '. Podés hablar, pero no cantar.'); return; }
+    if (sa === 'act') { hablar('Vamos con la fuerza: ' + exTxt(+sb.slice(1)) + '.'); return; }
+    // Dentro de la fuerza habla poco: como mucho una frase cada dos ejercicios (la propuesta al vencer ya anunció el siguiente)
+    const j = +sb.slice(1); if (S.ultH != null && j - S.ultH < 2) return;
+    if (rec) { hablar(rec + ' Ahora ' + exTxt(j) + '.'); S.ultH = j; }
+    else if (!vencio) { hablar('Ahora ' + exTxt(j) + '.'); S.ultH = j; }
+  }
+  function mtHtml(st){
+    const S = SALA; if (S.mtStep !== S.step) mtCambio(S);
+    const b = t => '<p class="sv smt">' + SV_BOLT + '<span>' + t + '</span></p>';
+    if (S.pausa) return b('En pausa: el reloj de la sesión te espera.');
+    if (!MANUAL && S.vence) return b(S.repreg ? mtRepTxt(st) : mtPropTxt(st));
+    return S.hito ? b(S.hito) : '';
+  }
+  function mtPos(st){ const S = SALA; $('#salaPos').textContent += S.pausa ? ' · en pausa' : !MANUAL && st !== 'car' ? ' · ≈ ' + Math.max(1, Math.round(mtDur(st) / 60)) + "'" : ''; }
+  const ICO_PAU = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>', ICO_SEG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+  function mtFoot(){
+    const S = SALA; $('#salaMic').hidden = SIN_SENAL || esMenor();
+    const p = $('#salaPausa'); p.hidden = MANUAL; p.innerHTML = S && S.pausa ? ICO_SEG : ICO_PAU; p.setAttribute('aria-label', S && S.pausa ? 'Seguir la sesión' : 'Pausar la sesión'); p.setAttribute('aria-pressed', !!(S && S.pausa));
+    acSync();
+  }
+  function cronoArrancar(){ const S = SALA; if (!S || S.cronoOn) return; S.cronoOn = true; clearInterval(cronoT); cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); }
+  function mtTic(){
+    const S = SALA; if (!S || S.pausa || MANUAL) { if (BLOQ && S) lockRen(); return; }
+    const st = steps()[S.step]; if (S.mtStep !== S.step) return;
+    S.el += mtVel(); const d = mtDur(st);
+    if (!S.vence && S.el >= d) { S.vence = true; hablar(mtPropTxt(st)); if (curScr === 'sala') renderSala(); }
+    else if (S.vence && !S.repreg && S.el >= d + MT_REPREG) { S.repreg = true; hablar(mtRepTxt(st)); if (curScr === 'sala') renderSala(); }
+    if (BLOQ) lockRen();
+  }
+  setInterval(mtTic, 1000);
+  function acSync(){
+    const set = (k, on) => { const b = document.querySelector('[data-ac="' + k + '"]'); if (b) b.setAttribute('aria-pressed', on); };
+    set('voz1', VOZ); set('voz0', !VOZ); set('au1', AURIC); set('au0', !AURIC); set('rap1', RAPIDO); set('rap0', !RAPIDO); set('man1', MANUAL); set('man0', !MANUAL);
+    $$('#dcPick [data-dc2]').forEach(x => x.setAttribute('aria-pressed', x.dataset.dc2 === DECI));
+    $$('#dsPick [data-ds]').forEach(x => x.setAttribute('aria-pressed', +x.dataset.ds === DSEG));
+    const a = $('#anotarYo'); if (a) a.checked = MANUAL;
+    const v = $('#salaVoz'); if (v) { v.setAttribute('aria-pressed', VOZ); v.setAttribute('aria-label', VOZ ? 'Voz: con auriculares' : 'Voz: solo en pantalla'); }
+  }
+  function vozCambiar(on){
+    VOZ = on; acSync();
+    if (VOZ && !AURIC) toast('Conectá tus auriculares: mientras, te escribimos acá');
+    else if (VOZ && !vozHay()) toast('Este teléfono no tiene voz: te escribimos acá');
+    else { toast(VOZ ? 'Voz: con auriculares' : 'Voz: solo en pantalla'); if (VOZ) hablar('Dale, te voy hablando por los auriculares.'); else callar(); }
+  }
+  $('#salaVoz').addEventListener('click', () => { vozCambiar(!VOZ); if (SALA) renderSala(); });
+  $('#salaPausa').addEventListener('click', () => { if (!SALA) return; SALA.pausa = !SALA.pausa; callar(); toast(SALA.pausa ? 'En pausa: el reloj te espera' : 'Seguimos ⚡'); renderSala(); });
+  $('#anotarYo').addEventListener('change', e => { MANUAL = e.target.checked; if (SALA) { SALA.vence = false; SALA.repreg = false; } acSync(); toast(MANUAL ? 'Anotás vos: sin reloj, pasás con Listo' : 'La app te lleva: marca los tiempos'); });
+  // ---- "Decímelo" (escalón 2, simulado): mantener apretado; lo dicho pasa a una tarjeta para confirmar ----
+  var DECI_F = { reps:'hice 10, 10 y 8 con 42 y medio', ocupada:'está ocupada', falta:'¿cuánto me falta?', duele:'me duele el hombro' };
+  var DC = null, micOn = false;
+  const mic = $('#salaMic');
+  mic.addEventListener('pointerdown', e => { if (!SALA) return; micOn = true; mic.classList.add('on'); try { mic.setPointerCapture(e.pointerId); } catch (_) {} callar(); $('#salaListo').textContent = 'Te escucho…'; });
+  mic.addEventListener('pointerup', () => { if (!micOn) return; micOn = false; mic.classList.remove('on'); renderSala(); deciMostrar(); });
+  mic.addEventListener('pointercancel', () => { micOn = false; mic.classList.remove('on'); if (SALA) renderSala(); });
+  mic.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (SALA) deciMostrar(); } });
+  mic.addEventListener('contextmenu', e => e.preventDefault());
+  function deciFalta(){
+    const S = SALA, st = steps()[S.step], fi = curF(), car = S.P.car.maq.toLowerCase();
+    if (st === 'car') return 'Te quedan ' + Math.max(1, Math.ceil((S.carMin * 60 - S.crono) / 60)) + ' minutos de ' + car + ' y terminás ⚡';
+    const fz = S.F.map((F, i) => ({ F:F, i:i })).filter(o => !o.F.done && !o.F.salteado && o.i !== fi).map(o => fx(o.i).n.split(' ')[0].toLowerCase());
+    const lista = fz.length > 1 ? fz.slice(0, -1).join(', ') + ' y ' + fz[fz.length - 1] : fz[0] || '';
+    return (st === 'act' ? 'Después de la activación, te ' : 'Te ') + (lista ? 'quedan ' + lista + ', y ' + S.carMin + ' minutos de ' + car : 'queda el cardio: ' + S.carMin + ' minutos de ' + car + ' y terminás') + '.';
+  }
+  function deciMostrar(){
+    const S = SALA; if (!S) return; const st = steps()[S.step], fi = curF();
+    const iR = fi >= 0 ? fi : S.F.findIndex(F => !F.done && !F.salteado), kR = iR >= 0 ? S.F[iR].kg : null;
+    const frase = DECI === 'reps' ? 'hice 10, 10 y 8' + (kR ? ' con ' + vozTxt(fmtKg(kR)).replace(' kilos', '') : '') : DECI_F[DECI];
+    const oido = '<div class="deoido"><span class="small muted">Escuché</span><span class="deq">«' + frase + '»</span></div>';
+    const pie = '<span class="small muted">El audio se procesa en tu teléfono y no se guarda.</span>';
+    const pre = () => $('#salaSheetIn').insertAdjacentHTML('afterbegin', oido);
+    if (DECI === 'duele') { // "me duele" siempre va al protocolo fijo de Cambiar · Me molesta; el modelo nunca responde sobre dolor
+      if (fi >= 0) { salaCambiar(); const b = $('#salaSheetIn [data-cm2="molesta"]'); if (b) b.click(); pre(); return; }
+      $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Si duele, pará</span><span class="muted" style="line-height:1.45">No hace falta forzar. Seguí solo con lo que no moleste, o terminá acá.</span><span style="font-weight:700">¿Le avisamos a tu profe?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-avisa2="1">Avisale a Lucas</button><button class="btn ghost sm" data-close>No, gracias</button></div>';
+      pre(); $('#salaSheet').hidden = false; return;
+    }
+    if (DECI === 'ocupada') { if (fi >= 0) { salaCambiarOcupada(); pre(); } else toast('Eso va en la fuerza: ahora estás en ' + pasoCorto(st)); return; }
+    if (DECI === 'falta') { const t = deciFalta(); $('#salaSheetIn').innerHTML = oido + '<p class="sv big">' + SV_BOLT + '<span>' + t + '</span></p><button class="btn" data-close>Dale</button>'; $('#salaSheet').hidden = false; hablar(t); return; }
+    // Cantidades dictadas: van al ejercicio actual (o al próximo de fuerza) y se confirman
+    const i = fi >= 0 ? fi : S.F.findIndex(F => !F.done && !F.salteado); if (i < 0) { toast('Ya anotamos toda la fuerza'); return; }
+    const f = fx(i), F = S.F[i], reps = [10, 10, 8].slice(0, f.sr); while (reps.length < f.sr) reps.push(8);
+    DC = { i:i, reps:reps, kg:F.kg };
+    $('#salaSheetIn').innerHTML = oido + '<div class="card deca"><b>' + f.n + '</b><span class="dekg">' + reps.join(' · ') + (DC.kg !== null ? ' <small>con</small> <b>' + fmtKg(DC.kg) + '</b> kg' : ' rep') + '</span></div><div class="grid2" style="gap:8px"><button class="btn sm" data-dc="ok">Confirmar</button><button class="btn ghost sm" data-dc="fix">Corregir</button></div>' + pie;
+    $('#salaSheet').hidden = false;
+  }
+  $('#salaSheet').addEventListener('click', e => {
+    if (e.target.closest('[data-avisa2]')) { $('#salaSheet').hidden = true; toast('Listo. Lucas te busca en la sala ⚡'); return; }
+    const d = e.target.closest('[data-dc]'); if (!d || !DC || !SALA) return;
+    const S = SALA, F = S.F[DC.i], cur = DC.i === curF(); F.reps = DC.reps.slice(); if (DC.kg !== null) F.kg = DC.kg;
+    $('#salaSheet').hidden = true;
+    if (d.dataset.dc === 'fix') { DC = null; if (cur) salaAjustar(); else { renderSala(); toast('Corregilo en ese ejercicio con Ajustar'); } return; }
+    const n = fx(DC.i).n; DC = null;
+    if (cur) { salaListo(); toast('Anotado: ' + n.toLowerCase() + ' ⚡'); return; }
+    F.sets = F.sets.map(() => true); F.done = true; WK.reg = true; if (S.F.every(x => x.done || x.salteado) && !S.fueSumada) { S.fueSumada = true; WK.fue++; }
+    renderForma(); renderToday(); renderSala(); toast('Anotado: ' + n.toLowerCase() + ' ⚡');
+  });
+  acSync(); descansoHrec();

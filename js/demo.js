@@ -159,4 +159,64 @@
     entDemo('hoy', NOENT ? 'No llegó la entrada: Empezar queda como secundario' : 'Llegó la entrada');
   });
   $('#limRemo').addEventListener('click', () => { LIM.remo = 2; if (SALA) salaRehacer(); entDemo('hoy', 'Las dos últimas en remo fueron "Al límite": hoy no sube'); });
-
+//#bloque 315
+  // ===== v46 · T7: pantalla bloqueada simulada y tocable (actividad en vivo y notificaciones de un toque) y panel del acompañante =====
+  // Simula al sistema operativo, no una pantalla del socio. Nada de salud y "Tu sede" en lugar del nombre.
+  var BLOQ = false, LK_OLV = false, LK_FIN = false, NOTI = { chk:false, lun:false, olv:false };
+  const lk = document.createElement('div'); lk.className = 'lock'; lk.id = 'lockScr'; lk.hidden = true; lk.setAttribute('role', 'dialog'); lk.setAttribute('aria-label', 'Pantalla bloqueada (simulada)');
+  $('.app').appendChild(lk);
+  const LKB = '<svg class="vbolt" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg>';
+  const lkHd = t => '<div class="lkhd">' + LKB + '<span>VIVA · ' + t + '</span></div>';
+  const lkBt = a => '<div class="lkbtns">' + a.map(x => '<button' + (x[2] ? ' class="pri"' : '') + ' data-lk="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>';
+  const mmss = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+  function lkAct(S){
+    const st = steps()[S.step], fi = curF(), pr = salaProg();
+    let h = '<div class="lkcard lkact">' + lkHd('Tu sede · en curso') + '<div class="lkprog">' + pr.map(p => '<i><b style="width:' + Math.round(p * 100) + '%"></b></i>').join('') + '</div>';
+    if (S.pausa) return h + '<b>En pausa</b><span>Abrí la app para seguir.</span></div>';
+    if (!MANUAL && S.vence) return h + '<b>' + (S.repreg ? mtRepTxt(st) : mtPropTxt(st)) + '</b>' + lkBt(fi >= 0 ? [['listo', 'Listo', 1], ['cambiar', 'Cambiar']] : [['listo', 'Listo', 1]]) + '</div>';
+    if (st === 'act') return h + '<b>Activación · ' + S.P.act.min + ' min</b>' + lkBt([['listo', 'Listo', 1]]) + '</div>';
+    if (st === 'car') return h + '<b>' + S.P.car.maq + ' · ' + S.carMin + ' min</b><span class="lkbig">' + mmss(S.crono) + '</span>' + lkBt([['listo', 'Listo · terminar', 1]]) + '</div>';
+    const f = fx(fi), F = S.F[fi];
+    if (S.rest > 0) { const nx = F.sets.indexOf(false) >= 0 ? 'serie ' + (F.sets.indexOf(false) + 1) + ' de ' + f.sr : (fi + 1 < S.F.length ? fx(fi + 1).n + (S.F[fi + 1].kg ? ' · ' + fmtKg(S.F[fi + 1].kg) + ' kg' : '') : 'el cardio'); return h + '<span>Descanso</span><span class="lkbig">' + mmss(S.rest) + '</span><span>Siguiente: ' + nx + '</span>' + lkBt([['saltear', 'Saltear']]) + '</div>'; }
+    return h + '<b>' + f.n + '</b><span class="lkbig">' + f.sr + ' × ' + F.reps[0] + (F.kg ? ' · ' + fmtKg(F.kg) + ' kg' : '') + '</span>' + lkBt([['listo', 'Listo', 1], ['cambiar', 'Cambiar']]) + '</div>';
+  }
+  function lockRen(){
+    if (!BLOQ) return;
+    const now = ahora(), hh = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    let fe = ''; try { fe = now.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' }); } catch (_) {}
+    let h = '<div class="lktop"><span class="lkfecha">' + fe + '</span><span class="lkhora">' + hh + '</span></div><div class="lkstack">';
+    const S = SALA;
+    if (S) h += lkAct(S);
+    else if (LK_FIN) h += '<div class="lkcard">' + lkHd('ahora') + '<b>Sesión cerrada ⚡</b><span>Desbloqueá para ver tu semana.</span></div>';
+    if (S && LK_OLV && !NOTI.olv) h += '<div class="lkcard">' + lkHd('hace 1 min') + '<b>¿Terminaste?</b><span>Tu sesión sigue abierta.</span>' + lkBt([['olv-cerrar', 'Cerrala', 1], ['olv-sigo', 'Sigo']]) + '</div>';
+    if (!S && !LK_FIN && !NOTI.chk && !prep.done) h += '<div class="lkcard">' + lkHd('antes de tu horario') + '<b>¿Cómo venís hoy?</b><span>Tu sede está tranquila.</span>' + lkBt([['chk-todo', 'Con todo'], ['chk-normal', 'Normal'], ['chk-sinen', 'Sin energía']]) + '</div>';
+    if (!S && !LK_FIN && !NOTI.lun) { const m = META_SEM, sube = LAST_WK >= m; h += '<div class="lkcard">' + lkHd('lunes') + '<b>La semana pasada viniste ' + LAST_WK + '.</b><span>' + (sube ? '¿Repetimos o subimos a ' + (m + 1) + '?' : 'Tu meta es ' + m + ': ¿la mantenemos o la ponemos en ' + LAST_WK + '?') + '</span>' + lkBt(sube ? [['lun-rep', 'Repetir'], ['lun-sub', 'Subir a ' + (m + 1), 1]] : [['lun-rep', 'Seguir con ' + m, 1], ['lun-baj', 'Poner ' + LAST_WK]]) + '</div>'; }
+    h += '</div><button class="lkunlock" data-lk="abrir">Tocá para desbloquear</button>';
+    lk.innerHTML = h;
+  }
+  function lockAbrir(olv){ $('#demoSheet').hidden = true; LK_OLV = !!olv; LK_FIN = false; if (olv) NOTI.olv = false; BLOQ = true; lk.hidden = false; lockRen(); }
+  function lockCerrar(){ BLOQ = false; lk.hidden = true; const fin = LK_FIN; LK_FIN = false; if (SALA) { renderSala(); go('sala'); } else if (fin) go('cierre'); }
+  lk.addEventListener('click', e => {
+    const b = e.target.closest('[data-lk]'); if (!b) return; const v = b.dataset.lk;
+    if (v === 'abrir') return lockCerrar();
+    if (v === 'listo' && SALA) { const st = steps()[SALA.step]; salaListo(); if (st === 'car') LK_FIN = true; }
+    if (v === 'saltear' && SALA) { SALA.rest = 0; renderSala(); }
+    if (v === 'cambiar' && SALA) { lockCerrar(); salaCambiar(); return; } // puede tocar salud: pide desbloquear
+    if (v.indexOf('chk-') === 0) { NOTI.chk = true; chkAnswer(v.slice(4)); }
+    if (v.indexOf('lun-') === 0) { NOTI.lun = true; if (v !== 'lun-rep') { META_SEM = v === 'lun-sub' ? META_SEM + 1 : LAST_WK; renderForma(); renderHoy(); renderAcc(); } }
+    if (v === 'olv-cerrar' && SALA) { NOTI.olv = true; salaCerrar(); LK_FIN = true; }
+    if (v === 'olv-sigo') NOTI.olv = true;
+    lockRen();
+  });
+  $('#verBloq').addEventListener('click', () => lockAbrir(false));
+  $('#verOlvido').addEventListener('click', () => { if (!SALA) { if (MOM !== 'sala') setMom('sala', true); salaStart(); } lockAbrir(true); });
+  $('#acPick').addEventListener('click', e => {
+    const b = e.target.closest('[data-ac]'); if (!b) return; const k = b.dataset.ac;
+    if (k === 'voz1' || k === 'voz0') { vozCambiar(k === 'voz1'); if (SALA) renderSala(); return; }
+    if (k === 'au1' || k === 'au0') { AURIC = k === 'au1'; if (!AURIC) callar(); toast(AURIC ? 'Auriculares conectados' : 'Sin auriculares: la voz queda en pantalla'); }
+    if (k === 'rap1' || k === 'rap0') { RAPIDO = k === 'rap1'; toast(RAPIDO ? 'Reloj rápido: 1 segundo vale 10' : 'Reloj real'); }
+    if (k === 'man1' || k === 'man0') { MANUAL = k === 'man1'; if (SALA) { SALA.vence = false; SALA.repreg = false; } toast(MANUAL ? 'Anota el socio: sin reloj' : 'La app lo lleva por tiempo'); }
+    acSync(); if (SALA) renderSala();
+  });
+  $('#dcPick').addEventListener('click', e => { const b = e.target.closest('[data-dc2]'); if (!b) return; DECI = b.dataset.dc2; acSync(); $('#demoSheet').hidden = true; if (SALA) { renderSala(); go('sala'); } toast('Mantené apretado Decímelo en la sesión'); });
+  $('#dsPick').addEventListener('click', e => { const b = e.target.closest('[data-ds]'); if (!b) return; DSEG = +b.dataset.ds; acSync(); entDemo('hoy', DSEG >= 5 ? (semCumplida() ? '5 días seguidos y la semana cumplida: Hoy propone descanso' : '5 días seguidos sin la semana cumplida: nunca "no vengas", solo qué entrenar') : '2 días seguidos'); });

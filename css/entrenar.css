@@ -106,3 +106,43 @@
 .honb span{flex:1}
 .honb .link{min-height:44px;padding:0 4px;font-size:14px;font-weight:700}
 .obody .wktit{white-space:normal;line-height:1.15}
+
+/* v46 · T7 El acompañante */
+.salatop{grid-template-columns:44px minmax(0,1fr) auto}
+.salatop .salaprog,.salatop .salapos{grid-column:2}
+.salactl{grid-row:1/3;grid-column:3;display:flex;gap:6px}
+.salactl button{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--panel);color:var(--txt);display:flex;align-items:center;justify-content:center;padding:0}
+.salactl button[aria-pressed="true"]{border-color:var(--lime);color:var(--lime);box-shadow:0 0 10px rgba(64,196,255,.35)}
+.salactl button[hidden]{display:none}
+.salafoot{display:flex;gap:10px;align-items:stretch}
+.salalisto{flex:1;width:auto}
+.salamic{flex:0 0 72px;min-height:64px;border-radius:18px;border:1px solid var(--line2);background:var(--panel);color:var(--txt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:inherit;font-size:11px;font-weight:700;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;padding:0}
+.salamic.on{background:var(--yel);color:#111;border-color:var(--yel);box-shadow:0 0 20px rgba(255,233,74,.55)}
+.salamic[hidden]{display:none}
+.smt{padding:10px 12px;border:1px solid rgba(255,233,74,.35);border-radius:14px;background:rgba(255,233,74,.06);font-weight:600}
+.deoido{display:flex;flex-direction:column;gap:2px}
+.deq{font-size:19px;font-style:italic;line-height:1.3}
+.deca{gap:6px}
+.dekg{font-size:26px;font-weight:700}
+.dekg b{font-size:30px}
+.dekg small{font-size:15px;font-weight:500;color:var(--muted)}
+.lock{position:absolute;inset:0;z-index:80;background:radial-gradient(120% 70% at 50% 0%,#24304d 0%,#0b1120 55%,#04060b 100%);color:#fff;display:flex;flex-direction:column;padding:max(46px,env(safe-area-inset-top,0px)) 12px 18px;gap:20px;overflow-y:auto}
+.lock[hidden]{display:none}
+.lktop{display:flex;flex-direction:column;align-items:center}
+.lkfecha{font-size:17px;font-weight:600;opacity:.85}
+.lkhora{font-size:84px;font-weight:700;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.lkstack{display:flex;flex-direction:column;gap:10px}
+.lkcard{background:rgba(48,55,72,.72);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:7px;font-size:15px;line-height:1.35}
+.lkcard b{font-size:17px}
+.lkhd{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.75;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.lkhd .vbolt{width:10px;height:15px;color:var(--yel)}
+.lkbig{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums}
+.lkbtns{display:flex;gap:8px;margin-top:2px}
+.lkbtns button{flex:1;min-height:46px;border-radius:14px;border:none;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-weight:700;font-size:15px}
+.lkbtns button.pri{background:var(--lime);color:#04131a}
+.lkprog{display:flex;gap:4px}
+.lkprog i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;position:relative}
+.lkprog i b{position:absolute;top:0;bottom:0;left:0;background:var(--lime)}
+.lkunlock{margin-top:auto;align-self:center;background:none;border:none;color:#fff;opacity:.75;font:inherit;font-size:14px;min-height:44px}
+.lkunlock::before{content:'';display:block;width:134px;height:5px;border-radius:3px;background:#fff;margin:0 auto 8px}
+#salaBody > .sv:first-child,#salaBody > .smt{padding-right:58px}

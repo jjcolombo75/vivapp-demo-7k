@@ -20,9 +20,9 @@
 
 <!-- MODO SALA (versión 41): un ejercicio por pantalla, un toque por ejercicio -->
 <section class="scr" id="sala" hidden aria-label="Tu sesión">
-  <div class="salatop"><button class="salamenu" id="salaMenu" aria-label="Menú de la sesión"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button><div class="salaprog" id="salaProg" aria-hidden="true"></div><span class="salapos" id="salaPos"></span></div>
+  <div class="salatop"><button class="salamenu" id="salaMenu" aria-label="Menú de la sesión"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button><div class="salaprog" id="salaProg" aria-hidden="true"></div><span class="salapos" id="salaPos"></span><div class="salactl"><button id="salaPausa" aria-label="Pausar la sesión" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button><button id="salaVoz" aria-label="Voz: solo en pantalla" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg></button></div></div>
   <div class="salabody" id="salaBody"></div>
-  <div class="salafoot"><button class="salalisto" id="salaListo">Listo</button></div>
+  <div class="salafoot"><button class="salamic" id="salaMic" aria-label="Decímelo: mantené apretado para hablar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Decímelo</span></button><button class="salalisto" id="salaListo">Listo</button></div>
 </section>
 
 <!-- ONBOARDING DE ENTRENAR (versión 44): invitación, 4 preguntas salteables y cierre con la sesión de hoy -->
@@ -41,6 +41,7 @@
   <div class="body" style="padding-top:28px">
     <button class="link lime" data-go="hoy" style="align-self:flex-start;padding:0;min-height:40px;margin-bottom:-8px">‹ Volver a hoy</button>
     <h1 class="h1">Tus rutinas</h1>
+    <label class="swrow" for="anotarYo" style="padding:4px 0"><span class="stack" style="gap:2px;flex:1"><span>Prefiero anotar yo</span><span class="small muted">Sin reloj: pasás de ejercicio cuando tocás Listo.</span></span><input type="checkbox" class="sw" id="anotarYo"></label>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="act">Activas</button>
       <button role="tab" aria-selected="false" data-tab="hist">Historial</button>
