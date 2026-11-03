@@ -118,7 +118,9 @@
 
 /* ===== v40 ===== */
 /* Tu sede arriba a la derecha: caja chica con medidor de color (4 rayitas que crecen, como señal) */
-.sedebox{margin-left:auto;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-height:50px;max-width:150px;padding:6px 11px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:inherit;text-align:left;cursor:pointer}
+.sedebox{margin-left:auto;flex-shrink:0;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:7px;min-height:50px;max-width:177px;padding:6px 11px 6px 9px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:inherit;text-align:left;cursor:pointer}
+.sedebox .sbpin{flex-shrink:0;color:var(--dat);filter:drop-shadow(0 0 4px var(--dat-dim))}
+.sedebox .sbt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
 .sedebox .sbk{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1}
 .sedebox .sbr{display:flex;align-items:flex-end;gap:7px;min-width:0}
 .sedebox .sbn{font-size:14.5px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
