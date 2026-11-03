@@ -1,13 +1,13 @@
 /* ===== v37 · Esquinas iluminadas (cian abajo a la izquierda, magenta arriba a la derecha), opción de demo ===== */
-.app{--esqI:1.4} /* v48 · intensidad de las esquinas del fondo (1 = hasta v47); barra en Demo */
-.esqFondo{position:absolute;inset:0;z-index:-1;pointer-events:none;display:none;background:radial-gradient(90% 42% at 100% 0%,rgba(244,0,160,calc(.24*var(--esqI))),rgba(244,0,160,0) 72%),radial-gradient(95% 40% at 0% 92%,rgba(7,176,242,calc(.24*var(--esqI))),rgba(7,176,242,0) 72%)}
+.app{--esqO:.56} /* v49 · intensidad de las esquinas (1 = hasta v47), por opacity: anda en Safari; barra en Demo */
+.esqFondo{position:absolute;inset:0;z-index:-1;pointer-events:none;display:none;opacity:var(--esqO);background:radial-gradient(90% 42% at 100% 0%,rgba(244,0,160,.6),rgba(244,0,160,0) 72%),radial-gradient(95% 40% at 0% 92%,rgba(7,176,242,.6),rgba(7,176,242,0) 72%)}
 .app[data-esq="fondo"] .esqFondo,.app[data-esq="ambos"] .esqFondo{display:block}
-.app[data-mode="light"] .esqFondo{background:radial-gradient(90% 42% at 100% 0%,rgba(244,0,160,calc(.10*var(--esqI))),rgba(244,0,160,0) 72%),radial-gradient(95% 40% at 0% 92%,rgba(7,176,242,calc(.11*var(--esqI))),rgba(7,176,242,0) 72%)}
+.app[data-mode="light"] .esqFondo{background:radial-gradient(90% 42% at 100% 0%,rgba(244,0,160,.25),rgba(244,0,160,0) 72%),radial-gradient(95% 40% at 0% 92%,rgba(7,176,242,.275),rgba(7,176,242,0) 72%)}
 .esqint{display:flex;align-items:center;gap:10px;min-height:44px}.esqint input{flex:1;accent-color:var(--dat);min-height:44px}.esqint b{min-width:44px;text-align:right;font-size:14px}
-.ecj{position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;display:none;background:radial-gradient(75% 70% at 100% 0%,rgba(244,0,160,.20),rgba(244,0,160,0) 70%),radial-gradient(75% 70% at 0% 100%,rgba(7,176,242,.22),rgba(7,176,242,0) 70%)}
+.ecj{position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;display:none;opacity:var(--esqO);background:radial-gradient(75% 70% at 100% 0%,rgba(244,0,160,.357),rgba(244,0,160,0) 70%),radial-gradient(75% 70% at 0% 100%,rgba(7,176,242,.393),rgba(7,176,242,0) 70%)}
 .app[data-esq="cajas"] .ecj,.app[data-esq="ambos"] .ecj{display:block}
 .app[data-esq="cajas"] .tcjBox,.app[data-esq="ambos"] .tcjBox{isolation:isolate}
-.app[data-mode="light"] .ecj{background:radial-gradient(75% 70% at 100% 0%,rgba(244,0,160,.09),rgba(244,0,160,0) 70%),radial-gradient(75% 70% at 0% 100%,rgba(7,176,242,.10),rgba(7,176,242,0) 70%)}
+.app[data-mode="light"] .ecj{background:radial-gradient(75% 70% at 100% 0%,rgba(244,0,160,.161),rgba(244,0,160,0) 70%),radial-gradient(75% 70% at 0% 100%,rgba(7,176,242,.179),rgba(7,176,242,0) 70%)}
 /* ===== v35 · Tu mural VIVA en Inicio; trama en las pantallas de marca ===== */
 .bgviva{position:relative;isolation:isolate}
 .tramaV{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}

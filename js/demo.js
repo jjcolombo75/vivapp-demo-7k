@@ -21,9 +21,9 @@
   let tramaT = null; new MutationObserver(() => { if ($('.app').dataset.trama === 'cajas' || esqOn()) { clearTimeout(tramaT); tramaT = setTimeout(tramaCajas, 60); } }).observe($('.app'), { childList:true, subtree:true });
   $('#barrasPick').addEventListener('click', () => setTimeout(() => { if (typeof renderOccChart === 'function' && !$('#occChart').hidden) renderOccChart(); }, 0));
   ['#tramaPick', '#esqPick'].forEach(q => $(q).addEventListener('click', () => setTimeout(tramaCajas, 0)));
-  // v48 · intensidad de las esquinas del fondo (100% = hasta v47); si están apagadas, las enciende en el fondo
-  $('#esqInt').addEventListener('input', e => { const v = +e.target.value, ap = $('.app'); ap.style.setProperty('--esqI', v / 100); $('#esqIntV').textContent = v + '%';
-    if (!/^(fondo|ambos)$/.test(ap.dataset.esq || '')) { const n = ap.dataset.esq === 'cajas' ? 'ambos' : 'fondo'; ap.dataset.esq = n; $$('#esqPick [data-esq]').forEach(x => x.setAttribute('aria-pressed', x.dataset.esq === n)); setTimeout(tramaCajas, 0); } });
+  // v49 · intensidad de las esquinas, fondo y cajas (100% = hasta v47); si están apagadas, las enciende en el fondo
+  $('#esqInt').addEventListener('input', e => { const v = +e.target.value, ap = $('.app'); ap.style.setProperty('--esqO', v / 250); $('#esqIntV').textContent = v + '%';
+    if (!ap.dataset.esq || ap.dataset.esq === 'no') { const n = 'fondo'; ap.dataset.esq = n; $$('#esqPick [data-esq]').forEach(x => x.setAttribute('aria-pressed', x.dataset.esq === n)); setTimeout(tramaCajas, 0); } });
   $('#cajaPick').addEventListener('click', e => { const b = e.target.closest('[data-cajas]'); if (!b) return; $('.app').dataset.cajas = b.dataset.cajas; $$('#cajaPick [data-cajas]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
   // Coach IA (futuro): solo como opción de demo
   const COACH_ICO = {
