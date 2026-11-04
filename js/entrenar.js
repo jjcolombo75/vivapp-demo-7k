@@ -933,7 +933,8 @@
   // ---- La voz (escalón 1): plantillas, síntesis del teléfono, solo con auriculares. Sin síntesis, solo texto ----
   const vozTxt = t => String(t).replace(/<[^>]+>/g, '').replace(/⚡/g, '').replace(/(\d+),5/g, '$1 y medio').replace(/(\d+) × (\d+)/g, '$1 series de $2').replace(/\bkg\b/g, 'kilos').replace(/\bmin\b/g, 'minutos').replace(/·/g, ',').replace(/\s+/g, ' ').trim();
   var vozES = null;
-  function vozElegir(){ try { const vs = speechSynthesis.getVoices(); vozES = vs.find(v => /^es[-_](AR|UY)/i.test(v.lang)) || vs.find(v => /^es[-_](419|US|MX)/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null; } catch (_) {} }
+  // v47: entre las voces en español del teléfono, primero la calidad (premium, mejorada) y después la región; las voces locales antes que las de red
+  function vozElegir(){ try { const q = v => { const n = v.name + ' ' + (v.voiceURI || ''); return (/premium|enhanced|mejorad|neural|natural/i.test(n) ? 0 : 10) + (/compact/i.test(n) ? 3 : 0) + (v.localService === false ? 5 : 0) + (/^es[-_](AR|UY)/i.test(v.lang) ? 0 : /^es[-_](419|US|MX)/i.test(v.lang) ? 1 : 2); }; vozES = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a, b) => q(a) - q(b))[0] || null; } catch (_) {} }
   try { if (window.speechSynthesis) { vozElegir(); speechSynthesis.onvoiceschanged = vozElegir; } } catch (_) {}
   const vozHay = () => { try { return !!window.speechSynthesis; } catch (_) { return false; } };
   function hablar(t){ if (!(VOZ && AURIC && vozHay()) || !t) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(vozTxt(t)); u.lang = vozES ? vozES.lang : 'es-AR'; if (vozES) u.voice = vozES; u.rate = 1; speechSynthesis.speak(u); } catch (_) {} }
@@ -991,7 +992,7 @@
     VOZ = on; acSync();
     if (VOZ && !AURIC) toast('Conectá tus auriculares: mientras, te escribimos acá');
     else if (VOZ && !vozHay()) toast('Este teléfono no tiene voz: te escribimos acá');
-    else { toast(VOZ ? 'Voz: con auriculares' : 'Voz: solo en pantalla'); if (VOZ) hablar('Dale, te voy hablando por los auriculares.'); else callar(); }
+    else { vozElegir(); toast(VOZ ? 'Voz: ' + (vozES ? vozES.name : 'la del teléfono') : 'Voz: solo en pantalla'); if (VOZ) hablar('Dale, te voy hablando por los auriculares.'); else callar(); }
   }
   $('#salaVoz').addEventListener('click', () => { vozCambiar(!VOZ); if (SALA) renderSala(); });
   $('#salaPausa').addEventListener('click', () => { if (!SALA) return; SALA.pausa = !SALA.pausa; callar(); toast(SALA.pausa ? 'En pausa: el reloj te espera' : 'Seguimos ⚡'); renderSala(); });
