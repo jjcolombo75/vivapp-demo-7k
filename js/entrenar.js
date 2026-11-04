@@ -487,9 +487,9 @@
   const SALA_B = {
     act:{ min:8, items:ACT_B },
     fue:[
-      { k:'remo', n:'Remo sentado', maq:'remo', zona:'Zona espalda · al fondo, a la izquierda', sr:3, rep:12, kg:42.5, prev:40, t:270, alt:[{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' }, { n:'Remo en polea baja', zona:'Zona poleas · junto a la columna', kg:40, maq:'polea' }] },
-      { k:'jalon', n:'Jalón al pecho', maq:'jalon', zona:'Zona espalda · al fondo, al centro', sr:3, rep:12, kg:45, prev:45, t:270, alt:[{ n:'Jalón con agarre neutro', zona:'Zona espalda · al fondo, al centro', kg:42.5, maq:'jalon' }, { n:'Dominadas asistidas', zona:'Zona espalda · contra la pared', kg:null, maq:'jalon' }], hombro:{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' } },
-      { k:'curl', n:'Curl de bíceps en máquina', maq:'curl', zona:'Zona brazos · junto a los espejos', sr:3, rep:12, kg:20, prev:20, t:240, alt:[{ n:'Curl con mancuernas', zona:'Zona peso libre', kg:10, maq:'curl' }, { n:'Curl en polea', zona:'Zona poleas · junto a la columna', kg:15, maq:'polea' }] }
+      { k:'remo', n:'Remo sentado', maq:'remo', zona:'Zona espalda · al fondo, a la izquierda', sr:3, rep:12, kg:42.5, prev:40, t:270, ctl:'Bajá en 2 o 3 segundos sin soltar el peso', alt:[{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' }, { n:'Remo en polea baja', zona:'Zona poleas · junto a la columna', kg:40, maq:'polea' }] },
+      { k:'jalon', n:'Jalón al pecho', maq:'jalon', zona:'Zona espalda · al fondo, al centro', sr:3, rep:12, kg:45, prev:45, t:270, ctl:'Llevá la barra al pecho sin balancearte', alt:[{ n:'Jalón con agarre neutro', zona:'Zona espalda · al fondo, al centro', kg:42.5, maq:'jalon' }, { n:'Dominadas asistidas', zona:'Zona espalda · contra la pared', kg:null, maq:'jalon' }], hombro:{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' } },
+      { k:'curl', n:'Curl de bíceps en máquina', maq:'curl', zona:'Zona brazos · junto a los espejos', sr:3, rep:12, kg:20, prev:20, t:240, ctl:'Despacio, sin despegar los codos del apoyo', alt:[{ n:'Curl con mancuernas', zona:'Zona peso libre', kg:10, maq:'curl' }, { n:'Curl en polea', zona:'Zona poleas · junto a la columna', kg:15, maq:'polea' }] }
     ],
     car:{ maq:'Cinta', min:12, txt:'caminata en subida', zona:'Zona cardio · frente a las ventanas' }
   };
@@ -612,7 +612,7 @@
     try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { if (SALA) SALA.lock = l; }).catch(() => {}); } catch (_) {}
     renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy();
     renderSala(); go('sala');
-    hablar(mtSaludo());
+    hablar(mtSaludo(), 'inicio');
   }
   // Estado "sesión abierta" de la demo: activación y el primer ejercicio hechos
   function salaDemo(){ SALA = salaNew(); SALA.actDone = true; SALA.F[0].done = true; SALA.F[0].sets = SALA.F[0].sets.map(() => true); SALA.step = 2; SALA.saludo = false; }
@@ -698,7 +698,7 @@
       if (v === 'otra') { renderSala(); return salaCambiarOcupada(); }
       renderSala(); return; }
     const sd = e.target.closest('[data-set]');
-    if (sd) { const F = S.F[curF()], j = +sd.dataset.set; F.sets[j] = !F.sets[j]; if (F.sets[j] && F.sets.indexOf(false) >= 0) { S.rest = 90; clearInterval(restT); restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); } renderSala(); return; }
+    if (sd) { const F = S.F[curF()], j = +sd.dataset.set; F.sets[j] = !F.sets[j]; if (F.sets[j] && F.sets.indexOf(false) >= 0) { S.rest = 90; clearInterval(restT); restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) vozFinDescanso(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); } renderSala(); return; }
     if (e.target.closest('#sSkipRest')) { S.rest = 0; clearInterval(restT); renderSala(); return; }
     if (e.target.closest('#sAjustar')) return salaAjustar();
     if (e.target.closest('#sAjCar')) { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Minutos de cardio</span><div class="sadj"><button class="opt" data-cm="-5">−5</button><b id="sCarMin">' + S.carMin + ' min</b><button class="opt" data-cm="5">+5</button></div><button class="btn" data-close>Listo</button>'; $('#salaSheet').hidden = false; return; }
@@ -784,7 +784,7 @@
         : '<div class="card ciq"><span style="font-weight:700">¿Cómo estuvo?</span><div class="opts g3" id="ciFeel"><button class="opt" data-fl="liviana">Liviana</button><button class="opt" data-fl="justa">Justa</button><button class="opt" data-fl="limite">Al límite</button></div></div>') +
       '<div class="cinext"><span class="small muted">Tu próxima</span><span style="font-weight:700;font-size:17px">Día ' + nx.k + ' · ' + nx.n.toLowerCase() + '</span></div>' +
       '<button class="btn" data-go="inicio">Volver a tu inicio</button>';
-    hablar(completa ? 'Sesión completa ⚡ Encendiste tu semana.' : 'Guardamos lo que hiciste ⚡');
+    hablar(vozResumen(S, rec ? S.F[remo].kg : null), 'cierre');
     SALA = null;
     go('cierre');
   }
@@ -931,30 +931,39 @@
     return (NOENT ? 'Arrancamos ⚡' : 'Llegaste a Sarmiento ⚡') + (ETAPA === 'vuelvo' ? ' Volviste: hoy vamos al 80% de lo que hacías.' : ' Hoy toca el Día ' + d.k + (ds ? ' y ' + ds.charAt(0).toLowerCase() + ds.slice(1) : '') + ': arrancamos con ' + P.act.min + ' minutos de activación.');
   }
   // ---- La voz (escalón 1): plantillas, síntesis del teléfono, solo con auriculares. Sin síntesis, solo texto ----
-  const vozTxt = t => String(t).replace(/<[^>]+>/g, '').replace(/⚡/g, '').replace(/(\d+),5/g, '$1 y medio').replace(/(\d+) × (\d+)/g, '$1 series de $2').replace(/\bkg\b/g, 'kilos').replace(/\bmin\b/g, 'minutos').replace(/·/g, ',').replace(/\s+/g, ' ').trim();
+  const vozTxt = t => String(t).replace(/<[^>]+>/g, '').replace(/\s*⚡\s*(?=\S)/g, '. ').replace(/⚡/g, '').replace(/([.?!])\. /g, '$1 ').replace(/(\d+),5/g, '$1 y medio').replace(/(\d+) × (\d+)/g, '$1 series de $2').replace(/\bkg\b/g, 'kilos').replace(/\bmin\b/g, 'minutos').replace(/·/g, ',').replace(/\s+/g, ' ').trim();
   var vozES = null;
   // v47: entre las voces en español del teléfono, primero la calidad (premium, mejorada) y después la región; las voces locales antes que las de red
   function vozElegir(){ try { const q = v => { const n = v.name + ' ' + (v.voiceURI || ''); return (/premium|enhanced|mejorad|neural|natural/i.test(n) ? 0 : 10) + (/compact/i.test(n) ? 3 : 0) + (v.localService === false ? 5 : 0) + (/^es[-_](AR|UY)/i.test(v.lang) ? 0 : /^es[-_](419|US|MX)/i.test(v.lang) ? 1 : 2); }; vozES = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a, b) => q(a) - q(b))[0] || null; } catch (_) {} }
   try { if (window.speechSynthesis) { vozElegir(); speechSynthesis.onvoiceschanged = vozElegir; } } catch (_) {}
   const vozHay = () => { try { return !!window.speechSynthesis; } catch (_) { return false; } };
-  function hablar(t){ if (!(VOZ && AURIC && vozHay()) || !t) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(vozTxt(t)); u.lang = vozES ? vozES.lang : 'es-AR'; if (vozES) u.voice = vozES; u.rate = 1; speechSynthesis.speak(u); } catch (_) {} }
+  // Reglas duras en el motor, no en el prompt: solo los momentos fijos y nunca lo de la lista "nunca por voz" (una más, dolor, cambiar cargas, datos sensibles). Nunca por parlante: solo con auriculares
+  var VOZ_MOMENTOS = { inicio:1, ejercicio:1, descanso:1, cierre:1, respuesta:1, sistema:1 };
+  var NUNCA_VOZ = /\buna m[aá]s\b|duel|dolor|molest|lesi[oó]n|\b(sub[ií]|prob[aá]|subimos|bajamos|sum[aá]|sac[aá])\b|\bbaj[aá] (a|la carga|el peso)\b|salud|consentimiento|menor de|calor[ií]/i;
+  function hablar(t, k){ if (!(VOZ && AURIC && vozHay()) || !t || !VOZ_MOMENTOS[k] || NUNCA_VOZ.test(vozTxt(t))) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(vozTxt(t)); u.lang = vozES ? vozES.lang : 'es-AR'; if (vozES) u.voice = vozES; u.rate = 1; speechSynthesis.speak(u); } catch (_) {} }
   const callar = () => { try { speechSynthesis.cancel(); } catch (_) {} };
   // ---- Cambio de paso (cualquiera sea el modo: toque, Decímelo, pantalla bloqueada o deslizar) ----
+  // ---- v51 · Voz en momentos fijos (docs/entrenar-propuesta.md § 3): al arrancar, antes de cada ejercicio, fin del descanso y resumen al cerrar. Entre medio, silencio ----
+  function vozEj(st){
+    const S = SALA; if (st === 'car') return S.P.car.maq + ', ' + S.carMin + ' min, ' + S.P.car.txt + '. Podés hablar, pero no cantar.';
+    const i = +st.slice(1), f = fx(i), F = S.F[i];
+    return f.n + ': ' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' segundos' : '') + '.' + (f.prev && !F.swap ? ' La vez pasada, ' + fmtKg(f.prev) + ' kg.' : F.kg ? ' Con ' + fmtKg(F.kg) + ' kg.' : '') + (f.ctl && !F.swap ? ' ' + f.ctl + '.' : '');
+  }
+  function vozFinDescanso(){ const S = SALA, i = curF(); if (!S || i < 0) return; const F = S.F[i], j = F.sets.indexOf(false); hablar('Descanso terminado' + (j >= 0 ? ': serie ' + (j + 1) + ' de ' + F.sets.length + '.' : '.'), 'descanso'); }
+  function vozResumen(S, recKg){
+    const nF = S.F.filter(f => f.done).length, p = [];
+    if (S.actDone) p.push('la activación'); if (nF) p.push(nF + (nF === 1 ? ' ejercicio' : ' ejercicios') + ' de fuerza'); if (S.carDone) p.push(S.carMin + ' min de ' + S.P.car.maq.toLowerCase());
+    return (p.length ? 'Hiciste ' + (p.length > 1 ? p.slice(0, -1).join(', ') + ' y ' + p[p.length - 1] : p[0]) + '.' : 'Cerramos la sesión.') + (recKg ? ' En remo subiste a ' + fmtKg(recKg) + ' kg.' : '');
+  }
+  // ---- Cambio de paso (cualquiera sea el modo: toque, Decímelo, pantalla bloqueada o deslizar) ----
   function mtCambio(S){
-    const sts = steps(), a = S.mtStep, b = S.step, vencio = S.vence;
+    const sts = steps(), a = S.mtStep, b = S.step;
     S.mtStep = b; S.el = 0; S.vence = false; S.repreg = false; S.hito = '';
     if (a === null || a === undefined || b <= a) return;
     const sa = sts[a], sb = sts[b];
     if (sb === 'car' && !MANUAL) cronoArrancar();
-    let rec = '';
-    if (sa[0] === 'f') { const i = +sa.slice(1), F = S.F[i], f = fx(i); if (F.done && !F.swap && f.prev && F.kg > f.prev && EXP !== 'arranco' && !esMenor()) rec = 'Récord en ' + f.n.toLowerCase() + ' ⚡'; }
-    S.hito = rec;
-    if (sb === 'car') { hablar((rec ? rec + ' ' : '') + 'Te queda el cardio y terminás: ' + S.carMin + ' min de ' + S.P.car.maq.toLowerCase() + ', ' + S.P.car.txt + '. Podés hablar, pero no cantar.'); return; }
-    if (sa === 'act') { hablar('Vamos con la fuerza: ' + exTxt(+sb.slice(1)) + '.'); return; }
-    // Dentro de la fuerza habla poco: como mucho una frase cada dos ejercicios (la propuesta al vencer ya anunció el siguiente)
-    const j = +sb.slice(1); if (S.ultH != null && j - S.ultH < 2) return;
-    if (rec) { hablar(rec + ' Ahora ' + exTxt(j) + '.'); S.ultH = j; }
-    else if (!vencio) { hablar('Ahora ' + exTxt(j) + '.'); S.ultH = j; }
+    if (sa[0] === 'f') { const i = +sa.slice(1), F = S.F[i], f = fx(i); if (F.done && !F.swap && f.prev && F.kg > f.prev && EXP !== 'arranco' && !esMenor()) S.hito = 'Récord en ' + f.n.toLowerCase() + ' ⚡'; } // solo en pantalla
+    hablar(vozEj(sb), 'ejercicio');
   }
   function mtHtml(st){
     const S = SALA; if (S.mtStep !== S.step) mtCambio(S);
@@ -975,8 +984,8 @@
     const S = SALA; if (!S || S.pausa || MANUAL) { if (BLOQ && S) lockRen(); return; }
     const st = steps()[S.step]; if (S.mtStep !== S.step) return;
     S.el += mtVel(); const d = mtDur(st);
-    if (!S.vence && S.el >= d) { S.vence = true; hablar(mtPropTxt(st)); if (curScr === 'sala') renderSala(); }
-    else if (S.vence && !S.repreg && S.el >= d + MT_REPREG) { S.repreg = true; hablar(mtRepTxt(st)); if (curScr === 'sala') renderSala(); }
+    if (!S.vence && S.el >= d) { S.vence = true; if (curScr === 'sala') renderSala(); } // la propuesta va en pantalla y en la pantalla bloqueada, en silencio
+    else if (S.vence && !S.repreg && S.el >= d + MT_REPREG) { S.repreg = true; if (curScr === 'sala') renderSala(); }
     if (BLOQ) lockRen();
   }
   setInterval(mtTic, 1000);
@@ -992,7 +1001,7 @@
     VOZ = on; acSync();
     if (VOZ && !AURIC) toast('Conectá tus auriculares: mientras, te escribimos acá');
     else if (VOZ && !vozHay()) toast('Este teléfono no tiene voz: te escribimos acá');
-    else { vozElegir(); toast(VOZ ? 'Voz: ' + (vozES ? vozES.name : 'la del teléfono') : 'Voz: solo en pantalla'); if (VOZ) hablar('Dale, te voy hablando por los auriculares.'); else callar(); }
+    else { vozElegir(); toast(VOZ ? 'Voz: ' + (vozES ? vozES.name : 'la del teléfono') : 'Voz: solo en pantalla'); if (VOZ) hablar('Dale, te hablo al empezar cada ejercicio.', 'sistema'); else callar(); }
   }
   $('#salaVoz').addEventListener('click', () => { vozCambiar(!VOZ); if (SALA) renderSala(); });
   $('#salaPausa').addEventListener('click', () => { if (!SALA) return; SALA.pausa = !SALA.pausa; callar(); toast(SALA.pausa ? 'En pausa: el reloj te espera' : 'Seguimos ⚡'); renderSala(); });
@@ -1026,7 +1035,7 @@
       pre(); $('#salaSheet').hidden = false; return;
     }
     if (DECI === 'ocupada') { if (fi >= 0) { salaCambiarOcupada(); pre(); } else toast('Eso va en la fuerza: ahora estás en ' + pasoCorto(st)); return; }
-    if (DECI === 'falta') { const t = deciFalta(); $('#salaSheetIn').innerHTML = oido + '<p class="sv big">' + SV_BOLT + '<span>' + t + '</span></p><button class="btn" data-close>Dale</button>'; $('#salaSheet').hidden = false; hablar(t); return; }
+    if (DECI === 'falta') { const t = deciFalta(); $('#salaSheetIn').innerHTML = oido + '<p class="sv big">' + SV_BOLT + '<span>' + t + '</span></p><button class="btn" data-close>Dale</button>'; $('#salaSheet').hidden = false; hablar(t, 'respuesta'); return; }
     // Cantidades dictadas: van al ejercicio actual (o al próximo de fuerza) y se confirman
     const i = fi >= 0 ? fi : S.F.findIndex(F => !F.done && !F.salteado); if (i < 0) { toast('Ya anotamos toda la fuerza'); return; }
     const f = fx(i), F = S.F[i], reps = [10, 10, 8].slice(0, f.sr); while (reps.length < f.sr) reps.push(8);
