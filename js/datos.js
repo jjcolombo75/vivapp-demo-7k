@@ -56,8 +56,8 @@
   function renderToday(){
     const r = rutinas[actual], mm = typeof MOM === 'undefined' ? 'antes' : MOM, prox = (mm === 'despues' && !sesHecha) || mm === 'descanso';
     const d = r.dias[mm === 'despues' && !sesHecha ? (r.next + 1) % r.dias.length : r.next];
-    $('#todayLbl').innerHTML = '<span class="sig">' + firma(mm === 'sesion' ? 'Tu sesión' : prox || mm === 'despues' ? 'Tu próxima rutina' : 'Tu rutina') + '</span>';
-    $('#todayCambiar').hidden = mm === 'sesion';
+    $('#todayLbl').innerHTML = '<span class="sig">' + firma(mm === 'sesion' ? 'Tu sesión' : prox || mm === 'despues' ? 'Tu próxima rutina' : 'Tu rutina hoy') + '</span>';
+    $('#todayCambiar').hidden = true; // v57 · Cambiar vive en Hoy y Rutinas
     $('#todayBy').textContent = r.tipo === 'profe' ? 'Prof. Lucas' : 'Generada con IA';
     $('#todayLetter').textContent = d.k; $('#todayName').textContent = d.n;
     // La sesión en tres partes (simulada: la prescribe el profe en EVO; activación y cardio según el objetivo)
@@ -70,5 +70,10 @@
     $('#todayPlan').innerHTML = P.map((x, i) => '<span class="tdp" style="flex:' + x[1] + '"><span class="bar tdb' + (mm === 'sesion' ? ' live' : '') + '"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span><span class="tdl"><b>' + x[0] + '</b> ' + x[2] + '</span></span>').join('');
     $('#todayPlan').setAttribute('aria-label', 'Tu sesión: ' + P.map(x => x[0] + ' ' + x[2]).join(', ') + '.');
     $('#todayTags').innerHTML = d.ex.map(k => '<span class="tag">' + lib[k].n + '</span>').join('');
+    // v57 · rutina en una línea + Empezar (entrenar-propuesta § 11.6); Empezar lleva a Hoy (§ 11.8)
+    let nL = nEx, mL = tot; try { if (!prox && mm !== 'despues' && typeof salaPlan === 'function') { const SP = salaPlan(); nL = SP.fue.length; mL = planMin(SP); } } catch (_) {}
+    $('#todayLine').innerHTML = '<b>Día ' + d.k + ' · ' + d.n.toLowerCase() + '</b><span>' + nL + ' ejercicios · ~' + mL + ' min</span>';
+    $('#iniAcc').hidden = !(mm === 'antes' || mm === 'sala');
   }
   $('#startToday').addEventListener('click', () => startDay(actual, rutinas[actual].next));
+  $('#iniEmpezar').addEventListener('click', () => go('hoy'));

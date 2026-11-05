@@ -39,7 +39,10 @@
     </div>
 
     <div class="card" id="todayCard">
-      <div class="between"><span class="wktit" id="todayLbl"><span class="sig"><b>Tu</b> <i>rutina</i></span></span><button class="link lime" data-go="rutinas" id="todayCambiar" style="min-height:44px;margin:-12px 0;padding:0;font-size:14px">Cambiar</button><span class="small muted" id="todayBy" hidden>Prof. Lucas</span></div>
+      <div class="between"><span class="wktit" id="todayLbl"><span class="sig"><b>Tu</b> <i>rutina hoy</i></span></span><button class="link lime" data-go="rutinas" id="todayCambiar" hidden style="min-height:44px;margin:-12px 0;padding:0;font-size:14px">Cambiar</button><span class="small muted" id="todayBy" hidden>Prof. Lucas</span></div>
+      <div class="tdline"><span id="todayLine"></span><div class="accbar iniacc" id="iniAcc"><button class="accbtn go" id="iniEmpezar"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg><span>Empezar</span></button></div></div>
+      <div class="inichk" id="iniChk" hidden></div>
+      <div class="tdold" hidden>
       <div class="tdrow"><span class="tdday" aria-hidden="true"><small>Día</small><b id="todayLetter">B</b></span>
         <span class="stack" style="gap:3px;min-width:0"><span class="tdname" id="todayName">Espalda y bíceps</span>
         <span class="small muted" id="todayMeta">Prof. Lucas · 3 ejercicios · 45 min</span></span></div>
@@ -48,10 +51,9 @@
         <span class="small" hidden style="color:var(--dat);font-weight:700" id="todayWhy">Elegida según tu recuperación: tus piernas todavía descansan del lunes.</span>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap" id="todayTags" hidden></div>
-      <div class="hoyrow" id="hoyRow"></div>
-      <div class="stack" id="prepAsk" hidden style="gap:10px"></div>
       <button class="btn neonbtn" id="startToday" hidden aria-label="Empezar entrenamiento"><span class="stdtxt"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Empezar entrenamiento</span><svg class="cartel" viewBox="0 0 300 62" aria-hidden="true"><defs><linearGradient id="cartelGrad" x1="0" x2="1"><stop offset="0" stop-color="#ffe94a"/><stop offset=".5" stop-color="#07b0f2"/><stop offset="1" stop-color="#f400a0"/></linearGradient><linearGradient id="cartelGradL" x1="0" x2="1"><stop offset="0" stop-color="#8a6a00"/><stop offset=".5" stop-color="#00748a"/><stop offset="1" stop-color="#b0127a"/></linearGradient><filter id="cartelGlow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="340" height="102"><feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b1"/><feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b2"/><feMerge><feMergeNode in="b1"/><feMergeNode in="b1"/><feMergeNode in="b2"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><text x="150" y="50" text-anchor="middle">EMPEZAR</text></svg></button>
       
+      </div>
     </div>
 
     <button class="card planaviso" id="planAviso" data-go="plan" hidden>

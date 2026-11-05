@@ -290,9 +290,7 @@
     const r = rutinas[actual], dk = 'Día ' + r.dias[r.next].k;
     let lbl = null, cls = '', ico = '';
     if (!pausa) {
-      if (MOM === 'antes') { lbl = 'Ver tu rutina'; }
-      else if (MOM === 'sala') { lbl = 'Empezar · ' + dk; cls = 'on go'; ico = ICO_PLAY; }
-      else if (MOM === 'sesion') { lbl = 'Volver a tu sesión'; cls = 'on'; ico = ICO_SES; }
+      if (MOM === 'sesion') { lbl = 'Volver a tu sesión'; cls = 'on'; ico = ICO_SES; }
     }
     const cen = ACC_POS === 'centro';
     $('#accBar').hidden = !lbl || cen;
@@ -306,7 +304,7 @@
     $('.app').dataset.accbar = !$('#accBar').hidden && curScr === 'inicio' ? '1' : '0';
     if (['hoy', 'rutinas', 'progreso', 'ia', 'entrenando', 'sala', 'cierre'].includes(curScr)) na.setAttribute('aria-current', 'page'); else na.removeAttribute('aria-current');
   }
-  function accGo(){ if (MOM === 'sala') salaStart(); else if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else go('hoy'); }
+  function accGo(){ if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else go('hoy'); }
   $('#accBtn').addEventListener('click', accGo);
   $('#navAcc').addEventListener('click', accGo);
   $('#momPick').addEventListener('click', e => {
@@ -314,7 +312,7 @@
     $('#demoSheet').hidden = true; go('inicio');
     toast({ antes:'Antes de ir: todavía no vino hoy', sala:'En la sala: entró por el molinete', sesion:'Sesión abierta: está entrenando', despues:'Después: ya entrenó hoy', descanso:'Día sin entrenar: la semana ya está cumplida' }[MOM]);
   });
-  $('.app').dataset.ah = 'gira';
+  $('.app').dataset.ah = 'espectro';
   $('#haloPick').addEventListener('click', e => { const b = e.target.closest('[data-ah]'); if (!b) return; $('.app').dataset.ah = b.dataset.ah; $$('#haloPick [data-ah]').forEach(x => x.setAttribute('aria-pressed', x === b)); if (MOM !== 'sala') setMom('sala'); $('#demoSheet').hidden = true; go('inicio'); });
   $('#accPick').addEventListener('click', e => {
     const b = e.target.closest('[data-acc]'); if (!b) return; ACC_POS = b.dataset.acc;
@@ -342,6 +340,8 @@
       const vis = ok && shown < 2; el.hidden = !vis;
       if (vis) { shown++; if (last.nextElementSibling !== el) last.insertAdjacentElement('afterend', el); last = el; }
     });
+    const ev = ['fitBox', 'fitPromo'].map(i => $('#' + i)).find(e => e && !e.hidden); if (ev && ref.previousElementSibling !== ev) ref.insertAdjacentElement('beforebegin', ev); // Tu evolución: siempre arriba de Tu rutina hoy
+    const hr = $('#hoyRow'), ic = $('#iniChk'); if (hr && ic) { const sh = !hr.hidden && !!hr.textContent.trim(); ic.hidden = !sh; if (sh) { const c = hr.cloneNode(true), x = c.querySelector('#prepRedo'); if (x) x.remove(); ic.innerHTML = c.innerHTML; } } // v57 · Inicio muestra el resultado del día, no la pregunta
     const cp = $('#clubPromo'); if (cp && !cp.hidden && cp.parentElement.lastElementChild !== cp) cp.parentElement.appendChild(cp); // Club Viva: siempre la última caja
     const fbx = $('#fitBox'); fbx.classList.toggle('nov', !!FIT_NOV); $('#fitNov').textContent = FIT_NOV ? (nIB === 1 ? 'tu punto de partida' : 'medición nueva') : '';
   }

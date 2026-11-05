@@ -577,6 +577,7 @@
   function salaProg(){ if (!SALA) return [0, 0, 0]; const n = SALA.F.length; return [SALA.actDone ? 1 : 0, n ? SALA.F.filter(f => f.done).length / n : 0, SALA.carDone ? 1 : 0]; }
   // ---- Hoy ----
   let hOpen = -1;
+  var HB = { ses:false, cue:null, para:true, rep:false }, HR = -1; // v57 · bloques plegables de Hoy (cue null = abierto si falta responder)
   function renderEntHoy(){
     const r = rutinas[actual], d = r.dias[r.next], P = salaPlan(), tot = planMin(P);
     $('#hLetter').textContent = d.k; $('#hName').textContent = d.n;
@@ -598,17 +599,35 @@
     $('#hCorto').innerHTML = CORTO ? 'Volver a la versión completa' : '¿Poco tiempo? <b>Hacé la versión de 30 min</b>'; $('#hCorto').hidden = MOM === 'sesion';
     const b = $('#hEmpezar'), ses = MOM === 'sesion';
     b.parentElement.hidden = !!pausa;
-    b.className = 'accbtn' + (MOM === 'sala' ? ' on go' : ses ? ' on' : '');
+    b.className = 'accbtn' + (ses ? ' on' : ' go');
     b.innerHTML = (ses ? ICO_SES : ICO_PLAY).replace('<svg ', '<svg width="20" height="20" ') + '<span>' + (ses ? 'Volver a tu sesión' : 'Comenzar rutina · Día ' + d.k) + '</span>';
+    hbRender(P, d, tot);
+  }
+  // v57 · Hoy = preparación (entrenar-propuesta § 11.7): sesión · tu cuerpo hoy · para hoy (solo si hay algo) · repasar
+  function hbRender(P, d, tot){
+    if (!HB) return;
+    const ses = MOM === 'sesion', hr = $('#hoyRow'), falta = hr.hidden && !$('#prepAsk').hidden;
+    $('#hbsesS').textContent = 'Día ' + d.k + ' · ~' + tot + ' min';
+    const hd = hr.querySelector('.hdot'), cs = { todo:'Con todo', normal:'Normal', sinen:'Sin energía', cuidar:'Cuidando', bien:'Bien', igual:'Cuidando', peor:'Descansa', profe:'Con tu profe', menor:'Con tu profe', skip:'Normal' }[CHK] || '';
+    $('#hbcueS').innerHTML = falta ? 'Sin responder' : hr.hidden || !cs ? '' : (hd ? hd.outerHTML : '') + cs;
+    const vacio = $('#hCuida').hidden && $('#hNota').hidden; $('#hbPara').hidden = vacio;
+    $('#hbrepS').textContent = P.fue.length + ' ejercicios';
+    $('#hRep').innerHTML = P.fue.map((f, i) => { const L = lib[f.k] || lib[String(f.k).replace(/H$/, '')], op = HR === i;
+      return '<div class="hrep"><button class="hrb" data-hr="' + i + '" aria-expanded="' + op + '"><span>' + f.n + '</span><small>' + f.sr + ' × ' + f.rep + (f.kg ? ' · ' + fmtKg(f.kg) + ' kg' : '') + '</small></button>' +
+        (op ? '<div class="hrd">' + (L && L.tip ? L.tip : 'Tu profe te lo muestra en la sala.') + '</div>' : '') + '</div>'; }).join('');
+    const op = { ses:HB.ses, cue:HB.cue === null ? falta : HB.cue, para:HB.para, rep:HB.rep };
+    Object.keys(op).forEach(k => { const el = $('[data-hbk="' + k + '"]'); el.classList.toggle('open', !!op[k]); el.querySelector('.hbh').setAttribute('aria-expanded', !!op[k]); });
+    $('#hEmpezar').classList.toggle('big', !ses && !falta && vacio);
   }
   $('#hParts').addEventListener('click', e => { const b = e.target.closest('[data-hp]'); if (!b) return; const i = +b.dataset.hp; hOpen = hOpen === i ? -1 : i; renderEntHoy(); });
   $('#hCorto').addEventListener('click', () => { CORTO = !CORTO; renderEntHoy(); renderToday(); toast(CORTO ? 'Versión de 30 minutos: las tres partes, más cortas' : 'Volviste a la versión completa'); });
+  $('section#hoy').addEventListener('click', e => { const h = e.target.closest('[data-hb]'); if (h) { HB[h.dataset.hb] = !h.parentElement.classList.contains('open'); renderEntHoy(); return; } const r = e.target.closest('[data-hr]'); if (r) { HR = HR === +r.dataset.hr ? -1 : +r.dataset.hr; renderEntHoy(); } });
   $('#hEmpezar').addEventListener('click', () => { if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else salaStart(); });
   // ---- Modo sala ----
   function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => ({ sets:Array(f.sr).fill(false), done:false, salteado:false, kg:f.kg, reps:Array(f.sr).fill(f.rep), swap:null })), carDone:false, carMin:P.car.min, t0:+ahora(), saludo:true, chk:false, rest:0, crono:0, el:0, vence:false, repreg:false, pausa:false, mtStep:null, hito:'' }; }
   function salaStart(){
     if (MOM !== 'sala' && MOM !== 'sesion' && !NOENT) setMom('sala', true);
-    SALA = salaNew(); SALA.chk = !prep.done;
+    SALA = salaNew(); SALA.chk = false; // v57 · la pregunta del día vive solo en Hoy (§ 11.7)
     MOM = 'sesion'; syncMomPick();
     try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { if (SALA) SALA.lock = l; }).catch(() => {}); } catch (_) {}
     renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy();

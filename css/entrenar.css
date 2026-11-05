@@ -194,3 +194,24 @@
 .strans{margin:0;font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
 .sprepb{gap:8px;margin-top:auto}
 .ctiempos{margin:0;font-size:15px;line-height:1.4;color:var(--txt)}
+
+/* v57 · Hoy = preparación: bloques plegables (entrenar-propuesta § 11.7) */
+.hacc{padding:0}
+#hEmpezar.big{min-height:76px;font-size:21px;border-radius:20px}
+.hblk{gap:12px}
+.hbh{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;margin:-6px 0;background:none;border:0;padding:0;color:var(--txt);font:inherit;text-align:left;cursor:pointer}
+.hbt{font-family:var(--disp,inherit);font-weight:800;font-size:17px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+.hbs{flex:1;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:7px;font-size:13.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbs .hdot{width:10px;height:10px;border-radius:5px;flex-shrink:0}
+.hbh>svg{flex-shrink:0;color:var(--muted);transition:transform .2s}
+.hblk.open .hbh>svg{transform:rotate(180deg)}
+.hblk:not(.open) .hbb{display:none}
+.hbb{display:flex;flex-direction:column;gap:12px}
+.hblk .hoyrow{border-top:0;padding-top:0}
+.hblk .hct{display:none}
+.hrb{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:48px;background:none;border:0;border-top:1px solid var(--line);padding:4px 0;color:var(--txt);font:inherit;font-size:15px;font-weight:700;text-align:left;cursor:pointer}
+.hrep:first-child .hrb{border-top:0}
+.hrb small{font-weight:400;font-size:13px;color:var(--muted);white-space:nowrap}
+.hrd{font-size:14px;line-height:1.45;color:var(--muted);padding:0 0 10px}
+.hbs{display:block;text-align:right}.hbs .hdot{display:inline-block;margin-right:7px;vertical-align:0}
+.hblk .between .link{white-space:nowrap}
