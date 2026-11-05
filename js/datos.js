@@ -33,13 +33,13 @@
       const days = r.dias.map((d, i) => {
         const st = i < r.next ? 'done' : i === r.next ? (cur ? 'today' : 'nextd') : '';
         const lab = i < r.next ? 'Hecho' : i === r.next ? (cur ? 'Hoy' : 'Sigue') : d.lbl;
-        return '<button class="day ' + st + '" data-start="' + rid + ':' + i + '" aria-label="Día ' + d.k + ', ' + d.n + '"><b>' + d.k + '</b><span>' + lab + '</span></button>';
+        return '<button class="day ' + st + (RUT_VER === rid + ':' + i ? ' sel' : '') + '" data-ver="' + rid + ':' + i + '" aria-expanded="' + (RUT_VER === rid + ':' + i) + '" aria-label="Día ' + d.k + ', ' + d.n + '"><b>' + d.k + '</b><span>' + lab + '</span></button>';
       }).join('');
       return '<div class="card rut' + (cur ? ' cur' : '') + '">' +
         '<div style="display:flex;align-items:center;gap:10px">' + head + (cur ? '<span class="pill ok">EN CURSO</span>' : '<span class="pill" style="background:var(--panel2);color:var(--muted)">ACTIVA</span>') + '</div>' +
         '<div class="stack" style="gap:4px"><span class="h2" style="font-size:28px">' + r.nombre + '</span><span class="small muted">' + r.sub + '</span></div>' +
         '<div class="days" style="grid-template-columns:repeat(' + r.dias.length + ',minmax(0,1fr))">' + days + '</div>' +
-        '<span class="small muted">Tocá un día para ver sus ejercicios y entrenar.</span>' +
+        (RUT_VER && RUT_VER.split(':')[0] === rid ? rutDetalle(rid, +RUT_VER.split(':')[1]) : '') +
         (r.tipo === 'ia' ? '<div class="note muted"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>Tu profe fue avisado de que usás esta rutina</div>' : '') +
         (cur ? '' : '<button class="btn ghost sm" data-use="' + rid + '">Seguir esta rutina</button>') +
         '</div>';
@@ -48,6 +48,7 @@
   $('#rutList').addEventListener('click', e => {
     const u = e.target.closest('[data-use]');
     if (u) { actual = u.dataset.use; renderRoutines(); renderToday(); toast('Ahora seguís: ' + rutinas[actual].nombre); return; }
+    if (rutClick(e)) return;
     const s = e.target.closest('[data-start]');
     if (s) { const [rid, i] = s.dataset.start.split(':'); startDay(rid, +i); }
   });

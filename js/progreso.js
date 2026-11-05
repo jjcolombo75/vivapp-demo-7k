@@ -404,7 +404,7 @@
   $('#muralList').addEventListener('click', e => { const b = e.target.closest('[data-mshare]'); if (!b) return; const ev = muralEventos().find(x => x.id === b.dataset.mshare); if (ev) shareEv(ev); });
   $('#muralShare').addEventListener('click', () => { const nm = MUR.meses.length + (MUR.cerrado ? 0 : 0);
     openStory({ type:'ach', a:{ big:String(semAcum()), unit:'SEMANAS CUMPLIDAS ⚡', cap:'mi mural VIVA' + (nm ? ': ' + nm + (nm === 1 ? ' mes cumplido' : ' meses cumplidos') : ''), feedT:'Mi mural VIVA' }, noSede:true }); });
-  document.addEventListener('click', e => { if (e.target.closest('#mesHit')) { renderMural(); go('progreso'); setTimeout(() => { const c = $('#muralCard'); if (c) c.scrollIntoView({ block:'start' }); }, 30); } });
+  document.addEventListener('click', e => { if (e.target.closest('#mesHit')) { renderMural(); go('muralScr'); setTimeout(() => { const c = $('#muralCard'); if (c) c.scrollIntoView({ block:'start' }); }, 30); } });
 
 //#bloque 260
   // ----- El momento del cartel: al cerrarse un Mes completo -----

@@ -130,7 +130,7 @@
       : falta > quedan ? 'Este mes ya no llega al cartel. Cada semana igual suma a tu ritmo y a tus fichas.'
       : 'Te ' + (falta === 1 ? 'falta <strong>1 semana</strong>' : 'faltan <strong>' + falta + ' semanas</strong>') + ' para tu neón de ' + mes + ' ⚡';
   }
-  const irMural = () => { renderMural(); go('progreso'); setTimeout(() => { const c = $('#muralCard'); if (c) c.scrollIntoView({ block:'start' }); }, 30); };
+  const irMural = () => { renderMural(); go('muralScr'); };
   $('#mesVer').addEventListener('click', irMural); $('#mesBar').addEventListener('click', irMural);
   $('#mtPick').addEventListener('click', e => {
     const b = e.target.closest('[data-mt]'); if (!b) return; MUR_TXT = b.dataset.mt;

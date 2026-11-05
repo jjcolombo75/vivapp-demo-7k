@@ -361,7 +361,7 @@
     frozenP = 0.35; requestAnimationFrame(() => { resize3D(); draw3D(playing ? 0 : frozenP); });
   }
   function loop3D(now){
-    if (rig && curEx && !$('#entrenando').hidden) {
+    if (rig && curEx && rig.host.offsetParent !== null) {
       resize3D();
       const t = (now - t0) / PER;
       const p = playing ? 0.5 - 0.5 * Math.cos(2 * Math.PI * (t % 1)) : frozenP;
@@ -466,7 +466,7 @@
 
 //#bloque 200
   // ===== Asesor IA: mapa de recuperación, correcciones del profe y ajuste por sensación =====
-  $('#recMap').innerHTML = $('#bodymap').innerHTML;
+  if ($('#recMap')) $('#recMap').innerHTML = $('#bodymap').innerHTML;
   const recState = { cuads:'mid', gluteos:'mid', isquios:'mid', abdomen:'ok', dorsales:'ok', trapecio:'ok', biceps:'ok', triceps:'ok', hombros:'ok', pecho:'ok', antebrazo:'ok' };
   $$('#recMap .m').forEach(m => m.setAttribute('class', 'm ' + (recState[m.dataset.m] || '')));
   const correcciones = [ { ex:'Sentadilla goblet', fecha:'Sáb', txt:'Bajá un poco más y mantené el pecho arriba. ¡La espalda está perfecta!', ok:true } ];
@@ -487,9 +487,9 @@
   const SALA_B = {
     act:{ min:8, items:ACT_B },
     fue:[
-      { k:'remo', n:'Remo sentado', maq:'remo', zona:'Zona espalda · al fondo, a la izquierda', sr:3, rep:12, kg:42.5, prev:40, t:270, ctl:'Bajá en 2 o 3 segundos sin soltar el peso', alt:[{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' }, { n:'Remo en polea baja', zona:'Zona poleas · junto a la columna', kg:40, maq:'polea' }] },
-      { k:'jalon', n:'Jalón al pecho', maq:'jalon', zona:'Zona espalda · al fondo, al centro', sr:3, rep:12, kg:45, prev:45, t:270, ctl:'Llevá la barra al pecho sin balancearte', alt:[{ n:'Jalón con agarre neutro', zona:'Zona espalda · al fondo, al centro', kg:42.5, maq:'jalon' }, { n:'Dominadas asistidas', zona:'Zona espalda · contra la pared', kg:null, maq:'jalon' }], hombro:{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' } },
-      { k:'curl', n:'Curl de bíceps en máquina', maq:'curl', zona:'Zona brazos · junto a los espejos', sr:3, rep:12, kg:20, prev:20, t:240, ctl:'Despacio, sin despegar los codos del apoyo', alt:[{ n:'Curl con mancuernas', zona:'Zona peso libre', kg:10, maq:'curl' }, { n:'Curl en polea', zona:'Zona poleas · junto a la columna', kg:15, maq:'polea' }] }
+      { k:'remo', n:'Remo sentado', maq:'remo', zona:'Zona espalda · al fondo, a la izquierda', sr:3, rep:12, kg:42.5, prev:40, t:270, ctl:'Bajá en 2 o 3 segundos sin soltar el peso', tempo:[3,1,1,0], mirar:['Espalda derecha: no vayas para atrás', 'Llevá los codos pegados hasta el final'], alt:[{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' }, { n:'Remo en polea baja', zona:'Zona poleas · junto a la columna', kg:40, maq:'polea' }] },
+      { k:'jalon', n:'Jalón al pecho', maq:'jalon', zona:'Zona espalda · al fondo, al centro', sr:3, rep:12, kg:45, prev:45, t:270, ctl:'Llevá la barra al pecho sin balancearte', tempo:[3,0,1,0], mirar:['Pecho arriba: la barra va a la clavícula', 'Subí controlando, que no te tire'], alt:[{ n:'Jalón con agarre neutro', zona:'Zona espalda · al fondo, al centro', kg:42.5, maq:'jalon' }, { n:'Dominadas asistidas', zona:'Zona espalda · contra la pared', kg:null, maq:'jalon' }], hombro:{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' } },
+      { k:'curl', n:'Curl de bíceps en máquina', maq:'curl', zona:'Zona brazos · junto a los espejos', sr:3, rep:12, kg:20, prev:20, t:240, ctl:'Despacio, sin despegar los codos del apoyo', tempo:[3,0,1,1], mirar:['Los codos quietos en el apoyo', 'Bajá hasta estirar casi del todo'], alt:[{ n:'Curl con mancuernas', zona:'Zona peso libre', kg:10, maq:'curl' }, { n:'Curl en polea', zona:'Zona poleas · junto a la columna', kg:15, maq:'polea' }] }
     ],
     car:{ maq:'Cinta', min:12, txt:'caminata en subida', zona:'Zona cardio · frente a las ventanas' }
   };
@@ -498,7 +498,7 @@
   // v42 · cuidar completo y estados de la demo (instrucción de Entrenar, secciones 7 y 11)
   // MOLESTIA: la molestia guardada con consentimiento (dato de salud). CUIDA: lo que se cuida HOY. CHK: la respuesta de hoy.
   var MOLESTIA = null, PEOR = false, CHK = null, RESOLVER = false, AVISO_PROFE = false;
-  var ETAPA = 'normal', EXP = 'habitual', SALA_LLENA = false, SIN_SENAL = false, NOENT = false, LIM = {}, CIERRE_K = [];
+  var ETAPA = 'normal', EXP = 'arranco', SALA_LLENA = false, SIN_SENAL = false, NOENT = false, LIM = {}, CIERRE_K = [];
   var esMenor = () => ETAPA === 'menor';
   var zonaTxt = z => z === 'Otra' ? 'lo que nos contaste' : 'tu ' + String(z).toLowerCase();
   // La carga sugerida no sube: primeras 4 semanas (Arranco), al volver de una pausa, con molestia y en menores (va la del profe)
@@ -517,7 +517,7 @@
     return enSala ? '<div class="schk">' + h + '</div>' : h;
   }
   function chkFuHtml(){
-    if (RESOLVER) return '<div class="schk chkfu"><span class="schq">¿Lo damos por resuelto? ⚡</span><span class="small muted">Dos veces seguidas nos dijiste que está bien.</span><div class="grid2" style="gap:8px"><button class="btn sm" data-fu="res">Sí</button><button class="btn ghost sm" data-fu="nores">Todavía no</button></div></div>';
+    if (RESOLVER) return '<div class="schk chkfu"><span class="schq">¿Lo damos por resuelto?</span><span class="small muted">Dos veces seguidas nos dijiste que está bien.</span><div class="grid2" style="gap:8px"><button class="btn sm" data-fu="res">Sí</button><button class="btn ghost sm" data-fu="nores">Todavía no</button></div></div>';
     if (AVISO_PROFE) return '<div class="schk chkfu"><span class="schq">¿Le avisamos a tu profe?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-fu="avisa">Avisale a Lucas</button><button class="btn ghost sm" data-fu="noavisa">No, gracias</button></div></div>';
     return '';
   }
@@ -545,9 +545,9 @@
     const ck = e.target.closest('[data-ck]'); if (ck) { chkAnswer(ck.dataset.ck); return true; }
     const fu = e.target.closest('[data-fu]'); if (!fu) return false;
     const v = fu.dataset.fu, zt = MOLESTIA ? zonaTxt(MOLESTIA.zona) : '';
-    if (v === 'res') { MOLESTIA = null; CUIDA = null; RESOLVER = false; toast('Resuelto ⚡ Borramos el dato y no te preguntamos más'); }
+    if (v === 'res') { MOLESTIA = null; CUIDA = null; RESOLVER = false; toast('Resuelto. Borramos el dato y no te preguntamos más'); }
     if (v === 'nores') { RESOLVER = false; toast('Dale, te seguimos preguntando'); }
-    if (v === 'avisa') { AVISO_PROFE = false; toast('Listo. Lucas sabe que hoy ' + zt + ' está peor ⚡'); }
+    if (v === 'avisa') { AVISO_PROFE = false; toast('Listo. Lucas sabe que hoy ' + zt + ' está peor'); }
     if (v === 'noavisa') { AVISO_PROFE = false; }
     if (SALA) salaRehacer();
     renderHoy(); renderEntHoy(); if (SALA && curScr === 'sala') renderSala();
@@ -570,6 +570,7 @@
       if (ETAPA === 'vuelvo') { f.kg = Math.max(2.5, Math.round(f.prev * 0.8 / 2.5) * 2.5); f.vuelvo = true; return; }
       if (f.kg > f.prev && (ns || (LIM[f.k] || 0) >= 2)) { if (!ns) f.lim = true; f.kg = f.prev; }
     });
+    P.fue.forEach(f => { const a = RUT_AJ && RUT_AJ[f.k]; if (!a) return; if (a.kg != null && f.kg != null) { f.kg = a.kg; f.aj = true; f.lim = false; } if (a.desc) f.desc = a.desc; });
     return P;
   }
   const planMin = P => P.act.min + P.fue.length * 8 + P.car.min;
@@ -598,7 +599,7 @@
     const b = $('#hEmpezar'), ses = MOM === 'sesion';
     b.parentElement.hidden = !!pausa;
     b.className = 'accbtn' + (MOM === 'sala' ? ' on go' : ses ? ' on' : '');
-    b.innerHTML = (ses ? ICO_SES : ICO_PLAY).replace('<svg ', '<svg width="20" height="20" ') + '<span>' + (ses ? 'Volver a tu sesión' : 'Empezar · Día ' + d.k) + '</span>';
+    b.innerHTML = (ses ? ICO_SES : ICO_PLAY).replace('<svg ', '<svg width="20" height="20" ') + '<span>' + (ses ? 'Volver a tu sesión' : 'Comenzar rutina · Día ' + d.k) + '</span>';
   }
   $('#hParts').addEventListener('click', e => { const b = e.target.closest('[data-hp]'); if (!b) return; const i = +b.dataset.hp; hOpen = hOpen === i ? -1 : i; renderEntHoy(); });
   $('#hCorto').addEventListener('click', () => { CORTO = !CORTO; renderEntHoy(); renderToday(); toast(CORTO ? 'Versión de 30 minutos: las tres partes, más cortas' : 'Volviste a la versión completa'); });
@@ -638,7 +639,7 @@
     $('#salaProg').innerHTML = ['Activación', 'Fuerza', 'Cardio'].map((n, i) => '<span class="sp' + (prog[i] >= 1 ? ' full' : '') + '"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span>').join('');
     const fi = curF();
     $('#salaPos').textContent = st === 'act' ? 'Activación' : st === 'car' ? 'Cardio' : 'Fuerza · ' + (fi + 1) + ' de ' + S.F.length; mtPos(st);
-    const voz = t => '<p class="sv">' + SV_BOLT + '<span>' + t + '</span></p>';
+    const voz = t => '<p class="sv"><span>' + t + '</span></p>';
     let h = '';
     if (SIN_SENAL) h += '<p class="snosig"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/></svg>Sin señal: guardamos todo y lo subimos después.</p>';
     const dk = rutinas[actual].dias[rutinas[actual].next].k;
@@ -662,23 +663,26 @@
         '<h2 class="sname">' + f.n + '</h2>' +
         (ETAPA === '60' ? '<div class="sload s60"><b>' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' s' : '') + '</b>' + (F.kg ? '<span>' + fmtKg(F.kg) + ' kg</span>' : '') + '</div>'
           : '<div class="sload">' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' s' : '') + (F.kg ? ' · <b>' + fmtKg(F.kg) + '</b> kg' : '') + '</div>');
-      if (f.prev && F.kg > f.prev && !F.swap) h += voz('La vez pasada hiciste ' + fmtKg(f.prev) + ' kg completo: hoy probá ' + fmtKg(F.kg) + ' ⚡');
-      else if (f.lim && !F.swap) h += voz('La vez pasada fue al límite: hoy repetimos ' + fmtKg(F.kg) + ' kg');
+      if (f.prev && f.kg > f.prev && F.kg === f.kg && !f.aj && !F.swap) h += voz('La vez pasada: ' + fmtKg(f.prev) + ' kg, todas las series completas. Regla de Lucas: hoy ' + fmtKg(F.kg) + ' kg.');
+      else if (f.lim && !F.swap) h += voz('La vez pasada fue al límite. Regla de Lucas: hoy repetís ' + fmtKg(F.kg) + ' kg.');
       else if (f.vuelvo && !F.swap) h += '<p class="shint">Al 80% de la vez pasada (' + fmtKg(f.prev) + ' kg).</p>';
       if (f.cambiado) h += '<p class="shint">Hoy en lugar de ' + f.cambiado.toLowerCase() + ', para cuidar tu hombro.</p>';
+      h += exCue(f, fi);
       if (S.rest > 0) {
         h += '<div class="srest" role="timer"><span class="srt">' + Math.floor(S.rest / 60) + ':' + String(S.rest % 60).padStart(2, '0') + '</span><span class="small muted">' + (F.sets.indexOf(false) >= 0 ? 'Siguiente: serie ' + (F.sets.indexOf(false) + 1) + ' de ' + f.sr : 'Siguiente: ' + (fi + 1 < S.F.length ? fx(fi + 1).n : 'el cardio')) + '</span><button class="link lime" id="sSkipRest">Saltear descanso</button></div>';
       } else {
-        h += '<div class="sdots"><span class="small muted">Series</span>' + F.sets.map((x, j) => '<button class="sdot' + (x ? ' on' : '') + '" data-set="' + j + '" aria-label="Serie ' + (j + 1) + (x ? ', hecha' : '') + '">' + (j + 1) + '</button>').join('') + '<button class="link lime" id="sAjustar">Ajustar</button></div>';
+        h += '<div class="sdots"><span class="small muted">Series</span>' + F.sets.map((x, j) => '<button class="sdot' + (x ? ' on' : '') + '" data-set="' + j + '" aria-label="Serie ' + (j + 1) + (x ? ', hecha' : '') + '">' + (j + 1) + '</button>').join('') + '<button class="link lime" id="sCambiar">Cambiar</button></div>';
       }
-      h += '<div class="srow"><button class="btn ghost sm" id="sCambiar">Cambiar</button><button class="link" id="sComo">Ver cómo se hace</button></div>';
+      h += exAcc(f, fi);
     }
+    if (enPrep(st)) h = prepHtml(st);
     h = mtHtml(st) + h;
-    $('#salaBody').innerHTML = h;
-    $('#salaListo').textContent = st === 'car' ? 'Listo · terminar' : 'Listo';
+    $('#salaBody').innerHTML = h; exMount();
+    $('#salaListo').textContent = enPrep(st) ? (st === 'car' ? 'Empezar cardio' : 'Empezar ejercicio') : st === 'car' ? 'Listo · terminar' : 'Listo';
     mtFoot();
   }
   function salaListo(){
+    if (enPrep(steps()[SALA.step])) return prepEmpezar();
     const S = SALA, st = steps()[S.step]; S.saludo = false; S.chk = false; S.rest = 0;
     WK.reg = true;
     if (st === 'act') { S.actDone = true; WK.act++; }
@@ -692,19 +696,19 @@
   $('#salaBody').addEventListener('click', e => {
     const S = SALA; if (!S) return;
     if (chkClick(e)) return;
+    if (exClick(e)) return;
     const ll = e.target.closest('[data-ll]');
     if (ll) { const v = ll.dataset.ll; S.llenaOk = true;
       if (v === 'dale') { const i = S.P.fue.findIndex(x => x.k === 'curl'); const pf = S.P.fue.splice(i, 1)[0], pF = S.F.splice(i, 1)[0]; S.P.fue.unshift(pf); S.F.unshift(pF); toast('Arrancamos por bíceps. Espalda, cuando se libere'); }
       if (v === 'otra') { renderSala(); return salaCambiarOcupada(); }
       renderSala(); return; }
     const sd = e.target.closest('[data-set]');
-    if (sd) { const F = S.F[curF()], j = +sd.dataset.set; F.sets[j] = !F.sets[j]; if (F.sets[j] && F.sets.indexOf(false) >= 0) { S.rest = 90; clearInterval(restT); restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) vozFinDescanso(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); } renderSala(); return; }
+    if (sd) { const F = S.F[curF()], j = +sd.dataset.set; F.sets[j] = !F.sets[j]; if (F.sets[j] && F.sets.indexOf(false) >= 0) { S.rest = fx(curF()).desc || 90; clearInterval(restT); restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) vozFinDescanso(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); } renderSala(); return; }
     if (e.target.closest('#sSkipRest')) { S.rest = 0; clearInterval(restT); renderSala(); return; }
     if (e.target.closest('#sAjustar')) return salaAjustar();
     if (e.target.closest('#sAjCar')) { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Minutos de cardio</span><div class="sadj"><button class="opt" data-cm="-5">−5</button><b id="sCarMin">' + S.carMin + ' min</b><button class="opt" data-cm="5">+5</button></div><button class="btn" data-close>Listo</button>'; $('#salaSheet').hidden = false; return; }
     if (e.target.closest('#sCrono')) { S.cronoOn = !S.cronoOn; clearInterval(cronoT); if (S.cronoOn) cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); renderSala(); return; }
     if (e.target.closest('#sCambiar')) return salaCambiar();
-    if (e.target.closest('#sComo')) { toast('Abre el video de tu profe o el maniquí 3D de este ejercicio'); return; }
   });
   // Deslizar a la derecha vuelve al ejercicio anterior
   let tx = null;
@@ -719,7 +723,7 @@
   }
   function salaCambiarOcupada(){
     const base = SALA.P.fue[curF()];
-    $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Otras de tu sede</span><span class="small muted">Trabajan lo mismo. Es solo por hoy y el registro sigue.</span>' + (base.alt.length ? base.alt.map((a, i) => '<button class="scmb" data-alt="' + i + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button>').join('') : '<span class="muted">Hoy no tenemos otra igual en tu sede. Probá esperar un minuto o saltealo.</span>');
+    $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Otras de tu sede</span><span class="small muted">' + (actual === 'profe' ? 'Las eligió Lucas para tu rutina. ' : 'Trabajan lo mismo. ') + 'Es solo por hoy y el registro sigue.</span>' + (actual === 'profe' && base.alt.length ? '<button class="link lime" data-siempre="1" style="min-height:44px;align-self:flex-start;padding:0">¿Siempre está ocupada? Pedile a Lucas que la cambie</button>' : '') + (base.alt.length ? base.alt.map((a, i) => '<button class="scmb" data-alt="' + i + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button>').join('') : '<span class="muted">Hoy no tenemos otra igual en tu sede.</span>') + (curF() < SALA.F.length - 1 ? '<button class="scmb" data-despues="1"><b>Hacerlo después</b><span>Va al final de la fuerza</span></button>' : '');
     $('#salaSheet').hidden = false;
   }
   function salaCambiar(){
@@ -736,11 +740,11 @@
     if (e.target.id === 'salaSheet' || e.target.closest('[data-close]')) return close();
     const z = e.target.closest('[data-z]');
     if (z) { $('#salaSheet').hidden = true;
-      if (z.dataset.z === 'profe') { CUIDA = null; chkFin('profe'); toast('Listo. Lucas sabe que querés hablarlo ⚡'); }
+      if (z.dataset.z === 'profe') { CUIDA = null; chkFin('profe'); toast('Listo. Lucas sabe que querés hablarlo'); }
       else { CUIDA = z.dataset.z; PEOR = false; chkFin('cuidar'); toast(CUIDA === 'Hombro' ? 'Cambiamos el jalón por remo con apoyo de pecho' : 'Hoy evitamos lo que carga ' + zonaTxt(CUIDA)); }
       return close(); }
     const mz = e.target.closest('[data-mz]');
-    if (mz) { $('#salaSheet').hidden = true; CUIDA = null; chkFin('menor'); if (mz.dataset.mz === 'avisa') toast('Listo. Lucas te busca en la sala ⚡'); return close(); }
+    if (mz) { $('#salaSheet').hidden = true; CUIDA = null; chkFin('menor'); if (mz.dataset.mz === 'avisa') toast('Listo. Lucas te busca en la sala'); return close(); }
     if (e.target.closest('[data-guardar]')) { MOLESTIA = { zona:CUIDA, bien:0 }; toast('Guardado. La próxima te preguntamos cómo está ' + zonaTxt(CUIDA)); return close(); }
     if (e.target.closest('[data-noguardar]')) { CUIDA = null; toast('No lo guardamos. Era por hoy'); return close(); }
     const ak = e.target.closest('[data-ak]'); if (ak) { const F = S.F[curF()]; F.kg = Math.max(0, F.kg + +ak.dataset.ak); return salaAjustar(); }
@@ -754,17 +758,17 @@
       if (v === 'nose') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">' + f.n + '</span>' + (esMenor() ? '<span class="muted" style="line-height:1.45">Tu profe te lo muestra en la sala.</span>' : '<button class="btn ghost" data-como="1">Ver cómo se hace</button>') + '<button class="btn sm" data-avisa="1">Pedile ayuda a tu profe</button>'; return; }
       if (v === 'saltear') { const F = S.F[curF()]; F.salteado = true; if (S.F.every(x => x.done || x.salteado) && !S.fueSumada && S.F.some(x => x.done)) { S.fueSumada = true; WK.fue++; } S.step = Math.min(steps().length - 1, S.step + 1); toast('Salteado. Seguimos'); renderForma(); return close(); } }
     const al = e.target.closest('[data-alt]'); if (al) { const F = S.F[curF()], a = S.P.fue[curF()].alt[+al.dataset.alt]; F.swap = a; F.kg = a.kg; toast('Listo: hoy hacés ' + a.n.toLowerCase()); return close(); }
-    if (e.target.closest('[data-avisa]')) { toast('Listo. Lucas sabe que estás en ' + fx(curF()).n.toLowerCase() + ' ⚡'); return close(); }
-    if (e.target.closest('[data-como]')) { toast('Abre el video de tu profe o el maniquí 3D'); return close(); }
+    if (e.target.closest('[data-avisa]')) { toast('Listo. Lucas sabe que estás en ' + fx(curF()).n.toLowerCase() + ''); return close(); }
+    if (e.target.closest('[data-como]')) { S.pan = 'como'; S.panStep = S.step; return close(); }
     if (e.target.closest('[data-fin]')) { $('#salaSheet').hidden = true; return salaCerrar(); }
   });
   $('#salaMenu').addEventListener('click', () => { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Tu sesión</span><button class="btn ghost" data-close>Seguir entrenando</button><button class="btn ghost" data-fin="1">Terminar acá</button><span class="small muted" style="line-height:1.45">Guardamos lo que marcaste. Si la dejás abierta, se cierra sola a las 3 horas.</span>'; $('#salaSheet').hidden = false; });
   // ---- Cierre: una pantalla y una pregunta ----
   function salaCerrar(){
     const S = SALA; if (!S) return;
-    clearInterval(restT); clearInterval(cronoT); try { if (S.lock) S.lock.release(); } catch (_) {}
+    clearInterval(restT); clearInterval(cronoT); try { if (S.lock) S.lock.release(); } catch (_) {} S.cerrada = true;
     const prog = salaProg(), completa = prog.every(x => x >= 1), r = rutinas[actual], d = r.dias[r.next];
-    const min = Math.round(planMin(S.P) * (completa ? 1.05 : 0.6));
+    const tReal = (S.tEj || 0) + (S.tDesc || 0) + (S.tTrans || 0), min = tReal >= 300 ? Math.round(tReal / 60) : Math.round(planMin(S.P) * (completa ? 1.05 : 0.6));
     const remo = S.P.fue.findIndex(f => f.k === 'remo'), rec = remo >= 0 && S.F[remo].done && !S.F[remo].swap && S.F[remo].kg > (S.P.fue[remo].prev || 99) && EXP !== 'arranco' && !esMenor();
     if (rec) { const h = hist.remo; if (h) { const last = h[h.length - 1]; if (last[0] === hoyLbl) last[1] = S.F[remo].kg; else h.push([hoyLbl, S.F[remo].kg]); } }
     CIERRE_K = S.P.fue.filter((f, i) => S.F[i].done && !S.F[i].swap).map(f => f.k);
@@ -776,7 +780,7 @@
       : 'Guardamos lo que hiciste ⚡ ' + [S.actDone ? 'la activación' : '', S.F.filter(f => f.done).length ? S.F.filter(f => f.done).length + (S.F.filter(f => f.done).length === 1 ? ' ejercicio' : ' ejercicios') + ' de fuerza' : ''].filter(Boolean).join(' y ') + '.';
     renderSemana(); const sv = $('#wkBox .eqsvg'), comp = semCompleta(), cump = semCumplida();
     $('#cierreBody').innerHTML = '<span class="tagi m cbig"><span>' + (completa ? '¡Listo!' : 'Guardado') + '</span></span>' +
-      '<p class="sv big">' + SV_BOLT + '<span>' + lect + '</span></p>' +
+      '<p class="sv big">' + SV_BOLT + '<span>' + lect + '</span></p>' + tiemposHtml(S) +
       '<div class="card cisem"><div class="between"><span class="wktit"><span class="sig"><b>Tu</b> <i>semana</i></span>' + (comp ? '<span class="tagi sm"><span>Completa</span></span>' : cump ? '<span class="wkleg2">· Cumplida</span>' : '') + '</span></div>' + (sv ? sv.outerHTML : '') + '</div>' +
       (rec ? '<div class="card cilog"><span style="font-weight:700">Récord en remo sentado: ' + fmtKg(S.F[remo].kg) + ' kg ⚡</span><button class="flowshare" id="ciShare"><svg class="bolt-ico" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg> Contalo en tus historias</button></div>' : '') +
       (NOENT ? '<span class="small muted cinoent">Tu sesión encendió tu semana. La visita se suma cuando llegue tu entrada.</span>' : '') +
@@ -918,17 +922,16 @@
   function pasoCorto(st){ if (st === 'act') return 'la activación'; const w = (st === 'car' ? SALA.P.car.maq : fx(+st.slice(1)).n).split(' ')[0].toLowerCase(); return (ART[w] || 'el') + ' ' + w; }
   const exTxt = i => { const f = fx(i), F = SALA.F[i]; return f.n.toLowerCase() + ', ' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' segundos' : '') + (F.kg ? ' con ' + fmtKg(F.kg) + ' kg' : ''); };
   function mtProx(){ const S = SALA, nx = steps()[S.step + 1]; if (!nx) return ''; if (nx === 'car') return 'Sigue ' + S.P.car.maq.toLowerCase() + ' · ' + S.carMin + ' min'; const i = +nx.slice(1), F = S.F[i]; return 'Sigue ' + fx(i).n.toLowerCase() + (F.kg ? ' · ' + fmtKg(F.kg) + ' kg' : ''); }
-  function mtPropTxt(st){ return st === 'car' ? '¿Terminaste ' + pasoCorto(st) + '? Tocá Listo y cerramos ⚡' : '¿Listo con ' + pasoCorto(st) + '? ' + mtProx(); }
+  function mtPropTxt(st){ return st === 'car' ? '¿Terminaste ' + pasoCorto(st) + '? Tocá Listo y cerramos' : '¿Listo con ' + pasoCorto(st) + '? ' + mtProx(); }
   function mtRepTxt(st){ return '¿Seguís con ' + pasoCorto(st) + '? Cuando termines, tocá Listo.'; }
   // ---- Descanso y fatiga (regla de Juanjo, 1/11): Arranco y Habitual. Parámetros de demo; E3 verifica la evidencia ----
-  const DESC_MUS = { B:'Tus piernas descansan', C:'Tu espalda descansa' };
-  function descansoTxt(){ if (EXP === 'avanzado' || actual !== 'profe') return ''; return DESC_MUS[rutinas[actual].dias[rutinas[actual].next].k] || ''; }
-  function descansoHrec(){ const el = document.querySelector('.hrec'); if (!el) return; const ds = descansoTxt(), d = rutinas[actual].dias[rutinas[actual].next]; el.innerHTML = (ds ? ds + ': hoy ' + d.n.toLowerCase() : 'Elegida según tu recuperación') + '<span aria-hidden="true"> ›</span>'; }
+  // v52 · T9: la frase sale del mismo cálculo que "Tu cuerpo hoy" (bloque 307), no de una tabla fija
+  function descansoTxt(){ if (EXP === 'avanzado') return ''; const c = cuerpoHoy(); return c.rec.length ? recFrase(c.rec) : ''; }
   // Nunca "no vengas" a quien viene menos que su meta: el descanso total se propone solo con la semana ya cumplida
   function fatigaTxt(){ return EXP !== 'avanzado' && DSEG >= 5 && semCumplida() && MOM !== 'sesion' ? 'Venís ' + DSEG + ' días seguidos y ya cumpliste tu semana ⚡ Mañana y pasado, descanso: tu cuerpo también entrena descansando.' : ''; }
   function mtSaludo(){
     const P = SALA.P, d = rutinas[actual].dias[rutinas[actual].next], ds = descansoTxt();
-    return (NOENT ? 'Arrancamos ⚡' : 'Llegaste a Sarmiento ⚡') + (ETAPA === 'vuelvo' ? ' Volviste: hoy vamos al 80% de lo que hacías.' : ' Hoy toca el Día ' + d.k + (ds ? ' y ' + ds.charAt(0).toLowerCase() + ds.slice(1) : '') + ': arrancamos con ' + P.act.min + ' minutos de activación.');
+    return (NOENT ? 'Arrancamos.' : 'Llegaste a Sarmiento.') + (ETAPA === 'vuelvo' ? ' Volviste: hoy vamos al 80% de lo que hacías.' : ' Hoy toca el Día ' + d.k + (ds ? ' y ' + ds.charAt(0).toLowerCase() + ds.slice(1) : '') + ': arrancamos con ' + P.act.min + ' minutos de activación.');
   }
   // ---- La voz (escalón 1): plantillas, síntesis del teléfono, solo con auriculares. Sin síntesis, solo texto ----
   const vozTxt = t => String(t).replace(/<[^>]+>/g, '').replace(/\s*⚡\s*(?=\S)/g, '. ').replace(/⚡/g, '').replace(/([.?!])\. /g, '$1 ').replace(/(\d+),5/g, '$1 y medio').replace(/(\d+) × (\d+)/g, '$1 series de $2').replace(/\bkg\b/g, 'kilos').replace(/\bmin\b/g, 'minutos').replace(/·/g, ',').replace(/\s+/g, ' ').trim();
@@ -962,12 +965,12 @@
     if (a === null || a === undefined || b <= a) return;
     const sa = sts[a], sb = sts[b];
     if (sb === 'car' && !MANUAL) cronoArrancar();
-    if (sa[0] === 'f') { const i = +sa.slice(1), F = S.F[i], f = fx(i); if (F.done && !F.swap && f.prev && F.kg > f.prev && EXP !== 'arranco' && !esMenor()) S.hito = 'Récord en ' + f.n.toLowerCase() + ' ⚡'; } // solo en pantalla
+    if (sa[0] === 'f') { const i = +sa.slice(1), F = S.F[i], f = fx(i); if (F.done && !F.swap && f.prev && F.kg > f.prev && EXP !== 'arranco' && !esMenor()) S.hito = 'Récord en ' + f.n.toLowerCase() + ''; } // solo en pantalla
     hablar(vozEj(sb), 'ejercicio');
   }
   function mtHtml(st){
     const S = SALA; if (S.mtStep !== S.step) mtCambio(S);
-    const b = t => '<p class="sv smt">' + SV_BOLT + '<span>' + t + '</span></p>';
+    const b = t => '<p class="sv smt"><span>' + t + '</span></p>';
     if (S.pausa) return b('En pausa: el reloj de la sesión te espera.');
     if (!MANUAL && S.vence) return b(S.repreg ? mtRepTxt(st) : mtPropTxt(st));
     return S.hito ? b(S.hito) : '';
@@ -983,6 +986,7 @@
   function mtTic(){
     const S = SALA; if (!S || S.pausa || MANUAL) { if (BLOQ && S) lockRen(); return; }
     const st = steps()[S.step]; if (S.mtStep !== S.step) return;
+    if (enPrep(st)) { if (BLOQ) lockRen(); return; }  // v54: el motor no corre mientras se prepara
     S.el += mtVel(); const d = mtDur(st);
     if (!S.vence && S.el >= d) { S.vence = true; if (curScr === 'sala') renderSala(); } // la propuesta va en pantalla y en la pantalla bloqueada, en silencio
     else if (S.vence && !S.repreg && S.el >= d + MT_REPREG) { S.repreg = true; if (curScr === 'sala') renderSala(); }
@@ -1004,7 +1008,7 @@
     else { vozElegir(); toast(VOZ ? 'Voz: ' + (vozES ? vozES.name : 'la del teléfono') : 'Voz: solo en pantalla'); if (VOZ) hablar('Dale, te hablo al empezar cada ejercicio.', 'sistema'); else callar(); }
   }
   $('#salaVoz').addEventListener('click', () => { vozCambiar(!VOZ); if (SALA) renderSala(); });
-  $('#salaPausa').addEventListener('click', () => { if (!SALA) return; SALA.pausa = !SALA.pausa; callar(); toast(SALA.pausa ? 'En pausa: el reloj te espera' : 'Seguimos ⚡'); renderSala(); });
+  $('#salaPausa').addEventListener('click', () => { if (!SALA) return; SALA.pausa = !SALA.pausa; callar(); toast(SALA.pausa ? 'En pausa: el reloj te espera' : 'Seguimos'); renderSala(); });
   $('#anotarYo').addEventListener('change', e => { MANUAL = e.target.checked; if (SALA) { SALA.vence = false; SALA.repreg = false; } acSync(); toast(MANUAL ? 'Anotás vos: sin reloj, pasás con Listo' : 'La app te lleva: marca los tiempos'); });
   // ---- "Decímelo" (escalón 2, simulado): mantener apretado; lo dicho pasa a una tarjeta para confirmar ----
   var DECI_F = { reps:'hice 10, 10 y 8 con 42 y medio', ocupada:'está ocupada', falta:'¿cuánto me falta?', duele:'me duele el hombro' };
@@ -1017,7 +1021,7 @@
   mic.addEventListener('contextmenu', e => e.preventDefault());
   function deciFalta(){
     const S = SALA, st = steps()[S.step], fi = curF(), car = S.P.car.maq.toLowerCase();
-    if (st === 'car') return 'Te quedan ' + Math.max(1, Math.ceil((S.carMin * 60 - S.crono) / 60)) + ' minutos de ' + car + ' y terminás ⚡';
+    if (st === 'car') return 'Te quedan ' + Math.max(1, Math.ceil((S.carMin * 60 - S.crono) / 60)) + ' minutos de ' + car + ' y terminás';
     const fz = S.F.map((F, i) => ({ F:F, i:i })).filter(o => !o.F.done && !o.F.salteado && o.i !== fi).map(o => fx(o.i).n.split(' ')[0].toLowerCase());
     const lista = fz.length > 1 ? fz.slice(0, -1).join(', ') + ' y ' + fz[fz.length - 1] : fz[0] || '';
     return (st === 'act' ? 'Después de la activación, te ' : 'Te ') + (lista ? 'quedan ' + lista + ', y ' + S.carMin + ' minutos de ' + car : 'queda el cardio: ' + S.carMin + ' minutos de ' + car + ' y terminás') + '.';
@@ -1035,7 +1039,7 @@
       pre(); $('#salaSheet').hidden = false; return;
     }
     if (DECI === 'ocupada') { if (fi >= 0) { salaCambiarOcupada(); pre(); } else toast('Eso va en la fuerza: ahora estás en ' + pasoCorto(st)); return; }
-    if (DECI === 'falta') { const t = deciFalta(); $('#salaSheetIn').innerHTML = oido + '<p class="sv big">' + SV_BOLT + '<span>' + t + '</span></p><button class="btn" data-close>Dale</button>'; $('#salaSheet').hidden = false; hablar(t, 'respuesta'); return; }
+    if (DECI === 'falta') { const t = deciFalta(); $('#salaSheetIn').innerHTML = oido + '<p class="sv big"><span>' + t + '</span></p><button class="btn" data-close>Dale</button>'; $('#salaSheet').hidden = false; hablar(t, 'respuesta'); return; }
     // Cantidades dictadas: van al ejercicio actual (o al próximo de fuerza) y se confirman
     const i = fi >= 0 ? fi : S.F.findIndex(F => !F.done && !F.salteado); if (i < 0) { toast('Ya anotamos toda la fuerza'); return; }
     const f = fx(i), F = S.F[i], reps = [10, 10, 8].slice(0, f.sr); while (reps.length < f.sr) reps.push(8);
@@ -1044,14 +1048,184 @@
     $('#salaSheet').hidden = false;
   }
   $('#salaSheet').addEventListener('click', e => {
-    if (e.target.closest('[data-avisa2]')) { $('#salaSheet').hidden = true; toast('Listo. Lucas te busca en la sala ⚡'); return; }
+    if (e.target.closest('[data-avisa2]')) { $('#salaSheet').hidden = true; toast('Listo. Lucas te busca en la sala'); return; }
     const d = e.target.closest('[data-dc]'); if (!d || !DC || !SALA) return;
     const S = SALA, F = S.F[DC.i], cur = DC.i === curF(); F.reps = DC.reps.slice(); if (DC.kg !== null) F.kg = DC.kg;
     $('#salaSheet').hidden = true;
-    if (d.dataset.dc === 'fix') { DC = null; if (cur) salaAjustar(); else { renderSala(); toast('Corregilo en ese ejercicio con Ajustar'); } return; }
+    if (d.dataset.dc === 'fix') { DC = null; if (cur) salaAjustar(); else { renderSala(); toast('Corregilo en ese ejercicio con Planilla'); } return; }
     const n = fx(DC.i).n; DC = null;
-    if (cur) { salaListo(); toast('Anotado: ' + n.toLowerCase() + ' ⚡'); return; }
+    if (cur) { salaListo(); toast('Anotado: ' + n.toLowerCase() + ''); return; }
     F.sets = F.sets.map(() => true); F.done = true; WK.reg = true; if (S.F.every(x => x.done || x.salteado) && !S.fueSumada) { S.fueSumada = true; WK.fue++; }
-    renderForma(); renderToday(); renderSala(); toast('Anotado: ' + n.toLowerCase() + ' ⚡');
+    renderForma(); renderToday(); renderSala(); toast('Anotado: ' + n.toLowerCase() + '');
   });
-  acSync(); descansoHrec();
+  acSync();
+//#bloque 307
+  // ===== v52 · T9 Modo estándar (docs/tickets/T9-modo-estandar.md) =====
+  // Pantalla del ejercicio: indicación del profe con su tempo y Ritmo (metrónomo visual, apagado por defecto),
+  // y tres accesos del mismo peso, plegados: Cómo se hace (video y 3D: cajas hasta decidir con el dueño) · Músculos · Planilla.
+  var TEMPO_DEF = [2, 0, 1, 0];  // por defecto, si el profe no fijó uno (demo)
+  var ANIMFIG = document.querySelector('#entrenando .animfig'), ANIMPAR = ANIMFIG ? ANIMFIG.parentNode : null, ANIMNEXT = ANIMFIG ? ANIMFIG.nextSibling : null;
+  var BMAP = $('#bodymap') ? $('#bodymap').innerHTML : '';
+  const baseK = i => { const k = SALA.P.fue[i].k; return lib[k] ? k : lib[k.replace(/H$/, '')] ? k.replace(/H$/, '') : null; };
+  const exLib = i => { const k = baseK(i); return k ? lib[k] : null; };
+  const exArr = () => EXP === 'arranco' || esMenor();
+  const tempoTxt = t => 'Bajá en ' + t[0] + ' s' + (t[1] ? ' · pausa ' + t[1] : '') + ' · subí en ' + t[2] + (t[3] ? ' · pausa ' + t[3] : '');
+  function bmapSvg(p, s, r){
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); g.innerHTML = BMAP;
+    g.querySelectorAll('.m').forEach(m => { const k = m.getAttribute('data-m'); m.setAttribute('class', 'm' + (p.includes(k) ? ' p' : s.includes(k) ? ' s' : r.includes(k) ? ' r' : '')); });
+    return g.innerHTML;
+  }
+  function mtrHtml(t){
+    const T = t[0] + t[1] + t[2] + t[3], p = x => Math.round(x / T * 1000) / 10, a = p(t[0]), b = p(t[0] + t[1]), c = p(t[0] + t[1] + t[2]), id = 'mtr' + t.join('');
+    return '<style>@keyframes ' + id + '{0%{transform:scaleY(1)}' + a + '%{transform:scaleY(.1)}' + b + '%{transform:scaleY(.1)}' + c + '%{transform:scaleY(1)}100%{transform:scaleY(1)}}</style>' +
+      '<div class="smtr"><span class="tubo" aria-hidden="true"><i style="animation:' + id + ' ' + T + 's linear infinite"></i></span><span class="small muted">Seguí la barra: baja y sube con el peso. No hace falta contar.</span></div>';
+  }
+  function exCue(f, i){
+    const L = exLib(i), F = SALA.F[i], ctl = f.ctl || (L ? L.tip : ''), t = f.tempo || TEMPO_DEF;
+    return '<div class="scue' + (exArr() ? ' big' : '') + '"><p><b>' + (actual === 'profe' ? 'Lucas' : 'Tu profe') + ':</b> ' + ctl + '</p>' +
+      '<div class="sctl"><span class="stmp">' + tempoTxt(t) + '</span><button class="stbtn" data-mtr="1" aria-pressed="' + !!F.ritmo + '">' + (F.ritmo ? 'Apagar ritmo' : 'Ritmo') + '</button></div>' +
+      (F.ritmo ? mtrHtml(t) : '') + '</div>';
+  }
+  function exAcc(f, i){
+    const S = SALA; if (S.panStep !== S.step) { S.pan = null; S.panStep = S.step; }
+    const B = [['como', 'Cómo se hace'], ['mus', 'Músculos'], ['plan', 'Planilla']];
+    return '<div class="sacc">' + B.map(b => '<button class="sacb' + (b[0] === 'como' && exArr() && !S.pan ? ' pri' : '') + '" data-pan="' + b[0] + '" aria-expanded="' + (S.pan === b[0]) + '">' + b[1] + '</button>').join('') + '</div>' +
+      (S.pan ? '<div class="span">' + exPan(S.pan, f, i) + '</div>' : '');
+  }
+  function exPan(v, f, i){
+    const L = exLib(i), F = SALA.F[i];
+    if (v === 'como') {
+      const mi = f.mirar || (L ? [L.tip] : []);
+      return '<span class="spt">Qué mirar</span><ul class="smira">' + mi.map(x => '<li>' + x + '</li>').join('') + '</ul>' +
+        (esMenor() ? '<p class="shint">Tu profe te lo muestra en la sala.</p>' : '') +
+        '<div class="svid"><span class="sfoto">Video de tu profe · muestra</span><svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 8v8l6-4z" fill="currentColor"/></svg><span class="small">' + f.n + ' · 20 s, guardado en el teléfono</span></div>' +
+        (L && ANIMFIG ? '<div class="s3d" id="s3dHost"></div>' : '');
+    }
+    if (v === 'mus') {
+      if (!L) return '<p class="shint">Tu profe te muestra qué trabaja.</p>';
+      return '<div class="smus"><svg class="bmap" viewBox="0 0 160 150" role="img" aria-label="Músculos que trabaja">' + bmapSvg(L.mus, L.sec, []) + '</svg><div class="stack" style="gap:6px"><span><b>Principal:</b> ' + L.mus.map(k => musName[k]).join(' · ') + '</span>' +
+        (L.sec.length ? '<span class="muted">También: ' + L.sec.map(k => musName[k]).join(' · ') + '</span>' : '') + '<span class="legend" style="justify-content:flex-start"><i class="lp"></i>Principal <i class="ls"></i>Secundario</span></div></div>';
+    }
+    let h = f.prev && !F.swap ? '<span class="small muted">La vez pasada: ' + fmtKg(f.prev) + ' kg · ' + f.sr + ' × ' + f.rep + '</span>' : '';
+    if (F.kg) h += '<div class="sprow"><span>Carga</span><span class="sadj"><button class="opt" data-pk="-2.5" aria-label="Bajar 2,5 kg">−</button><b>' + fmtKg(F.kg) + ' kg</b><button class="opt" data-pk="2.5" aria-label="Subir 2,5 kg">+</button></span><span class="spgap"></span></div>';
+    h += F.reps.map((r, j) => '<div class="sprow"><span>Serie ' + (j + 1) + '</span><span class="sadj"><button class="opt" data-pr="' + j + ':-1" aria-label="Menos">−</button><b>' + r + (f.seg ? ' s' : ' rep') + '</b><button class="opt" data-pr="' + j + ':1" aria-label="Más">+</button></span><button class="spchk' + (F.sets[j] ? ' on' : '') + '" data-set="' + j + '" aria-pressed="' + F.sets[j] + '" aria-label="Serie ' + (j + 1) + (F.sets[j] ? ', hecha' : '') + '">✓</button></div>').join('');
+    return h + '<span class="small muted">Listo anota lo que está acá.</span>';
+  }
+  function exClick(e){
+    const S = SALA, pn = e.target.closest('[data-pan]');
+    if (pn) { S.pan = S.pan === pn.dataset.pan ? null : pn.dataset.pan; S.panStep = S.step; renderSala(); return true; }
+    const i = curF(); if (i < 0) return false;
+    const F = S.F[i], f = fx(i);
+    if (e.target.closest('[data-mtr]')) { F.ritmo = !F.ritmo; renderSala(); return true; }
+    const pk = e.target.closest('[data-pk]'); if (pk) { F.kg = Math.max(0, F.kg + +pk.dataset.pk); renderSala(); return true; }
+    const pr = e.target.closest('[data-pr]'); if (pr) { const [j, d] = pr.dataset.pr.split(':').map(Number); F.reps[j] = Math.max(1, F.reps[j] + d * (f.seg ? 5 : 1)); renderSala(); return true; }
+    return false;
+  }
+  // El 3D es un solo nodo: se muda a la caja de "Cómo se hace" y vuelve a la pantalla vieja cuando se cierra
+  function exMount(){
+    if (!ANIMFIG) return;
+    const host = document.getElementById('s3dHost');
+    if (host) { host.appendChild(ANIMFIG); const i = curF(), L = i >= 0 ? exLib(i) : null; if (L && curEx !== L) setAnim(L); }
+    else if (ANIMFIG.parentNode !== ANIMPAR) ANIMPAR.insertBefore(ANIMFIG, ANIMNEXT);
+  }
+  $('#salaSheet').addEventListener('click', e => { if (!e.target.closest('[data-siempre]')) return; $('#salaSheet').hidden = true; renderSala(); toast('Le avisamos a Lucas: él decide si la cambia en tu rutina'); });
+  // ---- Tu cuerpo hoy (Hoy): rutina de hoy encendida, lo trabajado como principal hace menos de 72 h atenuado. Estimación con el registro ----
+  var DIAS_ULT = { A:dA[dA.length - 1], B:dB[dB.length - 1], C:dC[dC.length - 1] };  // días desde la última sesión registrada de cada día (demo)
+  function cuerpoHoy(){
+    const r = rutinas[actual], d = r.dias[r.next], hoy = [], rec = [], DU = DIAS_ULT || {};
+    salaPlan().fue.forEach(f => { const k = lib[f.k] ? f.k : f.k.replace(/H$/, ''); if (lib[k]) lib[k].mus.forEach(m => { if (!hoy.includes(m)) hoy.push(m); }); });
+    if (actual === 'profe') r.dias.forEach(x => { const da = DU[x.k]; if (x.k === d.k || da == null || da >= 3) return; x.ex.forEach(k => { if (lib[k]) lib[k].mus.forEach(m => { if (!hoy.includes(m) && !rec.includes(m)) rec.push(m); }); }); });
+    return { hoy:hoy, rec:rec, d:d };
+  }
+  function recFrase(rec){
+    const n = rec.map(k => musName[k].toLowerCase()), sing = rec.length === 1 && ['pecho', 'abdomen', 'antebrazo', 'trapecio'].includes(rec[0]);
+    return (sing ? 'Tu ' : 'Tus ') + (n.length > 1 ? n.slice(0, -1).join(', ') + ' y ' + n[n.length - 1] : n[0]) + (sing ? ' se recupera' : ' se recuperan');
+  }
+  function descansoHrec(){
+    const el = $('#hCuerpo'); if (!el || !DIAS_ULT) return;  // antes de que corra el bloque 307, nada
+    const c = cuerpoHoy(), fr = (c.rec.length ? recFrase(c.rec) + ': hoy ' : 'Hoy ') + c.d.n.toLowerCase();
+    el.innerHTML = '<svg class="bmap" viewBox="0 0 160 150" role="img" aria-label="' + fr + '">' + bmapSvg(c.hoy, [], c.rec) + '</svg><div class="hcb"><span class="hct">Tu cuerpo hoy</span><span class="hcf">' + fr + '</span>' +
+      '<span class="legend"><i class="lp"></i>Hoy' + (c.rec.length ? ' <i class="lr"></i>Se recupera' : '') + '</span><span class="small muted">Estimado con lo que registraste</span></div>';
+  }
+  descansoHrec();
+  // ---- v53 · Rutinas como subsección (entrenar-propuesta.md § 11.1): ver el día antes de entrenar, ajustar carga y descanso, pedir cambios ----
+  var RUT_VER = null, RUT_AJ = {};
+  function rutEx(rid, i){
+    const r = rutinas[rid], d = r.dias[i];
+    if (rid === 'profe' && d.k === 'B') return SALA_B.fue.map(f => ({ k:f.k, n:f.n, sr:f.sr, rep:f.rep, kg:f.kg, seg:false }));
+    return d.ex.map(k => { const st = lib[k].sets[0], kg = parseFloat(String(st[1]).replace(',', '.')); return { k:k, n:lib[k].n, sr:lib[k].sets.length, rep:parseInt(String(st[2]), 10) || 12, kg:isNaN(kg) ? null : kg, seg:esTiempo(k) }; });
+  }
+  function rutDetalle(rid, i){
+    const r = rutinas[rid], d = r.dias[i];
+    return '<div class="rdet"><span class="rdt">Día ' + d.k + ' · ' + d.n + '</span>' + rutEx(rid, i).map(x => {
+      const a = RUT_AJ[x.k] || {}, kg = a.kg != null ? a.kg : x.kg, ds = a.desc || 90;
+      return '<div class="rdex"><span class="rdn"><b>' + x.n + '</b><span class="small muted">' + x.sr + ' × ' + x.rep + (x.seg ? ' s' : '') + '</span></span>' +
+        (kg != null ? '<span class="sadj"><button class="opt" data-rk="' + x.k + ':-2.5:' + kg + '" aria-label="Bajar 2,5 kg">−</button><b>' + fmtKg(kg) + ' kg</b><button class="opt" data-rk="' + x.k + ':2.5:' + kg + '" aria-label="Subir 2,5 kg">+</button></span>' : '<span class="small muted">Peso corporal</span>') +
+        '<span class="sadj"><button class="opt" data-rd="' + x.k + ':-15:' + ds + '" aria-label="Menos descanso">−</button><b>' + ds + ' s</b><button class="opt" data-rd="' + x.k + ':15:' + ds + '" aria-label="Más descanso">+</button></span></div>';
+    }).join('') + '<span class="small muted">Carga y descanso quedan para las próximas veces. Series y ejercicios: tu profe.</span>' +
+      '<button class="btn sm" data-start="' + rid + ':' + i + '">Empezar el Día ' + d.k + '</button>' +
+      (r.tipo === 'profe' ? '<button class="btn ghost sm" data-rpide="1">Pedile un cambio a Lucas</button>' : '') + '</div>';
+  }
+  function rutClick(e){
+    const v = e.target.closest('[data-ver]'); if (v) { RUT_VER = RUT_VER === v.dataset.ver ? null : v.dataset.ver; renderRoutines(); return true; }
+    const k = e.target.closest('[data-rk]'); if (k) { const [x, d, b] = k.dataset.rk.split(':'); RUT_AJ[x] = Object.assign(RUT_AJ[x] || {}, { kg:Math.max(0, +b + +d) }); renderRoutines(); renderEntHoy(); return true; }
+    const r = e.target.closest('[data-rd]'); if (r) { const [x, d, b] = r.dataset.rd.split(':'); RUT_AJ[x] = Object.assign(RUT_AJ[x] || {}, { desc:Math.min(300, Math.max(30, +b + +d)) }); renderRoutines(); return true; }
+    if (e.target.closest('[data-rpide]')) { toast('Le avisamos a Lucas. Lo ven juntos en la sala.'); return true; }
+    return false;
+  }
+  // ---- v54 · Empezar ejercicio y transición cronometrada (entrenar-propuesta.md § 11.5) ----
+  // Cada ejercicio de fuerza y el cardio arrancan en "Preparando": máquina, dónde está y tres acciones.
+  // La transición se cronometra sumando, sin alarma; a los TRANS_MAX s la app ofrece otra máquina o hacerlo después, sin culpa.
+  var TRANS_MAX = 180;
+  function enPrep(st){ const S = SALA; if (!S || !st) return false; if (st === 'car') return !S.carGo; if (st[0] !== 'f') return false; const F = S.F[+st.slice(1)]; return !!F && !F.go && !F.done; }
+  const trMmss = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+  function transTxt(){ return 'Entre ejercicios: ' + trMmss(SALA.trans || 0); }
+  function prepHtml(st){
+    const S = SALA, car = st === 'car', i = car ? -1 : +st.slice(1), f = car ? null : fx(i), F = car ? null : S.F[i];
+    const ult = !car && i === S.F.length - 1;
+    const llena = !car && SALA_LLENA && i === 0 && !S.llenaOk && S.P.fue.length > 1 && S.P.fue.some(x => x.k === 'curl') && S.P.fue[0].k !== 'curl';
+    let h = '<span class="sprep">Preparando · ' + (car ? 'cardio' : 'ejercicio ' + (i + 1) + ' de ' + S.F.length) + '</span>';
+    if (llena) h += '<div class="schk sllena"><span class="schq">La zona de espalda está llena</span><span class="small muted">' + f.n + ' está ocupada. ¿Empezamos por bíceps?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-ll="dale">Sí</button><button class="btn ghost sm" data-ll="no">No, sigo así</button></div></div>';
+    h += '<div class="smaq">' + maqSvg(car ? 'cinta' : f.maq) + '<span class="sfoto">Foto de la sede</span></div><span class="szona">' + (car ? S.P.car.zona : f.zona) + '</span>' +
+      '<h2 class="sname">' + (car ? S.P.car.maq + ' · ' + S.P.car.txt : f.n) + '</h2>' +
+      (car ? '<div class="sload"><b>' + S.carMin + '</b> min</div>' : '<div class="sload">' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' s' : '') + (F.kg ? ' · <b>' + fmtKg(F.kg) + '</b> kg' : '') + '</div>') +
+      '<p class="strans" id="sTrans">' + transTxt() + '</p>';
+    if ((S.esp || 0) >= TRANS_MAX && !car) h += '<div class="schk"><span class="schq">¿Probamos otra máquina o pasamos al siguiente?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-pr2="ocup">Otra máquina</button>' + (ult ? '' : '<button class="btn ghost sm" data-pr2="desp">Hacerlo después</button>') + '</div></div>';
+    if (!car) h += '<div class="grid2 sprepb"><button class="btn ghost sm" data-pr2="ocup">Está ocupada</button>' + (ult ? '' : '<button class="btn ghost sm" data-pr2="desp">Hacer después</button>') + '</div>';
+    return h;
+  }
+  function prepEmpezar(){
+    const S = SALA, st = steps()[S.step];
+    if (st === 'car') S.carGo = true; else S.F[+st.slice(1)].go = true;
+    S.trLog = S.trLog || []; S.trLog.push({ paso:st === 'car' ? 'car' : fx(+st.slice(1)).k, seg:S.trans || 0 });
+    S.trans = 0; S.el = 0; S.vence = false; S.repreg = false; S.llenaOk = true;
+    renderSala();
+  }
+  function hacerDespues(){
+    const S = SALA, i = curF(); if (i < 0 || i >= S.F.length - 1) return;
+    const pf = S.P.fue.splice(i, 1)[0], pF = S.F.splice(i, 1)[0]; S.P.fue.push(pf); S.F.push(pF);
+    S.el = 0; S.vence = false; S.repreg = false; S.pan = null; S.esp = 0;
+    $('#salaSheet').hidden = true; renderSala(); toast('Lo dejamos para el final de la fuerza');
+  }
+  $('#salaBody').addEventListener('click', e => {
+    const b = e.target.closest('[data-pr2]'); if (!b || !SALA) return;
+    if (b.dataset.pr2 === 'ocup') salaCambiarOcupada(); else hacerDespues();
+  });
+  $('#salaSheet').addEventListener('click', e => { if (e.target.closest('[data-despues]')) hacerDespues(); else if (e.target.closest('[data-alt]') && SALA) SALA.esp = 0; });  // otra máquina: la espera vuelve a cero
+  // Reloj de la sesión: entrenando · descansando · entre ejercicios (no cuenta la pausa). Con la demo rápida, ×10
+  setInterval(() => {
+    const S = SALA; if (!S || S.pausa || MOM !== 'sesion' || S.cerrada) return;
+    const st = steps()[S.step], v = mtVel();
+    if (S.trStep !== S.step) { S.trStep = S.step; S.esp = 0; if (enPrep(st)) S.trans = 0; }
+    S.tEj = S.tEj || 0; S.tDesc = S.tDesc || 0; S.tTrans = S.tTrans || 0;
+    if (enPrep(st)) {
+      const antes = S.esp || 0; S.trans = (S.trans || 0) + v; S.esp = antes + v; S.tTrans += v;
+      if (curScr === 'sala') { if (antes < TRANS_MAX && S.trans >= TRANS_MAX) renderSala(); else { const el = $('#sTrans'); if (el) el.textContent = transTxt(); } }
+    } else if (st[0] === 'f' && S.rest > 0) S.tDesc += v;
+    else S.tEj += v;
+  }, 1000);
+  function tiemposHtml(S){
+    const tot = (S.tEj || 0) + (S.tDesc || 0) + (S.tTrans || 0); if (tot < 60) return '';
+    const m = x => Math.round(x / 60);
+    return '<p class="ctiempos">' + m(tot) + ' min: ' + m(S.tEj) + ' entrenando, ' + m(S.tDesc) + ' descansando, ' + m(S.tTrans) + ' entre ejercicios.</p>';
+  }

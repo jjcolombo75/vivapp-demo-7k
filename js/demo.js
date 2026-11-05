@@ -108,7 +108,7 @@
   $('#muralPick').addEventListener('click', e => {
     const b = e.target.closest('[data-mur]'); if (!b) return; MURK = b.dataset.mur; MUR = Object.assign(MURALES[MURK](), { cerrado:false }); muralNuevo = null; renderMuralHome();
     $$('#muralPick [data-mur]').forEach(x => x.setAttribute('aria-pressed', x === b));
-    $('#demoSheet').hidden = true; renderMural(); renderPremios(); renderForma(); renderDesafios(); go('progreso');
+    $('#demoSheet').hidden = true; renderMural(); renderPremios(); renderForma(); renderDesafios(); go('muralScr');
   });
   var CIERRE_C = false;
   $('#cerrarMesC').addEventListener('click', () => { CIERRE_C = true; cerrarMesDemo(); });

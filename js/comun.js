@@ -5,7 +5,7 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
   let modo = 'socio';
-  const withNav = ['inicio','hoy','rutinas','progreso','beneficios','social','plan'];
+  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','plan'];
   let curScr = 'login', prevScr = 'login';
 
   function go(id){
@@ -16,7 +16,7 @@
     $('#nav2').hidden = !ppuIds.includes(id);
     if (withNav.includes(id)) modo = 'socio'; if (ppuIds.includes(id)) modo = 'ppu';
     $$('#nav2 button').forEach(b => { if (b.dataset.go === id) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
-    $$('#nav button').forEach(b => { if (b.dataset.go === (['progreso','clases','rutinas','ia','entrenando'].includes(id) ? 'hoy' : id)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+    $$('#nav button').forEach(b => { if (b.dataset.go === (['progreso','clases','rutinas','ia','entrenando'].includes(id) ? 'hoy' : id === 'muralScr' ? 'inicio' : id)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
     const body = $('#'+id+' .body'); if (body) body.scrollTop = 0;
     if (id === 'entrenando') startClock();
     if (id === 'inicio' && typeof semMarcarVisto === 'function') semMarcarVisto();

@@ -3,20 +3,12 @@
 <section class="scr" id="progreso" hidden aria-label="Progreso">
   <div class="body" style="padding-top:28px">
     <h1 class="h1">Entrenar</h1>
-    <div class="tabs" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="false" data-go="hoy">Hoy</button><button role="tab" aria-selected="true">Progreso</button></div>
+    <div class="tabs t3" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="false" data-go="hoy">Hoy</button><button role="tab" aria-selected="false" data-go="rutinas">Rutinas</button><button role="tab" aria-selected="true">Progreso</button></div>
     <div class="card" id="sesSum" hidden style="gap:12px;border-color:var(--dat)">
       <div class="between"><span class="lbl">Tu entrenamiento de hoy</span><span class="pill ok">GUARDADO</span></div>
       <div class="pbreak" id="sesSumGrid"></div>
       <div class="note lime" id="sesForma" hidden></div>
       <span class="small muted" id="sesKcal" style="line-height:1.45"></span>
-    </div>
-    <div class="card muralCard" id="muralCard">
-      <div class="between"><span class="mtitle sig" style="font-size:26px"><b>Tu</b> <i>mural VIVA</i></span><button class="link lime" id="muralLista" style="min-height:44px;padding:0;font-size:14px">Ver como lista</button></div>
-      <span class="muralNext" id="muralNext"></span>
-      <div class="mural" id="mural"></div>
-      <div class="list mlist" id="muralList" hidden></div>
-      <button class="btn ghost sm" id="muralShare">Compartir mi mural</button>
-      <span class="small muted" style="line-height:1.45">Cada Mes cumplido enciende un cartel con el color de tu ritmo al cerrar el mes; cada ficha, una pieza de la pared de Viva. Lo que lográs no se apaga.</span>
     </div>
     <div class="grid3" id="progTiles">
       <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px" id="mesCount">0</span><span class="small muted" id="mesLbl">entrenamientos en noviembre</span></div>
@@ -52,6 +44,20 @@
     <div class="stack" id="recBox" style="gap:10px">
       <span class="lbl">Récords personales</span>
       <div class="list" id="recList"></div>
+    </div>
+  </div>
+</section>
+<!-- Tu mural VIVA (v53: fuera de Progreso; se abre desde Tu mes) -->
+<section class="scr" id="muralScr" hidden aria-label="Tu mural VIVA">
+  <div class="body" style="padding-top:28px">
+    <button class="link lime" data-go="inicio" style="align-self:flex-start;padding:0;min-height:40px;margin-bottom:-8px">‹ Volver a Inicio</button>
+    <div class="card muralCard" id="muralCard">
+      <div class="between"><span class="mtitle sig" style="font-size:26px"><b>Tu</b> <i>mural VIVA</i></span><button class="link lime" id="muralLista" style="min-height:44px;padding:0;font-size:14px">Ver como lista</button></div>
+      <span class="muralNext" id="muralNext"></span>
+      <div class="mural" id="mural"></div>
+      <div class="list mlist" id="muralList" hidden></div>
+      <button class="btn ghost sm" id="muralShare">Compartir mi mural</button>
+      <span class="small muted" style="line-height:1.45">Cada Mes cumplido enciende un cartel con el color de tu ritmo al cerrar el mes; cada ficha, una pieza de la pared de Viva. Lo que lográs no se apaga.</span>
     </div>
   </div>
 </section>

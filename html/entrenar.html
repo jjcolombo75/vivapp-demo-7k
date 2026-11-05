@@ -2,7 +2,7 @@
 <section class="scr" id="hoy" hidden aria-label="Entrenar: hoy">
   <div class="body" style="padding-top:28px">
     <h1 class="h1">Entrenar</h1>
-    <div class="tabs" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="true">Hoy</button><button role="tab" aria-selected="false" data-go="progreso">Progreso</button></div>
+    <div class="tabs t3" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="true">Hoy</button><button role="tab" aria-selected="false" data-go="rutinas">Rutinas</button><button role="tab" aria-selected="false" data-go="progreso">Progreso</button></div>
     <div class="honb" id="hOnb" hidden><span><b>¿Armamos tu entrenamiento?</b> Son 4 preguntas.</span><button class="link lime" id="hOnbSi">Dale</button><button class="link" id="hOnbNo">Ahora no</button></div>
     <div class="card" id="hoyCard" style="gap:12px">
       <div class="between"><span class="wktit" id="hTit"><span class="sig"><b>Tu</b> <i>rutina</i></span></span><button class="link lime" data-go="rutinas" style="min-height:44px;margin:-12px 0;padding:0;font-size:14px">Cambiar</button></div>
@@ -11,7 +11,7 @@
       <div class="hprofe" id="hProfe"></div>
       <div class="hcuida" id="hCuida" hidden></div>
       <div class="hnota" id="hNota" hidden></div>
-      <button class="hrec" data-go="rutinas">Elegida según tu recuperación<span aria-hidden="true"> ›</span></button>
+      <div class="hcuerpo" id="hCuerpo"></div>
     </div>
     <button class="hcorto" id="hCorto"></button>
   </div>
@@ -37,10 +37,10 @@
 </section>
 
 <!-- 3. RUTINAS -->
-<section class="scr" id="rutinas" hidden aria-label="Tus rutinas">
+<section class="scr" id="rutinas" hidden aria-label="Entrenar: rutinas">
   <div class="body" style="padding-top:28px">
-    <button class="link lime" data-go="hoy" style="align-self:flex-start;padding:0;min-height:40px;margin-bottom:-8px">‹ Volver a hoy</button>
-    <h1 class="h1">Tus rutinas</h1>
+    <h1 class="h1">Entrenar</h1>
+    <div class="tabs t3" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="false" data-go="hoy">Hoy</button><button role="tab" aria-selected="true">Rutinas</button><button role="tab" aria-selected="false" data-go="progreso">Progreso</button></div>
     <label class="swrow" for="anotarYo" style="padding:4px 0"><span class="stack" style="gap:2px;flex:1"><span>Prefiero anotar yo</span><span class="small muted">Sin reloj: pasás de ejercicio cuando tocás Listo.</span></span><input type="checkbox" class="sw" id="anotarYo"></label>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="act">Activas</button>
@@ -48,25 +48,13 @@
     </div>
 
     <div class="stack" id="tab-act" style="gap:12px">
-      <div class="card" id="recCard" style="gap:12px">
-        <div class="between"><span class="lbl">Tu cuerpo hoy</span><span class="small muted">Según tus últimos entrenamientos</span></div>
-        <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;align-items:center">
-          <svg id="recMap" viewBox="0 0 160 150" role="img" aria-label="Mapa de recuperación muscular"></svg>
-          <div class="stack" style="gap:8px">
-            <span class="small" style="display:flex;gap:8px;align-items:flex-start"><span class="dot" style="background:var(--dat);margin-top:4px"></span><span><strong>Listos:</strong> espalda, bíceps, hombros, pecho</span></span>
-            <span class="small" style="display:flex;gap:8px;align-items:flex-start"><span class="dot" style="background:var(--orange);margin-top:4px"></span><span><strong>Recuperándose:</strong> piernas y glúteos (lunes)</span></span>
-            <span class="small" style="display:flex;gap:8px;align-items:flex-start"><span class="dot" style="background:var(--pink);margin-top:4px"></span><span><strong>Cansado:</strong> nada hoy</span></span>
-          </div>
-        </div>
-        <div class="note lime">Hoy te conviene el Día B · Espalda y bíceps.</div>
-      </div>
+      <p class="small muted" style="margin:0">Tocá un día para ver sus ejercicios. Ajustás carga y descanso; los ejercicios y las series los define tu profe.</p>
+      <div class="stack" id="rutList" style="gap:16px"></div>
       <div class="card" id="corrCard" style="gap:10px">
         <div class="between"><span class="lbl">Correcciones de tu profe</span><span class="small muted">Prof. Lucas</span></div>
         <div class="stack" id="corrList" style="gap:8px"></div>
         <span class="small muted">Mientras entrenás, tocá "Mandale un video a tu profe" y te responde en 48 h.</span>
       </div>
-      <p class="small muted" style="margin:0">Elegí cuál de tus rutinas activas querés seguir ahora.</p>
-      <div class="stack" id="rutList" style="gap:16px"></div>
     </div>
 
     <div class="list" id="tab-hist" hidden>
