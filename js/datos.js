@@ -23,8 +23,33 @@
   };
   let actual = 'profe';
 
+  // ===== T15 · Modelo de rutina con variantes (lo escribe el profe; en producción, la app del profe / Viva Gestión, E6) =====
+  // Por día y ejercicio. grp + gt (super · tri · gigante · circuito) + vueltas: agrupación, descanso solo al terminar el grupo (descG).
+  // esq (const · asc · desc · drop · restpause · cluster) + kgs por serie (+ drop: cargas de bajada sin descanso).
+  // obj (reps · rango · amrap · rir · tiempo · dist · escalera) + rango / rir / seg. amrapUlt: solo la última serie.
+  // desc (s por serie) · tempo · ctl · nota · prog (progresión semanal) · fallo (nunca para menores ni Arranco: exArr).
+  const VARIANTES = {
+    A:{ sentadilla:{ grp:'s1', gt:'super', desc:0, descG:90, obj:'rango', rango:[10, 12], nota:'Con el puente, seguido: sin descanso entre los dos.' },
+        puente:{ grp:'s1', gt:'super', desc:0, descG:90, prog:'Cuando hagas 15 en las tres, sumá 5 kg de disco.' },
+        plancha:{ obj:'tiempo', seg:true, desc:60, ctl:'Sostené sin que caiga la cadera; respirá.' } },
+    B:{ remo:{ esq:'asc', kgs:[40, 42.5, 45], repsS:[12, 10, 8], nota:'Pirámide: cada serie más peso y menos repeticiones.' },
+        jalon:{ obj:'rango', rango:[8, 10], prog:'Cuando hagas 10 en las tres, +2,5 kg.' },
+        curl:{ esq:'drop', drop:[15, 10], desc:60, nota:'La última es drop: bajá a 15 y a 10 sin descansar.', fallo:true } },
+    C:{ press:{ obj:'amrap', amrapUlt:true, nota:'La última, las que salgan con buena técnica.', fallo:true },
+        plancha:{ obj:'tiempo', seg:true, desc:45 },
+        curl:{ obj:'rir', rir:2, nota:'Pará cuando te queden 2 repeticiones en el tanque.' } },
+    D:{ sentadilla:{ grp:'c1', gt:'circuito', vueltas:3, desc:0, descG:120 },
+        press:{ grp:'c1', gt:'circuito', vueltas:3, desc:0, descG:120 },
+        remo:{ grp:'c1', gt:'circuito', vueltas:3, desc:0, descG:120, nota:'Circuito: los tres seguidos y 2 minutos al terminar la vuelta.' } }
+  };
+  var CARDIO_DEMO = { min:12, int:'habla' };  // int: 'habla' (prueba del habla) o { vel:5.5, inc:6 }
+  var GT_N = { super:'Superserie', tri:'Triserie', gigante:'Serie gigante', circuito:'Circuito' };
+  var ESQ_N = { asc:'Pirámide', desc:'Pirámide invertida', drop:'Drop set', restpause:'Rest-pause', cluster:'Cluster' };
+  function varTxt(f){ if (!f) return ''; return f.gt ? GT_N[f.gt] : f.esq && ESQ_N[f.esq] ? ESQ_N[f.esq] : f.obj === 'amrap' ? 'Las que salgan' : f.obj === 'tiempo' ? 'Por tiempo' : f.obj === 'rango' ? 'Rango ' + f.rango.join('–') : f.obj === 'rir' ? 'RIR ' + f.rir : f.obj === 'escalera' ? 'Escalera' : f.obj === 'dist' ? 'Por distancia' : ''; }
+
   function renderRoutines(){
     const order = [actual].concat(Object.keys(rutinas).filter(k => k !== actual && k !== 'ppu' && k !== 'lead' && rutinas[k]));
+    if (typeof renderCambios === 'function') renderCambios();
     $('#rutList').innerHTML = order.map(rid => {
       const r = rutinas[rid], cur = rid === actual;
       const head = r.tipo === 'profe'

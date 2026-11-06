@@ -84,6 +84,7 @@
     if ([1, 3, 5].includes(wd) || (wd === 6 && d < 21)) entrenoDia.add(d);
   }
   cerrado.forEach((v, d) => entrenoDia.delete(d));
+  { const o = (todayWd + 6) % 7; let t = 0; for (let d = o + 1; d <= o + 28; d++) if (entrenoDia.has(d)) t++; META_SEM = Math.min(META_SEM, Math.round(t / 4) + 1); } // T12: la meta simulada no supera lo que viene haciendo + 1
   let hoyEntreno = false, fFmt = 'aguja';
   function serie(){
     const out = []; let ctl = 0, atl = 0;

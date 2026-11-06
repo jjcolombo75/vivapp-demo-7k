@@ -246,6 +246,7 @@
 
   // Volumen por músculo (Avanzado): series registradas en los últimos 7 días. Sin promedio ni déficit: sirve para repartir el trabajo.
   function renderCarga(){
+    if (!$('#volList')) return; // v58: el volumen vive en el informe de Progreso (T12)
     const g = {};
     Object.keys(hist).forEach(k => hist[k].forEach(e => { if (diasDesde(e[0]) <= 7) g[lib[k].grupo] = (g[lib[k].grupo] || 0) + lib[k].sets.length; }));
     const L = Object.keys(g).map(k => [k, g[k]]).sort((a, b) => b[1] - a[1]), mx = L.length ? L[0][1] : 1;

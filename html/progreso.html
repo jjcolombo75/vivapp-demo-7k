@@ -10,41 +10,105 @@
       <div class="note lime" id="sesForma" hidden></div>
       <span class="small muted" id="sesKcal" style="line-height:1.45"></span>
     </div>
-    <div class="grid3" id="progTiles">
-      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px" id="mesCount">0</span><span class="small muted" id="mesLbl">entrenamientos en noviembre</span></div>
-      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px;color:var(--dat)" id="semAcum">10</span><span class="small muted">semanas cumplidas</span></div>
-      <div class="tile" style="padding:14px 12px;gap:4px"><span class="num" style="font-size:32px" id="tile3n">—</span><span class="small muted" id="tile3l">min por sesión</span></div>
+    <div class="between" style="margin-top:2px"><span class="lbl">Tu informe</span><span class="small muted" id="prHasta"></span></div>
+
+    <!-- § 11.9 · Primera imagen: el cuerpo (v61). Modelo anatómico, flota sin caja; se gira y se hace zoom con los dedos; Frente · Perfil · Espalda -->
+    <div class="prmapa" id="prMapa">
+      <span class="prfr" id="prMapaFr"></span>
+      <div class="seg prvista" role="tablist" aria-label="Qué muestra el cuerpo"><button class="on" role="tab" aria-selected="true">Últimas 4 semanas</button><button role="tab" aria-selected="false" aria-disabled="true" disabled>Hoy <i>pronto</i></button></div>
+      <div class="prfila" id="prFila">
+      <div class="pr3d" id="pr3d">
+        <svg class="bmap prmap" id="prMapaSvg" viewBox="0 0 160 150" role="img" aria-label="Mapa del cuerpo" style="display:none"></svg>
+        <div class="pr3dwait" id="pr3dWait"><div class="spin" aria-hidden="true"></div><span class="small muted">Cargando tu cuerpo…</span></div>
+      </div>
+      <div class="prbarv" id="prBarV" aria-hidden="true">
+        <i class="prv"></i>
+        <span style="top:0">Más que tu banda</span><span style="top:22%">En tu banda</span><span style="top:56%">Por debajo</span><span style="top:86%">Sin series</span>
+      </div>
+      </div>
+      <div class="prvistas" id="prVistas"><button data-vista="frente" aria-pressed="true">Frente</button><button data-vista="perfil" aria-pressed="false">Perfil</button><button data-vista="espalda" aria-pressed="false">Espalda</button></div>
+      <div class="card prref">
+        <div class="prbar" aria-hidden="true"><i class="prb0"></i><i class="prb1"></i><i class="prb2"></i><i class="prb3"></i></div>
+        <div class="prbarl"><span>Sin series</span><span>Por debajo</span><span>En tu banda</span><span>Más que tu banda</span></div>
+        <span class="small muted" style="line-height:1.4">Series por semana de cada músculo, promedio de las últimas 4 semanas (desde el <span id="prMapaSem"></span>), contra la banda de tu profe. En oscuro, lo que la app todavía no mide. Deslizá de costado para girarlo; tocá un músculo para ver sus series.</span>
+      </div>
+      <span class="prcred" id="prCred">Modelo anatómico provisorio: Écorché (Charleeh), BodyParts3D y Z-Anatomy, CC BY-SA 4.0.</span>
     </div>
-    <div class="card">
-      <div class="between"><span style="font-weight:700">Entrenamientos por semana</span><span class="small muted" id="wkMeta">Meta: 4</span></div>
+
+    <!-- 1. Constancia -->
+    <div class="card pr" id="prCons">
+      <div class="between"><span class="prt">Constancia</span><span class="src real">Entradas</span></div>
+      <div class="prbig"><span class="num" id="prConsN">0</span><span class="prunit" id="prConsU">de 4 esta semana</span><span class="prtr" id="prConsT"></span></div>
+      <div class="between" style="margin-top:2px"><span class="small muted">Entradas por semana, últimas 8</span><span class="small muted" id="wkMeta"></span></div>
       <div class="chart" id="wkChart" role="img" aria-label="Últimas 8 semanas"></div>
       <div class="axis" id="wkAxis"></div>
+      <div class="prrow3"><span><b id="mesCount">0</b><i id="mesLbl">entrenamientos en el mes</i></span><span><b id="semAcum">0</b><i>semanas cumplidas en total</i></span><span><b id="tile3n">—</b><i id="tile3l">min por sesión</i></span></div>
+      <div class="prq"><span class="prk">Qué significa</span><span id="prConsS"></span></div>
+      <div class="prq"><span class="prk">Qué hago</span><span id="prConsH"></span></div>
     </div>
-    <div class="card" id="bienCard" style="gap:10px">
-      <span style="font-weight:700" id="bienTxt">Lo estás haciendo bien ⚡</span>
-      <span class="lbl">Tus primeras veces</span>
-      <div class="list" id="pvList"></div>
+
+    <!-- 2. Volumen por zona (Habitual y Avanzado) -->
+    <div class="card pr" id="prVol">
+      <div class="between"><span class="prt">Volumen por zona</span><span class="small muted" id="prVolSem"></span></div>
+      <div class="prbig"><span class="num" id="prVolN">0</span><span class="prunit">series en la semana</span><span class="prtr" id="prVolT"></span></div>
+      <div class="prvol" id="prVolList"></div>
+      <span class="small muted" id="prVolBanda" style="line-height:1.45"></span>
+      <div class="prq"><span class="prk">Qué significa</span><span id="prVolS"></span></div>
+      <div class="prq"><span class="prk">Qué hago</span><span id="prVolH"></span></div>
     </div>
-    <div class="card" id="palCard" style="gap:10px">
-      <div class="between"><span style="font-weight:700">Tu avance</span><span class="small muted">Según lo que registrás</span></div>
+
+    <!-- 3. Equilibrio -->
+    <div class="card pr" id="prEq">
+      <div class="between"><span class="prt">Equilibrio</span><span class="small muted">Últimas 4 semanas</span></div>
+      <div class="preq" id="prEqBars"></div>
+      <div class="list" id="prEqAv"></div>
+      <div class="prq"><span class="prk">Qué significa</span><span id="prEqS"></span></div>
+      <div class="prq"><span class="prk">Qué hago</span><span id="prEqH"></span></div>
+    </div>
+
+    <!-- 4. Fuerza: Habitual en una frase; Avanzado con gráfico y récords -->
+    <div class="card pr" id="palCard">
+      <div class="between"><span class="prt">Fuerza</span><span class="src real">Tus series</span></div>
       <div class="list" id="palList"></div>
+      <div class="prq"><span class="prk">Qué significa</span><span>Subir la carga con las mismas repeticiones es ganar fuerza. Lo que no sube todavía no es un problema: la fuerza avanza por escalones.</span></div>
     </div>
-    <div class="card" id="avCard">
-      <div class="between"><span style="font-weight:700">Avance por ejercicio</span><span class="small muted" id="avUnit">Peso máximo por sesión</span></div>
+    <div class="card pr" id="avCard">
+      <div class="between"><span class="prt">Fuerza por ejercicio</span><span class="small muted" id="avUnit">Peso máximo por sesión</span></div>
       <div class="chips" id="avChips"></div>
       <svg id="avChart" viewBox="0 0 320 170" role="img" aria-label="Avance del ejercicio" style="width:100%;height:auto;display:block"></svg>
       <div class="between small"><span class="muted" id="avFrom">Desde el 15/09</span><span id="avDelta" style="font-weight:700;color:var(--dat)">+2,5 kg</span></div>
       <span class="small muted" id="av1rm" style="line-height:1.45"></span>
+      <div class="prq"><span class="prk">Qué hago</span><span id="prFzH"></span></div>
     </div>
-    <div class="card" id="volCard" style="gap:6px">
-      <div class="between"><span style="font-weight:700">Volumen por músculo</span><span class="small muted">Últimos 7 días</span></div>
-      <div id="volList"></div>
-      <span class="small muted" style="line-height:1.45;margin-top:4px">Series que registraste. Sirve para repartir el trabajo entre músculos: no hay un número correcto.</span>
-    </div>
-    <div class="stack" id="recBox" style="gap:10px">
-      <span class="lbl">Récords personales</span>
+    <div class="card pr" id="recBox" style="gap:10px">
+      <div class="between"><span class="prt">Mejores marcas</span><span class="small muted">Desde que registrás</span></div>
       <div class="list" id="recList"></div>
     </div>
+
+    <!-- 5. Evolución (Índice FIT, solo si se midió) -->
+    <div class="card pr" id="prEvo">
+      <div class="between"><span class="prt">Evolución</span><span class="src real">InBody</span></div>
+      <div class="prbig"><span class="num" id="prEvoN">+0,9</span><span class="prunit" id="prEvoU">kg de músculo desde tu punto de partida</span><span class="prtr" id="prEvoT"></span></div>
+      <div class="prq"><span class="prk">Qué significa</span><span id="prEvoS"></span></div>
+      <div class="prq"><span class="prk">Qué hago</span><span id="prEvoH"></span></div>
+    </div>
+
+    <!-- 6. Lo que dice tu profe -->
+    <div class="card pr" id="prProfe">
+      <div class="between"><span class="prt">Lo que dice tu profe</span><span class="small muted" id="prProfeF"></span></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><span class="avatar">LP</span><span class="stack" style="gap:4px;flex:1"><span style="font-weight:700">Prof. Lucas Pérez</span><span style="line-height:1.5" id="prProfeTxt"></span></span></div>
+      <div class="prrev" id="prProfeRev"></div>
+      <button class="btn ghost sm" data-toast="Tu profe recibe tu mensaje y te responde en la app">Escribirle a Lucas</button>
+    </div>
+
+    <!-- 8. Primeras veces (Arranco) -->
+    <div class="card pr" id="bienCard" style="gap:10px">
+      <div class="between"><span class="prt">Primeras veces</span><span class="src real">Tus series</span></div>
+      <div class="list" id="pvList"></div>
+      <div class="prq"><span class="prk">Qué significa</span><span>Cada ejercicio nuevo que registrás queda acá con su fecha. En las primeras semanas lo que cuenta es aprender el movimiento, no la carga.</span></div>
+    </div>
+
+    <div class="between" style="align-items:flex-start"><span class="small muted" style="line-height:1.45;flex:1">Los consejos de este informe tienen dos fuentes: tu profe y las fichas validadas por el equipo VIVA. Ningún texto lo genera una IA.</span><button class="link lime" id="prFichas" style="padding:0;min-height:40px;white-space:nowrap">Ver las fichas</button></div>
   </div>
 </section>
 <!-- Tu mural VIVA (v53: fuera de Progreso; se abre desde Tu mes) -->
@@ -61,6 +125,32 @@
     </div>
   </div>
 </section>
+
+<div class="sheet" id="cvSheet" hidden role="dialog" aria-label="Tu cuerpo, en grande">
+  <div class="sheetin cvin">
+    <div class="between"><span class="h2" style="font-size:24px" id="cvT">Tu cuerpo hoy</span><button class="link" id="cvX" style="padding:0;min-height:44px">Cerrar</button></div>
+    <div class="cvhost" id="cvHost"><div class="pr3dwait" id="cvWait"><div class="spin" aria-hidden="true"></div><span class="small muted">Cargando tu cuerpo…</span></div></div>
+    <div class="prvistas"><button data-vista="frente" aria-pressed="true">Frente</button><button data-vista="perfil" aria-pressed="false">Perfil</button><button data-vista="espalda" aria-pressed="false">Espalda</button></div>
+    <span class="legend" id="cvLeg" style="justify-content:flex-start"></span>
+    <span class="small" id="cvSel" style="min-height:20px"></span>
+  </div>
+</div>
+<div class="sheet" id="musSheet" hidden role="dialog" aria-label="Series del músculo">
+  <div class="sheetin" style="gap:12px">
+    <div class="between"><span class="h2" style="font-size:24px" id="msT"></span><button class="link" id="msX" style="padding:0;min-height:40px">Cerrar</button></div>
+    <div class="prbig"><span class="num" id="msN"></span><span class="prunit">series por semana</span><span class="prtr" id="msB"></span></div>
+    <div class="msw" id="msW"></div>
+    <div class="prq"><span class="prk">De qué</span><span id="msE"></span></div>
+    <div class="prq"><span class="prk">Qué hago</span><span id="msH"></span></div>
+  </div>
+</div>
+<div class="sheet" id="fvSheet" hidden role="dialog" aria-label="Ficha validada por el equipo VIVA">
+  <div class="sheetin" style="gap:12px">
+    <div class="between"><span class="src real">Validado por el equipo VIVA</span><button class="link" id="fvX" style="padding:0;min-height:40px">Cerrar</button></div>
+    <div class="list" id="fvList"></div>
+    <div class="stack" id="fvOne" hidden style="gap:8px"><span class="h2" style="font-size:24px" id="fvT"></span><span style="line-height:1.55" id="fvTx"></span><span class="small muted" style="line-height:1.45" id="fvSrc"></span><button class="link lime" id="fvBack" style="align-self:flex-start;padding:0">‹ Todas las fichas</button></div>
+  </div>
+</div>
 
 <!--#h07-->
 <!-- 23. PRIMERAS 4 SEMANAS -->

@@ -4,39 +4,35 @@
     <h1 class="h1">Entrenar</h1>
     <div class="tabs t3" role="tablist" aria-label="Entrenar"><button role="tab" aria-selected="true">Hoy</button><button role="tab" aria-selected="false" data-go="rutinas">Rutinas</button><button role="tab" aria-selected="false" data-go="progreso">Progreso</button></div>
     <div class="honb" id="hOnb" hidden><span><b>¿Armamos tu entrenamiento?</b> Son 4 preguntas.</span><button class="link lime" id="hOnbSi">Dale</button><button class="link" id="hOnbNo">Ahora no</button></div>
-    <div class="accbar hacc"><button class="accbtn go" id="hEmpezar"></button></div>
-    <div class="card hblk" data-hbk="ses">
-      <button class="hbh" data-hb="ses" aria-expanded="false"><span class="hbt">La sesión de hoy</span><span class="hbs" id="hbsesS"></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-      <div class="hbb">
-        <span class="wktit" id="hTit" hidden></span>
-        <div class="tdrow"><span class="tdday" aria-hidden="true"><small>Día</small><b id="hLetter">B</b></span><span class="stack" style="gap:3px;min-width:0"><span class="tdname" id="hName"></span><span class="small muted" id="hMeta"></span></span></div>
-        <div class="hparts" id="hParts"></div>
-        <div class="between"><button class="hcorto" id="hCorto"></button><button class="link lime" data-go="rutinas" style="min-height:44px;padding:0;font-size:14px">Ver rutinas</button></div>
-      </div>
+    <!-- T15 · Hoy = la herramienta de la sala: (a) Viva te habla · (b) tu cuerpo hoy · para hoy (solo si hay algo) · (c) tu rutina hoy (el día + la lista; T-R v73) · (d) Empezar fijo abajo -->
+    <div class="hnota hviva" id="hNota" hidden></div>
+    <div class="card hcue" id="hCue">
+      <span class="wktit"><span class="sig"><b>Tu</b> <i>cuerpo hoy</i></span></span>
+      <div class="stack" id="prepAsk" hidden style="gap:10px"></div>
+      <div class="hoyrow" id="hoyRow"></div>
+      <div class="hcuerpo" id="hCuerpo"></div>
     </div>
-    <div class="card hblk" data-hbk="cue">
-      <button class="hbh" data-hb="cue" aria-expanded="false"><span class="hbt">Tu cuerpo hoy</span><span class="hbs" id="hbcueS"></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-      <div class="hbb">
-        <div class="stack" id="prepAsk" hidden style="gap:10px"></div>
-        <div class="hoyrow" id="hoyRow"></div>
-        <div class="hcuerpo" id="hCuerpo"></div>
-      </div>
+    <div class="card hpara" id="hbPara">
+      <span class="hbt">Para hoy</span>
+      <div class="hcuida" id="hCuida" hidden></div>
+      <div id="hPend"></div>
     </div>
-    <div class="card hblk" data-hbk="para" id="hbPara">
-      <button class="hbh" data-hb="para" aria-expanded="false"><span class="hbt">Para hoy</span><span class="hbs" id="hbparaS"></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-      <div class="hbb">
-        <div class="hcuida" id="hCuida" hidden></div>
-        <div class="hnota" id="hNota" hidden></div>
-      </div>
-    </div>
-    <div class="card hblk" data-hbk="rep">
-      <button class="hbh" data-hb="rep" aria-expanded="false"><span class="hbt">Repasar</span><span class="hbs" id="hbrepS"></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-      <div class="hbb">
-        <div class="hprofe" id="hProfe"></div>
-        <div id="hRep"></div>
-      </div>
+    <!-- T-R v73: "Tu sesión hoy" y "Tu rutina hoy" en una sola tarjeta, debajo de Tu cuerpo hoy: primero el día (partes, cambiar de día, versión corta), después la lista -->
+    <div class="card hrut" id="hRut">
+      <span class="wktit" id="hTit" hidden></span>
+      <div class="between"><span class="wktit"><span class="sig"><b>Tu</b> <i>rutina hoy</i></span></span><span class="small muted" id="hRutS" hidden></span></div>
+      <div class="tdrow"><span class="tdday" aria-hidden="true"><small>Día</small><b id="hLetter">B</b></span><span class="stack" style="gap:3px;min-width:0"><span class="tdname" id="hName"></span><span class="small muted" id="hMeta"></span></span></div>
+      <div class="hparts" id="hParts"></div>
+      <div class="hdias" id="hDias"></div>
+      <div class="between"><button class="hcorto" id="hCorto"></button><button class="link lime" data-go="rutinas" style="min-height:44px;padding:0;font-size:14px">Ver rutinas</button></div>
+      <div class="hsep" aria-hidden="true"></div>
+      <div class="hprofe" id="hProfe"></div>
+      <div id="hRep"></div>
+      <p class="hreg" id="hReg" hidden>Lo que registrás arma tu Progreso y lo ve Lucas.</p>
+      <div id="hRutAdd"></div>
     </div>
   </div>
+  <div class="accbar hacc"><button class="accbtn go" id="hEmpezar"></button></div>
 </section>
 
 <!-- MODO SALA (versión 41): un ejercicio por pantalla, un toque por ejercicio -->
@@ -75,6 +71,10 @@
         <div class="between"><span class="lbl">Correcciones de tu profe</span><span class="small muted">Prof. Lucas</span></div>
         <div class="stack" id="corrList" style="gap:8px"></div>
         <span class="small muted">Mientras entrenás, tocá "Mandale un video a tu profe" y te responde en 48 h.</span>
+      </div>
+      <div class="card" id="cambiosCard" hidden style="gap:10px">
+        <div class="between"><span class="lbl">Cambios y pedidos</span><span class="small muted">con fecha y autor</span></div>
+        <div class="stack" id="cambiosList" style="gap:8px"></div>
       </div>
     </div>
 

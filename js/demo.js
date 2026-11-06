@@ -135,6 +135,19 @@
 //#bloque 310
   // ===== v42 · Panel de demo, Entrenar =====
   function entDemo(dest, msg){ $('#demoSheet').hidden = true; renderAcc(); renderHoy(); renderEntHoy(); renderToday(); if (dest) go(dest); if (msg) toast(msg); }
+  $('#genPick').addEventListener('click', e => { const b = e.target.closest('[data-gen]'); if (!b) return; GENERO = b.dataset.gen || null;
+    $$('#genPick [data-gen]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    if (MAPA.pintar) { const h = $('#pr3d'); h.querySelectorAll('canvas').forEach(c => c.remove()); $('#pr3dWait').hidden = false; MAPA.pintar = null; MAPA.vista = null; }
+    renderProg(); });
+  const rehacerCuerpo = () => { if (MAPA.pintar) { $('#pr3d').querySelectorAll('canvas').forEach(c => c.remove()); $('#pr3dWait').hidden = false; MAPA.pintar = null; MAPA.vista = null; } };
+  $('#mapaLayPick').addEventListener('click', e => { const b = e.target.closest('[data-lay]'); if (!b) return;
+    $$('#mapaLayPick [data-lay]').forEach(x => x.setAttribute('aria-pressed', x === b)); $('#prMapa').classList.toggle('lat', b.dataset.lay === 'lat'); rehacerCuerpo(); renderProg(); });
+  $('#perfPick').addEventListener('click', e => { const b = e.target.closest('[data-perf]'); if (!b) return; PERFIL_MAPA = b.dataset.perf || null;
+    $$('#perfPick [data-perf]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    const ex = PERFIL_MAPA && PERFILES[PERFIL_MAPA].exp, eb = ex && document.querySelector('#expPick [data-exp="' + ex + '"]');
+    if (eb) eb.click(); else renderProg(); });
+  window.demoVer = () => { $('#verCnt').textContent = '"Ver" el cuerpo: Hoy ' + VER_CNT.hoy + ' · ficha ' + VER_CNT.ficha + ' · sesión ' + VER_CNT.sesion + ' (métrica de la Prueba: ≥20 % lo abre más de una vez por semana)'; };
+  window.demoCuerpo = () => { $('#genMs').textContent = 'Cuerpo de Progreso: modelo ' + (MAPA.genero === 'F' ? 'femenino' : 'masculino') + (GENERO === 'F' ? ' (el mismo para todos: el femenino llega con la compra)' : '') + ', cargó en ' + (MAPA.ms / 1000).toFixed(1).replace('.', ',') + ' s. El género sale de EVO y nunca se pregunta.'; };
   $('#expPick').addEventListener('click', e => { const b = e.target.closest('[data-exp]'); if (!b) return; EXP = b.dataset.exp; renderProg(); $$('#expPick [data-exp]').forEach(x => x.setAttribute('aria-pressed', x === b)); SALA && salaRehacer(); entDemo('hoy', { arranco:'Arranco: la carga no sube en las primeras 4 semanas', habitual:'Habitual', avanzado:'Avanzado' }[EXP]); });
   $('#etPick').addEventListener('click', e => {
     const b = e.target.closest('[data-et]'); if (!b) return; ETAPA = b.dataset.et; $('.app').dataset.etapa = ETAPA;

@@ -423,6 +423,349 @@
   $('#cartelShare').addEventListener('click', () => { const ev = muralEventos().find(x => x.id === $('#cartelOv').dataset.ev); if (ev) shareEv(ev); });
 
 
+//#bloque 334
+  // ===== T12 · Progreso: el informe del profe (constancia, volumen por zona contra la banda, equilibrio, fuerza, evolución, lo que dice tu profe, fichas VIVA) =====
+  // Fuentes: entries (entrenoDia), series registradas (hist + lib[k].sets), músculos de la ficha (lib[k].mus cuenta 1, sec cuenta ½), banda por objetivo (OBJ) con ajuste del profe (simulado), InBody (IB), comentario del profe (simulado; en producción, tablero del profe, E6).
+  const ZONAS_PR = [['piernas', 'Piernas', ['cuads', 'gluteos', 'isquios']], ['espalda', 'Espalda', ['dorsales', 'trapecio']], ['pecho', 'Pecho', ['pecho']], ['hombros', 'Hombros', ['hombros']], ['brazos', 'Brazos', ['biceps', 'triceps', 'antebrazo']], ['abdomen', 'Abdomen', ['abdomen']]];
+  const zonaDe = m => (ZONAS_PR.find(z => z[2].includes(m)) || [null])[0];
+  // Empuje / tracción (tren superior) y superior / inferior, por ejercicio
+  const EJ_CLASE = { press:['empuje', 'sup'], remo:['traccion', 'sup'], jalon:['traccion', 'sup'], curl:['traccion', 'sup'], sentadilla:[null, 'inf'], puente:[null, 'inf'], plancha:[null, null] };
+  // Bandas por objetivo: series por semana por zona (Schoenfeld 2017; Baz-Valle 2022; ACSM 2009). El profe ajusta por socio o por zona.
+  const BANDA_OBJ = { bien:[4, 10], forma:[6, 12], ver:[8, 14], musc:[10, 20], rend:[8, 16] };
+  var BANDA_PROFE = { piernas:[8, 14] }; // simulado: Prof. Lucas subió Piernas
+  function bandaDe(z){ return BANDA_PROFE[z] || BANDA_OBJ[(OBJ[0] || 'forma')] || BANDA_OBJ.forma; }
+  // Series por zona en una ventana de días [desde, hasta) contados hacia atrás
+  function seriesZona(desde, hasta){
+    const S = {}; ZONAS_PR.forEach(z => S[z[0]] = 0);
+    Object.keys(hist).forEach(k => hist[k].forEach(e => { const d = diasDesde(e[0]); if (d < desde || d >= hasta) return; const n = lib[k].sets.length, P = new Set((lib[k].mus || []).map(zonaDe));
+      P.forEach(z => { if (z) S[z] += n; }); new Set((lib[k].sec || []).map(zonaDe)).forEach(z => { if (z && !P.has(z)) S[z] += n / 2; }); }));
+    return S;
+  }
+  function seriesClase(dias){
+    const C = { empuje:0, traccion:0, sup:0, inf:0 };
+    Object.keys(hist).forEach(k => hist[k].forEach(e => { if (diasDesde(e[0]) >= dias) return; const n = lib[k].sets.length, c = EJ_CLASE[k] || [null, null]; if (c[0]) C[c[0]] += n; if (c[1]) C[c[1]] += n; }));
+    return C;
+  }
+  const semanasSin = z => { let min = 999; Object.keys(hist).forEach(k => { const toca = (lib[k].mus || []).concat(lib[k].sec || []).some(m => zonaDe(m) === z); if (toca) hist[k].forEach(e => min = Math.min(min, diasDesde(e[0]))); }); return min === 999 ? null : Math.floor(min / 7); };
+  // Fichas validadas por el equipo VIVA (texto fijo; fuente en cada una; el dueño valida: docs/dueno.md)
+  const FV = [
+    ['vol', 'Cuántas series por semana', 'Para ganar músculo, entre 10 y 20 series por semana por zona rinden más que menos de 5. Para mantener lo que tenés alcanza con 4 a 6. Más de 20 no suma y cuesta recuperar.', 'ACSM 2026 (posición: ~10 o más series por grupo por semana para hipertrofia); Schoenfeld, Ogborn & Krieger 2017 (metaanálisis, 15 estudios); Baz-Valle 2022. Evidencia: posición y metaanálisis.'],
+    ['frec', 'Repartir en dos días', 'Con el mismo volumen, trabajar una zona 2 veces por semana rinde igual que 1 y es más fácil de hacer bien. Si tu banda es de 16 series, 8 un día y 8 otro.', 'ACSM 2026 (con el mismo volumen, la frecuencia no cambia el resultado; todos los grupos al menos 2 días por semana); Schoenfeld, Grgic & Krieger 2019. Evidencia: posición y metaanálisis.'],
+    ['carga', 'Cuándo subir la carga', 'Cuando completás todas las repeticiones del rango en todas las series con buena técnica, subí entre 2 y 10 % (en máquinas, el escalón siguiente). Si no llegás a las repeticiones mínimas, bajá.', 'ACSM 2026 (sobrecarga progresiva); ACSM 2009 (2–10 %); NSCA Essentials, regla "2 por 2". Evidencia: posición de expertos.'],
+    ['fallo', 'Cerca del fallo, no al fallo', 'Terminar cada serie con 1 a 3 repeticiones en reserva da el mismo músculo que llegar al fallo y cuesta menos recuperar. Al fallo, solo si tu profe lo indica.', 'ACSM 2026 (llegar al fallo no es necesario); Grgic 2022 (metaanálisis); Refalo 2023; Morán-Navarro 2017. Evidencia: posición y metaanálisis.'],
+    ['desc', 'Descanso entre series', 'Más de 60 segundos rinde más que menos; pasados los 90 no se ve diferencia en máquinas y aislamiento. En multiarticulares pesados, 2 a 3 minutos.', 'Singer 2024 (metaanálisis bayesiano); NSCA. Evidencia: metaanálisis; el tramo de 2–3 min es inferencia.'],
+    ['eq', 'Empuje y tracción', 'Por cada serie de empuje (press, pecho), una de tracción (remo, jalón). Lo mismo arriba y abajo: ninguna zona queda semanas sin trabajo.', 'ACSM 2009 (selección de ejercicios); NSCA Essentials (balance muscular). Evidencia: posición de expertos, sin ensayo directo.'],
+    ['pierna', 'Piernas cada semana', 'Las piernas son la mitad del cuerpo: al menos una sesión por semana con sentadilla, bisagra o prensa. Sin pierna, la fuerza general y la cadera se quedan.', 'ACSM 2026 (todos los grupos grandes al menos 2 días por semana); OMS 2020. Evidencia: posición.'],
+    ['rm', 'Tu máximo estimado', 'El máximo para una repetición se estima con la fórmula de Epley: kg × (1 + repeticiones ÷ 30). Es confiable hasta 10 repeticiones; por arriba se infla. No hace falta probarlo.', 'LeSuer 1997; Reynolds 2006 (validación de fórmulas). Evidencia: estudios de validación.'],
+    ['dolor', 'Dolor después de entrenar', 'El dolor muscular de 24 a 72 horas después de una sesión es normal, sobre todo con ejercicios nuevos o al fallo. Dolor en una articulación, agudo o que no baja en 3 días: avisale a tu profe.', 'Cheung 2003 (revisión); Morán-Navarro 2017. Evidencia: revisión.'],
+    ['const', 'Constancia primero', 'Lo que más pesa en el resultado es seguir viniendo: el hábito tarda en promedio 2 meses en formarse, y las semanas cumplidas valen más que una sesión perfecta.', 'Singh 2024 (metaanálisis: 59–66 días); Laranjo 2021. Evidencia: metaanálisis.'],
+    ['fit', 'Índice FIT', 'La bioimpedancia varía con el agua, la comida y la hora. Medite siempre en las mismas condiciones y mirá la tendencia entre mediciones, nunca una sola.', 'Kyle 2004 (ESPEN); ACSM Guidelines. Evidencia: posición.']
+  ];
+  const fvLink = (k, t) => '<button class="fvl" data-fv="' + k + '">' + (t || 'Ficha VIVA') + '</button>';
+  const profeF = () => '<b class="prsig">Prof. Lucas</b>';
+  function fvAbrir(k){ $('#fvSheet').hidden = false; const f = FV.find(x => x[0] === k); $('#fvOne').hidden = !f; $('#fvList').hidden = !!f; if (f) { $('#fvT').textContent = f[1]; $('#fvTx').textContent = f[2]; $('#fvSrc').textContent = 'Fuente: ' + f[3]; }
+    else $('#fvList').innerHTML = FV.map(x => '<div><button class="fvl" data-fv="' + x[0] + '" style="flex:1;text-align:left;font-weight:500">' + x[1] + '</button><span class="muted" aria-hidden="true">›</span></div>').join(''); }
+  document.addEventListener('click', e => { const b = e.target.closest('[data-fv]'); if (b) { fvAbrir(b.dataset.fv); return; } if (e.target.closest('#prFichas')) fvAbrir(null); if (e.target.closest('#fvX') || (e.target.id === 'fvSheet')) $('#fvSheet').hidden = true; if (e.target.closest('#fvBack')) fvAbrir(null); });
+  // Comentario del profe (simulado)
+  const PROFE_MSGS = { arranco:{ fz:'', t:'Vi tus registros: ocho ejercicios nuevos y las series completas. Esta semana sumamos el día D. Si algo duele, me decís.' },
+    habitual:{ fz:'En remo, subí a 42,5 la próxima.', t:'Vi tus registros: en remo sentado mantenés 40 kg hace 4 sesiones con todas las repeticiones. En la próxima subí a 42,5. Piernas quedó corta la semana pasada: el día D también tiene sentadilla.' } };
+  PROFE_MSGS.avanzado = PROFE_MSGS.habitual;
+  const PROFE_MSG = { f:dmLbl(diaAtras(2)) };
+  // § 11.9 · El cuerpo (v61): modelo anatómico (GLB, una malla por músculo con extras.vk = clave de Vivapp). Color continuo anclado en la banda del profe:
+  // 0 = gris · por debajo = celeste (oscuro → claro) · en banda = cian → magenta · más = magenta → amarillo. Al cruzar un borde cambia de familia.
+  // Género: el de EVO (members); sin dato, el masculino como neutro. Nunca se pregunta.
+  const MUS_N = { cuads:'Cuádriceps', gluteos:'Glúteos', isquios:'Isquiotibiales', dorsales:'Dorsales', trapecio:'Espalda alta', pecho:'Pectoral', hombros:'Hombros', biceps:'Bíceps', triceps:'Tríceps', antebrazo:'Antebrazo', abdomen:'Abdomen' };
+  var GENERO = null; // 'F' · 'M' · null (sin dato). En producción: members de EVO. Demo: panel.
+  var CUERPO_MODELO = 'M'; // un solo cuerpo: el écorché tratado como maqueta (v66). El de grupos (v65) se descartó.
+  const CUERPO_GLB = { M:'modelos/cuerpo-m.js', F:null, G:null }; // GLB empaquetado como script (tools/cuerpo-js.py). F: 'modelos/cuerpo-f.js' cuando se compre el modelo (dueno.md); hasta entonces, el masculino
+  var MAPA = { val:{}, sem:[] };
+  function seriesMus(desde, hasta){
+    const M = {}; Object.keys(MUS_N).forEach(k => M[k] = 0);
+    Object.keys(hist).forEach(k => hist[k].forEach(e => { const d = diasDesde(e[0]); if (d < desde || d >= hasta) return; const n = lib[k].sets.length;
+      (lib[k].mus || []).forEach(m => { if (m in M) M[m] += n; }); (lib[k].sec || []).forEach(m => { if (m in M) M[m] += n / 2; }); }));
+    return M;
+  }
+  const hex = c => [c >> 16 & 255, c >> 8 & 255, c & 255], mixC = (a, b, t) => { const A = hex(a), B = hex(b); return A.map((x, i) => Math.round(x + (B[i] - x) * Math.max(0, Math.min(1, t)))); };
+  const C_GRIS = 0x7a828f, C_CEL0 = 0x1d4257, C_CEL1 = 0x4f9cc0, C_CIAN = 0x07b0f2, C_MAG = 0xf400a0, C_AMA = 0xffe94a, C_NOMIDE = 0x2a313c, C_HUESO = 0x3a414c;
+  // valor → [r,g,b] y tramo
+  function colorMus(v, b){
+    if (v <= 0) return [hex(C_GRIS), 'sin'];
+    if (v < b[0]) return [mixC(C_CEL0, C_CEL1, v / b[0]), 'bajo'];
+    if (v <= b[1]) return [mixC(C_CIAN, C_MAG, (v - b[0]) / Math.max(1, b[1] - b[0])), 'ok'];
+    return [mixC(C_MAG, C_AMA, (v - b[1]) / Math.max(1, b[1] * 0.5)), 'alto'];
+  }
+  const TRAMO_TXT = { sin:'sin series en 4 semanas', bajo:'por debajo de tu banda', ok:'en tu banda', alto:'más que tu banda' };
+  // Perfiles de demo (v67): el mismo socio en tres momentos. Series por semana por músculo, 4 semanas (vieja → nueva). Solo el cuerpo y su frase.
+  var PERFIL_MAPA = null;
+  const PERFILES = {
+    mes:{ n:'Un mes', exp:'arranco', ej:'Rutina de inicio, cuerpo completo, 2 días',
+      s:{ cuads:[2,3,3,4], gluteos:[2,2,3,3], isquios:[0,1,1,1], dorsales:[2,2,3,3], trapecio:[0,1,1,2], pecho:[2,2,3,3], hombros:[0,1,1,2], biceps:[0,0,1,1], triceps:[0,0,1,1], antebrazo:[0,0,0,0], abdomen:[2,2,2,3] } },
+    seis:{ n:'6 meses', exp:'habitual', ej:'Rutina de 3 días, empuje · tracción · piernas',
+      s:{ cuads:[8,9,10,9], gluteos:[7,8,8,9], isquios:[4,4,5,5], dorsales:[8,9,9,10], trapecio:[6,6,7,7], pecho:[9,9,10,10], hombros:[5,5,6,6], biceps:[6,6,7,7], triceps:[6,7,7,8], antebrazo:[1,2,2,2], abdomen:[6,6,7,7] } },
+    anio:{ n:'Más de un año', exp:'avanzado', ej:'Rutina de 5 días por grupos',
+      s:{ cuads:[12,13,13,14], gluteos:[11,12,12,13], isquios:[9,10,10,11], dorsales:[11,12,12,12], trapecio:[9,10,10,10], pecho:[14,15,15,16], hombros:[10,11,12,12], biceps:[12,13,14,14], triceps:[11,12,12,13], antebrazo:[5,6,6,7], abdomen:[9,10,11,11] } }
+  };
+  function renderMapa(x){
+    const off = (todayWd + 6) % 7, PF = PERFIL_MAPA && PERFILES[PERFIL_MAPA];
+    let M, Z;
+    if (PF) { MAPA.sem = [3, 2, 1, 0].map(i => { const o = {}; Object.keys(MUS_N).forEach(k => o[k] = PF.s[k][i]); return o; });
+      M = {}; Object.keys(MUS_N).forEach(k => M[k] = PF.s[k].reduce((a, b) => a + b, 0));
+      Z = {}; ZONAS_PR.forEach(z => Z[z[0]] = Math.max(...z[2].map(k => M[k] || 0))); }
+    else { M = seriesMus(off + 1, off + 29); Z = seriesZona(off + 1, off + 29); MAPA.sem = [0, 1, 2, 3].map(i => seriesMus(off + 1 + 7 * i, off + 8 + 7 * i)); }
+    Object.keys(MUS_N).forEach(k => MAPA.val[k] = M[k] / 4);
+    $('#prMapaSem').textContent = dmLbl(diaAtras(off + 28));
+    const st = z => { const v = Z[z[0]] / 4, b = bandaDe(z[0]); return v <= 0 ? 'sin' : v < b[0] ? 'bajo' : v > b[1] ? 'alto' : 'ok'; },
+      de = s => ZONAS_PR.filter(z => st(z) === s).map(z => z[1].toLowerCase()), lista = L => L.length < 2 ? L.join('') : L.slice(0, -1).join(', ') + ' y ' + L[L.length - 1];
+    const P = []; if (de('ok').length) P.push(lista(de('ok')) + ' en tu banda'); if (de('bajo').length) P.push(lista(de('bajo')) + ' por debajo');
+    if (de('alto').length) P.push(lista(de('alto')) + ' por encima'); if (de('sin').length) P.push(lista(de('sin')) + ' sin series');
+    const fr = 'Últimas 4 semanas: ' + P.join('; ') + '.';
+    $('#prMapaFr').textContent = fr; $('#pr3d').setAttribute('aria-label', fr);
+    if (MAPA.pintar) { if (!MAPA.estado) { const cv = document.querySelector('canvas.pr3dc'); if (cv) { if (cv.parentNode !== $('#pr3d')) $('#pr3d').appendChild(cv); $('#pr3dWait').hidden = true; MAPA.resize(); } } MAPA.pintar(); } else cuerpo3D();
+  }
+  // Tarjeta de series del músculo
+  function musAbrir(k){
+    if (!MUS_N[k]) return; const v = MAPA.val[k], b = bandaDe(zonaDe(k)), tr = colorMus(v, b)[1];
+    $('#msT').textContent = MUS_N[k]; $('#msN').textContent = fmtN(Math.round(v * 2) / 2);
+    $('#msB').innerHTML = 'promedio de 4 semanas · tu banda <b>' + b[0] + '–' + b[1] + '</b> · ' + TRAMO_TXT[tr];
+    const mx = Math.max(b[1], ...MAPA.sem.map(S => S[k]));
+    $('#msW').innerHTML = MAPA.sem.slice().reverse().map((S, i) => { const w = S[k], c = colorMus(w, b)[0];
+      return '<div><span class="small muted">' + (i === 3 ? 'Semana pasada' : 'Hace ' + (4 - i) + ' sem.') + '</span><span class="msbar"><i class="pvband" style="left:' + (b[0] / mx * 100).toFixed(1) + '%;width:' + ((b[1] - b[0]) / mx * 100).toFixed(1) + '%"></i><i class="msv" style="width:' + Math.max(1.5, w / mx * 100).toFixed(1) + '%;background:rgb(' + c.join(',') + ')"></i></span><b>' + fmtN(w) + '</b></div>'; }).join('');
+    const ej = PERFIL_MAPA ? [PERFILES[PERFIL_MAPA].ej + ' (perfil de demo)'] : Object.keys(hist).filter(e => (lib[e].mus || []).includes(k) || (lib[e].sec || []).includes(k)).map(e => lib[e].n + ((lib[e].mus || []).includes(k) ? '' : ' (½)'));
+    $('#msE').textContent = PERFIL_MAPA ? ej[0] + '.' : ej.length ? ej.join(', ') + '. Una serie cuenta 1 si es el músculo principal y ½ si ayuda.' : 'Ningún ejercicio de tu rutina lo trabaja hoy.';
+    $('#msH').innerHTML = (tr === 'sin' ? 'No está en tu rutina de ahora. Preguntale a tu profe si es a propósito. ' : tr === 'bajo' ? 'Si sigue por debajo dos semanas más, hablalo con tu profe en la revisión. ' : tr === 'alto' ? 'Lo ve tu profe: más no siempre suma. ' : 'Está donde tu profe lo quiere. ') + fvLink('vol', 'Ficha: series por semana');
+    $('#musSheet').hidden = false;
+  }
+  document.addEventListener('click', e => { if (e.target.closest('#msX') || e.target.id === 'musSheet') $('#musSheet').hidden = true;
+    const v = e.target.closest('[data-vista]'); if (v && MAPA.vista) MAPA.vista(v.dataset.vista); });
+  // Carga diferida: Progreso abre con la frase y la referencia; el modelo llega después (three.js del CDN + cargadores locales + GLB).
+  function cuerpo3D(){
+    const host = $('#pr3d'); if (MAPA.cargando || MAPA.esperando || MAPA.pintar) return;
+    if (!host.clientWidth) { MAPA.esperando = true; const io = new IntersectionObserver(en => { if (en[0].isIntersecting && host.clientWidth) { io.disconnect(); MAPA.esperando = false; cuerpo3D(); } }); io.observe(host); return; }
+    cuerpoCargar(host, () => { $('#pr3dWait').hidden = true; mapa2D(); });
+    setTimeout(() => { if (!MAPA.pintar && !MAPA.estado) { $('#pr3dWait').hidden = true; mapa2D(); } }, 3000); // T12 · a los 3 s, el 2D; si el 3D llega después, lo reemplaza
+  }
+  function cuerpoCargar(host, falla0){
+    MAPA.cargando = true; MAPA.t0 = performance.now();
+    const js = (src, ok) => { let sc = document.querySelector('script[src*="' + src.split('/').pop() + '"]'); if (sc && sc.dataset.ok) return ok();
+      if (!sc) { sc = document.createElement('script'); sc.src = src; document.head.appendChild(sc); } sc.addEventListener('load', () => { sc.dataset.ok = 1; ok(); }); sc.addEventListener('error', falla); };
+    const falla = () => { MAPA.cargando = false; falla0(); };
+    const sigue = () => js('js/vendor/three-cuerpo.js?v=' + (typeof V !== 'undefined' ? V : '61'), () => { try { armarCuerpo(host, falla, js); } catch (e) { falla(); } });
+    if (window.THREE) sigue(); else js('js/vendor/three.min.js?v=' + (typeof V !== 'undefined' ? V : '72'), sigue);
+  }
+  function mapa2D(){ // respaldo si no carga el 3D: el mapa simple con el mismo color
+    const src = $('#bodymap'), svg = $('#prMapaSvg'); if (!src) return; svg.innerHTML = src.innerHTML; svg.style.display = '';
+    svg.querySelectorAll('.m').forEach(m => { const k = m.getAttribute('data-m'), c = colorMus(MAPA.val[k] || 0, bandaDe(zonaDe(k)))[0]; m.setAttribute('style', 'fill:rgb(' + c.join(',') + ')'); m.setAttribute('class', 'm'); });
+    svg.onclick = e => { const m = e.target.closest('[data-m]'); if (m) musAbrir(m.getAttribute('data-m')); };
+  }
+  function armarCuerpo(host, falla, js){
+    const T = THREE, W = host.clientWidth, H = host.clientHeight || Math.round(W * 1.2);
+    const ren = new T.WebGLRenderer({ antialias:true, alpha:true }); ren.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); ren.setSize(W, H);
+    if (ren.outputEncoding !== undefined) ren.outputEncoding = T.sRGBEncoding;
+    const scene = new T.Scene(), cam = new T.PerspectiveCamera(28, W / H, 0.05, 30);
+    // Luz blanda (v66): ambiente alta + una direccional suave desde arriba (sigue a la cámara); sin contraluz ni sombras
+    scene.add(new T.AmbientLight(0xffffff, 0.72));
+    const key = new T.DirectionalLight(0xffffff, 0.5); cam.add(key); key.position.set(0.4, 2.2, 0.6); scene.add(cam);
+    // Gestos por dirección (v62): dedo horizontal gira; vertical desplaza la página (touch-action: pan-y); dos dedos, zoom; tocar, tarjeta. Sin OrbitControls: tomaba todo el gesto y no dejaba scrollear.
+    let CY = 0.93; const CAM = { az:0, d:3.5 }, ponerCam = () => { cam.position.set(Math.sin(CAM.az) * CAM.d, CY, Math.cos(CAM.az) * CAM.d); cam.lookAt(0, CY, 0); };
+    ponerCam();
+    const dibujar = () => ren.render(scene, cam);
+    const lin = c => new T.Color(c[0] / 255, c[1] / 255, c[2] / 255).convertSRGBToLinear ? new T.Color(c[0] / 255, c[1] / 255, c[2] / 255).convertSRGBToLinear() : new T.Color(c[0] / 255, c[1] / 255, c[2] / 255);
+    // Maqueta de estudio (v66): todo grafito mate; el único color es el de la métrica
+    const matPlano = c => new T.MeshStandardMaterial({ color:lin(hex(c)), roughness:0.9, metalness:0 });
+    const M_BASE = matPlano(0x2b3139), M_SIL = matPlano(0x2f353e), M_SINSERIES = matPlano(0x4c535e), mats = {}, musMesh = [];
+    const adelante = m => { m.polygonOffset = true; m.polygonOffsetFactor = -2; m.polygonOffsetUnits = -2; return m; }; adelante(M_SINSERIES); // la capa que se mide gana a la profunda (sin manchas)
+    // v71: tres estados (Hoy y Músculos, en la hoja "Ver"): hoy/principal magenta · se recupera/secundario ámbar atenuado · resto grafito
+    const M_HOY = adelante(new T.MeshStandardMaterial({ color:lin(hex(0xf400a0)), emissive:lin(hex(0xf400a0)), emissiveIntensity:0.35, roughness:0.9, metalness:0 })), M_REC = adelante(matPlano(0x7a6440)), M_RESTO = adelante(matPlano(0x3a414b));
+    MAPA.resize = () => { const h = ren.domElement.parentNode, W2 = h && h.clientWidth, H2 = h && h.clientHeight; if (!W2 || !H2) return; ren.setSize(W2, H2); cam.aspect = W2 / H2; cam.updateProjectionMatrix(); dibujar(); };
+    const M_BORDE = new T.LineBasicMaterial({ color:0x07b0f2, transparent:true, opacity:0.3, depthWrite:false });
+    const loader = new T.GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
+    const url = CUERPO_MODELO === 'G' ? CUERPO_GLB.G : (GENERO === 'F' && CUERPO_GLB.F) || CUERPO_GLB.M;
+    const b64buf = s => { const b = atob(s), u8 = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u8[i] = b.charCodeAt(i); return u8.buffer; };
+    const cargar = (u, otra) => js(u + '?v=' + (typeof V !== 'undefined' ? V : '61'), () => { const G = (u.match(/cuerpo-(\w)\.js/) || [0, 'm'])[1].toUpperCase(), data = window['CUERPO_GLB_' + G]; if (!data) return otra ? cargar(otra) : falla(); loader.parse(b64buf(data), '', g => {
+      const raiz = g.scene; scene.add(raiz);
+      // encuadre según el modelo (el écorché tiene cabeza; el de grupos termina en el cuello)
+      const bx = new T.Box3().setFromObject(raiz), alto = bx.max.y - bx.min.y; CY = bx.min.y + alto * 0.5; CAM.d = (alto / 2) * 1.08 / Math.tan(cam.fov * Math.PI / 360); ponerCam();
+      // Cabeza, manos y pies: silueta, no anatomía. Se ocultan esas mallas y van formas lisas (elipsoide y cápsulas) en grafito mate.
+      raiz.updateMatrixWorld(true);
+      const bx1 = new T.Box3(), G3 = { cab:[], manoI:[], manoD:[], pieI:[], pieD:[] };
+      raiz.traverse(o => { if (!o.isMesh) return; bx1.setFromObject(o); const cx = (bx1.min.x + bx1.max.x) / 2;
+        if (bx1.min.y > bx.min.y + alto * 0.874) G3.cab.push(o);
+        else if (bx1.max.y < bx.min.y + alto * 0.525 && bx1.min.y > bx.min.y + alto * 0.3 && Math.abs(cx) > alto * 0.1) G3[cx > 0 ? 'manoI' : 'manoD'].push(o);
+        else if (bx1.max.y < bx.min.y + alto * 0.058) G3[cx > 0 ? 'pieI' : 'pieD'].push(o); });
+      const union = L => L.reduce((b, o) => b.union(new T.Box3().setFromObject(o)), new T.Box3());
+      const capsula = (r, largo) => { const pts = [], n = 10, h = Math.max(0, largo - 2 * r) / 2;
+        for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + i / n * Math.PI / 2; pts.push(new T.Vector2(Math.cos(a) * r, -h + Math.sin(a) * r)); }
+        for (let i = 0; i <= n; i++) { const a = i / n * Math.PI / 2; pts.push(new T.Vector2(Math.cos(a) * r, h + Math.sin(a) * r)); }
+        return new T.LatheGeometry(pts, 28); };
+      const silueta = (geo, b, rot) => { const m = new T.Mesh(geo, M_SIL), c = b.getCenter(new T.Vector3()); if (rot) m.rotation.x = rot; m.position.copy(c); m.userData.silueta = 1; scene.add(m); return m; };
+      G3.cab.forEach(o => o.visible = false); ['manoI', 'manoD', 'pieI', 'pieD'].forEach(k => G3[k].forEach(o => o.userData.silueta = 1)); // v67: manos y pies sin volumen agregado, en grafito
+      if (G3.cab.length) { const b = union(G3.cab), s = b.getSize(new T.Vector3()); const e = silueta(new T.SphereGeometry(1, 40, 28), b); e.scale.set(s.x * 0.47, s.y * 0.5, Math.min(s.z, s.x * 1.15) * 0.5); e.position.y += s.y * 0.03; e.position.z -= s.z * 0.1; }
+      // Materiales y contorno fino (1 px, cian 30 %) en los músculos que se miden
+      const bordes = o => { const a = o.geometry.attributes.position, arr = a.array, f = a.normalized ? (arr instanceof Int16Array ? 1 / 32767 : arr instanceof Int8Array ? 1 / 127 : arr instanceof Uint16Array ? 1 / 65535 : arr instanceof Uint8Array ? 1 / 255 : 1) : 1;
+        const pos = new Float32Array(a.count * 3); for (let i = 0; i < a.count; i++) { pos[i * 3] = a.getX(i) * f; pos[i * 3 + 1] = a.getY(i) * f; pos[i * 3 + 2] = a.getZ(i) * f; }
+        const g0 = new T.BufferGeometry(); g0.setAttribute('position', new T.BufferAttribute(pos, 3)); if (o.geometry.index) g0.setIndex(o.geometry.index);
+        const l = new T.LineSegments(new T.EdgesGeometry(g0, 40), M_BORDE); l.raycast = () => {}; o.add(l); };
+      raiz.traverse(o => { if (!o.isMesh || !o.visible) return; const k = o.userData.silueta ? null : o.userData.vk || (o.parent && o.parent.userData.vk); o.userData.k = k;
+        if (k) { musMesh.push(o); bordes(o); } else o.material = M_BASE; });
+      MAPA.pintar = () => { const E = MAPA.estado; if (E) { musMesh.forEach(o => { const k = o.userData.k; o.material = E.hoy.includes(k) ? M_HOY : E.rec.includes(k) ? M_REC : M_RESTO; }); dibujar(); return; }
+        musMesh.forEach(o => { const k = o.userData.k, c = colorMus(MAPA.val[k] || 0, bandaDe(zonaDe(k))), id = c[0].join(',');
+        o.material = c[1] === 'sin' ? M_SINSERIES : mats[id] || (mats[id] = adelante(new T.MeshStandardMaterial({ color:lin(c[0]), emissive:lin(c[0]), emissiveIntensity:c[1] === 'bajo' ? 0.22 : 0.38, roughness:0.9, metalness:0 }))); }); dibujar(); };
+      $('#pr3dWait').hidden = true; if (host.id === 'pr3d') $('#prMapaSvg').style.display = 'none'; host.appendChild(ren.domElement); ren.domElement.className = 'pr3dc'; ren.domElement.setAttribute('role', 'img');
+      MAPA.cargando = false; MAPA.ms = Math.round(performance.now() - MAPA.t0); window.VIV_CUERPO_MS = MAPA.ms; MAPA.genero = CUERPO_GLB.F && u === CUERPO_GLB.F ? 'F' : 'M';
+      $('#prCred').textContent = 'Modelo provisorio, el mismo para todos' + (GENERO === 'F' ? ' (el femenino llega con la compra)' : '') + ': Écorché (Charleeh), BodyParts3D y Z-Anatomy, CC BY-SA 4.0.';
+      MAPA.pintar(); if (window.demoCuerpo) demoCuerpo(); if (MAPA.alListo) { const f = MAPA.alListo; MAPA.alListo = null; f(); }
+    }, () => { if (otra) cargar(otra); else falla(); }); });
+    cargar(url, url !== CUERPO_GLB.M ? CUERPO_GLB.M : null);
+    // Frente · Perfil · Espalda: lleva la cámara sola (sin autogiro)
+    MAPA.vista = v => { const from = CAM.az; let to = { frente:0, perfil:Math.PI / 2, espalda:Math.PI }[v], t0 = performance.now();
+      while (to - from > Math.PI) to -= 2 * Math.PI; while (to - from < -Math.PI) to += 2 * Math.PI;
+      $$('[data-vista]').forEach(b => b.setAttribute('aria-pressed', b.dataset.vista === v));
+      const paso = () => { const p = Math.min(1, (performance.now() - t0) / 450), e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        CAM.az = from + (to - from) * e; ponerCam(); dibujar(); if (p < 1) requestAnimationFrame(paso); };
+      paso(); };
+    const vistaCerca = () => { const a = ((CAM.az % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI), V3 = [['frente', 0], ['perfil', Math.PI / 2], ['espalda', Math.PI], ['frente', 2 * Math.PI]];
+      const c = V3.reduce((m, x) => Math.abs(x[1] - a) < Math.abs(m[1] - a) ? x : m); $$('[data-vista]').forEach(b => b.setAttribute('aria-pressed', Math.abs(c[1] - a) < 0.35 && b.dataset.vista === c[0])); };
+    const cv = ren.domElement, P = new Map(); let pinch0 = 0, d0 = 0;
+    cv.addEventListener('pointerdown', e => { P.set(e.pointerId, [e.clientX, e.clientY]); if (P.size === 2) { const [a, b] = [...P.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); d0 = CAM.d; } });
+    cv.addEventListener('pointermove', e => { const q = P.get(e.pointerId); if (!q) return;
+      if (P.size === 1) { CAM.az -= (e.clientX - q[0]) * 0.011; ponerCam(); dibujar(); vistaCerca(); }
+      P.set(e.pointerId, [e.clientX, e.clientY]);
+      if (P.size === 2 && pinch0) { const [a, b] = [...P.values()]; CAM.d = Math.max(1.2, Math.min(5, d0 * pinch0 / Math.max(20, Math.hypot(a[0] - b[0], a[1] - b[1])))); ponerCam(); dibujar(); } });
+    const fin = e => { P.delete(e.pointerId); if (P.size < 2) pinch0 = 0; };
+    cv.addEventListener('pointerup', fin); cv.addEventListener('pointercancel', fin); cv.addEventListener('pointerleave', fin);
+    cv.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); CAM.d = Math.max(1.2, Math.min(5, CAM.d * (1 + e.deltaY * 0.01))); ponerCam(); dibujar(); }, { passive:false });
+    // Tocar (no arrastrar) un músculo abre su tarjeta
+    const ray = new T.Raycaster(), v2 = new T.Vector2(); let pd = null;
+    cv.addEventListener('pointerdown', e => pd = [e.clientX, e.clientY, performance.now()]);
+    cv.addEventListener('pointerup', e => { if (!pd || Math.hypot(e.clientX - pd[0], e.clientY - pd[1]) > 8 || performance.now() - pd[2] > 400) return;
+      const r = ren.domElement.getBoundingClientRect(); v2.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(v2, cam);
+      const hit = ray.intersectObjects(scene.children, true).find(h => h.object.visible); if (hit && hit.object.userData.k) (MAPA.estado ? cvSel(hit.object.userData.k) : musAbrir(hit.object.userData.k)); });
+  }
+  // ===== T12 v69 · Miniaturas del cuerpo para "Tu cuerpo hoy" (T15): frente y espalda, tres estados (hoy · se recupera · resto) =====
+  // Renderizador chico propio, fuera de pantalla (no toca el visor de Progreso). Mismo modelo (CUERPO_GLB) y mismas claves de músculo (extras.vk).
+  // Hoy (magenta, como el 2D) · se recupera (ámbar #b08a3e al 55 % sobre grafito) · resto, grafito mate. Sin espectro: eso es de Progreso.
+  var MINI = { cache:{}, cola:[], estado:null, ms:null };
+  function cuerpoMiniHoy(c, cb){
+    const clave = c.hoy.slice().sort().join(',') + '|' + c.rec.filter(m => !c.hoy.includes(m)).sort().join(',') + '|' + (GENERO === 'F' && CUERPO_GLB.F ? 'F' : 'M');
+    if (MINI.cache[clave]) return cb(MINI.cache[clave]);
+    MINI.cola.push([c, cb, clave]);
+    if (MINI.estado === 'listo') return miniTanda(); if (MINI.estado === 'falla') return miniTanda();
+    if (MINI.estado === 'cargando') return; MINI.estado = 'cargando'; MINI.t0 = performance.now();
+    const js = (src, ok, ko) => { let sc = document.querySelector('script[src*="' + src.split('?')[0].split('/').pop() + '"]'); if (sc && sc.dataset.ok) return ok();
+      if (!sc) { sc = document.createElement('script'); sc.src = src; document.head.appendChild(sc); } sc.addEventListener('load', () => { sc.dataset.ok = 1; ok(); }); sc.addEventListener('error', ko); };
+    const ko = () => { MINI.estado = 'falla'; miniTanda(); }, v = typeof V !== 'undefined' ? V : '69';
+    const url = (GENERO === 'F' && CUERPO_GLB.F) || CUERPO_GLB.M;
+    const modelo = () => js(url + '?v=' + v, () => { try { miniArmar(window['CUERPO_GLB_' + (url.match(/cuerpo-(\w)\.js/) || [0, 'm'])[1].toUpperCase()]); } catch (e) { ko(); } }, ko);
+    const vend = () => window.GLTFLoader || (window.THREE && THREE.GLTFLoader) ? modelo() : js('js/vendor/three-cuerpo.js?v=' + v, modelo, ko);
+    if (window.THREE) vend(); else js('js/vendor/three.min.js?v=' + v, vend, ko);
+  }
+  function miniArmar(data){
+    if (!data) throw new Error('sin modelo');
+    const T = THREE, W = 60, H = 118, ren = new T.WebGLRenderer({ antialias:true, alpha:true, preserveDrawingBuffer:true });
+    ren.setPixelRatio(2); ren.setSize(W, H); if (ren.outputEncoding !== undefined) ren.outputEncoding = T.sRGBEncoding;
+    const scene = new T.Scene(), cam = new T.PerspectiveCamera(22, W / H, 0.05, 30);
+    scene.add(new T.AmbientLight(0xffffff, 0.72)); const key = new T.DirectionalLight(0xffffff, 0.5); cam.add(key); key.position.set(0.4, 2.2, 0.6); scene.add(cam);
+    const lin = h => new T.Color(h).convertSRGBToLinear ? new T.Color(h).convertSRGBToLinear() : new T.Color(h);
+    const mat = (h, e) => new T.MeshStandardMaterial({ color:lin(h), roughness:0.9, metalness:0, emissive:e ? lin(h) : 0x000000, emissiveIntensity:e || 0 });
+    const ad = m => { m.polygonOffset = true; m.polygonOffsetFactor = -2; m.polygonOffsetUnits = -2; return m; };
+    const M = { base:mat(0x2b3139), sil:mat(0x2f353e), resto:ad(mat(0x3a414b)), hoy:ad(mat(0xf400a0, 0.35)), rec:ad(mat(0x7a6440)) }; // rec = #b08a3e al 55 % sobre grafito
+    const b = atob(data), u8 = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u8[i] = b.charCodeAt(i);
+    const loader = new T.GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
+    loader.parse(u8.buffer, '', g => {
+      const raiz = g.scene; scene.add(raiz); raiz.updateMatrixWorld(true);
+      const bx = new T.Box3().setFromObject(raiz), alto = bx.max.y - bx.min.y, CY = bx.min.y + alto * 0.5, D = (alto / 2) * 1.04 / Math.tan(cam.fov * Math.PI / 360);
+      // cabeza: mismo tratamiento que Progreso (se oculta, va un elipsoide liso); manos y pies en grafito
+      const cab = [], b1 = new T.Box3(); raiz.traverse(o => { if (!o.isMesh) return; b1.setFromObject(o); if (b1.min.y > bx.min.y + alto * 0.874) cab.push(o);
+        else if ((b1.max.y < bx.min.y + alto * 0.525 && b1.min.y > bx.min.y + alto * 0.3 && Math.abs((b1.min.x + b1.max.x) / 2) > alto * 0.1) || b1.max.y < bx.min.y + alto * 0.058) o.userData.silueta = 1; });
+      if (cab.length) { const u = cab.reduce((a, o) => a.union(new T.Box3().setFromObject(o)), new T.Box3()), s = u.getSize(new T.Vector3()), e = new T.Mesh(new T.SphereGeometry(1, 32, 22), M.sil);
+        cab.forEach(o => o.visible = false); e.position.copy(u.getCenter(new T.Vector3())); e.scale.set(s.x * 0.47, s.y * 0.5, Math.min(s.z, s.x * 1.15) * 0.5); e.position.y += s.y * 0.03; e.position.z -= s.z * 0.1; scene.add(e); }
+      const mus = []; raiz.traverse(o => { if (!o.isMesh || !o.visible) return; const k = o.userData.silueta ? null : o.userData.vk || (o.parent && o.parent.userData.vk); if (k) { o.userData.k = k; mus.push(o); } else o.material = M.base; });
+      MINI.foto = (hoy, rec) => { mus.forEach(o => o.material = hoy.includes(o.userData.k) ? M.hoy : rec.includes(o.userData.k) ? M.rec : M.resto);
+        const r = {}; [['frente', 0], ['espalda', Math.PI]].forEach(([n, az]) => { cam.position.set(Math.sin(az) * D, CY, Math.cos(az) * D); cam.lookAt(0, CY, 0); ren.render(scene, cam); r[n] = ren.domElement.toDataURL('image/png'); }); return r; };
+      MINI.estado = 'listo'; MINI.ms = Math.round(performance.now() - MINI.t0); window.VIV_MINI_MS = MINI.ms; miniTanda();
+    }, () => { MINI.estado = 'falla'; miniTanda(); });
+  }
+  function miniTanda(){ const L = MINI.cola.splice(0); L.forEach(([c, cb, clave]) => { if (MINI.estado !== 'listo') return cb(null); const r = MINI.cache[clave] || (MINI.cache[clave] = MINI.foto(c.hoy, c.rec)); cb(r); }); }
+  // ===== T12 v71 · "Ver": un único visor para toda la app. El canvas de Progreso se muda a la hoja y vuelve al cerrar. =====
+  var VER_CNT = { hoy:0, ficha:0, sesion:0 };
+  const VER_T = { hoy:['Tu cuerpo hoy', '<i class="lp"></i>Hoy <i class="lr"></i>Se recupera'], mus:['Músculos', '<i class="lp"></i>Principal <i class="ls"></i>Secundario'] };
+  function cvSel(k){ const E = MAPA.estado; if (!E) return; $('#cvSel').textContent = MUS_N[k] + (E.hoy.includes(k) ? (E.tipo === 'mus' ? ' · principal' : ' · hoy') : E.rec.includes(k) ? (E.tipo === 'mus' ? ' · secundario' : ' · se recupera') : ''); }
+  function cuerpoVer(E, origen){
+    VER_CNT[origen] = (VER_CNT[origen] || 0) + 1; if (window.demoVer) demoVer();
+    MAPA.estado = E; $('#cvT').textContent = E.titulo || VER_T[E.tipo][0]; $('#cvLeg').innerHTML = VER_T[E.tipo][1]; $('#cvSel').textContent = 'Deslizá para girarlo; tocá un músculo para ver su nombre.';
+    $('#cvSheet').hidden = false;
+    const host = $('#cvHost'), mudar = () => { const cv = document.querySelector('canvas.pr3dc'); if (!cv || $('#cvSheet').hidden) return; host.appendChild(cv); $('#cvWait').hidden = true; MAPA.resize(); const AT = ['dorsales', 'trapecio', 'triceps', 'gluteos', 'isquios']; if (MAPA.vista) MAPA.vista(E.hoy.length && E.hoy.every(k => AT.includes(k)) ? 'espalda' : 'frente'); MAPA.pintar(); };
+    if (MAPA.pintar) return mudar();
+    $('#cvWait').hidden = false; $('#cvWait').innerHTML = '<div class="spin" aria-hidden="true"></div><span class="small muted">Cargando tu cuerpo…</span>';
+    if (MAPA.cargando) { MAPA.alListo = mudar; return; }
+    setTimeout(() => { if (MAPA.pintar || $('#cvSheet').hidden || MAPA.estado !== E) return; const w = $('#cvWait'); w.innerHTML = '<svg class="bmap" viewBox="0 0 160 150" role="img" style="width:80%;max-width:320px">' + (E.tipo === 'mus' ? bmapSvg(E.hoy, E.rec, []) : bmapSvg(E.hoy, [], E.rec)) + '</svg>'; }, 3000);
+    MAPA.alListo = mudar; requestAnimationFrame(() => cuerpoCargar(host, () => { const w = $('#cvWait'); if (!w.querySelector('svg')) w.innerHTML = '<svg class="bmap" viewBox="0 0 160 150" role="img" style="width:80%;max-width:320px">' + (E.tipo === 'mus' ? bmapSvg(E.hoy, E.rec, []) : bmapSvg(E.hoy, [], E.rec)) + '</svg>'; }));
+  }
+  function cuerpoCerrar(){
+    $('#cvSheet').hidden = true; MAPA.estado = null;
+    const cv = document.querySelector('canvas.pr3dc'); if (cv) { $('#pr3d').appendChild(cv); $('#pr3dWait').hidden = true; if (MAPA.vista) MAPA.vista('frente'); }
+    if (MAPA.pintar) { MAPA.resize(); MAPA.pintar(); }
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-vercuerpo]');
+    if (b) { const L = s => (s || '').split(',').filter(Boolean); cuerpoVer({ hoy:L(b.dataset.hoy), rec:L(b.dataset.rec), tipo:b.dataset.tipo || 'hoy', titulo:b.dataset.titulo }, b.dataset.vercuerpo); return; }
+    if (e.target.id === 'cvSheet' || e.target.closest('#cvX')) cuerpoCerrar();
+  });
+  // Miniaturas en "Músculos" (sesión y ficha de Hoy): el 2D lleva data-mini y se reemplaza cuando llegan las imágenes (sin bloquear nada)
+  function miniCambiar(svg){
+    if (svg.dataset.miniPedido) return; svg.dataset.miniPedido = 1;
+    const L = s => (s || '').split(',').filter(Boolean), c = { hoy:L(svg.dataset.hoy), rec:L(svg.dataset.rec) };
+    try { cuerpoMiniHoy(c, r => { if (!r || !svg.isConnected) return; const fig = document.createElement('div'); fig.className = 'hc3d'; fig.setAttribute('role', 'img'); fig.setAttribute('aria-label', svg.getAttribute('aria-label') || '');
+      fig.innerHTML = '<span><img src="' + r.frente + '" alt=""><i>Frente</i></span><span><img src="' + r.espalda + '" alt=""><i>Espalda</i></span>'; svg.replaceWith(fig); }); } catch (e) {}
+  }
+  new MutationObserver(M => M.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType !== 1) return; if (n.matches && n.matches('svg[data-mini]')) miniCambiar(n); n.querySelectorAll && n.querySelectorAll('svg[data-mini]').forEach(miniCambiar); }))).observe(document.body, { childList:true, subtree:true });
+  function renderInforme(x, nMes){
+    const hoy = ahora(), off = (todayWd + 6) % 7, m = META_SEM;
+    $('#prHasta').textContent = 'Al ' + dmLbl(hoy);
+    // 1. Constancia: entradas esta semana contra la meta; 8 semanas; sesiones registradas
+    let c = hoyEntreno ? 1 : 0; for (let d = 1; d <= off; d++) if (entrenoDia.has(d)) c++;
+    const W = semWeeks(), cum = W.filter(w => w.cu).length, falta = Math.max(0, m - c), restan = 6 - off;
+    const sesSem = new Set(); Object.keys(hist).forEach(k => hist[k].forEach(e => { if (diasDesde(e[0]) <= off) sesSem.add(e[0]); }));
+    $('#prConsN').textContent = c; $('#prConsU').textContent = 'de ' + m + ' esta semana';
+    $('#prConsT').innerHTML = '<b>' + cum + ' de 8</b> semanas cumplidas';
+    $('#prConsS').textContent = 'Entradas por el molinete. Esta semana: ' + c + (c === 1 ? ' entrada' : ' entradas') + ', ' + sesSem.size + ' con series registradas. Tu meta la elegiste vos: ' + m + ' por semana.';
+    // T12 (6/11, Dirección): sin lenguaje de déficit; se dice lo que hay
+    $('#prConsH').innerHTML = (falta === 0 ? 'Meta de la semana cumplida.' : restan === 0 ? 'Esta semana viniste ' + c + (c === 1 ? ' vez' : ' veces') + '. La que viene arranca de cero.' : 'Llevás ' + c + ' de ' + m + ' esta semana. Cada vez que venís, cuenta.') + ' ' + fvLink('const', 'Ficha: constancia');
+    // 2. Volumen por zona: la última semana cerrada (lunes a domingo) contra la banda; tendencia contra la semana anterior
+    const S7 = seriesZona(off + 1, off + 8), S14 = seriesZona(off + 8, off + 15), tot7 = Object.values(S7).reduce((a, b) => a + b, 0), tot14 = Object.values(S14).reduce((a, b) => a + b, 0);
+    $('#prVolN').textContent = fmtN(tot7); $('#prVolT').innerHTML = (tot7 === tot14 ? 'igual que' : (tot7 > tot14 ? '<b>+' : '<b>−') + fmtN(Math.abs(tot7 - tot14)) + '</b> contra') + ' la semana anterior';
+    $('#prVolSem').textContent = 'Semana del ' + W[7].f;
+    const mx = Math.max(24, ...ZONAS_PR.map(z => Math.max(S7[z[0]], bandaDe(z[0])[1])));
+    let bajo = [], alto = []; var ZST = {};
+    $('#prVolList').innerHTML = ZONAS_PR.map(z => { const v = S7[z[0]], [lo, hi] = bandaDe(z[0]), st = v < lo ? 'bajo' : v > hi ? 'alto' : 'ok'; ZST[z[0]] = semanasSin(z[0]) === null ? 'sin' : st; if (st === 'bajo' && semanasSin(z[0]) !== null) bajo.push(z[1]); if (st === 'alto') alto.push(z[1]);
+      return '<div class="pvz" data-z="' + z[0] + '"><span class="pvn">' + z[1] + (BANDA_PROFE[z[0]] ? ' <i title="Banda ajustada por tu profe">LP</i>' : '') + '</span><span class="pvb"><i class="pvband" style="left:' + (lo / mx * 100).toFixed(1) + '%;width:' + ((hi - lo) / mx * 100).toFixed(1) + '%"></i><i class="pvv ' + st + '" style="width:' + Math.max(1.5, v / mx * 100).toFixed(1) + '%"></i></span><span class="pvs ' + st + '">' + fmtN(v) + '</span></div>'; }).join('');
+    const ob = objP();
+    renderMapa(x);
+    $('#prVolBanda').textContent = 'La franja clara es tu banda: ' + bandaDe('x')[0] + '–' + bandaDe('x')[1] + ' series por semana por tu objetivo (' + ob[1] + ')' + (Object.keys(BANDA_PROFE).length ? '; Prof. Lucas la ajustó en ' + Object.keys(BANDA_PROFE).map(k => ZONAS_PR.find(z => z[0] === k)[1] + ' (' + BANDA_PROFE[k].join('–') + ')').join(', ') : '') + '. Una serie cuenta 1 para el músculo principal y ½ para los secundarios.';
+    $('#prVolS').textContent = 'Cuántas series hizo cada zona en tu última semana cerrada. Dentro de la banda es lo que tu profe espera para tu objetivo; por debajo suele ser un día que faltó; por encima lo mira él.';
+    $('#prVolH').innerHTML = (bajo.length ? bajo.join(', ') + ' por debajo de la banda. Si se repite dos semanas, hablalo con tu profe en la revisión. ' : alto.length ? alto.join(', ') + ' por encima: lo ve tu profe. ' : 'Todas las zonas de tu rutina están dentro de la banda. ') + fvLink('vol', 'Ficha: series por semana');
+    // 3. Equilibrio: empuje/tracción y superior/inferior en 4 semanas; advertencias por zona con semanas
+    const C = seriesClase(28), eqRow = (a, b, la, lb) => { const t = a + b || 1; return '<div class="eqr"><span class="eql">' + la + ' <b>' + fmtN(a) + '</b></span><span class="eqb"><i style="width:' + (a / t * 100).toFixed(1) + '%"></i></span><span class="eql r"><b>' + fmtN(b) + '</b> ' + lb + '</span></div>'; };
+    $('#prEqBars').innerHTML = (x === 'arranco' ? '' : eqRow(C.empuje, C.traccion, 'Empuje', 'Tracción')) + eqRow(C.sup, C.inf, 'Superior', 'Inferior');
+    const av = ZONAS_PR.map(z => { const w = semanasSin(z[0]); return w === null ? [z[1], 'Sin series en tu rutina', 'sin'] : w >= 2 ? [z[1], w + ' semanas sin trabajar', 'sem'] : null; }).filter(Boolean);
+    $('#prEqAv').innerHTML = av.length ? av.map(a => '<div><span style="flex:1;font-weight:500">' + a[0] + '</span><span class="small ' + (a[2] === 'sin' ? 'muted' : '') + '" style="color:' + (a[2] === 'sin' ? '' : 'var(--dat)') + '">' + a[1] + '</span></div>').join('') : '<div><span class="muted" style="flex:1">Todas las zonas de tu rutina, trabajadas en las últimas 2 semanas.</span></div>';
+    const rEmp = C.traccion ? Math.round(C.traccion / Math.max(1, C.empuje) * 10) / 10 : 0;
+    $('#prEqS').textContent = (x === 'arranco' ? '' : 'Series de tirar contra series de empujar (' + fmtN(rEmp) + ' a 1) y ') + (x === 'arranco' ? 'Series de ' : '') + 'tren superior contra inferior en las últimas 4 semanas. Lo que una zona no trabaja en semanas, lo tiene que saber tu profe: no lo decide la app.';
+    $('#prEqH').innerHTML = (av.some(a => a[2] === 'sin') ? av.filter(a => a[2] === 'sin').map(a => a[0]).join(' y ') + (av.filter(a => a[2] === 'sin').length > 1 ? ' no están' : ' no está') + ' en tu rutina de ahora. Preguntale a tu profe si es a propósito. ' : av.length ? 'Volvé a ' + av.map(a => a[0].toLowerCase()).join(' y ') + ' en tu próxima sesión del día que corresponde. ' : 'Nada que corregir esta semana. ') + fvLink('eq', 'Ficha: empuje y tracción');
+    // 4. Fuerza (Avanzado): qué hago con firma
+    const PM = PROFE_MSGS[x] || PROFE_MSGS.habitual;
+    $('#prFzH').innerHTML = (PM.fz ? profeF() + ': ' + PM.fz + ' ' : '') + fvLink('carga', 'Ficha: cuándo subir la carga');
+    // 5. Evolución (Índice FIT, solo si se midió)
+    if (nIB) { const a = IB[0], u = IBv()[nIB - 1], dm = Math.round((u.m - a.m) * 10) / 10, dg = Math.round((u.g - a.g) * 10) / 10;
+      $('#prEvoN').textContent = (dm >= 0 ? '+' : '') + fmtN(dm); $('#prEvoU').textContent = 'kg de músculo desde tu punto de partida (' + a.f + ')';
+      $('#prEvoT').innerHTML = 'grasa <b>' + (dg > 0 ? '+' : '') + fmtN(dg) + ' %</b> · ' + nIB + (nIB === 1 ? ' medición' : ' mediciones');
+      $('#prEvoS').textContent = nIB > 1 ? 'Tu última medición InBody comparada con la primera. El titular es el músculo y la grasa, nunca el peso.' : 'Tu primera medición es el punto de partida. Desde la segunda, te comparás con vos.';
+      $('#prEvoH').innerHTML = 'Próxima medición: a las 12 semanas de la última (' + dmLbl(new Date(+hoy + (84 - diasDesde(u.f)) * 864e5)) + '). Misma hora, sin comer antes. ' + fvLink('fit', 'Ficha: Índice FIT'); }
+    // 6. Lo que dice tu profe: último comentario y próxima revisión
+    $('#prProfeF').textContent = PROFE_MSG.f; $('#prProfeTxt').textContent = PM.t;
+    $('#prProfeRev').innerHTML = '<b>Próxima revisión: semana 8</b><span>Con Lucas, en la sede · semana del ' + dmLbl(new Date(+hoy + (8 - off) * 864e5)) + '. Lleva este informe.</span>';
+  }
+
 //#bloque 335
   // ===== T1 · Progreso según la experiencia (Arranco · Habitual · Avanzado; menores como Arranco) =====
   // Fuentes: entries (entrenamientos, semanas), duración de la sesión en la app (minutos), registro de series (primeras veces, avance, récords, volumen).
@@ -460,12 +803,11 @@
     if (x === 'arranco') { $('#tile3n').textContent = pv.length; $('#tile3l').textContent = pv.length === 1 ? 'primera vez' : 'primeras veces'; }
     else { $('#tile3n').textContent = n ? Math.round(mins / n) : '—'; $('#tile3l').textContent = 'min por sesión'; }
     renderSemanas();
-    $('#bienCard').hidden = x === 'avanzado'; $('#palCard').hidden = x !== 'habitual';
-    $('#avCard').hidden = x !== 'avanzado'; $('#recBox').hidden = x !== 'avanzado'; $('#volCard').hidden = x !== 'avanzado';
-    $('#bienTxt').textContent = 'Este mes viniste ' + n + (n === 1 ? ' vez' : ' veces') + '. Lo estás haciendo bien ⚡';
+    $('#bienCard').hidden = x !== 'arranco'; $('#palCard').hidden = x !== 'habitual';
+    $('#avCard').hidden = x !== 'avanzado'; $('#recBox').hidden = x !== 'avanzado'; $('#prVol').hidden = x === 'arranco'; $('#prEvo').hidden = x !== 'avanzado' || !nIB;
     $('#pvList').innerHTML = pv.slice(0, 4).map(p => '<div><span style="flex:1;font-weight:500">' + p.t + '</span><span class="small muted">' + (p.dd === 0 ? 'Hoy' : p.f) + '</span></div>').join('');
     const ap = avancePalabras();
     $('#palList').innerHTML = ap.length ? ap.slice(0, 4).map(t => '<div><span style="flex:1;line-height:1.4">' + t + '</span></div>').join('') : '<div><span class="muted" style="flex:1">Cuando registres tus series, acá ves cuánto avanzás.</span></div>';
-    if (x === 'avanzado') renderCarga();
+    renderInforme(x, n);
   }
   renderProg();

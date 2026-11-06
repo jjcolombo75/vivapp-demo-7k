@@ -385,7 +385,7 @@
     const fail = () => { off.innerHTML = '<span class="small muted" style="line-height:1.45">No se pudo cargar el 3D. Revisá tu conexión y probá de nuevo.</span><button class="btn ghost sm" id="fig3dOn" style="width:auto;padding:0 20px">Reintentar</button>'; rig = null; };
     const build = () => { try { build3D(); if (!rig) return fail(); off.hidden = true; $('#cue').hidden = false; $('#repN').hidden = false; $('#animPlay').hidden = false; if (curEx) setAnim(curEx); } catch (e) { fail(); } };
     if (window.THREE) return build();
-    const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; sc.onload = build; sc.onerror = fail; document.head.appendChild(sc);
+    const sc = document.createElement('script'); sc.src = 'js/vendor/three.min.js?v=' + (typeof V !== 'undefined' ? V : '72'); sc.onload = build; sc.onerror = fail; document.head.appendChild(sc);
   }
   $('#figOff').addEventListener('click', e => { if (e.target.closest('#fig3dOn')) enable3D(); });
   requestAnimationFrame(loop3D);
@@ -512,7 +512,7 @@
     const zq = MOLESTIA && !esMenor();
     const q = zq ? '¿Cómo está ' + zonaTxt(MOLESTIA.zona) + ' hoy?' : '¿Cómo venís hoy?';
     const op = zq ? [['bien', 'Bien'], ['igual', 'Igual'], ['peor', 'Peor']] : [['todo', 'Con todo'], ['normal', 'Normal'], ['sinen', 'Sin energía'], ['cuidar', 'Con algo para cuidar']];
-    const h = '<div class="between"><span class="schq">' + q + '</span><button class="link" data-ck="skip" style="min-height:36px;padding:0;font-size:13px">Saltear</button></div>' +
+    const h = '<div class="between' + (enSala || zq ? '' : ' chkcab') + '"><span class="schq">' + (enSala || zq ? q : '') + '</span><button class="link" data-ck="skip" style="min-height:36px;padding:0;font-size:13px">Saltear</button></div>' +
       '<div class="opts ' + (zq ? 'g3' : 'g2') + ' chkopts">' + op.map(o => '<button class="opt" data-ck="' + o[0] + '">' + o[1] + '</button>').join('') + '</div>';
     return enSala ? '<div class="schk">' + h + '</div>' : h;
   }
@@ -560,6 +560,7 @@
       act:{ min:8, items:ACT_B },
       fue:d.ex.map(k => { const st = lib[k].sets[0], kg = parseFloat(String(st[1]).replace(',', '.')); return { k:k, n:lib[k].n, maq:'generic', zona:'Zona musculación', sr:lib[k].sets.length, rep:parseInt(String(st[2]), 10) || 12, kg:isNaN(kg) ? null : kg, prev:null, seg:esTiempo(k), alt:(ALT_G[k] || []).map(n => ({ n:n, zona:'Zona musculación', kg:null, maq:'generic' })) }; }),
       car:{ maq:'Cinta', min:12, txt:'caminata en subida', zona:'Zona cardio · frente a las ventanas' } };
+    varOverlay(P, d.k);  // T15 · el modelo con variantes, una sola fuente para Hoy, el motor, la planilla y Rutinas
     if (CORTO) { P.act = { min:5, items:P.act.items.slice(0, 2) }; P.fue = P.fue.slice(0, 2); P.car.min = 8; }
     if (CUIDA === 'Hombro' && PEOR) { P.fue = P.fue.filter(f => f.k !== 'remo' && f.k !== 'jalon'); P.car.min += 8; }
     else if (CUIDA === 'Hombro') P.fue = P.fue.map(f => f.hombro ? Object.assign({}, f.hombro, { k:f.k + 'H', sr:f.sr, rep:f.rep, prev:null, alt:[], cambiado:f.n }) : Object.assign(f, { kg:f.prev || f.kg }));
@@ -570,7 +571,8 @@
       if (ETAPA === 'vuelvo') { f.kg = Math.max(2.5, Math.round(f.prev * 0.8 / 2.5) * 2.5); f.vuelvo = true; return; }
       if (f.kg > f.prev && (ns || (LIM[f.k] || 0) >= 2)) { if (!ns) f.lim = true; f.kg = f.prev; }
     });
-    P.fue.forEach(f => { const a = RUT_AJ && RUT_AJ[f.k]; if (!a) return; if (a.kg != null && f.kg != null) { f.kg = a.kg; f.aj = true; f.lim = false; } if (a.desc) f.desc = a.desc; });
+    P.fue.forEach(f => { const a = RUT_AJ && RUT_AJ[f.k]; if (!a) return; if (a.kg != null && f.kg != null) { if (f.kgs) { const dd = a.kg - f.kgs[0]; f.kgs = f.kgs.map(x => Math.max(0, x + dd)); } f.kg = a.kg; f.aj = true; f.lim = false; } if (a.desc) f.desc = a.desc; });
+    cambiosYajustes(P, d.k);  // T15 · cambios de rutina (Avanzado y respuestas de Lucas) y ediciones del día desde Hoy
     return P;
   }
   const planMin = P => P.act.min + P.fue.length * 8 + P.car.min;
@@ -603,28 +605,25 @@
     b.innerHTML = (ses ? ICO_SES : ICO_PLAY).replace('<svg ', '<svg width="20" height="20" ') + '<span>' + (ses ? 'Volver a tu sesión' : 'Comenzar rutina · Día ' + d.k) + '</span>';
     hbRender(P, d, tot);
   }
-  // v57 · Hoy = preparación (entrenar-propuesta § 11.7): sesión · tu cuerpo hoy · para hoy (solo si hay algo) · repasar
+  // T15 · Hoy = la herramienta de la sala: la sesión (barras, cambiar de día), tu cuerpo hoy, para hoy (solo si hay algo), tu rutina hoy (la misma lista que el motor)
   function hbRender(P, d, tot){
-    if (!HB) return;
-    const ses = MOM === 'sesion', hr = $('#hoyRow'), falta = hr.hidden && !$('#prepAsk').hidden;
-    $('#hbsesS').textContent = 'Día ' + d.k + ' · ~' + tot + ' min';
-    const hd = hr.querySelector('.hdot'), cs = { todo:'Con todo', normal:'Normal', sinen:'Sin energía', cuidar:'Cuidando', bien:'Bien', igual:'Cuidando', peor:'Descansa', profe:'Con tu profe', menor:'Con tu profe', skip:'Normal' }[CHK] || '';
-    $('#hbcueS').innerHTML = falta ? 'Sin responder' : hr.hidden || !cs ? '' : (hd ? hd.outerHTML : '') + cs;
-    const vacio = $('#hCuida').hidden && $('#hNota').hidden; $('#hbPara').hidden = vacio;
-    $('#hbrepS').textContent = P.fue.length + ' ejercicios';
-    $('#hRep').innerHTML = P.fue.map((f, i) => { const L = lib[f.k] || lib[String(f.k).replace(/H$/, '')], op = HR === i;
-      return '<div class="hrep"><button class="hrb" data-hr="' + i + '" aria-expanded="' + op + '"><span>' + f.n + '</span><small>' + f.sr + ' × ' + f.rep + (f.kg ? ' · ' + fmtKg(f.kg) + ' kg' : '') + '</small></button>' +
-        (op ? '<div class="hrd">' + (L && L.tip ? L.tip : 'Tu profe te lo muestra en la sala.') + '</div>' : '') + '</div>'; }).join('');
-    const op = { ses:HB.ses, cue:HB.cue === null ? falta : HB.cue, para:HB.para, rep:HB.rep };
-    Object.keys(op).forEach(k => { const el = $('[data-hbk="' + k + '"]'); el.classList.toggle('open', !!op[k]); el.querySelector('.hbh').setAttribute('aria-expanded', !!op[k]); });
-    $('#hEmpezar').classList.toggle('big', !ses && !falta && vacio);
+    const ses = esSes(), r = rutinas[actual];
+    $('#hDias').innerHTML = ses ? '' : '<span class="small muted">Cambiar de día</span>' + r.dias.map((x, i) => '<button class="hday' + (i === r.next ? ' cur' : '') + '" data-hdia="' + i + '" aria-pressed="' + (i === r.next) + '" aria-label="Día ' + x.k + ', ' + x.n + '">' + x.k + '</button>').join('');
+    $('#hPend').innerHTML = pendHtml();
+    $('#hbPara').hidden = $('#hCuida').hidden && !$('#hPend').innerHTML;
+    const PP = ses ? SALA.P : P;
+    $('#hRutS').textContent = PP.fue.length + ' ejercicios · ' + (actual === 'profe' ? 'Lucas' : 'IA');
+    $('#hRep').innerHTML = hoyLista(PP);
+    $('#hReg').hidden = !sinRegistros(PP);
+    $('#hRutAdd').innerHTML = EXP === 'avanzado' && !esMenor() && !ses ? '<button class="link lime" data-hadd="1" style="min-height:44px;padding:0;font-size:14px;align-self:flex-start">+ Agregar un ejercicio</button>' : '';
+    $('#hEmpezar').classList.remove('big');
   }
   $('#hParts').addEventListener('click', e => { const b = e.target.closest('[data-hp]'); if (!b) return; const i = +b.dataset.hp; hOpen = hOpen === i ? -1 : i; renderEntHoy(); });
   $('#hCorto').addEventListener('click', () => { CORTO = !CORTO; renderEntHoy(); renderToday(); toast(CORTO ? 'Versión de 30 minutos: las tres partes, más cortas' : 'Volviste a la versión completa'); });
-  $('section#hoy').addEventListener('click', e => { const h = e.target.closest('[data-hb]'); if (h) { HB[h.dataset.hb] = !h.parentElement.classList.contains('open'); renderEntHoy(); return; } const r = e.target.closest('[data-hr]'); if (r) { HR = HR === +r.dataset.hr ? -1 : +r.dataset.hr; renderEntHoy(); } });
+  $('section#hoy').addEventListener('click', hoyClick);
   $('#hEmpezar').addEventListener('click', () => { if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else salaStart(); });
   // ---- Modo sala ----
-  function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => ({ sets:Array(f.sr).fill(false), done:false, salteado:false, kg:f.kg, reps:Array(f.sr).fill(f.rep), swap:null })), carDone:false, carMin:P.car.min, t0:+ahora(), saludo:true, chk:false, rest:0, crono:0, el:0, vence:false, repreg:false, pausa:false, mtStep:null, hito:'' }; }
+  function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => fNuevo(f)), carDone:false, carMin:P.car.min, t0:+ahora(), saludo:true, chk:false, rest:0, crono:0, el:0, vence:false, repreg:false, pausa:false, mtStep:null, hito:'' }; }
   function salaStart(){
     if (MOM !== 'sala' && MOM !== 'sesion' && !NOENT) setMom('sala', true);
     SALA = salaNew(); SALA.chk = false; // v57 · la pregunta del día vive solo en Hoy (§ 11.7)
@@ -671,7 +670,7 @@
       const C = P.car, m = Math.floor(S.crono / 60), sg = S.crono % 60;
       h += '<div class="smaq">' + maqSvg('cinta') + '<span class="sfoto">Foto de la sede</span></div><span class="szona">' + C.zona + '</span>' +
         '<h2 class="sname">' + C.maq + ' · ' + C.txt + '</h2><div class="sload"><b>' + S.carMin + '</b> min</div>' +
-        '<p class="shint">Intensidad: podés hablar, pero no cantar.</p>' +
+        '<p class="shint">' + cardioInt(C) + '</p>' +
         '<div class="srow"><button class="btn ghost sm" id="sCrono">' + (S.cronoOn ? 'Pausar' : 'Arrancar') + ' cronómetro · ' + m + ':' + String(sg).padStart(2, '0') + '</button><button class="link lime" id="sAjCar">Ajustar</button></div>';
     } else {
       const f = fx(fi), F = S.F[fi];
@@ -679,16 +678,16 @@
       if (llena) h += '<div class="schk sllena"><span class="schq">La zona de espalda está a full</span><span class="small muted">' + f.n + ' está ocupada. ¿Empezamos por bíceps?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-ll="dale">Dale</button><button class="btn ghost sm" data-ll="no">No, sigo así</button></div><button class="link lime" data-ll="otra" style="min-height:40px;padding:0;font-size:14px;align-self:flex-start">Ver otras de tu sede</button></div>';
       else h += '<div class="smaq">' + maqSvg(f.maq) + '<span class="sfoto">Foto de la sede</span></div>';
       h += '<span class="szona">' + f.zona + '</span>' +
-        '<h2 class="sname">' + f.n + '</h2>' +
-        (ETAPA === '60' ? '<div class="sload s60"><b>' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' s' : '') + '</b>' + (F.kg ? '<span>' + fmtKg(F.kg) + ' kg</span>' : '') + '</div>'
-          : '<div class="sload">' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' s' : '') + (F.kg ? ' · <b>' + fmtKg(F.kg) + '</b> kg' : '') + '</div>');
+        '<h2 class="sname">' + f.n + '</h2>' + varHtml(f, fi) +
+        (ETAPA === '60' ? '<div class="sload s60">' + cargaTxt(f, F) + '</div>'
+          : '<div class="sload">' + cargaTxt(f, F) + '</div>');
       if (f.prev && f.kg > f.prev && F.kg === f.kg && !f.aj && !F.swap) h += voz('La vez pasada: ' + fmtKg(f.prev) + ' kg, todas las series completas. Regla de Lucas: hoy ' + fmtKg(F.kg) + ' kg.');
       else if (f.lim && !F.swap) h += voz('La vez pasada fue al límite. Regla de Lucas: hoy repetís ' + fmtKg(F.kg) + ' kg.');
       else if (f.vuelvo && !F.swap) h += '<p class="shint">Al 80% de la vez pasada (' + fmtKg(f.prev) + ' kg).</p>';
       if (f.cambiado) h += '<p class="shint">Hoy en lugar de ' + f.cambiado.toLowerCase() + ', para cuidar tu hombro.</p>';
       h += exCue(f, fi);
       if (S.rest > 0) {
-        h += '<div class="srest" role="timer"><span class="srt">' + Math.floor(S.rest / 60) + ':' + String(S.rest % 60).padStart(2, '0') + '</span><span class="small muted">' + (F.sets.indexOf(false) >= 0 ? 'Siguiente: serie ' + (F.sets.indexOf(false) + 1) + ' de ' + f.sr : 'Siguiente: ' + (fi + 1 < S.F.length ? fx(fi + 1).n : 'el cardio')) + '</span><button class="link lime" id="sSkipRest">Saltear descanso</button></div>';
+        h += '<div class="srest" role="timer"><span class="srt">' + Math.floor(S.rest / 60) + ':' + String(S.rest % 60).padStart(2, '0') + '</span><span class="small muted">' + restSig(S, F, f, fi) + '</span><button class="link lime" id="sSkipRest">Saltear descanso</button></div>';
       } else {
         h += '<div class="sdots"><span class="small muted">Series</span>' + F.sets.map((x, j) => '<button class="sdot' + (x ? ' on' : '') + '" data-set="' + j + '" aria-label="Serie ' + (j + 1) + (x ? ', hecha' : '') + '">' + (j + 1) + '</button>').join('') + '<button class="link lime" id="sCambiar">Cambiar</button></div>';
       }
@@ -722,8 +721,8 @@
       if (v === 'otra') { renderSala(); return salaCambiarOcupada(); }
       renderSala(); return; }
     const sd = e.target.closest('[data-set]');
-    if (sd) { const F = S.F[curF()], j = +sd.dataset.set; F.sets[j] = !F.sets[j]; if (F.sets[j] && F.sets.indexOf(false) >= 0) { S.rest = fx(curF()).desc || 90; clearInterval(restT); restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) vozFinDescanso(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); } renderSala(); return; }
-    if (e.target.closest('#sSkipRest')) { S.rest = 0; clearInterval(restT); renderSala(); return; }
+    if (sd) { marcarSerie(+sd.dataset.set); return; }
+    if (e.target.closest('#sSkipRest')) { S.rest = 0; clearInterval(restT); volverAlGrupo(); renderSala(); return; }
     if (e.target.closest('#sAjustar')) return salaAjustar();
     if (e.target.closest('#sAjCar')) { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Minutos de cardio</span><div class="sadj"><button class="opt" data-cm="-5">−5</button><b id="sCarMin">' + S.carMin + ' min</b><button class="opt" data-cm="5">+5</button></div><button class="btn" data-close>Listo</button>'; $('#salaSheet').hidden = false; return; }
     if (e.target.closest('#sCrono')) { S.cronoOn = !S.cronoOn; clearInterval(cronoT); if (S.cronoOn) cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); renderSala(); return; }
@@ -766,7 +765,7 @@
     if (mz) { $('#salaSheet').hidden = true; CUIDA = null; chkFin('menor'); if (mz.dataset.mz === 'avisa') toast('Listo. Lucas te busca en la sala'); return close(); }
     if (e.target.closest('[data-guardar]')) { MOLESTIA = { zona:CUIDA, bien:0 }; toast('Guardado. La próxima te preguntamos cómo está ' + zonaTxt(CUIDA)); return close(); }
     if (e.target.closest('[data-noguardar]')) { CUIDA = null; toast('No lo guardamos. Era por hoy'); return close(); }
-    const ak = e.target.closest('[data-ak]'); if (ak) { const F = S.F[curF()]; F.kg = Math.max(0, F.kg + +ak.dataset.ak); return salaAjustar(); }
+    const ak = e.target.closest('[data-ak]'); if (ak) { const F = S.F[curF()]; kgsShift(F, +ak.dataset.ak); return salaAjustar(); }
     const ar = e.target.closest('[data-ar]'); if (ar) { const [j, d] = ar.dataset.ar.split(':').map(Number), F = S.F[curF()]; F.reps[j] = Math.max(1, F.reps[j] + d); return salaAjustar(); }
     const cm = e.target.closest('[data-cm]'); if (cm) { S.carMin = Math.max(5, S.carMin + +cm.dataset.cm); $('#sCarMin').textContent = S.carMin + ' min'; return; }
     const c2 = e.target.closest('[data-cm2]');
@@ -1122,12 +1121,13 @@
     }
     if (v === 'mus') {
       if (!L) return '<p class="shint">Tu profe te muestra qué trabaja.</p>';
-      return '<div class="smus"><svg class="bmap" viewBox="0 0 160 150" role="img" aria-label="Músculos que trabaja">' + bmapSvg(L.mus, L.sec, []) + '</svg><div class="stack" style="gap:6px"><span><b>Principal:</b> ' + L.mus.map(k => musName[k]).join(' · ') + '</span>' +
-        (L.sec.length ? '<span class="muted">También: ' + L.sec.map(k => musName[k]).join(' · ') + '</span>' : '') + '<span class="legend" style="justify-content:flex-start"><i class="lp"></i>Principal <i class="ls"></i>Secundario</span></div></div>';
+      return '<div class="smus"><svg class="bmap" viewBox="0 0 160 150" role="img" aria-label="Músculos que trabaja" data-mini="1" data-hoy="' + L.mus.join(',') + '" data-rec="' + L.sec.join(',') + '">' + bmapSvg(L.mus, L.sec, []) + '</svg><div class="stack" style="gap:6px"><span><b>Principal:</b> ' + L.mus.map(k => musName[k]).join(' · ') + '</span>' +
+        (L.sec.length ? '<span class="muted">También: ' + L.sec.map(k => musName[k]).join(' · ') + '</span>' : '') + '<span class="legend" style="justify-content:flex-start"><i class="lp"></i>Principal <i class="ls"></i>Secundario</span>' +
+        '<button class="link lime hcver" data-vercuerpo="sesion" data-tipo="mus" data-titulo="' + f.n + '" data-hoy="' + L.mus.join(',') + '" data-rec="' + L.sec.join(',') + '">Ver</button></div></div>';
     }
     let h = f.prev && !F.swap ? '<span class="small muted">La vez pasada: ' + fmtKg(f.prev) + ' kg · ' + f.sr + ' × ' + f.rep + '</span>' : '';
     if (F.kg) h += '<div class="sprow"><span>Carga</span><span class="sadj"><button class="opt" data-pk="-2.5" aria-label="Bajar 2,5 kg">−</button><b>' + fmtKg(F.kg) + ' kg</b><button class="opt" data-pk="2.5" aria-label="Subir 2,5 kg">+</button></span><span class="spgap"></span></div>';
-    h += F.reps.map((r, j) => '<div class="sprow"><span>Serie ' + (j + 1) + '</span><span class="sadj"><button class="opt" data-pr="' + j + ':-1" aria-label="Menos">−</button><b>' + r + (f.seg ? ' s' : ' rep') + '</b><button class="opt" data-pr="' + j + ':1" aria-label="Más">+</button></span><button class="spchk' + (F.sets[j] ? ' on' : '') + '" data-set="' + j + '" aria-pressed="' + F.sets[j] + '" aria-label="Serie ' + (j + 1) + (F.sets[j] ? ', hecha' : '') + '">✓</button></div>').join('');
+    h += F.reps.map((r, j) => '<div class="sprow"><span>' + serieLbl(f, F, j) + (F.kgs && F.kgs[j] !== F.kg ? ' · ' + fmtKg(F.kgs[j]) + ' kg' : '') + '</span><span class="sadj"><button class="opt" data-pr="' + j + ':-1" aria-label="Menos">−</button><b>' + r + (f.seg ? ' s' : ' rep') + '</b><button class="opt" data-pr="' + j + ':1" aria-label="Más">+</button></span><button class="spchk' + (F.sets[j] ? ' on' : '') + '" data-set="' + j + '" aria-pressed="' + F.sets[j] + '" aria-label="Serie ' + (j + 1) + (F.sets[j] ? ', hecha' : '') + '">✓</button></div>').join('');
     return h + '<span class="small muted">Listo anota lo que está acá.</span>';
   }
   function exClick(e){
@@ -1136,7 +1136,7 @@
     const i = curF(); if (i < 0) return false;
     const F = S.F[i], f = fx(i);
     if (e.target.closest('[data-mtr]')) { F.ritmo = !F.ritmo; renderSala(); return true; }
-    const pk = e.target.closest('[data-pk]'); if (pk) { F.kg = Math.max(0, F.kg + +pk.dataset.pk); renderSala(); return true; }
+    const pk = e.target.closest('[data-pk]'); if (pk) { kgsShift(F, +pk.dataset.pk); renderSala(); return true; }
     const pr = e.target.closest('[data-pr]'); if (pr) { const [j, d] = pr.dataset.pr.split(':').map(Number); F.reps[j] = Math.max(1, F.reps[j] + d * (f.seg ? 5 : 1)); renderSala(); return true; }
     return false;
   }
@@ -1164,7 +1164,16 @@
     const el = $('#hCuerpo'); if (!el || !DIAS_ULT) return;  // antes de que corra el bloque 307, nada
     const c = cuerpoHoy(), fr = (c.rec.length ? recFrase(c.rec) + ': hoy ' : 'Hoy ') + c.d.n.toLowerCase();
     el.innerHTML = '<svg class="bmap" viewBox="0 0 160 150" role="img" aria-label="' + fr + '">' + bmapSvg(c.hoy, [], c.rec) + '</svg><div class="hcb"><span class="hct">Tu cuerpo hoy</span><span class="hcf">' + fr + '</span>' +
-      '<span class="legend"><i class="lp"></i>Hoy' + (c.rec.length ? ' <i class="lr"></i>Se recupera' : '') + '</span><span class="small muted">Estimado con lo que registraste</span></div>';
+      '<div class="hcleg"><span class="legend"><i class="lp"></i>Hoy' + (c.rec.length ? ' <i class="lr"></i>Se recupera' : '') + '</span>' +
+      '<button class="link lime hcver" data-vercuerpo="hoy" data-tipo="hoy" data-hoy="' + c.hoy.join(',') + '" data-rec="' + c.rec.filter(m => !c.hoy.includes(m)).join(',') + '">Ver</button></div><span class="small muted">Estimado con lo que registraste</span></div>';
+    // T12 v69: miniaturas 3D (frente y espalda). Primero el 2D; las miniaturas se piden recién con Hoy a la vista y reemplazan el svg si llegan en menos de 2 s.
+    // Si tardan más, queda el 2D y quedan en caché para la próxima vez que se dibuje Hoy (sin aviso).
+    const pedir = () => { const t0 = performance.now(); try { cuerpoMiniHoy(c, r => { const svg = el.querySelector('svg.bmap'); if (!r || !svg || !el.isConnected) return;
+      if (performance.now() - t0 > 2000) return;
+      const fig = document.createElement('div'); fig.className = 'hc3d'; fig.setAttribute('role', 'img'); fig.setAttribute('aria-label', fr);
+      fig.innerHTML = '<span><img src="' + r.frente + '" alt=""><i>Frente</i></span><span><img src="' + r.espalda + '" alt=""><i>Espalda</i></span>'; svg.replaceWith(fig); }); } catch (e) {} };
+    if (el.offsetParent) setTimeout(pedir, 0);
+    else { const io = new IntersectionObserver(en => { if (en[0].isIntersecting) { io.disconnect(); pedir(); } }); io.observe(el); }
   }
   descansoHrec();
   // ---- v53 · Rutinas como subsección (entrenar-propuesta.md § 11.1): ver el día antes de entrenar, ajustar carga y descanso, pedir cambios ----
@@ -1177,11 +1186,11 @@
   function rutDetalle(rid, i){
     const r = rutinas[rid], d = r.dias[i];
     return '<div class="rdet"><span class="rdt">Día ' + d.k + ' · ' + d.n + '</span>' + rutEx(rid, i).map(x => {
-      const a = RUT_AJ[x.k] || {}, kg = a.kg != null ? a.kg : x.kg, ds = a.desc || 90;
-      return '<div class="rdex"><span class="rdn"><b>' + x.n + '</b><span class="small muted">' + x.sr + ' × ' + x.rep + (x.seg ? ' s' : '') + '</span></span>' +
+      const a = RUT_AJ[x.k] || {}, kg = a.kg != null ? a.kg : x.kg, ds = a.desc || 90, v = (VARIANTES[d.k] || {})[x.k], vt = varTxt(v);
+      return '<div class="rdex"><span class="rdn"><b>' + x.n + (vt ? '<span class="vpill">' + vt + '</span>' : '') + '</b><span class="small muted">' + (v && v.gt === 'circuito' ? v.vueltas + ' vueltas' : x.sr + ' × ' + (v && v.obj === 'rango' ? v.rango.join('–') : v && v.repsS ? v.repsS.join('/') : x.rep)) + (x.seg || (v && v.seg) ? ' s' : '') + (v && v.kgs ? ' · ' + v.kgs.map(fmtKg).join(' → ') + ' kg' : '') + '</span></span>' +
         (kg != null ? '<span class="sadj"><button class="opt" data-rk="' + x.k + ':-2.5:' + kg + '" aria-label="Bajar 2,5 kg">−</button><b>' + fmtKg(kg) + ' kg</b><button class="opt" data-rk="' + x.k + ':2.5:' + kg + '" aria-label="Subir 2,5 kg">+</button></span>' : '<span class="small muted">Peso corporal</span>') +
         '<span class="sadj"><button class="opt" data-rd="' + x.k + ':-15:' + ds + '" aria-label="Menos descanso">−</button><b>' + ds + ' s</b><button class="opt" data-rd="' + x.k + ':15:' + ds + '" aria-label="Más descanso">+</button></span></div>';
-    }).join('') + '<span class="small muted">Carga y descanso quedan para las próximas veces. Series y ejercicios: tu profe.</span>' +
+    }).join('') + '<span class="small muted">' + (EXP === 'avanzado' && !esMenor() ? 'Series, ejercicios y descansos los cambiás en Hoy; quedan acá con fecha.' : 'Carga y descanso quedan para las próximas veces. Series y ejercicios: tu profe.') + '</span>' +
       '<button class="btn sm" data-start="' + rid + ':' + i + '">Empezar el Día ' + d.k + '</button>' +
       (r.tipo === 'profe' ? '<button class="btn ghost sm" data-rpide="1">Pedile un cambio a Lucas</button>' : '') + '</div>';
   }
@@ -1207,7 +1216,7 @@
     if (llena) h += '<div class="schk sllena"><span class="schq">La zona de espalda está llena</span><span class="small muted">' + f.n + ' está ocupada. ¿Empezamos por bíceps?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-ll="dale">Sí</button><button class="btn ghost sm" data-ll="no">No, sigo así</button></div></div>';
     h += '<div class="smaq">' + maqSvg(car ? 'cinta' : f.maq) + '<span class="sfoto">Foto de la sede</span></div><span class="szona">' + (car ? S.P.car.zona : f.zona) + '</span>' +
       '<h2 class="sname">' + (car ? S.P.car.maq + ' · ' + S.P.car.txt : f.n) + '</h2>' +
-      (car ? '<div class="sload"><b>' + S.carMin + '</b> min</div>' : '<div class="sload">' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' s' : '') + (F.kg ? ' · <b>' + fmtKg(F.kg) + '</b> kg' : '') + '</div>') +
+      (car ? '<div class="sload"><b>' + S.carMin + '</b> min</div>' : '<div class="sload">' + cargaTxt(f, F) + '</div>') +
       '<p class="strans" id="sTrans">' + transTxt() + '</p>';
     if ((S.esp || 0) >= TRANS_MAX && !car) h += '<div class="schk"><span class="schq">¿Probamos otra máquina o pasamos al siguiente?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-pr2="ocup">Otra máquina</button>' + (ult ? '' : '<button class="btn ghost sm" data-pr2="desp">Hacerlo después</button>') + '</div></div>';
     if (!car) h += '<div class="grid2 sprepb"><button class="btn ghost sm" data-pr2="ocup">Está ocupada</button>' + (ult ? '' : '<button class="btn ghost sm" data-pr2="desp">Hacer después</button>') + '</div>';
@@ -1247,4 +1256,178 @@
     const tot = (S.tEj || 0) + (S.tDesc || 0) + (S.tTrans || 0); if (tot < 60) return '';
     const m = x => Math.round(x / 60);
     return '<p class="ctiempos">' + m(tot) + ' min: ' + m(S.tEj) + ' entrenando, ' + m(S.tDesc) + ' descansando, ' + m(S.tTrans) + ' entre ejercicios.</p>';
+  }
+//#bloque 308
+  // ===== T15 · Hoy, la herramienta de la sala (docs/tickets/T15-hoy-la-herramienta-de-la-sala.md) =====
+  // Una fuente (salaPlan + VARIANTES + CAMBIOS + HOY_AJ), dos formas: la lista de Hoy y el motor. Edición por experiencia; pedidos al profe.
+  var HOY_AJ = {}, CAMBIOS = [], PEDIDOS = [], HPAN = null, PED_T = 20000;
+  window.vivaDbg = function (src) { return eval(src); };  // solo para tools/probar*.py: evalúa dentro del ámbito de la app (no es un control de demo)
+  var CHEV = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--muted)"><path d="M6 9l6 6 6-6"/></svg>';
+  function esSes(){ return MOM === 'sesion' && !!SALA && !SALA.cerrada; }
+  const kBase = k => lib[k] ? k : lib[String(k).replace(/H$/, '')] ? String(k).replace(/H$/, '') : null;
+  function fueDeLib(k){ const st = lib[k].sets[0], kg = parseFloat(String(st[1]).replace(',', '.')); return { k:k, n:lib[k].n, maq:'generic', zona:'Zona musculación', sr:lib[k].sets.length, rep:parseInt(String(st[2]), 10) || 12, kg:isNaN(kg) ? null : kg, prev:null, seg:esTiempo(k), alt:(ALT_G[k] || []).map(n => ({ n:n, zona:'Zona musculación', kg:null, maq:'generic' })) }; }
+  function varOverlay(P, dk){
+    const VD = (typeof VARIANTES !== 'undefined' && VARIANTES[dk]) || {};
+    P.fue.forEach(f => { const v = VD[f.k]; if (v) Object.assign(f, JSON.parse(JSON.stringify(v))); if (f.gt === 'circuito' && f.vueltas) f.sr = f.vueltas; if (f.kgs) f.kg = f.kgs[0]; });
+    if (!P.car.int) P.car.int = CARDIO_DEMO.int;
+  }
+  function cambiosYajustes(P, dk){
+    (CAMBIOS || []).filter(c => c.dia === dk).forEach(c => { const a = c.ap;
+      if (a.agregar) { if (!P.fue.some(f => f.k === a.agregar)) P.fue.push(fueDeLib(a.agregar)); return; }
+      const i = P.fue.findIndex(f => f.k === c.k); if (i < 0) return; const f = P.fue[i];
+      if (a.quitar) { P.fue.splice(i, 1); return; }
+      if (a.sr) { f.sr = a.sr; if (f.kgs) f.kgs = Array.from({ length:a.sr }, (_, x) => f.kgs[Math.min(x, f.kgs.length - 1)]); if (f.repsS) f.repsS = Array.from({ length:a.sr }, (_, x) => f.repsS[Math.min(x, f.repsS.length - 1)]); }
+      if (a.desc != null) { if (f.grp) f.descG = a.desc; else f.desc = a.desc; }
+      if (a.swap) Object.assign(f, a.swap, { cambiado:f.n, prev:null, alt:[], k:f.k + 'S' }); });
+    P.fue.forEach(f => { const a = (HOY_AJ || {})[f.k]; if (!a) return;
+      if (a.kgs && f.kg != null) { f.kgs = a.kgs.slice(0, f.sr); f.kg = f.kgs[0]; f.aj = true; f.lim = false; }
+      if (a.reps) f.repsS = a.reps.slice(0, f.sr); });
+  }
+  function fNuevo(f){ const n = f.sr, at = (A, x) => A[Math.min(x, A.length - 1)];
+    return { sets:Array(n).fill(false), done:false, salteado:false, kg:f.kg, kgs:f.kgs ? Array.from({ length:n }, (_, x) => at(f.kgs, x)) : null, reps:f.repsS ? Array.from({ length:n }, (_, x) => at(f.repsS, x)) : Array(n).fill(f.rep), swap:null }; }
+  function kgsShift(F, d){ F.kg = Math.max(0, F.kg + d); if (F.kgs) F.kgs = F.kgs.map(x => Math.max(0, x + d)); }
+  // ---- la carga y la variante, dichas en una línea (motor, Hoy y Rutinas) ----
+  function cargaTxt(f, F){
+    const u = f.seg ? ' s' : '', kg = F.kg, kgs = F.kgs, reps = F.reps, K = x => '<b>' + fmtKg(x) + '</b>';
+    if (f.esq === 'asc' || f.esq === 'desc') return kgs.map(fmtKg).join(' → ') + ' kg · ' + reps.join('/') + ' reps';
+    if (f.esq === 'drop') return f.sr + ' × ' + reps[0] + ' · ' + K(kg) + ' kg · última: ' + [kg].concat(f.drop).map(fmtKg).join(' → ');
+    const r = f.obj === 'rango' ? f.rango[0] + '–' + f.rango[1] : f.obj === 'amrap' && !f.amrapUlt ? 'las que salgan' : reps[0] + u;
+    let h = (f.gt === 'circuito' ? f.sr + ' vueltas × ' : f.sr + ' × ') + r + (f.obj === 'amrap' && f.amrapUlt ? ', la última las que salgan' : '') + (f.obj === 'rir' ? ' · hasta RIR ' + f.rir : '');
+    if (kg != null && kg > 0) h += ' · ' + (kgs && kgs.some(x => x !== kg) ? kgs.map(fmtKg).join(' / ') : K(kg)) + ' kg';
+    return h;
+  }
+  function serieLbl(f, F, j){ const ult = j === F.reps.length - 1; let s = (f.gt === 'circuito' ? 'Vuelta ' : 'Serie ') + (j + 1);
+    if (f.obj === 'rango') s += ' · ' + f.rango.join('–'); if (f.obj === 'amrap' && (!f.amrapUlt || ult)) s += ' · las que salgan'; if (f.obj === 'rir') s += ' · RIR ' + f.rir;
+    if (f.esq === 'drop' && ult) s += ' · drop ' + f.drop.map(fmtKg).join(' → '); if (f.esq === 'restpause' && ult) s += ' · rest-pause 15 s'; if (f.esq === 'cluster') s += ' · cluster, 20 s entre bloques'; return s; }
+  function cardioInt(C){ const i = C.int || 'habla'; return i === 'habla' ? 'Intensidad: podés hablar, pero no cantar.' : 'Velocidad ' + fmtKg(i.vel) + ' · inclinación ' + i.inc + ' %.'; }
+  function grupoDe(i){ const S = SALA, f = S.P.fue[i]; if (!f || !f.grp) return null; return S.P.fue.map((x, k) => x.grp === f.grp ? k : -1).filter(k => k >= 0 && !S.F[k].salteado); }
+  function varHtml(f, fi){
+    const S = SALA; if (f.grp) { const g = grupoDe(fi) || [fi], otros = g.filter(x => x !== fi).map(x => fx(x).n.toLowerCase());
+      return '<p class="shint">' + GT_N[f.gt] + (otros.length ? ' con ' + otros.join(' y ') : '') + ': sin descanso entre ellos, ' + (f.descG || 90) + ' s al terminar' + (f.gt === 'circuito' ? ' la vuelta' : '') + '.</p>'; }
+    if (f.esq === 'asc' || f.esq === 'desc') return '<p class="shint">' + ESQ_N[f.esq] + ': cada serie ' + (f.esq === 'asc' ? 'más peso y menos reps' : 'menos peso y más reps') + '. Descanso normal entre series.</p>';
+    if (f.esq === 'drop') return '<p class="shint">Última serie drop: ' + [S.F[fi].kg].concat(f.drop).map(fmtKg).join(' → ') + ' kg sin descansar.</p>';
+    if (f.obj === 'amrap') return '<p class="shint">' + (f.amrapUlt ? 'La última serie' : 'Cada serie') + ', las que salgan: anotá las reps en la planilla.</p>';
+    if (f.obj === 'rir') return '<p class="shint">Pará cuando te queden ' + f.rir + ' repeticiones.</p>';
+    return '';
+  }
+  // ---- series con grupos: superserie y circuito alternan sin descanso; descanso del grupo al terminar el último ----
+  function descansar(seg){ const S = SALA; clearInterval(restT); if (!seg) { volverAlGrupo(); return; } S.rest = seg;
+    restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) { vozFinDescanso(); volverAlGrupo(); } if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); }
+  function volverAlGrupo(){ const S = SALA; if (S && S.volver != null) { S.step = S.volver; S.volver = null; S.pan = null; } }
+  function marcarSerie(j){
+    const S = SALA, i = curF(), F = S.F[i], f = fx(i);
+    F.sets[j] = !F.sets[j]; if (!F.sets[j]) return renderSala();
+    if (!F.sets.includes(false)) F.done = true;
+    const g = grupoDe(i);
+    if (g && g.length > 1) { const pos = g.indexOf(i);
+      if (pos < g.length - 1) { const nx = g[pos + 1]; S.F[nx].go = true; S.step = steps().indexOf('f' + nx); S.rest = 0; S.pan = null; toast('Sin descanso: ' + fx(nx).n.toLowerCase()); return renderSala(); }
+      const first = g.find(x => S.F[x].sets.includes(false));
+      if (first != null) { S.volver = steps().indexOf('f' + first); descansar(f.descG || 90); }
+      else { S.rest = 0; }
+      return renderSala(); }
+    if (F.sets.includes(false)) descansar(f.desc != null ? f.desc : 90);
+    renderSala();
+  }
+  function restSig(S, F, f, fi){
+    if (S.volver != null) { const v = +steps()[S.volver].slice(1), Fv = S.F[v]; return 'Siguiente: ' + fx(v).n.toLowerCase() + ' · ' + (f.gt === 'circuito' ? 'vuelta ' : 'serie ') + (Fv.sets.indexOf(false) + 1); }
+    return F.sets.indexOf(false) >= 0 ? 'Siguiente: serie ' + (F.sets.indexOf(false) + 1) + ' de ' + f.sr : 'Siguiente: ' + (fi + 1 < S.F.length ? fx(fi + 1).n : 'el cardio');
+  }
+  // ---- miniatura de evolución por ejercicio, según experiencia ----
+  function miniEvo(k){
+    const h = k && hist[k] ? hist[k].filter(x => x[0] !== hoyLbl).slice(-6) : [];
+    if (!h.length) return '<span class="hmini vac" aria-label="Sin registros"><svg viewBox="0 0 60 22" aria-hidden="true"><path d="M2 17h56" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3" fill="none"/></svg><i>sin registros</i></span>';
+    if (exArr()) return '<span class="hmini"><b class="hmx">×' + h.length + '</b><i>veces</i></span>';
+    const L = lib[k], rp = L ? parseInt(String(L.sets[0][2]), 10) || 10 : 10, rm = EXP === 'avanzado' && !esTiempo(k);
+    const vals = rm ? h.map(x => Math.round(x[1] * (1 + rp / 30))) : h.map(x => x[1]), mn = Math.min(...vals), mx = Math.max(...vals), sp = mx - mn || 1;
+    const pts = vals.map((v, i) => [2 + i * 56 / Math.max(1, vals.length - 1), 19 - (v - mn) / sp * 15]), la = pts[pts.length - 1];
+    return '<span class="hmini" aria-label="' + (rm ? '1RM estimado' : 'Mejor serie') + ': ' + vals.join(', ') + '"><svg viewBox="0 0 60 22" aria-hidden="true"><polyline points="' + pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') + '" fill="none" stroke="var(--lime)" stroke-width="1.8" stroke-linejoin="round"/><circle cx="' + la[0].toFixed(1) + '" cy="' + la[1].toFixed(1) + '" r="2.2" fill="var(--lime)"/></svg><i>' + (rm ? '1RM ~' + vals[vals.length - 1] + ' kg' : 'mejor ' + fmtKg(vals[vals.length - 1]) + (esTiempo(k) ? ' s' : ' kg')) + '</i></span>';
+  }
+  function sinRegistros(P){ return EXP === 'arranco' || P.fue.some(f => { const k = kBase(f.k); return !k || !hist[k] || !hist[k].length; }); }
+  function zonaBloq(f){ if (!CUIDA) return false; const L = lib[kBase(f.k)]; if (!L) return false;
+    const Z = { Hombro:['hombros', 'pecho', 'dorsales', 'trapecio'], Codo:['biceps', 'triceps', 'antebrazo'], 'Muñeca':['antebrazo', 'biceps'], Espalda:['dorsales', 'trapecio', 'abdomen'], Cadera:['gluteos', 'isquios', 'cuads'], Rodilla:['cuads', 'gluteos', 'isquios'], Tobillo:['cuads'] }[CUIDA] || [];
+    return L.mus.some(m => Z.includes(m)); }
+  // ---- Tu rutina hoy: la lista, cada ejercicio con su ficha ----
+  function hoyLista(PP){
+    const ses = esSes(), seen = {};
+    return PP.fue.map((f, i) => {
+      const F = ses ? SALA.F[i] : fNuevo(f), op = HR === i, kb = f.cambiado || (ses && F.swap) ? null : kBase(f.k), L = kBase(f.k) ? lib[kBase(f.k)] : null; let g = '';
+      if (f.grp && !seen[f.grp]) { seen[f.grp] = 1; const n = PP.fue.filter(x => x.grp === f.grp).length; g = '<div class="hgrp">' + (GT_N[f.gt] || 'Grupo') + (f.gt === 'circuito' ? ' · ' + f.vueltas + ' vueltas' : ' · ' + n + ' seguidos') + ' · sin descanso entre ellos</div>'; }
+      const done = ses && (F.done || F.salteado), hechas = ses ? F.sets.filter(Boolean).length : 0, vt = varTxt(f);
+      return g + '<div class="hrep' + (done ? ' done' : '') + '"><button class="hrb" data-hr="' + i + '" aria-expanded="' + op + '"><span class="hrn"><b>' + f.n + '</b><small>' + cargaTxt(f, F).replace(/<\/?b>/g, '') + (ses && hechas ? ' · ' + hechas + '/' + f.sr + ' ✓' : '') + (F.salteado ? ' · salteado' : '') + '</small>' + (vt ? '<span class="vpill">' + vt + '</span>' : '') + '</span>' + miniEvo(kb) + CHEV + '</button>' + (op ? hrDet(f, F, i, L, ses) : '') + '</div>';
+    }).join('');
+  }
+  function hrDet(f, F, i, L, ses){
+    const av = EXP === 'avanzado' && !esMenor(), men = esMenor(), bloq = zonaBloq(f), t = f.tempo || TEMPO_DEF, dsc = f.grp ? (f.descG || 90) + ' s al terminar el grupo' : (f.desc != null ? f.desc : 90) + ' s';
+    let h = '<div class="hrd">';
+    h += '<p class="hpl"><b>' + (actual === 'profe' ? 'Lucas' : 'La rutina') + ':</b> ' + f.sr + (f.gt === 'circuito' ? ' vueltas' : ' series') + ' · descanso ' + dsc + ' · ' + tempoTxt(t).toLowerCase() + (f.fallo && !exArr() ? ' · al fallo' : '') + '</p>';
+    if (f.ctl || (L && L.tip)) h += '<p class="hpl">' + (f.ctl || L.tip) + '</p>';
+    if (f.nota) h += '<p class="hnota2">' + f.nota + '</p>';
+    if (f.prog && !exArr()) h += '<p class="hpl">Progresión: ' + f.prog + '</p>';
+    if (f.kg != null && f.kg > 0) h += '<p class="hpl">' + (f.prev ? 'La vez pasada ' + fmtKg(f.prev) + ' kg · ' : '') + 'hoy ' + fmtKg(F.kg) + ' kg' + (f.prev && F.kg > f.prev && !f.aj ? ' · Regla de Lucas: +2,5' : f.aj ? ' · lo cambiaste vos' : f.lim ? ' · fue al límite: se repite' : '') + '</p>';
+    if (bloq) h += '<p class="hlock">Hoy cuidamos ' + zonaTxt(CUIDA) + ': este ejercicio no se toca.</p>';
+    h += F.reps.map((r, j) => { const kg = F.kgs ? F.kgs[j] : F.kg, ed = !bloq && !F.done;
+      return '<div class="hprow"><span>' + serieLbl(f, F, j) + '</span>' +
+        (kg != null && kg > 0 ? (ed ? '<span class="sadj"><button class="opt" data-hk="' + i + ':' + j + ':-2.5" aria-label="Bajar 2,5 kg">−</button><b>' + fmtKg(kg) + ' kg</b><button class="opt" data-hk="' + i + ':' + j + ':2.5" aria-label="Subir 2,5 kg">+</button></span>' : '<b>' + fmtKg(kg) + ' kg</b>') : '<span class="hpl">peso corporal</span>') +
+        (ed && !men ? '<span class="sadj"><button class="opt" data-hrp="' + i + ':' + j + ':-1" aria-label="Menos">−</button><b>' + r + (f.seg ? ' s' : '') + '</b><button class="opt" data-hrp="' + i + ':' + j + ':1" aria-label="Más">+</button></span>' : '<b>' + r + (f.seg ? ' s' : '') + '</b>') +
+        (ses ? '<button class="spchk' + (F.sets[j] ? ' on' : '') + '" data-hset="' + i + ':' + j + '" aria-pressed="' + F.sets[j] + '" aria-label="Serie ' + (j + 1) + (F.sets[j] ? ', hecha' : '') + '">✓</button>' : '<span class="spgap"></span>') + '</div>'; }).join('');
+    if (av && !bloq && !ses) h += '<div class="hprow"><span>Series · descanso</span><span class="sadj"><button class="opt" data-hsr="' + i + ':-1" aria-label="Una serie menos">−</button><b>' + f.sr + '</b><button class="opt" data-hsr="' + i + ':1" aria-label="Una serie más">+</button></span><span class="sadj"><button class="opt" data-hds="' + i + ':-15" aria-label="Menos descanso">−</button><b>' + (f.grp ? (f.descG || 90) : (f.desc != null ? f.desc : 90)) + ' s</b><button class="opt" data-hds="' + i + ':15" aria-label="Más descanso">+</button></span><span class="spgap"></span></div>';
+    h += '<div class="hacc2"><button class="sacb' + (exArr() && !HPAN ? ' pri' : '') + '" data-hpan="como" aria-expanded="' + (HPAN === 'como') + '">Cómo se hace</button><button class="sacb" data-hpan="mus" aria-expanded="' + (HPAN === 'mus') + '">Músculos</button></div>';
+    if (HPAN === 'como') h += '<div class="span"><span class="spt">Qué mirar</span><ul class="smira">' + (f.mirar || (L ? [L.tip] : ['Tu profe te lo muestra en la sala.'])).map(x => '<li>' + x + '</li>').join('') + '</ul>' + (men ? '<p class="shint">Tu profe te lo muestra en la sala.</p>' : '') + '<div class="svid"><span class="sfoto">Video de tu profe · muestra</span><svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 8v8l6-4z" fill="currentColor"/></svg><span class="small">' + f.n + ' · 20 s, guardado en el teléfono</span></div></div>';
+    if (HPAN === 'mus') h += '<div class="span">' + (L ? '<div class="smus"><svg class="bmap" viewBox="0 0 160 150" role="img" aria-label="Músculos que trabaja" data-mini="1" data-hoy="' + L.mus.join(',') + '" data-rec="' + L.sec.join(',') + '">' + bmapSvg(L.mus, L.sec, []) + '</svg><div class="stack" style="gap:6px"><span><b>Principal:</b> ' + L.mus.map(k => musName[k]).join(' · ') + '</span>' + (L.sec.length ? '<span class="muted">También: ' + L.sec.map(k => musName[k]).join(' · ') + '</span>' : '') + '<button class="link lime hcver" data-vercuerpo="ficha" data-tipo="mus" data-titulo="' + f.n + '" data-hoy="' + L.mus.join(',') + '" data-rec="' + L.sec.join(',') + '">Ver</button></div></div>' : '<p class="shint">Tu profe te muestra qué trabaja.</p>') + '</div>';
+    if (f.alt && f.alt.length) h += '<p class="hpl">Si está ocupada, Lucas eligió: ' + f.alt.map(a => a.n).join(' · ') + '</p>';
+    h += '<div class="grid2" style="gap:8px">' + (!ses ? '<button class="btn sm" data-hstart="' + i + '">Empezar acá</button>' : '') + (av ? (bloq || ses ? '' : '<button class="btn ghost sm" data-hquitar="' + i + '">Sacar de hoy</button>') : (actual === 'profe' ? '<button class="btn ghost sm" data-hpide="' + i + '">Pedirle a Lucas</button>' : '')) + '</div>';
+    h += '<span class="hpl">' + (av ? 'Series, descansos y ejercicios los cambiás vos; queda en Rutinas con fecha, como cambiado por vos.' : men ? 'Hoy ajustás solo la carga. Lo demás, con tu profe en la sala.' : 'Carga y reps de hoy las ajustás vos. Series, ejercicios y descansos los define Lucas: pedíselo y queda pendiente acá.') + '</span>';
+    return h + '</div>';
+  }
+  function planHoy(){ return esSes() ? SALA.P : salaPlan(); }
+  function ajusteDia(f, F){ const a = HOY_AJ[f.k] || (HOY_AJ[f.k] = {}); if (!a.kgs) a.kgs = F.kgs ? F.kgs.slice() : Array(f.sr).fill(F.kg); if (!a.reps) a.reps = F.reps.slice(); return a; }
+  function cambio(dk, k, n, txt, ap, autor){ CAMBIOS.push({ fecha:hoyLbl, dia:dk, k:k, n:n, txt:txt, ap:ap, autor:autor || 'vos' }); }
+  function hoyClick(e){
+    const r = e.target.closest('[data-hr]'); if (r) { HR = HR === +r.dataset.hr ? -1 : +r.dataset.hr; HPAN = null; renderEntHoy(); return true; }
+    const pn = e.target.closest('[data-hpan]'); if (pn) { HPAN = HPAN === pn.dataset.hpan ? null : pn.dataset.hpan; renderEntHoy(); return true; }
+    const dd = e.target.closest('[data-hdia]'); if (dd) { const R = rutinas[actual]; R.next = +dd.dataset.hdia; HR = -1; renderEntHoy(); renderToday(); renderRoutines(); toast('Hoy hacés el Día ' + R.dias[R.next].k + ' · ' + R.dias[R.next].n.toLowerCase()); return true; }
+    const st = e.target.closest('[data-hstart]'); if (st) { const i = +st.dataset.hstart; salaStart(); if (SALA) { SALA.step = Math.max(0, steps().indexOf('f' + i)); SALA.saludo = false; renderSala(); } return true; }
+    const P = planHoy(), ses = esSes(), dk = rutinas[actual].dias[rutinas[actual].next].k;
+    const hk = e.target.closest('[data-hk]'); if (hk) { const [i, j, d] = hk.dataset.hk.split(':').map(Number), f = P.fue[i]; if (ses) { const F = SALA.F[i]; if (!F.kgs) F.kgs = Array(f.sr).fill(F.kg); F.kgs[j] = Math.max(0, F.kgs[j] + d); F.kg = F.kgs[0]; } else { const a = ajusteDia(f, fNuevo(f)); a.kgs[j] = Math.max(0, a.kgs[j] + d); } renderEntHoy(); return true; }
+    const hr = e.target.closest('[data-hrp]'); if (hr) { const [i, j, d] = hr.dataset.hrp.split(':').map(Number), f = P.fue[i], paso = f.seg ? 5 : 1; if (ses) { const F = SALA.F[i]; F.reps[j] = Math.max(1, F.reps[j] + d * paso); } else { const a = ajusteDia(f, fNuevo(f)); a.reps[j] = Math.max(1, a.reps[j] + d * paso); } renderEntHoy(); return true; }
+    const hs = e.target.closest('[data-hset]'); if (hs && ses) { const [i, j] = hs.dataset.hset.split(':').map(Number), F = SALA.F[i]; F.sets[j] = !F.sets[j]; F.go = true; if (!F.sets.includes(false)) F.done = true; else F.done = false; WK.reg = true; renderEntHoy(); return true; }
+    const sr = e.target.closest('[data-hsr]'); if (sr) { const [i, d] = sr.dataset.hsr.split(':').map(Number), f = P.fue[i], n = Math.min(6, Math.max(1, f.sr + d)); if (n !== f.sr) cambio(dk, f.k, f.n, 'Series: ' + f.sr + ' → ' + n, { sr:n }); renderEntHoy(); return true; }
+    const ds = e.target.closest('[data-hds]'); if (ds) { const [i, d] = ds.dataset.hds.split(':').map(Number), f = P.fue[i], cur = f.grp ? (f.descG || 90) : (f.desc != null ? f.desc : 90), n = Math.min(300, Math.max(30, cur + d)); if (n !== cur) cambio(dk, f.k, f.n, 'Descanso: ' + cur + ' → ' + n + ' s', { desc:n }); renderEntHoy(); return true; }
+    const q = e.target.closest('[data-hquitar]'); if (q) { const f = P.fue[+q.dataset.hquitar]; cambio(dk, f.k, f.n, 'Sacaste ' + f.n.toLowerCase(), { quitar:true }); HR = -1; renderEntHoy(); toast('Fuera de hoy. Queda en Rutinas, cambiado por vos'); return true; }
+    if (e.target.closest('[data-hadd]')) { const en = P.fue.map(f => kBase(f.k)), libres = Object.keys(lib).filter(k => !en.includes(k));
+      $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Agregar un ejercicio</span><span class="small muted">De la biblioteca de Viva. Queda en tu rutina de hoy, cambiado por vos.</span>' + (libres.length ? libres.map(k => '<button class="scmb" data-hlib="' + k + '"><b>' + lib[k].n + '</b><span>' + lib[k].grupo + '</span></button>').join('') : '<span class="muted">Ya están todos los de la biblioteca de la demo.</span>'); $('#salaSheet').hidden = false; return true; }
+    const pd = e.target.closest('[data-hpide]'); if (pd) { const i = +pd.dataset.hpide, f = P.fue[i];
+      $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Pedirle a Lucas</span><span class="small muted">' + f.n + '. Lucas lo ve en su tablero y te responde; mientras, seguís con lo que está.</span>' + [['mas', 'Una serie más'], ['menos', 'Una serie menos'], ['cambiar', 'Cambiarlo por otro ejercicio'], ['desc', 'Más descanso'], ['otra', 'Otra cosa: se lo cuento en la sala']].map(o => '<button class="scmb" data-hped="' + i + ':' + o[0] + '"><b>' + o[1] + '</b></button>').join(''); $('#salaSheet').hidden = false; return true; }
+    return false;
+  }
+  $('#salaSheet').addEventListener('click', e => {
+    const lb = e.target.closest('[data-hlib]'); if (lb) { const dk = rutinas[actual].dias[rutinas[actual].next].k, k = lb.dataset.hlib; cambio(dk, k, lib[k].n, 'Agregaste ' + lib[k].n.toLowerCase(), { agregar:k }); $('#salaSheet').hidden = true; renderEntHoy(); toast('Agregado a hoy. Queda en Rutinas, cambiado por vos'); return; }
+    const pd = e.target.closest('[data-hped]'); if (pd) { const [i, tipo] = pd.dataset.hped.split(':'), P = planHoy(), f = P.fue[+i], dk = rutinas[actual].dias[rutinas[actual].next].k;
+      const txt = { mas:'una serie más en ' + f.n.toLowerCase(), menos:'una serie menos en ' + f.n.toLowerCase(), cambiar:'cambiar ' + f.n.toLowerCase(), desc:'más descanso en ' + f.n.toLowerCase(), otra:'hablar de ' + f.n.toLowerCase() + ' en la sala' }[tipo];
+      const p = { id:Date.now(), k:f.k, n:f.n, dia:dk, tipo:tipo, txt:txt, fecha:hoyLbl, estado:'pendiente' }; PEDIDOS.push(p);
+      $('#salaSheet').hidden = true; renderEntHoy(); renderRoutines(); toast('Le pedimos a Lucas. Te avisamos cuando responda');
+      setTimeout(() => pedidoResp(p.id), PED_T); return; }
+  });
+  // En la demo, Lucas responde solo a los 20 s (marcado como respuesta simulada). En producción: su tablero (E6).
+  function pedidoResp(id){
+    const p = PEDIDOS.find(x => x.id === id); if (!p || p.estado !== 'pendiente') return;
+    const P = salaPlan(), f = P.fue.find(x => x.k === p.k) || {}, sr = f.sr || 3, alt = f.alt && f.alt[0];
+    p.estado = 'respondido';
+    if (p.tipo === 'mas') { p.resp = 'Dale: desde hoy ' + (sr + 1) + ' series.'; cambio(p.dia, p.k, p.n, 'Series: ' + sr + ' → ' + (sr + 1), { sr:sr + 1 }, 'Prof. Lucas'); }
+    else if (p.tipo === 'menos') { p.resp = 'Dale: desde hoy ' + Math.max(1, sr - 1) + ' series.'; cambio(p.dia, p.k, p.n, 'Series: ' + sr + ' → ' + Math.max(1, sr - 1), { sr:Math.max(1, sr - 1) }, 'Prof. Lucas'); }
+    else if (p.tipo === 'cambiar' && alt) { p.resp = 'Dale: te lo cambié por ' + alt.n.toLowerCase() + '.'; cambio(p.dia, p.k, p.n, 'Cambiado por ' + alt.n.toLowerCase(), { swap:alt }, 'Prof. Lucas'); }
+    else if (p.tipo === 'desc') { const cur = f.grp ? (f.descG || 90) : (f.desc != null ? f.desc : 90); p.resp = 'Dale: ' + (cur + 30) + ' s de descanso.'; cambio(p.dia, p.k, p.n, 'Descanso: ' + cur + ' → ' + (cur + 30) + ' s', { desc:cur + 30 }, 'Prof. Lucas'); }
+    else p.resp = 'Lo vemos en la sala.';
+    if (!esSes()) { renderEntHoy(); renderRoutines(); }
+    toast('Lucas respondió tu pedido · respuesta simulada');
+  }
+  function pendHtml(){
+    const L = (PEDIDOS || []).slice(-4).reverse(); if (!L.length) return '';
+    return '<div class="hpend">' + L.map(p => p.estado === 'pendiente' ? '<span><b>Pedido a Lucas:</b> ' + p.txt + ' · pendiente</span>' : '<span><b>Lucas:</b> ' + p.resp + ' <em>(respuesta simulada en la demo)</em></span>').join('') + '</div>';
+  }
+  function renderCambios(){
+    const el = $('#cambiosCard'); if (!el) return; const C = (CAMBIOS || []), Pd = (PEDIDOS || []);
+    el.hidden = !C.length && !Pd.length; if (el.hidden) return;
+    $('#cambiosList').innerHTML = Pd.slice().reverse().map(p => '<div class="hped"><span><b>Pedido:</b> ' + p.txt + '</span><span class="small">' + p.fecha + ' · Día ' + p.dia + ' · ' + (p.estado === 'pendiente' ? 'pendiente, Lucas responde en 24 h' : 'Lucas: ' + p.resp + ' (respuesta simulada)') + '</span></div>').join('') +
+      C.slice().reverse().map(c => '<div class="hped"><span><b>' + c.n + ':</b> ' + c.txt + '</span><span class="small">' + c.fecha + ' · Día ' + c.dia + ' · ' + (c.autor === 'vos' ? 'cambiado por vos' : 'cambiado por ' + c.autor) + '</span></div>').join('');
   }
