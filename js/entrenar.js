@@ -44,11 +44,11 @@
   $('#activarBtn').addEventListener('click', () => {
     const nueva = crearRutinaIA();
     if (modo === 'ppu') { rutinas.ppu = nueva; $('#iaResult').hidden = true; $('#iaForm').hidden = false; renderPpuTrain(); go('ppuTrain'); toast('Rutina activada'); return; }
-    rutinas.ia = nueva;
-    actual = 'ia';
+    nueva.valida = false; rutinas.ia = nueva;
     $('#iaResult').hidden = true; $('#iaForm').hidden = false;
     renderRoutines(); renderToday();
-    go('rutinas'); toast('Rutina activada y en curso · tu profe fue avisado');
+    go('rutinas'); toast('Se la mandamos a Lucas: la usás cuando la valide');
+    setTimeout(() => { if (rutinas.ia !== nueva) return; nueva.valida = true; renderRoutines(); toast('Lucas validó tu rutina · respuesta simulada'); }, PED_T);
   });
 
   // ===== Sesión de entrenamiento: carga de kg y repeticiones =====
@@ -512,7 +512,7 @@
     const zq = MOLESTIA && !esMenor();
     const q = zq ? '¿Cómo está ' + zonaTxt(MOLESTIA.zona) + ' hoy?' : '¿Cómo venís hoy?';
     const op = zq ? [['bien', 'Bien'], ['igual', 'Igual'], ['peor', 'Peor']] : [['todo', 'Con todo'], ['normal', 'Normal'], ['sinen', 'Sin energía'], ['cuidar', 'Con algo para cuidar']];
-    const h = '<div class="between' + (enSala || zq ? '' : ' chkcab') + '"><span class="schq">' + (enSala || zq ? q : '') + '</span><button class="link" data-ck="skip" style="min-height:36px;padding:0;font-size:13px">Saltear</button></div>' +
+    const h = '<div class="between' + (enSala || zq ? '' : ' chkcab') + '"><span class="schq">' + (enSala || zq ? q : '') + '</span><button class="link lime" data-ck="skip" style="min-height:44px;padding:0 4px;font-size:14px">Saltear</button></div>' +
       '<div class="opts ' + (zq ? 'g3' : 'g2') + ' chkopts">' + op.map(o => '<button class="opt" data-ck="' + o[0] + '">' + o[1] + '</button>').join('') + '</div>';
     return enSala ? '<div class="schk">' + h + '</div>' : h;
   }
@@ -687,21 +687,29 @@
       if (f.cambiado) h += '<p class="shint">Hoy en lugar de ' + f.cambiado.toLowerCase() + ', para cuidar tu hombro.</p>';
       h += exCue(f, fi);
       if (S.rest > 0) {
-        h += '<div class="srest" role="timer"><span class="srt">' + Math.floor(S.rest / 60) + ':' + String(S.rest % 60).padStart(2, '0') + '</span><span class="small muted">' + restSig(S, F, f, fi) + '</span><button class="link lime" id="sSkipRest">Saltear descanso</button></div>';
+        h += '<div class="srest" role="timer"><span class="srt">' + Math.floor(S.rest / 60) + ':' + String(S.rest % 60).padStart(2, '0') + '</span><span class="small muted">' + restSig(S, F, f, fi) + '</span><span class="sradj"><button class="opt" data-rst="-15" aria-label="15 segundos menos">−15 s</button><button class="link lime" id="sSkipRest">Saltar</button><button class="opt" data-rst="15" aria-label="15 segundos más">+15 s</button></span></div>';
       } else {
-        h += '<div class="sdots"><span class="small muted">Series</span>' + F.sets.map((x, j) => '<button class="sdot' + (x ? ' on' : '') + '" data-set="' + j + '" aria-label="Serie ' + (j + 1) + (x ? ', hecha' : '') + '">' + (j + 1) + '</button>').join('') + '<button class="link lime" id="sCambiar">Cambiar</button></div>';
+        h += '<div class="sdots"><span class="small muted">Series</span>' + F.sets.map((x, j) => '<button class="sdot' + (x ? ' on' : '') + '" data-set="' + j + '" aria-label="Serie ' + (j + 1) + (x ? ', hecha' : '') + '">' + (j + 1) + '</button>').join('') + '<button class="link lime" id="sCambiar">Cambiar</button></div>' +
+          '<div class="slt">' + (MANUAL && F.sets.includes(true) && F.sets.includes(false) ? '<button class="link lime" id="sDescGo">Descanso ' + descDe(f) + ' s</button>' : '<span></span>') + (F.sets.includes(false) ? '<button class="link" id="sListoTodo">Listo todo, como estaba</button>' : '') + '</div>';
       }
       h += exAcc(f, fi);
     }
     if (enPrep(st)) h = prepHtml(st);
     h = mtHtml(st) + h;
     $('#salaBody').innerHTML = h; exMount();
-    $('#salaListo').textContent = enPrep(st) ? (st === 'car' ? 'Empezar cardio' : 'Empezar ejercicio') : st === 'car' ? 'Listo · terminar' : 'Listo';
+    $('#salaListo').textContent = enPrep(st) ? (st === 'car' ? 'Empezar cardio' : 'Empezar ejercicio') : st === 'car' ? 'Listo · terminar' : st[0] === 'f' ? listoTxt(S) : 'Listo';
     mtFoot();
   }
-  function salaListo(){
+  function salaListo(todo){
     if (enPrep(steps()[SALA.step])) return prepEmpezar();
-    const S = SALA, st = steps()[S.step]; S.saludo = false; S.chk = false; S.rest = 0;
+    const S = SALA, st = steps()[S.step]; S.saludo = false; S.chk = false;
+    // T15 v74 · Listo es por serie: marca la siguiente y arranca el descanso del profe. Durante el descanso, Listo lo saltea. "Listo todo" registra el ejercicio entero.
+    if (st[0] === 'f' && todo !== true) {
+      if (S.rest > 0) { S.rest = 0; clearInterval(restT); volverAlGrupo(); return renderSala(); }
+      const F = S.F[curF()], jx = F.sets.indexOf(false), antes = S.step;
+      if (jx >= 0) { WK.reg = true; marcarSerie(jx); if (F.sets.includes(false) || S.step !== antes || S.rest > 0) return; }
+    }
+    S.rest = 0; clearInterval(restT); S.volver = null;
     WK.reg = true;
     if (st === 'act') { S.actDone = true; WK.act++; }
     else if (st === 'car') { S.carDone = true; WK.car += S.carMin; S.cronoOn = false; renderForma(); return salaCerrar(); }
@@ -709,7 +717,7 @@
     S.step = Math.min(steps().length - 1, S.step + 1);
     renderForma(); renderToday(); renderSala(); $('#salaBody').scrollTop = 0;
   }
-  $('#salaListo').addEventListener('click', salaListo);
+  $('#salaListo').addEventListener('click', () => salaListo());
   let restT = null, cronoT = null;
   $('#salaBody').addEventListener('click', e => {
     const S = SALA; if (!S) return;
@@ -996,7 +1004,7 @@
   function mtPos(st){ const S = SALA; $('#salaPos').textContent += S.pausa ? ' · en pausa' : !MANUAL && st !== 'car' ? ' · ≈ ' + Math.max(1, Math.round(mtDur(st) / 60)) + "'" : ''; }
   const ICO_PAU = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>', ICO_SEG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
   function mtFoot(){
-    const S = SALA; $('#salaMic').hidden = SIN_SENAL || esMenor();
+    const S = SALA; $('#salaMic').hidden = SIN_SENAL || esMenor() || !AURIC;
     const p = $('#salaPausa'); p.hidden = MANUAL; p.innerHTML = S && S.pausa ? ICO_SEG : ICO_PAU; p.setAttribute('aria-label', S && S.pausa ? 'Seguir la sesión' : 'Pausar la sesión'); p.setAttribute('aria-pressed', !!(S && S.pausa));
     acSync();
   }
@@ -1220,6 +1228,7 @@
       '<p class="strans" id="sTrans">' + transTxt() + '</p>';
     if ((S.esp || 0) >= TRANS_MAX && !car) h += '<div class="schk"><span class="schq">¿Probamos otra máquina o pasamos al siguiente?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-pr2="ocup">Otra máquina</button>' + (ult ? '' : '<button class="btn ghost sm" data-pr2="desp">Hacerlo después</button>') + '</div></div>';
     if (!car) h += '<div class="grid2 sprepb"><button class="btn ghost sm" data-pr2="ocup">Está ocupada</button>' + (ult ? '' : '<button class="btn ghost sm" data-pr2="desp">Hacer después</button>') + '</div>';
+    if (!car) { const L = lib[kBase(f.k)]; h += '<details class="sprepc"><summary>Cómo se hace</summary><ul class="smira">' + (f.mirar || (L ? [L.tip] : ['Tu profe te lo muestra en la sala.'])).map(x => '<li>' + x + '</li>').join('') + '</ul>' + (f.ctl ? '<p class="shint">' + f.ctl + '</p>' : '') + '</details>'; }
     return h;
   }
   function prepEmpezar(){
@@ -1312,7 +1321,7 @@
   }
   // ---- series con grupos: superserie y circuito alternan sin descanso; descanso del grupo al terminar el último ----
   function descansar(seg){ const S = SALA; clearInterval(restT); if (!seg) { volverAlGrupo(); return; } S.rest = seg;
-    restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) { vozFinDescanso(); volverAlGrupo(); } if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); }
+    restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) { vozFinDescanso(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (_) {} volverAlGrupo(); } if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); }
   function volverAlGrupo(){ const S = SALA; if (S && S.volver != null) { S.step = S.volver; S.volver = null; S.pan = null; } }
   function marcarSerie(j){
     const S = SALA, i = curF(), F = S.F[i], f = fx(i);
@@ -1322,10 +1331,10 @@
     if (g && g.length > 1) { const pos = g.indexOf(i);
       if (pos < g.length - 1) { const nx = g[pos + 1]; S.F[nx].go = true; S.step = steps().indexOf('f' + nx); S.rest = 0; S.pan = null; toast('Sin descanso: ' + fx(nx).n.toLowerCase()); return renderSala(); }
       const first = g.find(x => S.F[x].sets.includes(false));
-      if (first != null) { S.volver = steps().indexOf('f' + first); descansar(f.descG || 90); }
+      if (first != null) { S.volver = steps().indexOf('f' + first); if (MANUAL) { S.step = S.volver; S.volver = null; } else descansar(f.descG || 90); }
       else { S.rest = 0; }
       return renderSala(); }
-    if (F.sets.includes(false)) descansar(f.desc != null ? f.desc : 90);
+    if (F.sets.includes(false) && !MANUAL) descansar(descDe(f));
     renderSala();
   }
   function restSig(S, F, f, fi){
@@ -1336,7 +1345,7 @@
   function miniEvo(k){
     const h = k && hist[k] ? hist[k].filter(x => x[0] !== hoyLbl).slice(-6) : [];
     if (!h.length) return '<span class="hmini vac" aria-label="Sin registros"><svg viewBox="0 0 60 22" aria-hidden="true"><path d="M2 17h56" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3" fill="none"/></svg><i>sin registros</i></span>';
-    if (exArr()) return '<span class="hmini"><b class="hmx">×' + h.length + '</b><i>veces</i></span>';
+    if (exArr()) return '<span class="hmini" aria-label="Hoy es tu ' + (h.length + 1) + '.ª vez"><b class="hmx">' + (h.length + 1) + '.ª</b><i>vez hoy</i></span>';
     const L = lib[k], rp = L ? parseInt(String(L.sets[0][2]), 10) || 10 : 10, rm = EXP === 'avanzado' && !esTiempo(k);
     const vals = rm ? h.map(x => Math.round(x[1] * (1 + rp / 30))) : h.map(x => x[1]), mn = Math.min(...vals), mx = Math.max(...vals), sp = mx - mn || 1;
     const pts = vals.map((v, i) => [2 + i * 56 / Math.max(1, vals.length - 1), 19 - (v - mn) / sp * 15]), la = pts[pts.length - 1];
@@ -1431,3 +1440,15 @@
     $('#cambiosList').innerHTML = Pd.slice().reverse().map(p => '<div class="hped"><span><b>Pedido:</b> ' + p.txt + '</span><span class="small">' + p.fecha + ' · Día ' + p.dia + ' · ' + (p.estado === 'pendiente' ? 'pendiente, Lucas responde en 24 h' : 'Lucas: ' + p.resp + ' (respuesta simulada)') + '</span></div>').join('') +
       C.slice().reverse().map(c => '<div class="hped"><span><b>' + c.n + ':</b> ' + c.txt + '</span><span class="small">' + c.fecha + ' · Día ' + c.dia + ' · ' + (c.autor === 'vos' ? 'cambiado por vos' : 'cambiado por ' + c.autor) + '</span></div>').join('');
   }
+//#bloque 309
+  // ===== T15 v74 · descanso prescrito por serie (observaciones de Dirección 1 y 7) =====
+  var MULTI = ['sentadilla', 'press', 'pesomuerto', 'hipthrust'];
+  function descDe(f){ if (f.grp) return f.descG || 90; if (f.desc != null) return f.desc; return MULTI.includes(kBase(f.k)) ? 150 : 90; }
+  function listoTxt(S){ const i = curF(); if (i < 0) return 'Listo'; const F = S.F[i], f = fx(i), jx = F.sets.indexOf(false);
+    if (S.rest > 0) return 'Saltar descanso'; if (jx < 0) return 'Listo'; return 'Listo · ' + (f.gt === 'circuito' ? 'vuelta ' : 'serie ') + (jx + 1) + ' de ' + F.sets.length; }
+  $('#salaBody').addEventListener('click', e => {
+    if (!SALA) return;
+    const r = e.target.closest('[data-rst]'); if (r) { SALA.rest = Math.max(1, SALA.rest + +r.dataset.rst); renderSala(); return; }
+    if (e.target.closest('#sListoTodo')) { salaListo(true); toast('Anotado como estaba indicado'); return; }
+    if (e.target.closest('#sDescGo')) { descansar(descDe(fx(curF()))); renderSala(); }
+  });

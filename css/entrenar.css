@@ -297,3 +297,8 @@
 .hcue .hcuerpo{background:none;padding:0;gap:10px}.hcue .hcf{font-size:14.5px}
 .hcleg{display:flex;align-items:center;justify-content:space-between;gap:8px}.hcleg .hcver{min-height:36px}
 .hsep{height:1px;background:var(--line2);margin:4px 0 2px}
+
+/* T15 v74 · descanso por serie, Listo todo, Cómo se hace en Preparando */
+.sradj{display:flex;align-items:center;gap:14px;margin-top:4px}.sradj .opt{min-height:40px;padding:0 12px;font-size:14px}
+.slt{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:2px}.slt .link{min-height:44px;padding:0;font-size:14px}
+.sprepc{border-top:1px solid var(--line);padding-top:6px}.sprepc summary{min-height:44px;display:flex;align-items:center;font-weight:700;cursor:pointer;color:var(--lime)}.sprepc .smira{margin:4px 0 0}
