@@ -7,7 +7,7 @@
   $('.app').dataset.barras = 'eq';
   ['tono', 'trama', 'esq', 'barras'].forEach(k => $('#' + k + 'Pick').addEventListener('click', e => { const b = e.target.closest('[data-' + k + ']'); if (!b) return; $('.app').dataset[k] = b.dataset[k]; $$('#' + k + 'Pick [data-' + k + ']').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
   // Trama en las cajas: una capa de vectores detrás del contenido de cada caja (también en las que se dibujan después)
-  const TBOX = '.card,.tile,.promo,.choice,.gcard,.slide,.passcard,.list,.post,.pcard,.ben,.cup,.sede,.wk,.slot,.rest';
+  const TBOX = '.k-caja'; // T16: la lista vive en SISTEMA (comun.js, bloque 015)
   const esqOn = () => /^(cajas|ambos)$/.test($('.app').dataset.esq || '');
   function tramaCajas(){
     if (esqOn()) $$(TBOX).forEach(el => { if (el.querySelector(':scope > .ecj')) return;
@@ -225,7 +225,6 @@
     lockRen();
   });
   $('#verBloq').addEventListener('click', () => lockAbrir(false));
-  $('#verBloqRut').addEventListener('click', () => { if (!SALA) { if (MOM !== 'sala') setMom('sala', true); salaStart(); } lockAbrir(false); }); // T-R v76: la rutina vista desde la pantalla bloqueada
   $('#verOlvido').addEventListener('click', () => { if (!SALA) { if (MOM !== 'sala') setMom('sala', true); salaStart(); } lockAbrir(true); });
   $('#demoSheet').addEventListener('click', e => { // T13: los botones data-ac viven en Cuándo y Entrenar
     const b = e.target.closest('[data-ac]'); if (!b) return; const k = b.dataset.ac;
@@ -323,3 +322,13 @@
     d.addEventListener('toggle', () => { (dmMem.pleg = dmMem.pleg || {})[d.dataset.k] = d.open; dmSave(); }); });
   window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC }); // para pruebas y T6
   dmSync();
+
+//#bloque 985
+  // T16 · gancho de prueba para tools/barrido.py: abre pantallas que necesitan estado. Ninguna pantalla lo usa.
+  window.VK_PRUEBA = { abrir: function (id) {
+    if (id === 'sala') { if (!SALA) salaDemo(); renderSala(); go('sala'); return; }
+    if (id === 'cierre') { if (!SALA) salaDemo(); salaCerrar(); return; }
+    if (id === 'onbE') { OB.step = 'inv'; OB.obj = []; OB.zonaAbierta = false; OB.zona = null; OB.meta = 3; OB.res = {}; obRender(); go('onbE'); return; }
+    if (id === 'chat') { openChat(conv[0].id); return; }
+    go(id);
+  } };

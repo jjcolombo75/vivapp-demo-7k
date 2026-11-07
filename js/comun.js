@@ -8,6 +8,19 @@
   const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','plan'];
   let curScr = 'login', prevScr = 'login';
 
+//#bloque 015
+  // T16 · SISTEMA: quién es cada componente visual. Única lista; css/sistema.css estiliza solo las clases k-*.
+  // Markup nuevo: usá la clase k-* directamente. Para sacar algo de la lista, cambiá su markup, no esta lista.
+  var SISTEMA = {
+    'k-caja': '.card,.tile,.promo,.choice,.gcard,.slide,.passcard,.list,.post,.pcard,.ben,.cup,.sede,.wk,.slot,.rest,.smaq',
+    'k-btn': '.btn:not(.ghost):not(.light),.qrbtn,.passbar,.sendb,.dbtn,.salalisto',
+    'k-btn2': '.btn.ghost,.btn.light,.salamic,.qchip',
+    'k-elige': '.opt,.chk,.clap,.npsg button,.varopt,.tabs button,.seg button,.prvistas button,.day.sel'
+  };
+  function sistemaEstampar(){ Object.keys(SISTEMA).forEach(k => { $$(SISTEMA[k]).forEach(el => { if (!el.classList.contains(k)) el.classList.add(k); }); }); }
+  sistemaEstampar();
+  new MutationObserver(sistemaEstampar).observe(document.querySelector('.app'), { childList:true, subtree:true });
+
   function go(id){
     if (id !== curScr) { prevScr = curScr; curScr = id; }
     $$('.scr').forEach(s => s.hidden = s.id !== id);

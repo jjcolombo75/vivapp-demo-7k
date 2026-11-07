@@ -1,0 +1,39 @@
+/* ===== T16 · Sistema visual de Vivapp (v76) =====
+   Se carga último. Regla: las opciones de Apariencia del panel SOLO cambian variables en .app;
+   los componentes SOLO leen variables. Una pantalla nueva hereda el lenguaje usando las clases k-*.
+   Quién es cada componente: la lista está UNA vez, en js/comun.js (bloque 015, SISTEMA), que estampa
+   k-caja · k-btn · k-btn2 · k-elige en el markup existente. Markup nuevo: poné la clase directamente. */
+
+/* --- Variables: valores de la estética predeterminada (Tubos, elegida por el dueño el 26/10) --- */
+.app{
+  --caja-fondo:var(--panel); --caja-borde:var(--line);
+  /* botón primario */
+  --bp-fondo:transparent; --bp-texto:var(--txt); --bp-borde:2.5px solid var(--lime);
+  --bp-brillo:0 0 5px rgba(64,196,255,.75),0 0 16px rgba(64,196,255,.4),inset 0 0 8px rgba(64,196,255,.22);
+  /* botón secundario */
+  --bs-fondo:var(--panel); --bs-texto:var(--txt); --bs-borde:1.5px solid rgba(64,196,255,.5); --bs-brillo:none;
+  /* elegido (opción marcada, pestaña activa) */
+  --sel-fondo:var(--lime-bg); --sel-texto:var(--txt); --sel-borde:2px solid var(--lime); --sel-brillo:0 0 10px rgba(64,196,255,.4);
+}
+/* Botones: Rellenos = la forma plana original (cian lleno). Neón usa los tubos y suma el cartel en .neonbtn (marca.css). */
+.app[data-btn="rellenos"]{
+  --bp-fondo:var(--lime); --bp-texto:var(--ink); --bp-borde:0 solid transparent; --bp-brillo:none;
+  --bs-fondo:var(--panel); --bs-borde:1px solid var(--line2);
+  --sel-fondo:var(--lime-bg); --sel-texto:var(--txt); --sel-borde:1px solid var(--lime); --sel-brillo:none;
+}
+.app[data-mode="light"]{ --bp-brillo:none; --bp-texto:var(--txt); --sel-brillo:none }
+.app[data-mode="light"][data-btn="rellenos"]{ --bp-texto:var(--ink) }
+/* Contraste de las cajas: "tono" cambia la paleta (marca.css, ya es por variables); "filete" solo el borde */
+.app[data-tono="filete"]:not([data-mode="light"]),.app[data-tono="ambos"]:not([data-mode="light"]){ --caja-borde:rgba(170,190,220,.2) }
+.app[data-tono="filete"][data-mode="light"],.app[data-tono="ambos"][data-mode="light"]{ --caja-borde:rgba(18,22,29,.16) }
+
+/* --- Componentes --- */
+.app .k-caja{ border-color:var(--caja-borde) }
+.app .k-btn:not(.neonbtn){ background:var(--bp-fondo)!important; color:var(--bp-texto)!important; border:var(--bp-borde)!important; box-shadow:var(--bp-brillo)!important }
+.app .k-btn2{ background:var(--bs-fondo)!important; color:var(--bs-texto)!important; border:var(--bs-borde)!important; box-shadow:var(--bs-brillo)!important }
+.app .k-elige:is([aria-pressed="true"],[aria-selected="true"],.on,.sel){ background:var(--sel-fondo)!important; color:var(--sel-texto)!important; border:var(--sel-borde)!important; box-shadow:var(--sel-brillo)!important; outline:none }
+
+/* --- Excepciones explícitas (cultura-viva § 5, "cuando se entrena se entrena"; producto § 10) ---
+   En la sesión (sala, entrenando, cierre) y en Progreso no hay trama ni esquinas detrás del contenido,
+   aunque el panel las encienda en el resto. Colores de marca, rayo y componentes siguen el sistema. */
+.app:is([data-scr="sala"],[data-scr="entrenando"],[data-scr="cierre"],[data-scr="progreso"]) :is(.tramaFondo,.esqFondo,.tcj,.ecj){ display:none!important }
