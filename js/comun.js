@@ -15,6 +15,7 @@
     'k-caja': '.card,.tile,.promo,.choice,.gcard,.slide,.passcard,.list,.post,.pcard,.ben,.cup,.sede,.wk,.slot,.rest,.smaq',
     'k-btn': '.btn:not(.ghost):not(.light),.qrbtn,.passbar,.sendb,.dbtn,.salalisto',
     'k-btn2': '.btn.ghost,.btn.light,.salamic,.qchip',
+    'k-barra': '.bar,.occ,.ocb,.salaprog .sp,.msbar',
     'k-elige': '.opt,.chk,.clap,.npsg button,.varopt,.tabs button,.seg button,.prvistas button,.day.sel'
   };
   function sistemaEstampar(){ Object.keys(SISTEMA).forEach(k => { $$(SISTEMA[k]).forEach(el => { if (!el.classList.contains(k)) el.classList.add(k); }); }); }

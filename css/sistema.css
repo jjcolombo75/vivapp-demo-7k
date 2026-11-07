@@ -27,7 +27,15 @@
 .app[data-tono="filete"]:not([data-mode="light"]),.app[data-tono="ambos"]:not([data-mode="light"]){ --caja-borde:rgba(170,190,220,.2) }
 .app[data-tono="filete"][data-mode="light"],.app[data-tono="ambos"][data-mode="light"]{ --caja-borde:rgba(18,22,29,.16) }
 
+/* Botón de acción fijo (Empezar, accbtn): forma propia, mismos estados que el primario */
+.app{ --acc-fondo:rgba(7,176,242,.07); --acc-texto:var(--txt); --acc-brillo:0 0 0 1px rgba(64,196,255,.25),0 0 16px rgba(64,196,255,.5),inset 0 0 12px rgba(64,196,255,.22); --acc-sombra-texto:0 0 8px rgba(64,196,255,.55) }
+.app[data-btn="rellenos"],.app[data-mode="light"]{ --acc-fondo:var(--lime); --acc-texto:#04131a; --acc-brillo:none; --acc-sombra-texto:none }
+/* Barras de progreso: Lisas = la pista propia de cada barra; Ecualizador = pista con trama y relleno en segmentos */
+.app[data-barras="eq"]{ --barra-pista:rgba(0,0,0,.4) repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 6px,transparent 6px 8px); --barra-sombra:inset 0 0 0 1px rgba(255,255,255,.07); --barra-mascara:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px) }
+
 /* --- Componentes --- */
+.app[data-barras="eq"] .k-barra{ background:var(--barra-pista)!important; box-shadow:var(--barra-sombra)!important; overflow:hidden }
+.app[data-barras="eq"] .k-barra>i{ border-radius:0!important; -webkit-mask:var(--barra-mascara); mask:var(--barra-mascara) }
 .app .k-caja{ border-color:var(--caja-borde) }
 .app .k-btn:not(.neonbtn){ background:var(--bp-fondo)!important; color:var(--bp-texto)!important; border:var(--bp-borde)!important; box-shadow:var(--bp-brillo)!important }
 .app .k-btn2{ background:var(--bs-fondo)!important; color:var(--bs-texto)!important; border:var(--bs-borde)!important; box-shadow:var(--bs-brillo)!important }

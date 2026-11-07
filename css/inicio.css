@@ -31,8 +31,7 @@
 /* Botón fijo de la acción del momento: encendido pero quieto */
 .accbar{flex-shrink:0;padding:8px max(18px, env(safe-area-inset-left, 0px)) 10px}
 .accbtn{width:100%;min-height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;font:inherit;font-size:18px;font-weight:800;letter-spacing:.01em;cursor:pointer;background:transparent;color:var(--lime);border:1.5px solid color-mix(in srgb,var(--lime) 60%,transparent)}
-.accbtn.on{color:var(--txt);border:2px solid var(--lime);background:rgba(7,176,242,.07);box-shadow:0 0 0 1px rgba(64,196,255,.25),0 0 16px rgba(64,196,255,.5),inset 0 0 12px rgba(64,196,255,.22);text-shadow:0 0 8px rgba(64,196,255,.55)}
-.app[data-btn="rellenos"] .accbtn.on,.app[data-mode="light"] .accbtn.on{background:var(--lime);color:#04131a;border-color:var(--lime);box-shadow:none;text-shadow:none}
+.accbtn.on{color:var(--acc-texto);border:2px solid var(--lime);background:var(--acc-fondo);box-shadow:var(--acc-brillo);text-shadow:var(--acc-sombra-texto)} /* T16: valores por opción en css/sistema.css */
 .app[data-mode="light"] .accbtn:not(.on){color:#00748a;border-color:#00748a}
 /* Opción de demo: la acción en el centro de la barra (es Entrenar; en la sala, Empezar) */
 .nav .navacc{position:relative;margin-top:-30px;gap:3px;min-width:70px;color:var(--muted)}
@@ -154,9 +153,8 @@
 .tdp .tdl b{color:var(--txt);font-weight:600}
 #todayCard .hoyrow{margin-top:4px}
 /* Barras como ecualizador en toda la app: la barra es una ranura de LEDs y el avance enciende LEDs */
-.app[data-barras="eq"] .bar,.app[data-barras="eq"] .occ,.app[data-barras="eq"] .ocb{height:10px!important;border-radius:3px;background:rgba(0,0,0,.4) repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 6px,transparent 6px 8px)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)!important;overflow:hidden}
+.app[data-barras="eq"] .bar,.app[data-barras="eq"] .occ,.app[data-barras="eq"] .ocb{height:10px!important;border-radius:3px} /* T16: pista y máscara del ecualizador en css/sistema.css (.k-barra) */
 .app[data-barras="eq"] .occ.sm{height:8px!important}
-.app[data-barras="eq"] .bar>i,.app[data-barras="eq"] .occ>i,.app[data-barras="eq"] .ocb>i{border-radius:0!important;-webkit-mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px);mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px)}
 .app[data-barras="eq"] .tdp .tdb{background:color-mix(in srgb,var(--pc) 10%,rgba(0,0,0,.4)) repeating-linear-gradient(90deg,color-mix(in srgb,var(--pc) 22%,transparent) 0 6px,transparent 6px 8px)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 30%,transparent)!important}
 .app[data-barras="eq"] .segs i,.app[data-barras="eq"] .segs16 i{border-radius:1.5px}
 
