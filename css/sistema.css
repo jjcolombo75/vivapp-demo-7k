@@ -30,15 +30,39 @@
 /* Botón de acción fijo (Empezar, accbtn): forma propia, mismos estados que el primario */
 .app{ --acc-fondo:rgba(7,176,242,.07); --acc-texto:var(--txt); --acc-brillo:0 0 0 1px rgba(64,196,255,.25),0 0 16px rgba(64,196,255,.5),inset 0 0 12px rgba(64,196,255,.22); --acc-sombra-texto:0 0 8px rgba(64,196,255,.55) }
 .app[data-btn="rellenos"],.app[data-mode="light"]{ --acc-fondo:var(--lime); --acc-texto:#04131a; --acc-brillo:none; --acc-sombra-texto:none }
-/* Barras de progreso: Lisas = la pista propia de cada barra; Ecualizador = pista con trama y relleno en segmentos */
-.app[data-barras="eq"]{ --barra-pista:rgba(0,0,0,.4) repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 6px,transparent 6px 8px); --barra-sombra:inset 0 0 0 1px rgba(255,255,255,.07); --barra-mascara:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px); --barra-mascara-v:repeating-linear-gradient(0deg,#000 0 6px,transparent 6px 8px) }
-
+/* Barras de progreso. Lisas = la forma propia de cada barra. Ecualizador = el medidor de Tu semana (comun.js, renderSemana):
+   ranura oscura; celdas con esquina de 1,5 px; apagadas en el color de la barra al 22 % con borde al 50 %; encendidas en el color del dato con reflejo blanco arriba. */
+.app[data-barras="eq"]{
+  --celda:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='10' viewBox='0 0 6 10' preserveAspectRatio='none'%3E%3Crect x='.5' y='1' width='4' height='8' rx='1.2' fill='%23fff'/%3E%3C/svg%3E");
+  --celda-apagada:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='10' viewBox='0 0 6 10' preserveAspectRatio='none'%3E%3Crect x='.9' y='1.4' width='3.2' height='7.2' rx='1.2' fill='%23fff' fill-opacity='.22' stroke='%23fff' stroke-opacity='.5' stroke-width='.8'/%3E%3C/svg%3E");
+  --celda-v:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect x='0' y='8%25' width='100%25' height='84%25' rx='2' fill='%23fff'/%3E%3C/svg%3E");
+  --reflejo:linear-gradient(rgba(255,255,255,.45),rgba(255,255,255,.45)) 0 2px/100% 1px no-repeat;
+}
 /* --- Componentes --- */
-.app[data-barras="eq"] .k-barra{ background:var(--barra-pista)!important; box-shadow:var(--barra-sombra)!important; overflow:hidden }
-.app[data-barras="eq"] .k-barra>i{ border-radius:0!important; -webkit-mask:var(--barra-mascara); mask:var(--barra-mascara) }
-/* Gráficos donde la barra entera es dato (columnas de Constancia, barra partida de Equilibrio): se corta en segmentos sin cambiar colores */
-.app[data-barras="eq"] .k-columnas>i{ border-radius:2px 2px 0 0; -webkit-mask:var(--barra-mascara-v) bottom/100% 100%; mask:var(--barra-mascara-v) bottom/100% 100% }
-.app[data-barras="eq"] .k-barra-dato{ border-radius:3px; -webkit-mask:var(--barra-mascara); mask:var(--barra-mascara) }
+.app[data-barras="eq"] .k-barra{ --tinte:var(--dat); position:relative; background:rgba(0,0,0,.4)!important; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)!important; border-radius:4px!important; overflow:hidden }
+.app[data-barras="eq"] .k-barra::before{ content:""; position:absolute; inset:0; background:var(--tinte); -webkit-mask:var(--celda-apagada) 0 0/6px 100% repeat-x; mask:var(--celda-apagada) 0 0/6px 100% repeat-x; pointer-events:none }
+.app[data-barras="eq"] .k-barra>i{ position:relative; border-radius:0!important; background-image:var(--reflejo); -webkit-mask:var(--celda) 0 0/6px 100% repeat-x; mask:var(--celda) 0 0/6px 100% repeat-x }
+.app[data-barras="eq"] .salaprog .sp{ --tinte:var(--lime) }
+.app[data-barras="eq"] .tdb{ --tinte:var(--pc) }
+.app[data-barras="eq"] .occ:has(i.mid),.app[data-barras="eq"] .sede.mid .occ{ --tinte:var(--orange) }
+.app[data-barras="eq"] .occ:has(i.high),.app[data-barras="eq"] .sede.high .occ{ --tinte:#ff7a45 }
+.app[data-barras="eq"] .occ:has(i.full),.app[data-barras="eq"] .sede.full .occ{ --tinte:var(--pink) }
+.app[data-barras="eq"] .msbar{ --tinte:#8f99ab }  /* volumen: pista con celdas neutras; la banda objetivo queda lisa; el valor, en celdas encendidas */
+.app[data-barras="eq"] .msbar>i{ -webkit-mask:none; mask:none; background-image:none }
+.app[data-barras="eq"] .msbar .msv{ border-radius:0; background-image:var(--reflejo); -webkit-mask:var(--celda) 0 0/6px 100% repeat-x; mask:var(--celda) 0 0/6px 100% repeat-x }
+/* Columnas (Constancia): una celda = una entrada (--cel la pone progreso.js); ranura oscura de alto completo,
+   celdas apagadas hasta arriba (26 %) y encendidas hasta el valor (--h) */
+.app[data-barras="eq"] .k-columnas{ --cel:25px }
+.app[data-barras="eq"] .k-columnas>i{ --c:#3a4456; position:relative; background:transparent!important; border-radius:0 }
+.app[data-barras="eq"] .k-columnas>i.hit{ --c:var(--dat) }
+.app[data-barras="eq"] .k-columnas>i.now{ --c:var(--dat-dim) }
+.app[data-barras="eq"] .k-columnas>i::before,.app[data-barras="eq"] .k-columnas>i::after{ content:""; position:absolute; bottom:0; height:var(--alto,100px) }
+.app[data-barras="eq"] .k-columnas>i::before{ left:-2px; right:-2px; bottom:-3px; height:calc(var(--alto,100px) + 6px); border-radius:6px; background:rgba(0,0,0,.4); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06) }
+.app[data-barras="eq"] .k-columnas>i::after{ left:2px; right:2px; background:linear-gradient(to top,var(--c) 0 var(--h,0px),color-mix(in srgb,var(--c) 26%,transparent) var(--h,0px));
+  -webkit-mask:var(--celda-v) 0 100%/100% var(--cel) repeat-y; mask:var(--celda-v) 0 100%/100% var(--cel) repeat-y }
+/* Barra de dato (Equilibrio): el fondo también es dato, así que todas las celdas van encendidas en sus dos colores */
+.app[data-barras="eq"] .k-barra-dato{ position:relative; border-radius:0; -webkit-mask:var(--celda) 0 0/6px 100% repeat-x; mask:var(--celda) 0 0/6px 100% repeat-x }
+.app[data-barras="eq"] .k-barra-dato::after{ content:""; position:absolute; inset:0; background:var(--reflejo) }
 .app .k-caja{ border-color:var(--caja-borde) }
 .app .k-btn:not(.neonbtn){ background:var(--bp-fondo)!important; color:var(--bp-texto)!important; border:var(--bp-borde)!important; box-shadow:var(--bp-brillo)!important }
 .app .k-btn2{ background:var(--bs-fondo)!important; color:var(--bs-texto)!important; border:var(--bs-borde)!important; box-shadow:var(--bs-brillo)!important }

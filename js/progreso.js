@@ -789,7 +789,8 @@
     const off = (todayWd + 6) % 7; let c = hoyEntreno ? 1 : 0;
     for (let d = 1; d <= off; d++) if (entrenoDia.has(d)) c++;
     const W = semWeeks().slice(1).map(x => ({ n:x.n, f:x.f })).concat([{ n:c, f:'Esta', now:true }]);
-    $('#wkChart').innerHTML = '<span class="goal"></span>' + W.map(x => '<i class="' + (x.now ? 'now' : x.n >= META_SEM ? 'hit' : '') + '" style="height:' + Math.max(4, Math.min(118, Math.round(x.n / META_SEM * 100))) + 'px"></i>').join('');
+    $('#wkChart').innerHTML = '<span class="goal"></span>' + W.map(x => '<i class="' + (x.now ? 'now' : x.n >= META_SEM ? 'hit' : '') + '" style="height:' + Math.max(4, Math.min(118, Math.round(x.n / META_SEM * 100))) + 'px;--h:' + Math.min(120, Math.round(x.n / META_SEM * 100)) + 'px"></i>').join('');
+    $('#wkChart').style.setProperty('--cel', (100 / META_SEM).toFixed(2) + 'px'); $('#wkChart').style.setProperty('--alto', (Math.floor(120 / (100 / META_SEM)) * 100 / META_SEM).toFixed(2) + 'px'); // T16: en Ecualizador, una celda = una entrada
     $('#wkChart').setAttribute('aria-label', 'Últimas 8 semanas: ' + W.map(x => x.n).join(', ') + ' entrenamientos. Meta: ' + META_SEM + ' por semana');
     $('#wkAxis').innerHTML = W.map(x => '<span>' + x.f + '</span>').join('');
     $('#wkMeta').textContent = 'Meta: ' + META_SEM;
