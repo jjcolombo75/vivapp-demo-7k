@@ -225,6 +225,7 @@
     lockRen();
   });
   $('#verBloq').addEventListener('click', () => lockAbrir(false));
+  $('#verBloqRut').addEventListener('click', () => { if (!SALA) { if (MOM !== 'sala') setMom('sala', true); salaStart(); } lockAbrir(false); }); // T-R v76: la rutina vista desde la pantalla bloqueada
   $('#verOlvido').addEventListener('click', () => { if (!SALA) { if (MOM !== 'sala') setMom('sala', true); salaStart(); } lockAbrir(true); });
   $('#demoSheet').addEventListener('click', e => { // T13: los botones data-ac viven en Cuándo y Entrenar
     const b = e.target.closest('[data-ac]'); if (!b) return; const k = b.dataset.ac;
