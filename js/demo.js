@@ -156,10 +156,10 @@
     if (MOM !== 'antes' && MOM !== 'sala') setMom('antes', true);
     entDemo(ETAPA === 'molestia' || ETAPA === 'menor' ? 'inicio' : 'hoy', { normal:'Etapa normal', vuelvo:'Vuelve de una pausa: primera sesión al 80%', molestia:'Tiene guardada una molestia en el hombro', menor:'Menor de 18: sin carga sugerida y sin guardar molestias', '60':'60 o más: letra más grande en la sesión' }[ETAPA]);
   });
-  $('#slPick').addEventListener('click', e => {
+  $('#demoSheet').addEventListener('click', e => { // T13: Sala en Cuándo, Señal en Quién es
     const l = e.target.closest('[data-sl]'), g = e.target.closest('[data-sg]'); if (!l && !g) return;
-    if (l) { SALA_LLENA = l.dataset.sl === '1'; $$('#slPick [data-sl]').forEach(x => x.setAttribute('aria-pressed', x === l)); if (SALA) SALA.llenaOk = false; }
-    if (g) { SIN_SENAL = g.dataset.sg === '1'; $$('#slPick [data-sg]').forEach(x => x.setAttribute('aria-pressed', x === g)); }
+    if (l) { SALA_LLENA = l.dataset.sl === '1'; $$('#demoSheet [data-sl]').forEach(x => x.setAttribute('aria-pressed', x === l)); if (SALA) SALA.llenaOk = false; }
+    if (g) { SIN_SENAL = g.dataset.sg === '1'; $$('#demoSheet [data-sg]').forEach(x => x.setAttribute('aria-pressed', x === g)); }
     entDemo(SALA ? 'sala' : 'hoy', l ? (SALA_LLENA ? 'Noche llena: aparece en el primer ejercicio de fuerza' : 'Sala normal') : (SIN_SENAL ? 'Sin señal: la sesión funciona igual' : 'Con señal'));
     if (SALA) renderSala();
   });
@@ -226,7 +226,7 @@
   });
   $('#verBloq').addEventListener('click', () => lockAbrir(false));
   $('#verOlvido').addEventListener('click', () => { if (!SALA) { if (MOM !== 'sala') setMom('sala', true); salaStart(); } lockAbrir(true); });
-  $('#acPick').addEventListener('click', e => {
+  $('#demoSheet').addEventListener('click', e => { // T13: los botones data-ac viven en Cuándo y Entrenar
     const b = e.target.closest('[data-ac]'); if (!b) return; const k = b.dataset.ac;
     if (k === 'voz1' || k === 'voz0') { vozCambiar(k === 'voz1'); if (SALA) renderSala(); return; }
     if (k === 'au1' || k === 'au0') { AURIC = k === 'au1'; if (!AURIC) callar(); toast(AURIC ? 'Auriculares conectados' : 'Sin auriculares: la voz queda en pantalla'); }
@@ -236,3 +236,89 @@
   });
   $('#dcPick').addEventListener('click', e => { const b = e.target.closest('[data-dc2]'); if (!b) return; DECI = b.dataset.dc2; acSync(); $('#demoSheet').hidden = true; if (SALA) { renderSala(); go('sala'); } toast('Mantené apretado Decímelo en la sesión'); });
   $('#dsPick').addEventListener('click', e => { const b = e.target.closest('[data-ds]'); if (!b) return; DSEG = +b.dataset.ds; acSync(); entDemo('hoy', DSEG >= 5 ? (semCumplida() ? '5 días seguidos y la semana cumplida: Hoy propone descanso' : '5 días seguidos sin la semana cumplida: nunca "no vengas", solo qué entrenar') : '2 días seguidos'); });
+//#bloque 340
+  // ===== T13 · Panel de demo en tres niveles: escenarios de un toque · la socia y el momento · por sección =====
+  // Agregar un escenario = una línea en ESCENARIOS (nombre, lo que fija, a dónde lleva). Lo que no fija queda como en BASE.
+  // Agregar un control = una fila en html/demo.html, en su sección; si es transversal, también su clave en BASE y en aplicar().
+  const ESCENARIOS = [
+    ['Socia nueva, semana 1', { ant:'nueva', est:0 }, 'inicio'],
+    ['Socia nueva, día 14 sin entrar', { ant:'nueva', est:0, aus:14 }, 'inicio'],
+    ['Habitual que viene menos: 10 días sin venir', { exp:'habitual', est:1, aus:10 }, 'inicio'],
+    ['Habitual en la sala, noche llena, con auriculares', { exp:'habitual', mom:'sala', sl:1, voz:1, au:1 }, 'hoy'],
+    ['Avanzado, semana completa, VIVA Flow', { ant:'1a', est:3, sem:'completa' }, 'inicio'],
+    ['Avanzado edita su rutina', { ant:'1a', dia:1 }, 'hoy'],
+    ['Vuelve de una pausa (4 semanas sin venir)', { exp:'habitual', et:'vuelvo', aus:28 }, 'hoy'],
+    ['Menor de 18, rutina del profe', { et:'menor' }, 'hoy'],
+    ['Con molestia en el hombro', { exp:'habitual', et:'molestia' }, 'inicio'],
+    ['60 o más', { et:'60' }, 'hoy'],
+    ['Sin registros en Entrenar', { exp:'habitual', sem:'sinreg' }, 'inicio'],
+    ['6 meses: Progreso con historia e Índice FIT', { ant:'6m', fit:3 }, 'progreso'],
+    ['Plan que vence y saldo pendiente', { plan:true, saldo:true }, 'inicio'],
+    ['Primera vez (onboarding de Entrenar)', { prim:true }, null]
+  ];
+  const BASE = { ant:'3m', et:'normal', est:2, aus:0, sem:'mitad', mom:'antes', sl:0, sg:0, voz:0, au:1, rap:1, ds:2, fit:3, obj:null, dia:1, plan:false, saldo:false };
+  var AUS_N = 0, DM_ESC = -1;
+  const DM_LS = 'vivapp.demo.panel';
+  const dmMem = (() => { try { return JSON.parse(localStorage.getItem(DM_LS)) || {}; } catch (e) { return {}; } })();
+  const dmSave = () => { try { localStorage.setItem(DM_LS, JSON.stringify(dmMem)); } catch (e) {} };
+  const dmB = q => $('#demoSheet ' + q);
+  const dmTap = q => { const b = dmB(q); if (b && b.getAttribute('aria-pressed') !== 'true') b.click(); };
+  // Antigüedad: un solo selector para la historia del cuerpo (perfiles de T12) y Tu mural (socia nueva · 3 meses · 1 año)
+  const ANT = { nueva:['mes', 'nueva'], '3m':['', '3m'], '6m':['seis', '3m'], '1a':['anio', '1a'] };
+  const ANT_EXP = { nueva:'arranco', '3m':'arranco', '6m':'habitual', '1a':'avanzado' };
+  const antAct = () => { const p = PERFIL_MAPA || ''; return Object.keys(ANT).find(k => ANT[k][0] === p) || '3m'; };
+  function setAnt(k){ dmTap('[data-perf="' + ANT[k][0] + '"]'); dmTap('[data-mur="' + ANT[k][1] + '"]'); }
+  function setAus(n){ sacados.splice(0).forEach(d => entrenoDia.add(d)); for (let d = 1; d <= n; d++) if (entrenoDia.has(d)) { entrenoDia.delete(d); sacados.push(d); } ausente = n > 0; AUS_N = n; renderForma(); renderHoy(); }
+  function setObj(k){ OBJ.length = 0; if (k) OBJ.push(k); renderForma(); renderProg(); }
+  function setDia(i){ rutinas.profe.next = i; HR = -1; renderEntHoy(); renderToday(); renderRoutines(); }
+  const venceCorto = () => Math.round((VENCE - HOY0) / 864e5) <= 5;
+  function setPlan(v){ if (venceCorto() !== v) $('#venceDemo').click(); }
+  function setSaldo(v){ if (deuda !== v) $('#deudaToggle').click(); }
+  function dmSync(){
+    $$('#etPick [data-etg]').forEach(g => { const xs = [...g.querySelectorAll('[data-et]')], v = xs.some(x => x.dataset.et === ETAPA) ? ETAPA : 'normal'; xs.forEach(x => x.setAttribute('aria-pressed', x.dataset.et === v)); });
+    if (!ausente) AUS_N = 0;
+    $$('#ausPick [data-aus]').forEach(x => x.setAttribute('aria-pressed', +x.dataset.aus === AUS_N));
+    const a = antAct(); $$('#antPick [data-ant]').forEach(x => x.setAttribute('aria-pressed', x.dataset.ant === a));
+    const o = OBJ[0] || 'forma'; $$('#objPick [data-objd]').forEach(x => x.setAttribute('aria-pressed', x.dataset.objd === o));
+    $$('#planPick [data-plan]').forEach(x => x.setAttribute('aria-pressed', (x.dataset.plan === 'vence') === venceCorto()));
+    $$('#saldoPick [data-saldo]').forEach(x => x.setAttribute('aria-pressed', (x.dataset.saldo === '1') === deuda));
+    const di = rutinas.profe.next; $$('#diaPick [data-dia]').forEach(x => x.setAttribute('aria-pressed', +x.dataset.dia === di));
+    $$('#escPick [data-esc]').forEach(x => x.setAttribute('aria-pressed', +x.dataset.esc === DM_ESC));
+  }
+  function dmFin(dest, msg){ $('#demoSheet').hidden = true; if (dest) go(dest); if (msg) toast(msg); dmSync(); }
+  function aplicar(c){
+    c = Object.assign({}, BASE, c);
+    if (NOENT) $('#noEnt').click();
+    for (const k in LIM) delete LIM[k];
+    setAnt(c.ant); dmTap('[data-exp="' + (c.exp || ANT_EXP[c.ant]) + '"]');
+    if (ETAPA !== c.et) dmB('[data-et="' + c.et + '"]').click();
+    setAus(0); dmB('[data-est="' + c.est + '"]').click(); setAus(c.aus);
+    if (MOM !== 'antes') setMom('antes', true);
+    dmB('[data-sem="' + c.sem + '"]').click();
+    if (c.mom !== 'antes') dmB('[data-mom="' + c.mom + '"]').click();
+    dmTap('[data-sl="' + c.sl + '"]'); dmTap('[data-sg="' + c.sg + '"]');
+    dmTap('[data-ac="voz' + c.voz + '"]'); dmTap('[data-ac="au' + c.au + '"]'); dmTap('[data-ac="rap' + c.rap + '"]');
+    dmTap('[data-ds="' + c.ds + '"]'); dmTap('[data-fit="' + c.fit + '"]');
+    setObj(c.obj); setDia(c.dia); setPlan(c.plan); setSaldo(c.saldo);
+  }
+  $('#escPick').innerHTML = ESCENARIOS.map((s, i) => '<button data-esc="' + i + '" aria-pressed="false">' + s[0] + '</button>').join('');
+  $('#escPick').addEventListener('click', e => { const b = e.target.closest('[data-esc]'); if (!b) return; const s = ESCENARIOS[+b.dataset.esc];
+    DM_ESC = +b.dataset.esc; aplicar(s[1]);
+    if (s[1].prim) { dmFin(null, null); $('#verPrim').click(); return; }
+    dmFin(s[2], s[0]); });
+  $('#dmReset').addEventListener('click', () => { dmTap('[data-gen=""]'); DM_ESC = 0; aplicar(ESCENARIOS[0][1]); dmFin('inicio', 'Demo reiniciada: ' + ESCENARIOS[0][0]); });
+  // Controles nuevos del nivel 2
+  $('#demoSheet').addEventListener('click', e => { const t = e.target; let b;
+    if ((b = t.closest('[data-ant]'))) { setAnt(b.dataset.ant); return dmFin('progreso', 'Antigüedad: ' + b.textContent + '. Progreso y Tu mural con esa historia'); }
+    if ((b = t.closest('[data-aus]'))) { setAus(+b.dataset.aus); return dmFin('inicio', AUS_N ? 'La socia no viene hace ' + AUS_N + ' días' : 'La socia viene seguido'); }
+    if ((b = t.closest('[data-objd]'))) { setObj(b.dataset.objd); return dmFin('inicio', 'Objetivo: ' + b.textContent); }
+    if ((b = t.closest('[data-plan]'))) { setPlan(b.dataset.plan === 'vence'); return dmFin('inicio', venceCorto() ? 'El plan vence en 3 días: aviso en Inicio' : 'Plan al día'); }
+    if ((b = t.closest('[data-saldo]'))) { setSaldo(b.dataset.saldo === '1'); return dmFin('inicio', deuda ? 'Con saldo pendiente' : 'Sin saldo pendiente'); }
+    if ((b = t.closest('[data-dia]'))) { setDia(+b.dataset.dia); return dmFin('hoy', 'Hoy: Día ' + b.textContent); }
+    setTimeout(dmSync, 0); });
+  $('#demoFab').addEventListener('click', dmSync);
+  // Plegado recordado entre visitas (nivel 1 y 2 abiertos, nivel 3 cerrado la primera vez)
+  $$('#demoSheet details.dmdet').forEach(d => { if (dmMem.pleg && d.dataset.k in dmMem.pleg) d.open = dmMem.pleg[d.dataset.k];
+    d.addEventListener('toggle', () => { (dmMem.pleg = dmMem.pleg || {})[d.dataset.k] = d.open; dmSave(); }); });
+  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC }); // para pruebas y T6
+  dmSync();

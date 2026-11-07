@@ -8,83 +8,177 @@
     <button class="coachok" id="coachClose">Entendido</button>
   </div>
 </div>
+<style>
+.dmh{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--lime);text-transform:uppercase;margin-top:6px}
+.dmesc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dmesc button{min-height:48px;border-radius:12px;border:1px solid var(--line2);background:var(--panel);color:var(--txt);font-size:13px;line-height:1.25;padding:6px 10px;text-align:left}
+.dmesc button[aria-pressed="true"]{border-color:var(--lime);box-shadow:inset 0 0 0 1px var(--lime)}
+.dmdet{border:1px solid var(--line2);border-radius:14px;padding:0 12px}
+.dmdet>summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:15px;cursor:pointer;list-style:none}
+.dmdet>summary::-webkit-details-marker{display:none}
+.dmdet>summary::after{content:'+';font-size:20px;color:var(--muted)}
+.dmdet[open]>summary::after{content:'–'}
+.dmdet[open]{padding-bottom:12px}
+.dmdet .dmrow+.dmrow{margin-top:12px}
+.dmrow{display:flex;flex-direction:column;gap:6px}
+.dmk{font-size:13px;color:var(--muted)}
+.demopanel .opt[disabled]{opacity:.45}
+.demopanel .opt small{display:block;font-size:10px;font-weight:400;letter-spacing:.08em;text-transform:uppercase}
+.dmayu{font-size:12px;color:var(--muted);line-height:1.4}
+</style>
 <div class="sheet" id="demoSheet" hidden role="dialog" style="z-index:29" aria-labelledby="dmTitle">
   <div class="sheetin demopanel">
     <div class="between"><span class="h2" style="font-size:26px" id="dmTitle">Panel de demo</span><button class="link lime" id="demoClose" style="min-height:44px">Listo</button></div>
     <span class="small muted" style="margin-top:-8px">Solo para la demo: el socio no ve nada de esto.</span>
-    <div class="dmsec"><span class="lbl">Inicio · momento del día</span>
-      <div class="opts g3" id="momPick"><button class="opt" data-mom="antes" aria-pressed="true">Antes de ir</button><button class="opt" data-mom="sala" aria-pressed="false">En la sala</button><button class="opt" data-mom="sesion" aria-pressed="false">Sesión abierta</button><button class="opt" data-mom="despues" aria-pressed="false">Después</button><button class="opt" data-mom="descanso" aria-pressed="false">Día sin entrenar</button></div>
-      <div class="opts g2" id="haloPick"><button class="opt" data-ah="quieto" aria-pressed="false">Empezar: quieto</button><button class="opt" data-ah="respira" aria-pressed="false">Empezar: halo que respira</button><button class="opt" data-ah="gira" aria-pressed="false">Empezar: luz cian que gira</button><button class="opt" data-ah="espectro" aria-pressed="true">Empezar: espectro que gira</button></div>
-      <div class="opts g2" id="accPick"><button class="opt" data-acc="abajo" aria-pressed="true">Botón de acción: fijo abajo</button><button class="opt" data-acc="centro" aria-pressed="false">Botón de acción: centro de la barra</button></div>
-      <span class="small muted" style="line-height:1.4">La app sabe el momento por la entrada del molinete (al instante) y la sesión abierta. En la sala, la visita ya cuenta en Tu ritmo y Tu semana. "Día sin entrenar" es con la semana ya cumplida. Con el botón en el centro, ese botón es Entrenar y en la sala empieza la sesión. El halo de Empezar se mueve solo en la sala; mientras tanto, el tubo del tramo deja de respirar (una sola animación). El espectro rompe la regla "espectro solo para VIVA Flow".</span></div>
-    <div class="dmsec"><span class="lbl">Entrenar</span>
-      <div class="opts g3" id="genPick"><button class="opt" data-gen="" aria-pressed="true">Género EVO: sin dato</button><button class="opt" data-gen="M" aria-pressed="false">Masculino</button><button class="opt" data-gen="F" aria-pressed="false">Femenino</button></div>
-      <div class="opts g3" id="mapaLayPick"><button class="opt" data-lay="abajo" aria-pressed="true">Barra abajo</button><button class="opt" data-lay="lat" aria-pressed="false">Barra al costado</button></div>
-      <div class="opts g3" id="perfPick" style="grid-template-columns:repeat(2,minmax(0,1fr))"><button class="opt" data-perf="" aria-pressed="true">Socio de la demo</button><button class="opt" data-perf="mes" aria-pressed="false">Este mes</button><button class="opt" data-perf="seis" aria-pressed="false">6 meses</button><button class="opt" data-perf="anio" aria-pressed="false">12 meses</button></div>
-      <span class="small muted" style="line-height:1.4">Perfiles: el cuerpo de Progreso de un socio con un mes, seis meses o más de un año entrenando.</span>
-      <span class="small muted" id="verCnt" style="line-height:1.4">"Ver" el cuerpo: Hoy 0 · ficha 0 · sesión 0</span>
-      <span class="small muted" id="genMs" style="line-height:1.4">Cuerpo de Progreso: el género sale de EVO y nunca se pregunta.</span>
-      <div class="opts g3" id="expPick"><button class="opt" data-exp="arranco" aria-pressed="true">Arranco</button><button class="opt" data-exp="habitual" aria-pressed="false">Habitual</button><button class="opt" data-exp="avanzado" aria-pressed="false">Avanzado</button></div>
-      <div class="opts g2" id="etPick"><button class="opt" data-et="normal" aria-pressed="true">Etapa: normal</button><button class="opt" data-et="vuelvo" aria-pressed="false">Vuelvo de una pausa</button><button class="opt" data-et="molestia" aria-pressed="false">Con molestia en el hombro</button><button class="opt" data-et="menor" aria-pressed="false">Menor de 18</button><button class="opt" data-et="60" aria-pressed="false" style="grid-column:1 / -1">60 o más</button></div>
-      <div class="opts g2" id="slPick"><button class="opt" data-sl="0" aria-pressed="true">Sala: normal</button><button class="opt" data-sl="1" aria-pressed="false">Sala: noche llena</button><button class="opt" data-sg="0" aria-pressed="true">Con señal</button><button class="opt" data-sg="1" aria-pressed="false">Sin señal</button></div>
-      <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="segBien">Simular segundo Bien</button><button class="btn ghost sm" id="noEnt">Simular que no llegó la entrada</button></div>
-      <button class="btn ghost sm" id="verPrim">Ver primera vez (onboarding)</button>
-      <button class="btn ghost sm" id="limRemo">Simular dos "Al límite" seguidos en remo</button>
-      <span class="small muted" style="line-height:1.4">Arranco, Vuelvo, la molestia y menores: la carga sugerida no sube (en menores va la del profe). Con molestia, la pregunta del día pasa a "¿Cómo está tu hombro hoy?"; el aviso del teléfono sigue diciendo "¿Cómo venís hoy?". Menores: "Con algo para cuidar" lleva al profe y no guarda nada. 60 o más: letra más grande y las repeticiones antes que los kilos. "Ver primera vez": el onboarding de Entrenar (nunca en medio de una sesión; "Después vemos" lo reofrece una sola vez en Hoy).</span></div>
-    <div class="dmsec"><span class="lbl">El acompañante</span>
-      <div class="opts g2" id="acPick"><button class="opt" data-ac="voz0" aria-pressed="true">Voz: solo en pantalla</button><button class="opt" data-ac="voz1" aria-pressed="false">Voz: con auriculares</button><button class="opt" data-ac="au1" aria-pressed="true">Auriculares: sí</button><button class="opt" data-ac="au0" aria-pressed="false">Auriculares: no</button><button class="opt" data-ac="rap1" aria-pressed="true">Reloj rápido ×10</button><button class="opt" data-ac="rap0" aria-pressed="false">Reloj real</button><button class="opt" data-ac="man0" aria-pressed="true">La app me lleva</button><button class="opt" data-ac="man1" aria-pressed="false">Prefiero anotar yo</button></div>
-      <span class="small muted">Decímelo: qué frase simula</span>
-      <div class="opts g2" id="dcPick"><button class="opt" data-dc2="reps" aria-pressed="true">"Hice 10, 10 y 8 con 42 y medio"</button><button class="opt" data-dc2="ocupada" aria-pressed="false">"Está ocupada"</button><button class="opt" data-dc2="falta" aria-pressed="false">"¿Cuánto me falta?"</button><button class="opt" data-dc2="duele" aria-pressed="false">"Me duele el hombro"</button></div>
-      <div class="opts g2" id="dsPick"><button class="opt" data-ds="2" aria-pressed="true">2 días seguidos</button><button class="opt" data-ds="5" aria-pressed="false">5 días seguidos</button></div>
-      <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="verBloq">Ver la pantalla bloqueada</button><button class="btn ghost sm" id="verOlvido">Bloqueada, sesión olvidada</button></div>
-      <span class="small muted" style="line-height:1.4">Al tocar Empezar, la app lleva la sesión por tiempo (el que define el profe por ejercicio; en la demo, reloj rápido ×10): al vencer propone el siguiente, repregunta una vez a los 5 minutos y nunca avanza sola. Los tres modos (toques, voz con Decímelo, pantalla bloqueada) llaman al mismo Listo y encienden Tu semana igual. La voz habla solo en momentos fijos: al arrancar, antes de cada ejercicio (nombre, series, carga anterior e indicación del profe), al terminar el descanso y un resumen al cerrar; nunca "una más", dolor, cambios de carga ni datos sensibles. Solo con auriculares (en la app se detectan; acá se simulan) y con la síntesis del teléfono (simulación: la voz real va en la app nativa). "Me duele" siempre va a Cambiar · Me molesta. Decímelo no está sin señal ni en menores. En la pantalla bloqueada: "Tu sede" y nada de salud; Cambiar pide desbloquear. Días seguidos: con 5 y la semana cumplida (Tu semana &gt; Semana cumplida) Hoy propone descanso; sin la semana cumplida, nunca. Los tiempos y la regla de descanso son parámetros de demo, a validar por los profes.</span></div>
-    <div class="dmsec"><span class="lbl">Métrica</span>
-      <div class="opts g3" id="varPick"><button class="varopt" data-var="P" aria-pressed="false"><b>1</b><svg class="batico" viewBox="0 0 57.3 110.3" aria-hidden="true"><use href="#vBat"/></svg><small>Tus pilas VIVA</small></button><button class="varopt" data-var="R" aria-pressed="false"><b>2</b><small>Tu ritmo VIVA</small></button><button class="varopt" data-var="F" aria-pressed="true"><b>2+3</b><small>Tu ritmo VIVA con VIVA Flow</small></button></div>
-      <span class="small muted" id="varZonas" style="line-height:1.4"></span></div>
-    <div class="dmsec"><span class="lbl">Estética</span>
-      <div class="opts g3" id="btnPick"><button class="opt" data-btn="rellenos" aria-pressed="false">Rellenos</button><button class="opt" data-btn="tubos" aria-pressed="true">Tubos</button><button class="opt" data-btn="cartel" aria-pressed="false">Neón</button></div></div>
-    <div class="dmsec"><span class="lbl">Cajas</span>
-      <div class="opts g2" id="cajaPick"><button class="opt" data-cajas="off" aria-pressed="true">Apagadas</button><button class="opt" data-cajas="on" aria-pressed="false">Encendidas</button></div>
-      <div class="opts g2" id="tonoPick"><button class="opt" data-tono="actual" aria-pressed="true">Contraste actual</button><button class="opt" data-tono="tono" aria-pressed="false">Más contraste</button><button class="opt" data-tono="filete" aria-pressed="false">Filete fino</button><button class="opt" data-tono="ambos" aria-pressed="false">Contraste + filete</button></div>
-      <div class="opts g3" id="tramaPick"><button class="opt" data-trama="no" aria-pressed="false">Sin trama</button><button class="opt" data-trama="fondo" aria-pressed="true">Trama en el fondo</button><button class="opt" data-trama="cajas" aria-pressed="false">Trama en las cajas</button></div>
-      <div class="opts g2" id="barrasPick"><button class="opt" data-barras="eq" aria-pressed="true">Barras: ecualizador</button><button class="opt" data-barras="lisas" aria-pressed="false">Barras: lisas</button></div>
-      <div class="opts g2" id="esqPick"><button class="opt" data-esq="no" aria-pressed="false">Sin esquinas</button><button class="opt" data-esq="fondo" aria-pressed="true">Esquinas en el fondo</button><button class="opt" data-esq="cajas" aria-pressed="false">Esquinas en las cajas</button><button class="opt" data-esq="ambos" aria-pressed="false">Esquinas en los dos</button></div>
-      <label class="esqint"><span class="small">Intensidad de las esquinas</span><input type="range" id="esqInt" min="50" max="250" step="10" value="140"><b id="esqIntV">140%</b></label>
-      <span class="small muted" style="line-height:1.4">Las esquinas son la luz cian y magenta de las pantallas de ingreso, más suave. La trama es el patrón oficial de Viva, muy tenue. El manual pide Inicio y las pantallas de uso diario planas: probala con texto largo antes de elegirla.</span></div>
-    <div class="dmsec"><span class="lbl">Coach IA (futuro)</span>
-      <div class="opts g2" id="coachOn"><button class="opt" data-coach="0" aria-pressed="true">No está</button><button class="opt" data-coach="1" aria-pressed="false">Está</button></div>
-      <div class="opts g3" id="coachIco"><button class="opt" data-ci="rayo" aria-pressed="true">Rayo</button><button class="opt" data-ci="chispa" aria-pressed="false">Chispa ✦</button><button class="opt" data-ci="globo" aria-pressed="false">Globo</button></div>
-      <div class="opts" id="coachCol" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px"><button class="opt" data-cc="#07b0f2" aria-pressed="true" style="border-radius:12px;padding:0">Cian</button><button class="opt" data-cc="#f400a0" aria-pressed="false" style="border-radius:12px;padding:0">Magenta</button><button class="opt" data-cc="#ffe94a" aria-pressed="false" style="border-radius:12px;padding:0">Amarillo</button><button class="opt" data-cc="#d7b8ff" aria-pressed="false" style="border-radius:12px;padding:0">Lila</button><button class="opt" data-cc="espectro" aria-pressed="false" style="border-radius:12px;padding:0;grid-column:1 / -1">Espectro (recorre los colores)</button></div>
-      <button class="btn ghost sm" id="coachNew">Simular que el Coach tiene algo nuevo</button>
-      <span class="small muted" style="line-height:1.4">Pendiente de la recomendación del chat "Coach IA". Por defecto no aparece. El botón se puede arrastrar a cualquier lugar.</span></div>
-    <div class="dmsec"><span class="lbl">Formato</span>
-      <div class="opts g2" id="fmtPick"><button class="varopt" data-fmt="aguja" aria-pressed="true"><b>A</b><small>Arco con el rayo</small></button><button class="varopt" data-fmt="vumetro" aria-pressed="false"><b>B</b><small>Barra de neón</small></button></div>
-      <button class="btn ghost sm" id="notifDemo">Ver el aviso antes de su horario</button>
-      <button class="btn ghost sm" id="ausDemo">Ver a la socia después de 10 días sin venir</button>
-      </div>
-    <div class="dmsec"><span class="lbl">Estado de la socia</span>
-      <div class="opts g2" id="estPick"><button class="opt" data-est="0" aria-pressed="false">Tranqui</button><button class="opt" data-est="1" aria-pressed="false">Parejo</button><button class="opt" data-est="2" aria-pressed="true">Firme</button><button class="opt" data-est="3" aria-pressed="false">VIVA Flow</button></div>
-      <span class="small muted" style="line-height:1.4">Cambia sus entradas de los últimos 120 días (simuladas) para llevarla a cada tramo.</span></div>
-    <div class="dmsec"><span class="lbl">Tu semana</span>
-      <div class="opts g2" id="semPick"><button class="opt" data-sem="lunes" aria-pressed="false">Lunes</button><button class="opt" data-sem="mitad" aria-pressed="true">A mitad de semana</button><button class="opt" data-sem="cumplida" aria-pressed="false">Semana cumplida</button><button class="opt" data-sem="completa" aria-pressed="false">Semana completa</button><button class="opt" data-sem="sinreg" aria-pressed="false" style="grid-column:1 / -1">Sin registros en Entrenar</button></div>
-      <div class="opts g2" id="eqPick"><button class="opt" data-eq="1" aria-pressed="true">Ecualizador: mostrar</button><button class="opt" data-eq="0" aria-pressed="false">Ecualizador: ocultar</button></div>
-      <div class="opts g2" id="eqEst"><button class="opt" data-ee="real" aria-pressed="true">Semana: realista</button><button class="opt" data-ee="barras" aria-pressed="false">Semana: barritas de neón</button></div>
-      <div class="opts g2" id="eqHalo"><button class="opt" data-h="0" aria-pressed="true">Barras sin halo</button><button class="opt" data-h="1" aria-pressed="false">Barras con halo</button></div>
-      <span class="small muted" style="line-height:1.4">Las barras toman el color del tramo de Tu ritmo y brillan más cuanto más se llenan; el halo (solo en modo oscuro) crece con ellas. Visitas sale de las entradas por molinete; activación, fuerza y cardio, de lo que la socia registra en Entrenar (simulado). Objetivo de demo: Estar en forma, salvo que se cambie en el detalle.</span></div>
-    <div class="dmsec"><span class="lbl">Tu mural VIVA</span>
-      <div class="opts g2" id="mtPick"><button class="opt" data-mt="cartel" aria-pressed="true">Letras: cartel de neón</button><button class="opt" data-mt="relleno" aria-pressed="false">Letras: rellenas</button></div>
-      <div class="opts g3" id="muralPick"><button class="opt" data-mur="nueva" aria-pressed="false">Socia nueva</button><button class="opt" data-mur="3m" aria-pressed="true">3 meses</button><button class="opt" data-mur="1a" aria-pressed="false">1 año</button></div>
-      <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="cerrarMes">Cerrar el mes: Mes cumplido</button><button class="btn ghost sm" id="cerrarMesC">Cerrar el mes: Mes completo</button></div>
-      <div class="opts g2" id="benPick"><button class="opt" data-bm="1" aria-pressed="true">Beneficio del mes: sí</button><button class="opt" data-bm="0" aria-pressed="false">Beneficio del mes: no</button></div>
-      <span class="small muted" style="line-height:1.4">Socia nueva: solo la bienvenida. 3 meses: 10 semanas cumplidas, el mes antepasado cumplido y el pasado completo. 1 año: 49 semanas, nueve meses cumplidos (tres completos) y todas las fichas. "Cerrar el mes" enciende el cartel de este mes con el color del tramo actual: cumplido (4 semanas cumplidas) o completo (4 semanas completas, con ⚡). Premios reales: propuesta para el dueño.</span></div>
-    <div class="dmsec"><span class="lbl">Índice FIT · medición InBody de la socia</span>
-      <div class="opts g3" id="fitPick"><button class="opt" data-fit="0" aria-pressed="false">Sin medir</button><button class="opt" data-fit="1" aria-pressed="false">1 medición</button><button class="opt" data-fit="3" aria-pressed="true">3 mediciones</button></div>
-      <span class="small muted" style="line-height:1.4">Provisorio: precio de la medición y cuántas están incluidas, pendientes del dueño. Por eso no se muestra ningún texto al socio.</span></div>
-    <div class="dmsec"><span class="lbl">Primer entrenamiento de la campaña</span>
-      <div class="opts g2" data-group="gancho"><button class="opt" aria-pressed="true">Gratis</button><button class="opt" aria-pressed="false">Mitad de precio</button></div></div>
-    <div class="dmsec"><span class="lbl">Ejemplos</span>
-      <button class="btn ghost sm" id="venceDemo">Ver plan que vence en 3 días</button>
-      <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="deudaToggle">Ver ejemplo con saldo pendiente</button><!--sin-gestion--></div></div>
+
+    <!-- Nivel 1 · Escenarios: la lista vive en js/demo.js (bloque 340, ESCENARIOS); agregar uno = una línea -->
+    <div class="dmsec"><span class="dmh">Escenarios</span>
+      <span class="dmayu">Un toque pone a la socia en esa situación y fija todo lo de abajo; después se ajusta.</span>
+      <div class="dmesc" id="escPick"></div></div>
+
+    <!-- Nivel 2 · La socia y el momento: cambia toda la app -->
+    <span class="dmh">La socia y el momento</span>
+    <details class="dmdet" data-k="quien" open><summary>Quién es</summary>
+      <div class="dmrow"><span class="dmk">Género</span>
+        <div class="opts g3" id="genPick"><button class="opt" data-gen="" aria-pressed="true">Sin dato</button><button class="opt" data-gen="F" aria-pressed="false">Femenino</button><button class="opt" data-gen="M" aria-pressed="false">Masculino</button></div>
+        <span class="dmayu">Sale de EVO y nunca se pregunta.</span></div>
+      <div class="dmrow"><span class="dmk">Experiencia</span>
+        <div class="opts g3" id="expPick"><button class="opt" data-exp="arranco" aria-pressed="true">Arranco</button><button class="opt" data-exp="habitual" aria-pressed="false">Habitual</button><button class="opt" data-exp="avanzado" aria-pressed="false">Avanzado</button></div></div>
+      <div class="dmrow"><span class="dmk">Objetivo</span>
+        <div class="opts g2" id="objPick"><button class="opt" data-objd="bien" aria-pressed="false">Sentirme bien</button><button class="opt" data-objd="forma" aria-pressed="true">Estar en forma</button><button class="opt" data-objd="ver" aria-pressed="false">Verme mejor</button><button class="opt" data-objd="musc" aria-pressed="false">Ganar músculo</button><button class="opt" data-objd="rend" aria-pressed="false" style="grid-column:1 / -1">Mejorar mi rendimiento</button></div></div>
+      <div class="dmrow"><span class="dmk">Antigüedad</span>
+        <div class="opts g2" id="antPick"><button class="opt" data-ant="nueva" aria-pressed="false">Nueva (un mes)</button><button class="opt" data-ant="3m" aria-pressed="true">3 meses</button><button class="opt" data-ant="6m" aria-pressed="false">6 meses</button><button class="opt" data-ant="1a" aria-pressed="false">Más de un año</button></div>
+        <span class="dmayu">Mueve juntos su historia en Progreso (el cuerpo) y Tu mural. Nueva, 6 meses y un año también fijan la experiencia (Arranco, Habitual, Avanzado).</span></div>
+      <div id="etPick">
+        <div class="dmrow" style="margin-top:12px"><span class="dmk">Edad</span>
+          <div class="opts g3" data-etg="edad"><button class="opt" data-et="normal" aria-pressed="true">Adulta</button><button class="opt" data-et="menor" aria-pressed="false">Menor de 18</button><button class="opt" data-et="60" aria-pressed="false">60 o más</button></div></div>
+        <div class="dmrow" style="margin-top:12px"><span class="dmk">Etapa</span>
+          <div class="opts g2" data-etg="etapa"><button class="opt" data-et="normal" aria-pressed="true">Normal</button><button class="opt" data-et="vuelvo" aria-pressed="false">Vuelve de una pausa</button><button class="opt" disabled>Primeras 8 semanas<small>pronto · T11</small></button><button class="opt" disabled>Meses 3 a 12<small>pronto · T11</small></button><button class="opt" disabled style="grid-column:1 / -1">Más de un año<small>pronto · T11</small></button></div></div>
+        <div class="dmrow" style="margin-top:12px"><span class="dmk">Molestia declarada</span>
+          <div class="opts g2" data-etg="molestia"><button class="opt" data-et="normal" aria-pressed="true">Ninguna</button><button class="opt" data-et="molestia" aria-pressed="false">En el hombro</button></div>
+          <span class="dmayu">Hoy la app maneja una sola situación a la vez: menor, 60 o más, pausa o molestia. Elegir una vuelve las otras a lo normal.</span></div></div>
+      <div class="dmrow" style="margin-top:12px"><span class="dmk">Días sin venir</span>
+        <div class="opts g5" id="ausPick" style="grid-template-columns:repeat(5,minmax(0,1fr))"><button class="opt" data-aus="0" aria-pressed="true" style="font-size:14px">0</button><button class="opt" data-aus="7" aria-pressed="false" style="font-size:14px">7</button><button class="opt" data-aus="10" aria-pressed="false" style="font-size:14px">10</button><button class="opt" data-aus="14" aria-pressed="false" style="font-size:14px">14</button><button class="opt" data-aus="28" aria-pressed="false" style="font-size:14px">28</button></div>
+        <span class="dmayu">Saca de sus entradas los últimos días; Tu ritmo y Tu semana lo reflejan.</span></div>
+      <div class="dmrow"><span class="dmk">Entradas del mes</span>
+        <div class="opts" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px"><button class="opt" disabled style="border-radius:12px;padding:0">0</button><button class="opt" disabled style="border-radius:12px;padding:0">1–5</button><button class="opt" disabled style="border-radius:12px;padding:0">6–10</button><button class="opt" disabled style="border-radius:12px;padding:0">11+</button></div>
+        <span class="dmayu">Pronto (T11): el tramo solo cambia avisos y lo que ve el profe. Mientras, lo mueven Tu ritmo y Días sin venir.</span></div>
+      <div class="dmrow"><span class="dmk">Plan</span>
+        <div class="opts g3" id="planPick"><button class="opt" data-plan="dia" aria-pressed="true">Al día</button><button class="opt" data-plan="vence" aria-pressed="false">Vence en 3 días</button><button class="opt" disabled>En pausa<small>pronto</small></button></div>
+        <div class="opts g2" id="saldoPick"><button class="opt" data-saldo="0" aria-pressed="true">Sin saldo</button><button class="opt" data-saldo="1" aria-pressed="false">Saldo pendiente</button></div></div>
+      <div class="dmrow"><span class="dmk">Rutina personalizada</span>
+        <div class="opts g2"><button class="opt" aria-pressed="true" disabled style="opacity:1">No</button><button class="opt" disabled>Sí<small>pronto · E6</small></button></div></div>
+      <div class="dmrow"><span class="dmk">Señal</span>
+        <div class="opts g2"><button class="opt" data-sg="0" aria-pressed="true">Con señal</button><button class="opt" data-sg="1" aria-pressed="false">Sin señal</button></div></div>
+    </details>
+    <details class="dmdet" data-k="cuando" open><summary>Cuándo</summary>
+      <div class="dmrow"><span class="dmk">Fecha de la demo</span><span class="dmayu">Miércoles 18/11/2026, fija para toda la app; la hora es la del teléfono.</span></div>
+      <div class="dmrow"><span class="dmk">Momento</span>
+        <div class="opts g3" id="momPick"><button class="opt" data-mom="antes" aria-pressed="true">Antes de ir</button><button class="opt" data-mom="sala" aria-pressed="false">En la sala</button><button class="opt" data-mom="sesion" aria-pressed="false">Sesión abierta</button><button class="opt" data-mom="despues" aria-pressed="false">Después</button><button class="opt" data-mom="descanso" aria-pressed="false" style="grid-column:span 2">Día sin entrenar</button></div>
+        <span class="dmayu">La app lo sabe por el molinete y la sesión abierta. En la sala la visita ya cuenta. "Día sin entrenar" es con la semana cumplida.</span></div>
+      <div class="dmrow"><span class="dmk">Sala</span>
+        <div class="opts g2"><button class="opt" data-sl="0" aria-pressed="true">Normal</button><button class="opt" data-sl="1" aria-pressed="false">Noche llena</button></div></div>
+      <div class="dmrow"><span class="dmk">Reloj de la sesión</span>
+        <div class="opts g2"><button class="opt" data-ac="rap1" aria-pressed="true">Rápido ×10</button><button class="opt" data-ac="rap0" aria-pressed="false">Real</button></div></div>
+    </details>
+    <details class="dmdet" data-k="ritmo" open><summary>Tu ritmo y Tu semana</summary>
+      <div class="dmrow"><span class="dmk">Tramo de Tu ritmo</span>
+        <div class="opts g2" id="estPick"><button class="opt" data-est="0" aria-pressed="false">Tranqui</button><button class="opt" data-est="1" aria-pressed="false">Parejo</button><button class="opt" data-est="2" aria-pressed="true">Firme</button><button class="opt" data-est="3" aria-pressed="false">VIVA Flow</button></div>
+        <span class="dmayu">Cambia sus entradas de los últimos 120 días (simuladas).</span></div>
+      <div class="dmrow"><span class="dmk">Punto de la semana</span>
+        <div class="opts g2" id="semPick"><button class="opt" data-sem="lunes" aria-pressed="false">Lunes</button><button class="opt" data-sem="mitad" aria-pressed="true">A mitad</button><button class="opt" data-sem="cumplida" aria-pressed="false">Cumplida</button><button class="opt" data-sem="completa" aria-pressed="false">Completa</button><button class="opt" data-sem="sinreg" aria-pressed="false" style="grid-column:1 / -1">Sin registros en Entrenar</button></div></div>
+      <div class="dmrow"><span class="dmk">Cierre del mes</span>
+        <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="cerrarMes">Mes cumplido</button><button class="btn ghost sm" id="cerrarMesC">Mes completo</button></div>
+        <div class="opts g2" id="benPick"><button class="opt" data-bm="1" aria-pressed="true">Beneficio del mes: sí</button><button class="opt" data-bm="0" aria-pressed="false">Beneficio: no</button></div>
+        <span class="dmayu">Enciende el cartel del mes en Tu mural con el color del tramo. Premios reales: propuesta para el dueño.</span></div>
+      <div class="dmrow"><span class="dmk">Índice FIT (InBody)</span>
+        <div class="opts g3" id="fitPick"><button class="opt" data-fit="0" aria-pressed="false">Sin medir</button><button class="opt" data-fit="1" aria-pressed="false">1 medición</button><button class="opt" data-fit="3" aria-pressed="true">3 mediciones</button></div>
+        <span class="dmayu">Precio y mediciones incluidas, pendientes del dueño: no se muestra texto al socio.</span></div>
+    </details>
+
+    <!-- Nivel 3 · Por sección (plegado) -->
+    <span class="dmh">Por sección</span>
+    <details class="dmdet" data-k="apariencia"><summary>Apariencia (toda la app)</summary>
+      <div class="dmrow"><span class="dmk">Botones</span>
+        <div class="opts g3" id="btnPick"><button class="opt" data-btn="rellenos" aria-pressed="false">Rellenos</button><button class="opt" data-btn="tubos" aria-pressed="true">Tubos</button><button class="opt" data-btn="cartel" aria-pressed="false">Neón</button></div></div>
+      <div class="dmrow"><span class="dmk">Cajas</span>
+        <div class="opts g2" id="cajaPick"><button class="opt" data-cajas="off" aria-pressed="true">Apagadas</button><button class="opt" data-cajas="on" aria-pressed="false">Encendidas</button></div>
+        <div class="opts g2" id="tonoPick"><button class="opt" data-tono="actual" aria-pressed="true">Contraste actual</button><button class="opt" data-tono="tono" aria-pressed="false">Más contraste</button><button class="opt" data-tono="filete" aria-pressed="false">Filete fino</button><button class="opt" data-tono="ambos" aria-pressed="false">Contraste + filete</button></div></div>
+      <div class="dmrow"><span class="dmk">Trama</span>
+        <div class="opts g3" id="tramaPick"><button class="opt" data-trama="no" aria-pressed="false">Sin trama</button><button class="opt" data-trama="fondo" aria-pressed="true">En el fondo</button><button class="opt" data-trama="cajas" aria-pressed="false">En las cajas</button></div></div>
+      <div class="dmrow"><span class="dmk">Esquinas cian y magenta</span>
+        <div class="opts g2" id="esqPick"><button class="opt" data-esq="no" aria-pressed="false">Sin esquinas</button><button class="opt" data-esq="fondo" aria-pressed="true">En el fondo</button><button class="opt" data-esq="cajas" aria-pressed="false">En las cajas</button><button class="opt" data-esq="ambos" aria-pressed="false">En los dos</button></div>
+        <label class="esqint"><span class="small">Intensidad</span><input type="range" id="esqInt" min="50" max="250" step="10" value="140"><b id="esqIntV">140%</b></label>
+        <span class="dmayu">El manual pide Inicio y las pantallas de uso diario planas: probá la trama con texto largo antes de elegirla.</span></div>
+      <div class="dmrow"><span class="dmk">Barras</span>
+        <div class="opts g2" id="barrasPick"><button class="opt" data-barras="eq" aria-pressed="true">Ecualizador</button><button class="opt" data-barras="lisas" aria-pressed="false">Lisas</button></div>
+        <div class="opts g2" id="eqHalo"><button class="opt" data-h="0" aria-pressed="true">Sin halo</button><button class="opt" data-h="1" aria-pressed="false">Con halo</button></div></div>
+      <div class="dmrow"><span class="dmk">Letras de Tu mural</span>
+        <div class="opts g2" id="mtPick"><button class="opt" data-mt="cartel" aria-pressed="true">Cartel de neón</button><button class="opt" data-mt="relleno" aria-pressed="false">Rellenas</button></div></div>
+    </details>
+    <details class="dmdet" data-k="inicio"><summary>Inicio</summary>
+      <div class="dmrow"><span class="dmk">Empezar</span>
+        <div class="opts g2" id="haloPick"><button class="opt" data-ah="quieto" aria-pressed="false">Quieto</button><button class="opt" data-ah="respira" aria-pressed="false">Halo que respira</button><button class="opt" data-ah="gira" aria-pressed="false">Luz cian que gira</button><button class="opt" data-ah="espectro" aria-pressed="true">Espectro que gira</button></div>
+        <span class="dmayu">Se mueve solo en la sala. El espectro rompe la regla "espectro solo para VIVA Flow".</span></div>
+      <div class="dmrow"><span class="dmk">Botón de acción</span>
+        <div class="opts g2" id="accPick"><button class="opt" data-acc="abajo" aria-pressed="true">Fijo abajo</button><button class="opt" data-acc="centro" aria-pressed="false">Centro de la barra</button></div></div>
+      <div class="dmrow"><span class="dmk">Tu semana</span>
+        <div class="opts g2" id="eqPick"><button class="opt" data-eq="1" aria-pressed="true">Ecualizador: mostrar</button><button class="opt" data-eq="0" aria-pressed="false">Ocultar</button></div>
+        <div class="opts g2" id="eqEst"><button class="opt" data-ee="real" aria-pressed="true">Realista</button><button class="opt" data-ee="barras" aria-pressed="false">Barritas de neón</button></div></div>
+      <div class="dmrow"><span class="dmk">Métrica</span>
+        <div class="opts g3" id="varPick"><button class="varopt" data-var="P" aria-pressed="false"><b>1</b><svg class="batico" viewBox="0 0 57.3 110.3" aria-hidden="true"><use href="#vBat"/></svg><small>Tus pilas VIVA</small></button><button class="varopt" data-var="R" aria-pressed="false"><b>2</b><small>Tu ritmo VIVA</small></button><button class="varopt" data-var="F" aria-pressed="true"><b>2+3</b><small>Tu ritmo VIVA con VIVA Flow</small></button></div>
+        <span class="dmayu" id="varZonas"></span>
+        <div class="opts g2" id="fmtPick"><button class="varopt" data-fmt="aguja" aria-pressed="true"><b>A</b><small>Arco con el rayo</small></button><button class="varopt" data-fmt="vumetro" aria-pressed="false"><b>B</b><small>Barra de neón</small></button></div></div>
+      <div class="dmrow"><span class="dmk">Avisos de ejemplo</span>
+        <button class="btn ghost sm" id="notifDemo">Ver el aviso antes de su horario</button></div>
+    </details>
+    <details class="dmdet" data-k="entrenar"><summary>Entrenar</summary>
+      <div class="dmrow"><span class="dmk">Día de la rutina del profe</span>
+        <div class="opts g2" id="diaPick"><button class="opt" data-dia="0" aria-pressed="false">A · superserie</button><button class="opt" data-dia="1" aria-pressed="true">B · pirámide y drop</button><button class="opt" data-dia="2" aria-pressed="false">C · AMRAP y RIR</button><button class="opt" data-dia="3" aria-pressed="false">D · circuito</button></div>
+        <span class="dmayu">Las variantes que el profe escribe; el cardio por tiempo está en todos los días.</span></div>
+      <div class="dmrow"><span class="dmk">Voz y auriculares</span>
+        <div class="opts g2"><button class="opt" data-ac="voz0" aria-pressed="true">Solo en pantalla</button><button class="opt" data-ac="voz1" aria-pressed="false">Voz con auriculares</button><button class="opt" data-ac="au1" aria-pressed="true">Auriculares: sí</button><button class="opt" data-ac="au0" aria-pressed="false">Auriculares: no</button></div>
+        <span class="dmayu">La voz habla solo en momentos fijos (arranque, antes de cada ejercicio, fin del descanso, cierre) y solo con auriculares; nunca dolor ni datos sensibles. En la app nativa, la síntesis del teléfono.</span></div>
+      <div class="dmrow"><span class="dmk">Decímelo: qué frase simula</span>
+        <div class="opts g2" id="dcPick"><button class="opt" data-dc2="reps" aria-pressed="true">"Hice 10, 10 y 8 con 42 y medio"</button><button class="opt" data-dc2="ocupada" aria-pressed="false">"Está ocupada"</button><button class="opt" data-dc2="falta" aria-pressed="false">"¿Cuánto me falta?"</button><button class="opt" data-dc2="duele" aria-pressed="false">"Me duele el hombro"</button></div>
+        <span class="dmayu">"Me duele" siempre va a Cambiar · Me molesta. Sin Decímelo sin señal ni en menores.</span></div>
+      <div class="dmrow"><span class="dmk">Días seguidos</span>
+        <div class="opts g2" id="dsPick"><button class="opt" data-ds="2" aria-pressed="true">2 días</button><button class="opt" data-ds="5" aria-pressed="false">5 días</button></div>
+        <span class="dmayu">Con 5 y la semana cumplida, Hoy propone descanso; sin la semana cumplida, nunca. Parámetro a validar por los profes.</span></div>
+      <div class="dmrow"><span class="dmk">Simular</span>
+        <button class="btn ghost sm" id="verPrim">Primera vez (onboarding)</button>
+        <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="segBien">Segundo "Bien" del hombro</button><button class="btn ghost sm" id="noEnt">Simular que no llegó la entrada</button></div>
+        <button class="btn ghost sm" id="limRemo">Dos "Al límite" seguidos en remo</button>
+        <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="verBloq">Pantalla bloqueada</button><button class="btn ghost sm" id="verOlvido">Bloqueada, sesión olvidada</button></div>
+        <span class="dmayu">En la pantalla bloqueada, "Tu sede" y nada de salud; Cambiar pide desbloquear.</span></div>
+    </details>
+    <details class="dmdet" data-k="progreso"><summary>Progreso</summary>
+      <div class="dmrow"><span class="dmk">Barra del espectro del cuerpo</span>
+        <div class="opts g2" id="mapaLayPick"><button class="opt" data-lay="abajo" aria-pressed="true">Abajo</button><button class="opt" data-lay="lat" aria-pressed="false">Al costado</button></div>
+        <span class="dmayu" id="genMs">Cuerpo de Progreso: el género sale de EVO y nunca se pregunta.</span>
+        <span class="dmayu" id="verCnt">"Ver" el cuerpo: Hoy 0 · ficha 0 · sesión 0</span></div>
+    </details>
+    <details class="dmdet" data-k="captacion"><summary>Captación</summary>
+      <div class="dmrow"><span class="dmk">Primer entrenamiento de la campaña</span>
+        <div class="opts g2" data-group="gancho"><button class="opt" aria-pressed="true">Gratis</button><button class="opt" aria-pressed="false">Mitad de precio</button></div></div>
+    </details>
+    <details class="dmdet" data-k="coach"><summary>Coach IA (futuro)</summary>
+      <div class="dmrow">
+        <div class="opts g2" id="coachOn"><button class="opt" data-coach="0" aria-pressed="true">No está</button><button class="opt" data-coach="1" aria-pressed="false">Está</button></div>
+        <div class="opts g3" id="coachIco"><button class="opt" data-ci="rayo" aria-pressed="true">Rayo</button><button class="opt" data-ci="chispa" aria-pressed="false">Chispa ✦</button><button class="opt" data-ci="globo" aria-pressed="false">Globo</button></div>
+        <div class="opts" id="coachCol" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px"><button class="opt" data-cc="#07b0f2" aria-pressed="true" style="border-radius:12px;padding:0">Cian</button><button class="opt" data-cc="#f400a0" aria-pressed="false" style="border-radius:12px;padding:0">Magenta</button><button class="opt" data-cc="#ffe94a" aria-pressed="false" style="border-radius:12px;padding:0">Amarillo</button><button class="opt" data-cc="#d7b8ff" aria-pressed="false" style="border-radius:12px;padding:0">Lila</button><button class="opt" data-cc="espectro" aria-pressed="false" style="border-radius:12px;padding:0;grid-column:1 / -1">Espectro</button></div>
+        <button class="btn ghost sm" id="coachNew">Simular que tiene algo nuevo</button>
+        <span class="dmayu">Pendiente de E3. El botón se puede arrastrar.</span></div>
+    </details>
+    <div class="grid2" style="gap:8px"><!--sin-gestion--><button class="btn ghost sm" id="dmReset">Reiniciar la demo</button></div>
+
+    <!-- Motor: controles viejos que la app todavía usa por dentro; el panel los maneja desde Antigüedad, Días sin venir y Plan -->
+    <div id="dmMotor" hidden>
+      <div id="perfPick"><button data-perf="" aria-pressed="true"></button><button data-perf="mes" aria-pressed="false"></button><button data-perf="seis" aria-pressed="false"></button><button data-perf="anio" aria-pressed="false"></button></div>
+      <div id="muralPick"><button data-mur="nueva" aria-pressed="false"></button><button data-mur="3m" aria-pressed="true"></button><button data-mur="1a" aria-pressed="false"></button></div>
+      <button id="ausDemo"></button><button id="venceDemo"></button><button id="deudaToggle"></button>
+      <div id="acPick"></div><div id="slPick"></div>
+    </div>
   </div>
 </div>
 
