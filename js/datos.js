@@ -10,6 +10,7 @@
     remo:{ n:'Remo sentado', grupo:'Dorsales y espalda alta', mus:['dorsales','trapecio'], sec:['biceps'], tip:'Espalda neutra, llevá el agarre hacia el ombligo.', sug:'Probá 42,5 kg: la última vez completaste todas las repeticiones.', sets:[['40 kg × 10','40','10'],['40 kg × 10','42,5','10'],['40 kg × 9','42,5','9'],['40 kg × 8','42,5','8']], anim:'row', cues:['Tirá hacia el ombligo','Estirá los brazos controlado'] },
     jalon:{ n:'Jalón al pecho', grupo:'Dorsales', mus:['dorsales'], sec:['biceps','trapecio'], tip:'Bajá la barra a la clavícula, sin balancearte.', sug:'Mantené 45 kg y buscá llegar a 12 repeticiones.', sets:[['45 kg × 10','45','12'],['45 kg × 10','45','12'],['45 kg × 9','45','10']], anim:'pulldown', cues:['Bajá la barra al pecho','Subí controlado'] },
     curl:{ n:'Curl martillo', grupo:'Bíceps y antebrazo', mus:['biceps'], sec:['antebrazo'], tip:'Codos pegados al cuerpo, sin balanceo.', sug:'Subí a 12 kg por mancuerna en la primera serie.', sets:[['10 kg × 12','12','10'],['10 kg × 12','10','12'],['10 kg × 10','10','12']], anim:'curl', cues:['Subí sin mover el codo','Bajá lento'] },
+    pecho:{ n:'Press de pecho en máquina', grupo:'Pecho y tríceps', mus:['pecho'], sec:['triceps','hombros'], tip:'Escápulas atrás y abajo; empujá sin despegar la espalda del respaldo.', sug:'Mantené 30 kg y buscá las 12 repeticiones en las tres series.', sets:[['30 kg × 12','30','12'],['30 kg × 12','30','12'],['30 kg × 11','30','12']], anim:'press', cues:['Empujá hasta casi estirar','Volvé despacio'] },
     press:{ n:'Press de hombros', grupo:'Hombros y tríceps', mus:['hombros'], sec:['triceps'], tip:'Abdomen firme, sin arquear la espalda.', sug:'Probá 10 kg por mancuerna.', sets:[['8 kg × 12','10','10'],['8 kg × 12','10','10'],['8 kg × 10','8','12']], anim:'press', cues:['Empujá hacia arriba','Bajá a la altura de las orejas'] }
   };
   const musName = { hombros:'Hombros', pecho:'Pecho', biceps:'Bíceps', antebrazo:'Antebrazo', abdomen:'Abdomen', cuads:'Cuádriceps', trapecio:'Espalda alta', dorsales:'Dorsales', triceps:'Tríceps', gluteos:'Glúteos', isquios:'Isquiotibiales' };
@@ -17,7 +18,7 @@
   // ===== Rutinas activas (ejemplo) =====
   const rutinas = {
     profe:{ tipo:'profe', nombre:'Hipertrofia · 4 días', by:'Prof. Lucas Pérez', sub:'Semana 3 de 8 · vence el 15/11', next:1,
-      dias:[ {k:'A', n:'Pierna y glúteos', ex:['sentadilla','puente','plancha'], lbl:'Lun'}, {k:'B', n:'Espalda y bíceps', ex:['remo','jalon','curl'], lbl:'Mar'}, {k:'C', n:'Hombros y core', ex:['press','plancha','curl'], lbl:'Jue'}, {k:'D', n:'Full body', ex:['sentadilla','press','remo'], lbl:'Vie'} ] },
+      dias:[ {k:'A', n:'Pierna y glúteos', ex:['sentadilla','puente','plancha'], lbl:'Lun'}, {k:'B', n:'Espalda, pecho y bíceps', ex:['remo','jalon','pecho','curl'], lbl:'Mar'}, {k:'C', n:'Hombros y core', ex:['press','plancha','curl'], lbl:'Jue'}, {k:'D', n:'Full body', ex:['sentadilla','press','remo'], lbl:'Vie'} ] },
     ia:{ tipo:'ia', nombre:'Core y movilidad · 2 días', by:'Generada con IA', sub:'Creada el 12/10 · 3 ejercicios por día', next:0,
       dias:[ {k:'A', n:'Core', ex:['plancha','puente','sentadilla'], lbl:'Mié'}, {k:'B', n:'Movilidad y fuerza', ex:['puente','press','plancha'], lbl:'Sáb'} ] }
   };

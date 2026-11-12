@@ -488,7 +488,7 @@
       return '<div class="swk"><div class="between"><span style="font-weight:700">' + b.n + '</span><span class="small' + (v >= b.meta ? '' : ' muted') + '" style="' + (v >= b.meta ? 'color:var(--dat);font-weight:700' : '') + '">' +
         (sinReg ? 'Sin registros todavía' : v + ' de ' + b.meta + (b.min ? ' minutos' : '')) + '</span></div>' +
         '<div class="swsegs" aria-hidden="true">' + Array.from({ length:b.N }, (_, j) => '<i>' + (j < b.on ? '<b style="background:' + (eqFlow ? 'var(--zflow)' : eqCol) + ';opacity:' + eqLuz(b.on / b.N).bd + (EQ_HALO ? ';box-shadow:0 0 ' + Math.round(4 + 8 * b.on / b.N) + 'px ' + (eqFlow ? 'var(--z2)' : eqCol) : '') + '"></b>' : '') + '</i>').join('') + '</div>' +
-        (i === 0 ? '<span class="small muted">Sale de tus entradas por molinete.</span>' : i === 3 ? '<span class="small muted">Cuenta el de la sala y el de afuera.</span>' : '') + '</div>';
+        (i === 0 ? '<span class="small muted">Sale de tus entradas por molinete.</span>' : i === 3 ? '<span class="small muted">Cuenta el de la sala y el de afuera.' + (CAR_PEND ? ' Pendiente: el cardio de hoy, afuera.' : '') + '</span>' : '') + '</div>';
     }).join('') + (WK.reg ? '' : '<div class="swk"><button class="btn ghost sm" data-go="rutinas">Registrá tu sesión y mirá cómo entrenás</button></div>');
     const fz = m.fue === m.vis ? 'fuerza en cada visita' : 'fuerza ' + m.fue + ' veces por semana';
     $('#swPorque').innerHTML = 'Tu objetivo es <strong>' + o[1] + '</strong>' + (OBJ.length ? '' : ' (el de partida, hasta que elijas el tuyo)') + ': tu profe te propone activación al empezar, ' + fz + ' y <strong>' + m.car + ' minutos de cardio</strong> por semana. Tu meta es venir <strong>' + m.vis + ' veces</strong>.';
@@ -523,7 +523,7 @@
   ['#cdMin', '#cdTipo'].forEach(id => $(id).addEventListener('click', e => { const b = e.target.closest('.opt'); if (!b) return; $$(id + ' .opt').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
   $('#cdGo').addEventListener('click', () => {
     const min = +($('#cdMin [aria-pressed="true"]') || { dataset:{ min:30 } }).dataset.min, t = ($('#cdTipo [aria-pressed="true"]') || { textContent:'Otro' }).textContent;
-    WK.car += min; WK.reg = true; $('#cardioSheet').hidden = true; renderForma(); renderSemanaDet();
+    WK.car += min; WK.reg = true; CAR_PEND = null; $('#cardioSheet').hidden = true; renderForma(); renderSemanaDet();
     toast('Sumaste ' + min + ' minutos (' + t.toLowerCase() + ') a tu semana ⚡');
   });
   function renderObj(){

@@ -211,7 +211,7 @@
     lk.innerHTML = h;
   }
   function lockAbrir(olv){ $('#demoSheet').hidden = true; LK_OLV = !!olv; LK_FIN = false; if (olv) NOTI.olv = false; BLOQ = true; lk.hidden = false; lockRen(); }
-  function lockCerrar(){ BLOQ = false; lk.hidden = true; const fin = LK_FIN; LK_FIN = false; if (SALA) { renderSala(); go('sala'); } else if (fin) go('cierre'); }
+  function lockCerrar(){ BLOQ = false; lk.hidden = true; const fin = LK_FIN; LK_FIN = false; if (SALA) { renderSala(); cajaAbrir(); } else if (fin) go('cierre'); }
   lk.addEventListener('click', e => {
     const b = e.target.closest('[data-lk]'); if (!b) return; const v = b.dataset.lk;
     if (v === 'abrir') return lockCerrar();
@@ -235,15 +235,15 @@
     if (k === 'man1' || k === 'man0') { MANUAL = k === 'man1'; if (SALA) { SALA.vence = false; SALA.repreg = false; } toast(MANUAL ? 'Anota el socio: sin reloj' : 'La app lo lleva por tiempo'); }
     acSync(); if (SALA) renderSala();
   });
-  $('#dcPick').addEventListener('click', e => { const b = e.target.closest('[data-dc2]'); if (!b) return; DECI = b.dataset.dc2; acSync(); $('#demoSheet').hidden = true; if (SALA) { renderSala(); go('sala'); } toast('Mantené apretado Decímelo en la sesión'); });
+  $('#dcPick').addEventListener('click', e => { const b = e.target.closest('[data-dc2]'); if (!b) return; DECI = b.dataset.dc2; acSync(); $('#demoSheet').hidden = true; if (SALA) { renderSala(); cajaAbrir(); } toast('Mantené apretado Decímelo en la sesión'); });
   $('#dsPick').addEventListener('click', e => { const b = e.target.closest('[data-ds]'); if (!b) return; DSEG = +b.dataset.ds; acSync(); entDemo('hoy', DSEG >= 5 ? (semCumplida() ? '5 días seguidos y la semana cumplida: Hoy propone descanso' : '5 días seguidos sin la semana cumplida: nunca "no vengas", solo qué entrenar') : '2 días seguidos'); });
 //#bloque 340
   // ===== T13 · Panel de demo en tres niveles: escenarios de un toque · la socia y el momento · por sección =====
   // Agregar un escenario = una línea en ESCENARIOS (nombre, lo que fija, a dónde lleva). Lo que no fija queda como en BASE.
   // Agregar un control = una fila en html/demo.html, en su sección; si es transversal, también su clave en BASE y en aplicar().
   const ESCENARIOS = [
-    ['Socia nueva, semana 1', { ant:'nueva', est:0 }, 'inicio'],
-    ['Socia nueva, día 14 sin entrar', { ant:'nueva', est:0, aus:14 }, 'inicio'],
+    ['Socia nueva, semana 1', { ant:'nueva', est:0, fit:0 }, 'inicio'],
+    ['Socia nueva, día 14 sin entrar', { ant:'nueva', est:0, aus:14, fit:0 }, 'inicio'],
     ['Habitual que viene menos: 10 días sin venir', { exp:'habitual', est:1, aus:10 }, 'inicio'],
     ['Habitual en la sala, noche llena, con auriculares', { exp:'habitual', mom:'sala', sl:1, voz:1, au:1 }, 'hoy'],
     ['Avanzado, semana completa, VIVA Flow', { ant:'1a', est:3, sem:'completa' }, 'inicio'],
@@ -327,7 +327,7 @@
 //#bloque 985
   // T16 · gancho de prueba para tools/barrido.py: abre pantallas que necesitan estado. Ninguna pantalla lo usa.
   window.VK_PRUEBA = { abrir: function (id) {
-    if (id === 'sala') { if (!SALA) salaDemo(); renderSala(); go('sala'); return; }
+    if (id === 'sala') { if (!SALA) salaDemo(); renderSala(); cajaAbrir(); return; }
     if (id === 'cierre') { if (!SALA) salaDemo(); salaCerrar(); return; }
     if (id === 'onbE') { OB.step = 'inv'; OB.obj = []; OB.zonaAbierta = false; OB.zona = null; OB.meta = 3; OB.res = {}; obRender(); go('onbE'); return; }
     if (id === 'chat') { openChat(conv[0].id); return; }

@@ -61,7 +61,8 @@
   const hist = {
     remo:hs([63].concat(dB), [35, 37.5, 40, 40, 40, 40]),
     jalon:hs(dB, [40, 42.5, 45, 45, 45]),
-    curl:hs(dB, [8, 8, 10, 10, 10]),
+    curl:hs(dB, [15, 17.5, 17.5, 20, 20]),  // T17: el curl del Día B es en máquina (20 kg), no con mancuernas
+    pecho:hs(dB, [25, 27.5, 30, 30, 30]),
     sentadilla:hs(dA, [12, 14, 14, 14, 14]),
     press:hs(dC, [6, 8, 8, 8, 8]),
     puente:hs(dA, [0, 0, 5, 10, 10]),
@@ -484,11 +485,15 @@
   // ===== v41 · Entrenar (claude/instruccion-prototipo-entrenar.md): Hoy, modo sala y cierre =====
   // Datos de la demo con la forma de EVO (ejercicios y cargas a validar por los profes de Viva)
   const ACT_B = [['Movilidad de hombros con banda', '10 por lado'], ['Escápulas en la pared', '12'], ['Bisagra de cadera', '10'], ['Plancha', '20 s']];
+  // T17 · activación de 5 minutos sin accesorios para quien arranca (borrador: la valida el profe) y el cómo de cada movimiento
+  const ACT_NUEVO = [['Marcha en el lugar', '1 min', 'Levantá las rodillas a la altura de la cadera y acompañá con los brazos.'], ['Círculos de hombros', '10 por lado', 'Brazos al costado: dibujá círculos grandes, despacio.'], ['Bisagra de cadera', '10', 'Rodillas apenas flexionadas: llevá la cadera atrás con la espalda derecha y volvé.'], ['Sentadilla al banco', '10', 'Sentate apenas en el banco y levantate empujando con los talones.'], ['Plancha con rodillas apoyadas', '20 s', 'Codos debajo de los hombros; el cuerpo en línea de las rodillas a la cabeza.']];
+  const ACT_COMO = { 'Movilidad de hombros con banda':'Con la banda tomada ancha, pasala de adelante hacia atrás por arriba de la cabeza, sin doblar los codos.', 'Escápulas en la pared':'Espalda contra la pared y brazos en W: subilos y bajalos sin despegar los codos.', 'Bisagra de cadera':'Rodillas apenas flexionadas: llevá la cadera atrás con la espalda derecha y volvé.', 'Plancha':'Codos debajo de los hombros, el cuerpo en línea recta; la cadera no cae.' };
   const SALA_B = {
     act:{ min:8, items:ACT_B },
     fue:[
       { k:'remo', n:'Remo sentado', maq:'remo', zona:'Zona espalda · al fondo, a la izquierda', sr:3, rep:12, kg:42.5, prev:40, t:270, ctl:'Bajá en 2 o 3 segundos sin soltar el peso', tempo:[3,1,1,0], mirar:['Espalda derecha: no vayas para atrás', 'Llevá los codos pegados hasta el final'], alt:[{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' }, { n:'Remo en polea baja', zona:'Zona poleas · junto a la columna', kg:40, maq:'polea' }] },
       { k:'jalon', n:'Jalón al pecho', maq:'jalon', zona:'Zona espalda · al fondo, al centro', sr:3, rep:12, kg:45, prev:45, t:270, ctl:'Llevá la barra al pecho sin balancearte', tempo:[3,0,1,0], mirar:['Pecho arriba: la barra va a la clavícula', 'Subí controlando, que no te tire'], alt:[{ n:'Jalón con agarre neutro', zona:'Zona espalda · al fondo, al centro', kg:42.5, maq:'jalon' }, { n:'Dominadas asistidas', zona:'Zona espalda · contra la pared', kg:null, maq:'jalon' }], hombro:{ n:'Remo con apoyo de pecho', zona:'Zona espalda · al fondo, a la derecha', kg:35, maq:'remo' } },
+      { k:'pecho', n:'Press de pecho en máquina', maq:'generic', zona:'Zona pecho · junto a la entrada', sr:3, rep:12, kg:30, prev:30, t:240, ctl:'Bajá en 2 segundos y empujá sin trabar los codos', tempo:[2,0,1,0], mirar:['La espalda apoyada en el respaldo', 'Las manos a la altura del pecho'], alt:[{ n:'Press con mancuernas en banco', zona:'Zona peso libre', kg:12, maq:'generic' }, { n:'Flexiones con apoyo en el banco', zona:'Zona peso libre', kg:null, maq:'generic' }] },
       { k:'curl', n:'Curl de bíceps en máquina', maq:'curl', zona:'Zona brazos · junto a los espejos', sr:3, rep:12, kg:20, prev:20, t:240, ctl:'Despacio, sin despegar los codos del apoyo', tempo:[3,0,1,1], mirar:['Los codos quietos en el apoyo', 'Bajá hasta estirar casi del todo'], alt:[{ n:'Curl con mancuernas', zona:'Zona peso libre', kg:10, maq:'curl' }, { n:'Curl en polea', zona:'Zona poleas · junto a la columna', kg:15, maq:'polea' }] }
     ],
     car:{ maq:'Cinta', min:12, txt:'caminata en subida', zona:'Zona cardio · frente a las ventanas' }
@@ -527,7 +532,7 @@
     if (v === 'skip') { prep.skip = true; CHK = 'skip'; }
     else { prep.resp = { pSueno:x, pDolor:x, pEnergia:x }; prep.skip = false; CHK = v; }
     if (SALA) { SALA.chk = false; salaRehacer(); }
-    calcPrep(); renderEntHoy(); if (SALA && curScr === 'sala') renderSala();
+    calcPrep(); renderEntHoy(); if (SALA && salaVis()) renderSala();
   }
   function chkAnswer(v){
     if (v === 'cuidar') {
@@ -550,7 +555,7 @@
     if (v === 'avisa') { AVISO_PROFE = false; toast('Listo. Lucas sabe que hoy ' + zt + ' está peor'); }
     if (v === 'noavisa') { AVISO_PROFE = false; }
     if (SALA) salaRehacer();
-    renderHoy(); renderEntHoy(); if (SALA && curScr === 'sala') renderSala();
+    renderHoy(); renderEntHoy(); if (SALA && salaVis()) renderSala();
     return true;
   }
   const fmtKg = v => (Math.round(v * 10) / 10).toString().replace('.', ',');
@@ -560,6 +565,7 @@
       act:{ min:8, items:ACT_B },
       fue:d.ex.map(k => { const st = lib[k].sets[0], kg = parseFloat(String(st[1]).replace(',', '.')); return { k:k, n:lib[k].n, maq:'generic', zona:'Zona musculación', sr:lib[k].sets.length, rep:parseInt(String(st[2]), 10) || 12, kg:isNaN(kg) ? null : kg, prev:null, seg:esTiempo(k), alt:(ALT_G[k] || []).map(n => ({ n:n, zona:'Zona musculación', kg:null, maq:'generic' })) }; }),
       car:{ maq:'Cinta', min:12, txt:'caminata en subida', zona:'Zona cardio · frente a las ventanas' } };
+    if (EXP === 'arranco') P.act = { min:5, items:ACT_NUEVO, nuevo:true };  // T17 · activación para quien arranca
     varOverlay(P, d.k);  // T15 · el modelo con variantes, una sola fuente para Hoy, el motor, la planilla y Rutinas
     if (CORTO) { P.act = { min:5, items:P.act.items.slice(0, 2) }; P.fue = P.fue.slice(0, 2); P.car.min = 8; }
     if (CUIDA === 'Hombro' && PEOR) { P.fue = P.fue.filter(f => f.k !== 'remo' && f.k !== 'jalon'); P.car.min += 8; }
@@ -621,7 +627,7 @@
   $('#hParts').addEventListener('click', e => { const b = e.target.closest('[data-hp]'); if (!b) return; const i = +b.dataset.hp; hOpen = hOpen === i ? -1 : i; renderEntHoy(); });
   $('#hCorto').addEventListener('click', () => { CORTO = !CORTO; renderEntHoy(); renderToday(); toast(CORTO ? 'Versión de 30 minutos: las tres partes, más cortas' : 'Volviste a la versión completa'); });
   $('section#hoy').addEventListener('click', hoyClick);
-  $('#hEmpezar').addEventListener('click', () => { if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else salaStart(); });
+  $('#hEmpezar').addEventListener('click', () => { if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); cajaAbrir(); } else salaStart(); });
   // ---- Modo sala ----
   function salaNew(){ const P = salaPlan(); return { P:P, step:0, actDone:false, F:P.fue.map(f => fNuevo(f)), carDone:false, carMin:P.car.min, t0:+ahora(), saludo:true, chk:false, rest:0, crono:0, el:0, vence:false, repreg:false, pausa:false, mtStep:null, hito:'' }; }
   function salaStart(){
@@ -630,7 +636,7 @@
     MOM = 'sesion'; syncMomPick();
     try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { if (SALA) SALA.lock = l; }).catch(() => {}); } catch (_) {}
     renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy();
-    renderSala(); go('sala');
+    renderSala(); cajaAbrir();
     hablar(mtSaludo(), 'inicio');
   }
   // Estado "sesión abierta" de la demo: activación y el primer ejercicio hechos
@@ -654,6 +660,7 @@
   function renderSala(){
     if (!SALA) return;
     const S = SALA, st = steps()[S.step], P = S.P, prog = salaProg();
+    if (curScr !== 'sala') { if (S.mtStep !== S.step) mtCambio(S); cajaRender(); return; }  // T17: la sesión vive en la caja
     $('#salaProg').innerHTML = ['Activación', 'Fuerza', 'Cardio'].map((n, i) => '<span class="sp' + (prog[i] >= 1 ? ' full' : '') + '"><i style="width:' + Math.round(prog[i] * 100) + '%"></i></span>').join('');
     const fi = curF();
     $('#salaPos').textContent = st === 'act' ? 'Activación' : st === 'car' ? 'Cardio' : 'Fuerza · ' + (fi + 1) + ' de ' + S.F.length; mtPos(st);
@@ -675,7 +682,7 @@
     } else {
       const f = fx(fi), F = S.F[fi];
       const llena = SALA_LLENA && fi === 0 && !S.llenaOk && S.P.fue.length > 1 && S.P.fue.some(x => x.k === 'curl') && S.P.fue[0].k !== 'curl';
-      if (llena) h += '<div class="schk sllena"><span class="schq">La zona de espalda está a full</span><span class="small muted">' + f.n + ' está ocupada. ¿Empezamos por bíceps?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-ll="dale">Dale</button><button class="btn ghost sm" data-ll="no">No, sigo así</button></div><button class="link lime" data-ll="otra" style="min-height:40px;padding:0;font-size:14px;align-self:flex-start">Ver otras de tu sede</button></div>';
+      if (llena) h += '<div class="schk sllena"><span class="schq">¿' + f.n + ' está ocupada?</span><span class="small muted">Si está ocupada, podés empezar por bíceps.</span><div class="grid2" style="gap:8px"><button class="btn sm" data-ll="dale">Dale</button><button class="btn ghost sm" data-ll="no">No, sigo así</button></div><button class="link lime" data-ll="otra" style="min-height:40px;padding:0;font-size:14px;align-self:flex-start">Ver otras de tu sede</button></div>';
       else h += '<div class="smaq">' + maqSvg(f.maq) + '<span class="sfoto">Foto de la sede</span></div>';
       h += '<span class="szona">' + f.zona + '</span>' +
         '<h2 class="sname">' + f.n + '</h2>' + varHtml(f, fi) +
@@ -711,8 +718,8 @@
     }
     S.rest = 0; clearInterval(restT); S.volver = null;
     WK.reg = true;
-    if (st === 'act') { S.actDone = true; WK.act++; }
-    else if (st === 'car') { S.carDone = true; WK.car += S.carMin; S.cronoOn = false; renderForma(); return salaCerrar(); }
+    if (st === 'act') { S.actDone = true; S.actSeg = S.etapaT || 0; WK.act++; }
+    else if (st === 'car') { S.carReal = Math.round(S.crono / 60); S.carDone = S.carReal > 0; WK.car += S.carReal; S.cronoOn = false; renderForma(); return salaCerrar(); }
     else { const F = S.F[curF()]; F.sets = F.sets.map(() => true); F.done = true; if (S.F.every(x => x.done || x.salteado) && !S.fueSumada) { S.fueSumada = true; WK.fue++; } }
     S.step = Math.min(steps().length - 1, S.step + 1);
     renderForma(); renderToday(); renderSala(); $('#salaBody').scrollTop = 0;
@@ -733,7 +740,7 @@
     if (e.target.closest('#sSkipRest')) { S.rest = 0; clearInterval(restT); volverAlGrupo(); renderSala(); return; }
     if (e.target.closest('#sAjustar')) return salaAjustar();
     if (e.target.closest('#sAjCar')) { $('#salaSheetIn').innerHTML = '<span class="h2">Minutos de cardio</span><div class="sadj"><button class="opt" data-cm="-5">−5</button><b id="sCarMin">' + S.carMin + ' min</b><button class="opt" data-cm="5">+5</button></div><button class="btn" data-close>Listo</button>'; $('#salaSheet').hidden = false; return; }
-    if (e.target.closest('#sCrono')) { S.cronoOn = !S.cronoOn; clearInterval(cronoT); if (S.cronoOn) cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); renderSala(); return; }
+    if (e.target.closest('#sCrono')) { S.cronoOn = !S.cronoOn; clearInterval(cronoT); if (S.cronoOn) cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (salaVis()) renderSala(); if (BLOQ) lockRen(); }, 1000); renderSala(); return; }
     if (e.target.closest('#sCambiar')) return salaCambiar();
   });
   // Deslizar a la derecha vuelve al ejercicio anterior
@@ -781,7 +788,7 @@
       if (v === 'ocupada') { return salaCambiarOcupada(); }
       if (v === 'ocupada-old') { $('#salaSheetIn').innerHTML = '<span class="h2">Otras de tu sede</span><span class="small muted">Trabajan lo mismo. Es solo por hoy y el registro sigue.</span>' + base.alt.map((a, i) => '<button class="scmb" data-alt="' + i + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button>').join(''); return; }
       if (v === 'molesta') { const a = base.alt[base.alt.length - 1]; $('#salaSheetIn').innerHTML = '<span class="h2">Probá con esta</span><button class="scmb" data-alt="' + (base.alt.length - 1) + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button><p class="shint">Si duele, pará: no hace falta forzar.</p><span style="font-weight:700">¿Le avisamos a tu profe?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-avisa="1">Avisale a Lucas</button><button class="btn ghost sm" data-close>No, gracias</button></div>'; return; }
-      if (v === 'nose') { $('#salaSheetIn').innerHTML = '<span class="h2">' + f.n + '</span>' + (esMenor() ? '<span class="muted" style="line-height:1.45">Tu profe te lo muestra en la sala.</span>' : '<button class="btn ghost" data-como="1">Ver cómo se hace</button>') + '<button class="btn sm" data-avisa="1">Pedile ayuda a tu profe</button>'; return; }
+      if (v === 'nose') { $('#salaSheetIn').innerHTML = '<span class="h2">' + f.n + '</span>' + '<button class="btn ghost" data-cjcomo="1">Ver cómo se hace</button>' + (esMenor() ? '<span class="muted" style="line-height:1.45">Tu profe te lo muestra en la sala.</span>' : '') + '<button class="btn sm" data-avisa="1">Pedile ayuda a tu profe</button>'; return; }
       if (v === 'saltear') { const F = S.F[curF()]; F.salteado = true; if (S.F.every(x => x.done || x.salteado) && !S.fueSumada && S.F.some(x => x.done)) { S.fueSumada = true; WK.fue++; } S.step = Math.min(steps().length - 1, S.step + 1); toast('Salteado. Seguimos'); renderForma(); return close(); } }
     const al = e.target.closest('[data-alt]'); if (al) { const F = S.F[curF()], a = S.P.fue[curF()].alt[+al.dataset.alt]; F.swap = a; F.kg = a.kg; toast('Listo: hoy hacés ' + a.n.toLowerCase()); return close(); }
     if (e.target.closest('[data-avisa]')) { toast('Listo. Lucas sabe que estás en ' + fx(curF()).n.toLowerCase() + ''); return close(); }
@@ -794,19 +801,17 @@
     const S = SALA; if (!S) return;
     clearInterval(restT); clearInterval(cronoT); try { if (S.lock) S.lock.release(); } catch (_) {} S.cerrada = true;
     const prog = salaProg(), completa = prog.every(x => x >= 1), r = rutinas[actual], d = r.dias[r.next];
-    const tReal = (S.tEj || 0) + (S.tDesc || 0) + (S.tTrans || 0), min = tReal >= 300 ? Math.round(tReal / 60) : Math.round(planMin(S.P) * (completa ? 1.05 : 0.6));
-    const remo = S.P.fue.findIndex(f => f.k === 'remo'), rec = remo >= 0 && S.F[remo].done && !S.F[remo].swap && S.F[remo].kg > (S.P.fue[remo].prev || 99) && EXP !== 'arranco' && !esMenor();
+    const tReal = (S.tEj || 0) + (S.tDesc || 0) + (S.tTrans || 0), min = Math.max(1, Math.round(tReal / 60));
+    const remo = S.P.fue.findIndex(f => f.k === 'remo'), rec = remo >= 0 && S.F[remo].done && !S.F[remo].decl && !S.F[remo].swap && S.F[remo].kg > (S.P.fue[remo].prev || 99) && EXP !== 'arranco' && !esMenor();
     if (rec) { const h = hist.remo; if (h) { const last = h[h.length - 1]; if (last[0] === hoyLbl) last[1] = S.F[remo].kg; else h.push([hoyLbl, S.F[remo].kg]); } }
-    CIERRE_K = S.P.fue.filter((f, i) => S.F[i].done && !S.F[i].swap).map(f => f.k);
+    CIERRE_K = S.P.fue.filter((f, i) => S.F[i].done && !S.F[i].decl && !S.F[i].swap).map(f => f.k);
     r.next = (r.next + 1) % r.dias.length; const nx = r.dias[r.next];
     if (!NOENT) { hoyEntreno = true; visHoy = true; } MOM = 'despues'; sesHecha = true; syncMomPick();
     renderForma(); renderHoy(); renderToday(); renderAcc(); renderEntHoy(); renderRoutines(); PROG_MIN = min; renderAvance(); renderRecords(); renderProg();
-    const lect = completa && (EXP === 'arranco' || esMenor()) ? 'Hiciste tu tercera sesión completa. Lo estás haciendo bien ⚡'
-      : completa ? 'Sesión completa en ' + min + ' minutos.' + (rec ? ' En remo subiste a ' + fmtKg(S.F[remo].kg) + ' kg ⚡' : ' ⚡')
-      : 'Guardamos lo que hiciste ⚡ ' + [S.actDone ? 'la activación' : '', S.F.filter(f => f.done).length ? S.F.filter(f => f.done).length + (S.F.filter(f => f.done).length === 1 ? ' ejercicio' : ' ejercicios') + ' de fuerza' : ''].filter(Boolean).join(' y ') + '.';
+    const lect = cierreLect(S, completa, min, rec ? S.F[remo].kg : null);  // T17: nombra lo hecho, no reprocha lo que faltó
     renderSemana(); const sv = $('#wkBox .eqsvg'), comp = semCompleta(), cump = semCumplida();
     $('#cierreBody').innerHTML = '<span class="tagi m cbig"><span>' + (completa ? '¡Listo!' : 'Guardado') + '</span></span>' +
-      '<p class="sv big">' + SV_BOLT + '<span>' + lect + '</span></p>' + tiemposHtml(S) +
+      '<p class="sv big">' + SV_BOLT + '<span>' + lect + '</span></p>' + tiemposHtml(S) + cierreExtra(S) +
       '<div class="card cisem"><div class="between"><span class="wktit"><span class="sig"><b>Tu</b> <i>semana</i></span>' + (comp ? '<span class="tagi sm"><span>Completa</span></span>' : cump ? '<span class="wkleg2">· Cumplida</span>' : '') + '</span></div>' + (sv ? sv.outerHTML : '') + '</div>' +
       (rec ? '<div class="card cilog"><span style="font-weight:700">Récord en remo sentado: ' + fmtKg(S.F[remo].kg) + ' kg ⚡</span><button class="flowshare" id="ciShare"><svg class="bolt-ico" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg> Contalo en tus historias</button></div>' : '') +
       (NOENT ? '<span class="small muted cinoent">Tu sesión encendió tu semana. La visita se suma cuando llegue tu entrada.</span>' : '') +
@@ -815,10 +820,11 @@
       '<div class="cinext"><span class="small muted">Tu próxima</span><span style="font-weight:700;font-size:17px">Día ' + nx.k + ' · ' + nx.n.toLowerCase() + '</span></div>' +
       '<button class="btn" data-go="inicio">Volver a tu inicio</button>';
     hablar(vozResumen(S, rec ? S.F[remo].kg : null), 'cierre');
-    SALA = null;
+    SALA = null; cajaCerrar();
     go('cierre');
   }
   $('#cierreBody').addEventListener('click', e => {
+    if (e.target.closest('[data-cjcar]')) { $('#cardioSheet').hidden = false; return; }
     const fl = e.target.closest('[data-fl]'); if (fl) { $$('#ciFeel .opt').forEach(x => x.setAttribute('aria-pressed', x === fl));
       const lim = fl.dataset.fl === 'limite'; CIERRE_K.forEach(k => { LIM[k] = lim ? (LIM[k] || 0) + 1 : 0; });
       const dos = lim && CIERRE_K.some(k => LIM[k] >= 2);
@@ -976,12 +982,12 @@
   function vozEj(st){
     const S = SALA; if (st === 'car') return S.P.car.maq + ', ' + S.carMin + ' min, ' + S.P.car.txt + '. Podés hablar, pero no cantar.';
     const i = +st.slice(1), f = fx(i), F = S.F[i];
-    return f.n + ': ' + f.sr + ' × ' + F.reps[0] + (f.seg ? ' segundos' : '') + '.' + (f.prev && !F.swap ? ' La vez pasada, ' + fmtKg(f.prev) + ' kg.' : F.kg ? ' Con ' + fmtKg(F.kg) + ' kg.' : '') + (f.ctl && !F.swap ? ' ' + f.ctl + '.' : '');
+    return f.n + ': ' + prescVoz(f, F) + '.' + (f.ctl && !F.swap ? ' ' + f.ctl + '.' : '');  // T17: la misma prescripción que la pantalla
   }
-  function vozFinDescanso(){ const S = SALA, i = curF(); if (!S || i < 0) return; const F = S.F[i], j = F.sets.indexOf(false); hablar('Descanso terminado' + (j >= 0 ? ': serie ' + (j + 1) + ' de ' + F.sets.length + '.' : '.'), 'descanso'); }
+  function vozFinDescanso(){ const S = SALA, i = curF(); if (!S || i < 0) return; const F = S.F[i], j = F.sets.indexOf(false); hablar('Descanso terminado.' + (j >= 0 ? ' ' + serieAhora(fx(i), F, j, true) + '.' : ''), 'descanso'); }
   function vozResumen(S, recKg){
-    const nF = S.F.filter(f => f.done).length, p = [];
-    if (S.actDone) p.push('la activación'); if (nF) p.push(nF + (nF === 1 ? ' ejercicio' : ' ejercicios') + ' de fuerza'); if (S.carDone) p.push(S.carMin + ' min de ' + S.P.car.maq.toLowerCase());
+    const nF = S.F.filter(f => f.done && !f.decl).length, p = [];
+    if (S.actDone) p.push('la activación'); if (S.F.some(f => f.decl)) p.push('la fuerza'); else if (nF) p.push(nF + (nF === 1 ? ' ejercicio' : ' ejercicios') + ' de fuerza'); if (S.carDone) p.push(S.carReal + ' min de ' + S.P.car.maq.toLowerCase());
     return (p.length ? 'Hiciste ' + (p.length > 1 ? p.slice(0, -1).join(', ') + ' y ' + p[p.length - 1] : p[0]) + '.' : 'Cerramos la sesión.') + (recKg ? ' En remo subiste a ' + fmtKg(recKg) + ' kg.' : '');
   }
   // ---- Cambio de paso (cualquiera sea el modo: toque, Decímelo, pantalla bloqueada o deslizar) ----
@@ -1008,14 +1014,14 @@
     const p = $('#salaPausa'); p.hidden = MANUAL; p.innerHTML = S && S.pausa ? ICO_SEG : ICO_PAU; p.setAttribute('aria-label', S && S.pausa ? 'Seguir la sesión' : 'Pausar la sesión'); p.setAttribute('aria-pressed', !!(S && S.pausa));
     acSync();
   }
-  function cronoArrancar(){ const S = SALA; if (!S || S.cronoOn) return; S.cronoOn = true; clearInterval(cronoT); cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); }
+  function cronoArrancar(){ const S = SALA; if (!S || S.cronoOn) return; S.cronoOn = true; clearInterval(cronoT); cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (salaVis()) renderSala(); if (BLOQ) lockRen(); }, 1000); }
   function mtTic(){
     const S = SALA; if (!S || S.pausa || MANUAL) { if (BLOQ && S) lockRen(); return; }
     const st = steps()[S.step]; if (S.mtStep !== S.step) return;
     if (enPrep(st)) { if (BLOQ) lockRen(); return; }  // v54: el motor no corre mientras se prepara
     S.el += mtVel(); const d = mtDur(st);
-    if (!S.vence && S.el >= d) { S.vence = true; if (curScr === 'sala') renderSala(); } // la propuesta va en pantalla y en la pantalla bloqueada, en silencio
-    else if (S.vence && !S.repreg && S.el >= d + MT_REPREG) { S.repreg = true; if (curScr === 'sala') renderSala(); }
+    if (!S.vence && S.el >= d) { S.vence = true; if (salaVis()) renderSala(); } // la propuesta va en pantalla y en la pantalla bloqueada, en silencio
+    else if (S.vence && !S.repreg && S.el >= d + MT_REPREG) { S.repreg = true; if (salaVis()) renderSala(); }
     if (BLOQ) lockRen();
   }
   setInterval(mtTic, 1000);
@@ -1133,7 +1139,7 @@
         (L.sec.length ? '<span class="muted">También: ' + L.sec.map(k => musName[k]).join(' · ') + '</span>' : '') + '<span class="legend" style="justify-content:flex-start"><i class="lp"></i>Principal <i class="ls"></i>Secundario</span>' +
         '<button class="link lime hcver" data-vercuerpo="sesion" data-tipo="mus" data-titulo="' + f.n + '" data-hoy="' + L.mus.join(',') + '" data-rec="' + L.sec.join(',') + '">Ver</button></div></div>';
     }
-    let h = f.prev && !F.swap ? '<span class="small muted">La vez pasada: ' + fmtKg(f.prev) + ' kg · ' + f.sr + ' × ' + f.rep + '</span>' : '';
+    let h = f.prev && !F.swap ? '<span class="small muted">La vez pasada: ' + fmtKg(f.prev) + ' kg' + (f.esq || (f.obj && f.obj !== 'reps') ? '' : ' · ' + f.sr + ' × ' + f.rep) + '</span>' : '';
     if (F.kg) h += '<div class="sprow"><span>Carga</span><span class="sadj"><button class="opt" data-pk="-2.5" aria-label="Bajar 2,5 kg">−</button><b>' + fmtKg(F.kg) + ' kg</b><button class="opt" data-pk="2.5" aria-label="Subir 2,5 kg">+</button></span><span class="spgap"></span></div>';
     h += F.reps.map((r, j) => '<div class="sprow"><span>' + serieLbl(f, F, j) + (F.kgs && F.kgs[j] !== F.kg ? ' · ' + fmtKg(F.kgs[j]) + ' kg' : '') + '</span><span class="sadj"><button class="opt" data-pr="' + j + ':-1" aria-label="Menos">−</button><b>' + r + (f.seg ? ' s' : ' rep') + '</b><button class="opt" data-pr="' + j + ':1" aria-label="Más">+</button></span><button class="spchk' + (F.sets[j] ? ' on' : '') + '" data-set="' + j + '" aria-pressed="' + F.sets[j] + '" aria-label="Serie ' + (j + 1) + (F.sets[j] ? ', hecha' : '') + '">✓</button></div>').join('');
     return h + '<span class="small muted">Listo anota lo que está acá.</span>';
@@ -1221,7 +1227,7 @@
     const ult = !car && i === S.F.length - 1;
     const llena = !car && SALA_LLENA && i === 0 && !S.llenaOk && S.P.fue.length > 1 && S.P.fue.some(x => x.k === 'curl') && S.P.fue[0].k !== 'curl';
     let h = '<span class="sprep">Preparando · ' + (car ? 'cardio' : 'ejercicio ' + (i + 1) + ' de ' + S.F.length) + '</span>';
-    if (llena) h += '<div class="schk sllena"><span class="schq">La zona de espalda está llena</span><span class="small muted">' + f.n + ' está ocupada. ¿Empezamos por bíceps?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-ll="dale">Sí</button><button class="btn ghost sm" data-ll="no">No, sigo así</button></div></div>';
+    if (llena) h += '<div class="schk sllena"><span class="schq">¿' + f.n + ' está ocupada?</span><span class="small muted">Si está ocupada, podés empezar por bíceps.</span><div class="grid2" style="gap:8px"><button class="btn sm" data-ll="dale">Sí</button><button class="btn ghost sm" data-ll="no">No, sigo así</button></div></div>';
     h += '<div class="smaq">' + maqSvg(car ? 'cinta' : f.maq) + '<span class="sfoto">Foto de la sede</span></div><span class="szona">' + (car ? S.P.car.zona : f.zona) + '</span>' +
       '<h2 class="sname">' + (car ? S.P.car.maq + ' · ' + S.P.car.txt : f.n) + '</h2>' +
       (car ? '<div class="sload"><b>' + S.carMin + '</b> min</div>' : '<div class="sload">' + cargaTxt(f, F) + '</div>') +
@@ -1257,13 +1263,14 @@
     S.tEj = S.tEj || 0; S.tDesc = S.tDesc || 0; S.tTrans = S.tTrans || 0;
     if (enPrep(st)) {
       const antes = S.esp || 0; S.trans = (S.trans || 0) + v; S.esp = antes + v; S.tTrans += v;
-      if (curScr === 'sala') { if (antes < TRANS_MAX && S.trans >= TRANS_MAX) renderSala(); else { const el = $('#sTrans'); if (el) el.textContent = transTxt(); } }
+      if (salaVis()) { if (antes < TRANS_MAX && S.trans >= TRANS_MAX) renderSala(); else { const el = $('#sTrans'); if (el) el.textContent = transTxt(); } }
     } else if (st[0] === 'f' && S.rest > 0) S.tDesc += v;
     else S.tEj += v;
   }, 1000);
   function tiemposHtml(S){
     const tot = (S.tEj || 0) + (S.tDesc || 0) + (S.tTrans || 0); if (tot < 60) return '';
     const m = x => Math.round(x / 60);
+    if (SEG === 'solo') return '<p class="ctiempos">' + m(tot) + ' min en la sala.</p>';
     return '<p class="ctiempos">' + m(tot) + ' min: ' + m(S.tEj) + ' entrenando, ' + m(S.tDesc) + ' descansando, ' + m(S.tTrans) + ' entre ejercicios.</p>';
   }
 //#bloque 308
@@ -1293,7 +1300,7 @@
       if (a.reps) f.repsS = a.reps.slice(0, f.sr); });
   }
   function fNuevo(f){ const n = f.sr, at = (A, x) => A[Math.min(x, A.length - 1)];
-    return { sets:Array(n).fill(false), done:false, salteado:false, kg:f.kg, kgs:f.kgs ? Array.from({ length:n }, (_, x) => at(f.kgs, x)) : null, reps:f.repsS ? Array.from({ length:n }, (_, x) => at(f.repsS, x)) : Array(n).fill(f.rep), swap:null }; }
+    return { sets:Array(n).fill(false), done:false, salteado:false, kg:f.kg, kgs:f.kgs ? Array.from({ length:n }, (_, x) => at(f.kgs, x)) : null, reps:f.repsS ? Array.from({ length:n }, (_, x) => at(f.repsS, x)) : Array(n).fill(f.obj === 'rango' ? f.rango[1] : f.rep), swap:null }; }
   function kgsShift(F, d){ F.kg = Math.max(0, F.kg + d); if (F.kgs) F.kgs = F.kgs.map(x => Math.max(0, x + d)); }
   // ---- la carga y la variante, dichas en una línea (motor, Hoy y Rutinas) ----
   function cargaTxt(f, F){
@@ -1321,7 +1328,7 @@
   }
   // ---- series con grupos: superserie y circuito alternan sin descanso; descanso del grupo al terminar el último ----
   function descansar(seg){ const S = SALA; clearInterval(restT); if (!seg) { volverAlGrupo(); return; } S.rest = seg;
-    restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) { vozFinDescanso(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (_) {} volverAlGrupo(); } if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); }
+    restT = setInterval(() => { if (!SALA || SALA.rest <= 0) { clearInterval(restT); return; } if (SALA.pausa) return; SALA.rest = Math.max(0, SALA.rest - mtVel()); if (SALA.rest <= 0) { vozFinDescanso(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (_) {} volverAlGrupo(); } if (salaVis()) renderSala(); if (BLOQ) lockRen(); }, 1000); }
   function volverAlGrupo(){ const S = SALA; if (S && S.volver != null) { S.step = S.volver; S.volver = null; S.pan = null; } }
   function marcarSerie(j){
     const S = SALA, i = curF(), F = S.F[i], f = fx(i);
@@ -1452,3 +1459,221 @@
     if (e.target.closest('#sListoTodo')) { salaListo(true); toast('Anotado como estaba indicado'); return; }
     if (e.target.closest('#sDescGo')) { descansar(descDe(fx(curF()))); renderSala(); }
   });
+//#bloque 311
+  // ===== T17 · La caja de seguimiento (docs/tickets/T17-la-caja-de-seguimiento.md) =====
+  // La sesión es una caja sobria encima de la pantalla actual: un dato grande y tres botones (Pausa · principal · Profe).
+  // El motor sigue siendo el de T7/T9/T15 (SALA, salaListo, marcarSerie, descansar); la caja es solo cómo se muestra.
+  // SEG: 'guiame' (serie por serie) · 'solo' (un aviso por etapa, declarado) · null (se pregunta una vez y se recuerda).
+  var CAJA = { abierta:false, chica:false }, SEG = null, SEG_DICHO = false, CAR_PEND = null;
+  var PORQUE_ACT = 'Tomate 5 minutos para calentar: tu cuerpo recién se está adaptando; en caliente todo sale mejor.';  // texto de Juanjo; lo firma y valida el profe
+  var REC_TXT = 'Te quedó el cardio de hoy. Cuando lo hagas, sumalo con un toque.';  // propuesta; la aprueba Juanjo
+  var ICO_PROFE = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>';
+  var ICO_MAS = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
+  var ICO_ABAJO = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  function salaVis(){ return curScr === 'sala' || !!(CAJA && CAJA.abierta && !CAJA.chica); }
+  function cajaAbrir(){ if (!SALA || !CAJA) return; CAJA.abierta = true; CAJA.chica = false; if (SEG === null && antAct() === 'nueva') SEG = 'guiame'; cajaRender(); }
+  function cajaCerrar(){ if (!CAJA) return; CAJA.abierta = false; CAJA.chica = false; cajaRender(); }
+  // Qué hacer ahora, dicho igual en la caja, la pastilla y la voz: "Serie 2 · 42,5 kg · 10"
+  function serieAhora(f, F, j, voz){
+    const ult = j === F.reps.length - 1, kg = F.kgs ? F.kgs[j] : F.kg;
+    const r = f.obj === 'rango' ? (voz ? 'de ' + f.rango[0] + ' a ' + f.rango[1] : f.rango.join('–')) : f.obj === 'amrap' && (!f.amrapUlt || ult) ? 'las que salgan' : F.reps[j] + (f.seg ? (voz ? ' segundos' : ' s') : '');
+    return (f.gt === 'circuito' ? 'Vuelta ' : 'Serie ') + (j + 1) + (kg ? ' · ' + fmtKg(kg) + ' kg' : '') + ' · ' + r + (f.esq === 'drop' && ult ? ' · después ' + f.drop.map(fmtKg).join(' y ') + ' kg' : '');
+  }
+  // La prescripción entera, en palabras, para la voz (pirámide y rango incluidos)
+  function prescVoz(f, F){
+    const R = F.reps, n = R.length, uni = f.gt === 'circuito' ? ' vueltas' : ' series', u = f.seg ? ' segundos' : '';
+    let t = f.obj === 'rango' ? n + uni + ' de ' + f.rango[0] + ' a ' + f.rango[1]
+      : f.obj === 'amrap' && !f.amrapUlt ? n + uni + ', las que salgan'
+      : R.every(r => r === R[0]) ? n + uni + ' de ' + R[0] + u : n + uni + ': ' + R.slice(0, -1).join(', ') + ' y ' + R[n - 1];
+    if (f.obj === 'amrap' && f.amrapUlt) t += ', la última las que salgan';
+    const K = F.kgs && F.kgs.some(x => x !== F.kgs[0]) ? F.kgs.map(fmtKg) : null;
+    if (K) t += '. Con ' + K.slice(0, -1).join(', ') + ' y ' + K[K.length - 1] + ' kg'; else if (F.kg) t += '. Con ' + fmtKg(F.kg) + ' kg';
+    if (f.esq === 'drop') t += '; la última, drop a ' + f.drop.map(fmtKg).join(' y ') + ' kg';
+    return t;
+  }
+  const etapaDe = st => st === 'act' ? 'act' : st === 'car' ? 'car' : 'fue';
+  const ETAPA_N = { act:'Activación', fue:'Fuerza', car:'Cardio' };
+  function cajaQue(){ const S = SALA, st = steps()[S.step]; if (st === 'act') return 'la activación'; if (st === 'car') return 'el cardio';
+    const i = curF(), F = S.F[i], j = F.sets.indexOf(false); return fx(i).n.toLowerCase() + (j >= 0 && SEG !== 'solo' ? ', serie ' + (j + 1) : ''); }
+  const movComo = x => x[2] || ACT_COMO[x[0]] || 'Tu profe te lo muestra en la sala.';
+  const links = L => '<div class="cjlinks">' + L.map(x => '<button data-cj="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>';
+  function cajaHtml(){
+    const S = SALA, st = steps()[S.step], P = S.P, solo = SEG === 'solo', et = etapaDe(st);
+    const pos = et === 'fue' && !solo ? 'Fuerza · ' + (curF() + 1) + ' de ' + S.F.length : ETAPA_N[et];
+    const tot = (S.tEj || 0) + (S.tDesc || 0) + (S.tTrans || 0);
+    let h = '<div class="cjtop"><span class="cjpos">' + pos + (S.pausa ? ' · en pausa' : '') + '</span><span class="cjclock" aria-label="Tiempo de la sesión">' + trMmss(tot) + '</span><button class="cjic" data-cj="menu" aria-label="Opciones de la sesión">' + ICO_MAS + '</button><button class="cjic" data-cj="chica" aria-label="Achicar la sesión">' + ICO_ABAJO + '</button></div>' +
+      '<div class="cjprog" aria-hidden="true">' + salaProg().map(p => '<i><b style="width:' + Math.round(p * 100) + '%"></b></i>').join('') + '</div>';
+    let b = '', main = '';
+    if (SEG === null) {
+      b = '<p class="cjq">¿Cómo te acompañamos?</p><button class="cjop" data-seg="guiame"><b>Guiame</b><span>Serie por serie, con el descanso.</span></button><button class="cjop" data-seg="solo"><b>Voy solo</b><span>Avisás cuando terminás cada parte.</span></button><p class="cjnota">Lo cambiás cuando quieras desde ⋯.</p>';
+    } else if (S.retomar) {
+      b = '<p class="cjbig">' + S.retomar + ' min en pausa</p><p class="cjl">Seguimos con ' + cajaQue() + '.</p>'; main = 'Retomar';
+    } else if (solo) {
+      const desc = et === 'act' ? P.act.items.map(x => x[0]).join(' · ') : et === 'car' ? P.car.maq + ' · ' + S.carMin + ' min' : S.F.map((F, i) => F.done || F.salteado ? '' : fx(i).n).filter(Boolean).join(' · ');
+      b = '<p class="cjej">' + ETAPA_N[et] + '</p><p class="cjbig">' + trMmss(S.etapaT || 0) + '</p><p class="cjl">' + desc + '</p>' + (SEG_DICHO ? '' : '<p class="cjnota">Tu profe ve que entrenaste, no cuánto levantaste.</p>');
+      main = 'Terminé ' + (et === 'act' ? 'la activación' : et === 'car' ? 'el cardio' : 'la fuerza');
+      if (et === 'act') b += links([['actno', 'Hoy no']]); if (et === 'car') b += links([['caraf', 'Lo hago afuera'], ['carno', 'Hoy no']]);
+    } else if (st === 'act') {
+      if (!S.actGo) {
+        b = '<p class="cjej">Activación · ' + P.act.min + ' min</p>' + (EXP === 'arranco' ? '<p class="cjfirma">' + PORQUE_ACT + '<span>Lucas, tu profe</span></p>' : '') + '<p class="cjl">' + P.act.items.map(x => x[0]).join(' · ') + '</p>' + links([['actno', 'Hoy no']]);
+        main = 'La hago';
+      } else {
+        b = '<p class="cjbig">' + trMmss(S.etapaT || 0) + ' <small>de ' + P.act.min + ' min</small></p>' + P.act.items.map((x, i) => '<button class="cjmov" data-mov="' + i + '" aria-expanded="' + (S.movAb === i) + '"><b>' + x[0] + '</b><span>' + x[1] + '</span></button>' + (S.movAb === i ? '<p class="cjmovc">' + movComo(x) + '</p>' : '')).join('');
+        main = 'Listo';
+      }
+    } else if (st === 'car') {
+      const C = P.car;
+      if (!S.carGo) { b = '<p class="cjej">' + C.maq + ' · ' + C.txt + '</p><p class="cjbig">' + S.carMin + ' min</p><p class="cjl">' + cardioInt(C) + '</p>' + links([['caraf', 'Lo hago afuera'], ['carno', 'Hoy no']]); main = 'Lo hago acá'; }
+      else { b = '<p class="cjej">' + C.maq + ' · ' + C.txt + '</p><p class="cjbig">' + trMmss(S.crono) + ' <small>de ' + S.carMin + ' min</small></p><p class="cjl">' + cardioInt(C) + '</p>'; main = 'Listo'; }
+    } else {
+      const i = curF(), f = fx(i), F = S.F[i], j = F.sets.indexOf(false);
+      if (enPrep(st)) {
+        b = '<p class="cjej">' + f.n + '</p><p class="cjl cjmuted">' + f.zona + '</p><p class="cjbig">' + serieAhora(f, F, 0) + '</p>' +
+          ((S.esp || 0) >= TRANS_MAX ? '<p class="cjl cjinfo">Hace 3 min que esperás. ¿Probamos otra?</p>' : '') +
+          links([['ocup', (S.esp || 0) >= TRANS_MAX ? 'Ver otras' : '¿Está ocupada?'], ['como', 'Cómo se hace']]);
+        main = 'Empezar';
+      } else if (S.rest > 0) {
+        let sig = '';
+        if (S.volver != null) { const v = +steps()[S.volver].slice(1), Fv = S.F[v]; sig = fx(v).n + ' · ' + serieAhora(fx(v), Fv, Fv.sets.indexOf(false)).toLowerCase(); }
+        else sig = j >= 0 ? serieAhora(f, F, j).toLowerCase() : (i + 1 < S.F.length ? fx(i + 1).n : 'el cardio');
+        b = '<p class="cjej">' + f.n + ' · descanso</p><p class="cjbig cjreloj" role="timer">' + trMmss(S.rest) + '</p><p class="cjl">Sigue: ' + sig + '</p>' +
+          '<div class="cjrst"><button class="opt" data-rst="-15" aria-label="15 segundos menos">−15 s</button><button class="opt" data-rst="15" aria-label="15 segundos más">+15 s</button></div>';
+        main = 'Saltar descanso';
+      } else {
+        const ctl = f.ctl && !F.swap ? f.ctl : '';
+        b = '<p class="cjej">' + f.n + '</p><p class="cjbig">' + (j >= 0 ? serieAhora(f, F, j) : 'Listo') + '</p>' +
+          (f.grp ? varHtml(f, i).replace('class="shint"', 'class="cjl"') : '') + (ctl ? '<p class="cjl">' + ctl + '</p>' : '') +
+          (!MANUAL && S.vence ? '<p class="cjl cjinfo">' + (S.repreg ? mtRepTxt(st) : mtPropTxt(st)) + '</p>' : S.hito ? '<p class="cjl cjinfo">' + S.hito + '</p>' : '') +
+          links([['como', 'Cómo se hace'], ['plan', 'Planilla'], ['camb', 'Cambiar']]);
+        main = 'Listo';
+      }
+    }
+    h += '<div class="cjbody">' + b + '</div>';
+    h += '<div class="cjbtns"><button class="cjb2" data-cj="pausa" aria-pressed="' + !!S.pausa + '">' + (S.pausa ? ICO_SEG : ICO_PAU) + '<span>' + (S.pausa ? 'Seguir' : 'Pausa') + '</span></button>' +
+      (main ? '<button class="cjb1" data-cj="main">' + main + '</button>' : '<span></span>') +
+      '<button class="cjb2" data-cj="profe">' + ICO_PROFE + '<span>Profe</span></button></div>';
+    return h;
+  }
+  function cajaPillTxt(){
+    const S = SALA, st = steps()[S.step], et = etapaDe(st);
+    if (S.pausa) return 'En pausa · ' + cajaQue();
+    if (SEG === 'solo') return ETAPA_N[et] + ' · ' + trMmss(S.etapaT || 0);
+    if (st === 'act') return 'Activación' + (S.actGo ? ' · ' + trMmss(S.etapaT || 0) : '');
+    if (st === 'car') return S.P.car.maq + (S.carGo ? ' · ' + trMmss(S.crono) + ' de ' + S.carMin + ' min' : ' · ' + S.carMin + ' min');
+    const i = curF(), f = fx(i), F = S.F[i], j = F.sets.indexOf(false);
+    if (S.rest > 0) return 'Descanso ' + trMmss(S.rest) + ' · ' + f.n;
+    return f.n + (j >= 0 && !enPrep(st) ? ' · ' + serieAhora(f, F, j) : '');
+  }
+  function cajaRender(){
+    const el = $('#caja'), pl = $('#cajaPill'); if (!el || !CAJA) return;
+    const S = SALA, on = CAJA.abierta && !!S && !S.cerrada && MOM === 'sesion';
+    el.hidden = !(on && !CAJA.chica); pl.hidden = !(on && CAJA.chica);
+    if (!on) return;
+    if (CAJA.chica) { pl.innerHTML = '<span class="cjpd" aria-hidden="true"></span><span class="cjpt">' + cajaPillTxt() + '</span><span class="cjpa">Abrir</span>'; return; }
+    $('#cajaIn').innerHTML = cajaHtml();
+  }
+  function cajaComo(){
+    const i = curF(); if (!SALA || i < 0) return; const f = fx(i), L = lib[kBase(f.k)];
+    $('#salaSheetIn').innerHTML = '<span class="h2">' + f.n + '</span><div class="cjvideo" aria-label="Video de tu profe"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Video de tu profe</span></div>' +
+      (esMenor() ? '<span class="muted" style="line-height:1.45">Tu profe te lo muestra en la sala.</span>' : '') +
+      '<ul class="smira">' + (f.mirar || (L ? [L.tip] : ['Tu profe te lo muestra en la sala.'])).map(x => '<li>' + x + '</li>').join('') + '</ul>' + (f.ctl ? '<p class="shint">' + f.ctl + '</p>' : '') +
+      '<button class="btn" data-close>Listo</button>';
+    $('#salaSheet').hidden = false;
+  }
+  function cajaMenu(){
+    const S = SALA, i0 = Math.max(0, curF()), quedan = S.F.filter((F, i) => i >= i0 && !F.done && !F.salteado).length, st = steps()[S.step];
+    const corto = st !== 'car' && (quedan > 2 || S.carMin > 8);
+    $('#salaSheetIn').innerHTML = '<span class="h2">Tu sesión</span>' +
+      '<button class="scmb" data-cjseg="' + (SEG === 'solo' ? 'guiame' : 'solo') + '"><b>' + (SEG === 'solo' ? 'Guiame' : 'Voy solo') + '</b><span>' + (SEG === 'solo' ? 'Serie por serie, con el descanso.' : 'Avisás cuando terminás cada parte.') + '</span></button>' +
+      (corto ? '<button class="scmb" data-cjacort="1"><b>Acortar lo que queda</b><span>' + acortTxt() + '</span></button>' : '') +
+      '<button class="scmb" data-fin="1"><b>Terminar acá</b><span>Guardamos lo que hiciste.</span></button>' +
+      '<button class="btn ghost" data-close>Seguir</button>';
+    $('#salaSheet').hidden = false;
+  }
+  // Recortar con la sesión en curso: la regla de la versión corta del profe (dos de fuerza, 8 min de cardio), aplicada a lo que falta
+  function acortQueda(){ const S = SALA, i0 = Math.max(0, curF()); return S.F.map((F, i) => i).filter(i => i >= i0 && !S.F[i].done && !S.F[i].salteado).slice(0, 2); }
+  function acortTxt(){ const k = acortQueda().map(i => fx(i).n.split(' ')[0].toLowerCase()); return 'Quedan ' + (k.length ? k.join(' y ') + ' y ' : '') + Math.min(8, SALA.carMin) + ' min de cardio.'; }
+  function acortar(){
+    const S = SALA, keep = acortQueda(), i0 = Math.max(0, curF()), fuera = [];
+    for (let i = S.F.length - 1; i >= i0; i--) if (!S.F[i].done && !S.F[i].salteado && !keep.includes(i)) { fuera.unshift(S.P.fue[i].n); S.P.fue.splice(i, 1); S.F.splice(i, 1); }
+    S.carMin = Math.min(8, S.carMin); S.recorte = fuera; toast('Listo. ' + acortTxt());
+  }
+  function soloTermine(st){
+    const S = SALA, t = S.etapaT || 0, et = etapaDe(st); SEG_DICHO = true; WK.reg = true; callar();
+    if (et === 'act') { S.actDone = true; S.actSeg = t; WK.act++; S.step = 1; }
+    else if (et === 'car') { S.carGo = true; S.carReal = Math.round(t / 60); S.carDone = S.carReal > 0; WK.car += S.carReal; renderForma(); return salaCerrar(); }
+    else { S.F.forEach(F => { if (!F.done && !F.salteado) { F.done = true; F.decl = true; } }); S.fueSeg = t; if (!S.fueSumada) { S.fueSumada = true; WK.fue++; } S.step = steps().indexOf('car'); }
+    S.etapaT = 0; renderForma(); renderToday(); renderSala();
+  }
+  function cajaMain(){
+    const S = SALA; if (!S) return; const st = steps()[S.step];
+    if (S.retomar) { S.retomar = 0; return renderSala(); }
+    if (S.pausa) { S.pausa = false; }
+    if (SEG === 'solo') return soloTermine(st);
+    if (st === 'act' && !S.actGo) { S.actGo = true; S.etapaT = 0; return renderSala(); }
+    if (st === 'car' && !S.carGo) { S.carGo = true; S.crono = 0; S.trans = 0; S.el = 0; S.vence = false; cronoArrancar(); return renderSala(); }
+    salaListo();
+  }
+  // Cierre: nombra lo hecho, no reprocha lo que faltó; si el cardio quedó para afuera, lo dice
+  function cierreLect(S, completa, min, recKg){
+    const nF = S.F.filter(F => F.done && !F.decl).length, decl = S.F.some(F => F.decl), p = [];
+    if (S.actDone) p.push('la activación');
+    if (decl) p.push('la fuerza'); else if (nF) p.push(nF + (nF === 1 ? ' ejercicio' : ' ejercicios') + ' de fuerza');
+    if (S.carDone) p.push(S.carReal + ' min de ' + S.P.car.maq.toLowerCase());
+    const lista = p.length > 1 ? p.slice(0, -1).join(', ') + ' y ' + p[p.length - 1] : p[0] || '';
+    let t = completa ? (S.recorte && S.recorte.length ? 'Hiciste la versión corta en ' : 'Sesión completa en ') + min + (min === 1 ? ' minuto.' : ' minutos.') + (recKg ? ' En remo subiste a ' + fmtKg(recKg) + ' kg ⚡' : ' ⚡')
+      : lista ? 'Guardamos lo que hiciste: ' + lista + ' ⚡' : 'Guardamos tu visita.';
+    if (S.carAfuera) t += ' El cardio queda para afuera.';
+    if (decl) t += ' Lo anotamos como lo contaste: tu profe ve que entrenaste.';
+    return t;
+  }
+  function cierreExtra(S){
+    if (!S.carAfuera) return '';
+    const c = CAR_PEND && CAR_PEND.cuando;
+    return '<div class="card ciq"><span style="font-weight:700">El cardio, afuera</span><span class="small muted" style="line-height:1.45">' +
+      (c === 'tarde' || c === 'manana' ? 'Te lo recordamos ' + (c === 'tarde' ? 'hoy a la tarde' : 'mañana') + ': «' + REC_TXT + '»' : 'Queda pendiente en Tu semana.') +
+      '</span><button class="btn ghost sm" data-cjcar="1">Sumar cardio de afuera</button></div>';
+  }
+  $('#caja').addEventListener('click', e => {
+    const S = SALA; if (!S) return;
+    const sg = e.target.closest('[data-seg]'); if (sg) { SEG = sg.dataset.seg; sgSync(); return renderSala(); }
+    const mv = e.target.closest('[data-mov]'); if (mv) { S.movAb = S.movAb === +mv.dataset.mov ? null : +mv.dataset.mov; return cajaRender(); }
+    const r = e.target.closest('[data-rst]'); if (r) { S.rest = Math.max(1, S.rest + +r.dataset.rst); return renderSala(); }
+    const b = e.target.closest('[data-cj]'); if (!b) return; const v = b.dataset.cj;
+    if (v === 'main') return cajaMain();
+    if (v === 'chica') { CAJA.chica = true; return cajaRender(); }
+    if (v === 'menu') return cajaMenu();
+    if (v === 'pausa') {
+      if (!S.pausa) { S.pausa = true; S.pausaT0 = Date.now(); callar(); }
+      else { S.pausa = false; const m = Math.round((Date.now() - (S.pausaT0 || Date.now())) / 1000 * mtVel() / 60); if (m >= 5) S.retomar = m; }
+      return renderSala();
+    }
+    if (v === 'profe') { $('#salaSheetIn').innerHTML = '<span class="h2">Tu profe</span><span class="muted" style="line-height:1.45">Le avisamos a Lucas que estás en ' + cajaQue() + ' y que lo necesitás.</span><button class="btn" data-cjprofe="1">Pedile ayuda a tu profe</button><button class="btn ghost" data-close>Ahora no</button>'; $('#salaSheet').hidden = false; return; }
+    if (v === 'actno') { S.actNo = true; S.step = 1; S.etapaT = 0; return renderSala(); }  // sin hacer y sin decir nada más
+    if (v === 'carno') { S.carNo = true; S.cronoOn = false; return salaCerrar(); }
+    if (v === 'caraf') { $('#salaSheetIn').innerHTML = '<span class="h2">El cardio, afuera</span><span class="muted" style="line-height:1.45">¿Te lo recuerdo?</span><button class="scmb" data-cjrec="tarde"><b>Hoy a la tarde</b></button><button class="scmb" data-cjrec="manana"><b>Mañana</b></button><button class="scmb" data-cjrec="no"><b>No</b><span>Queda pendiente en Tu semana.</span></button>'; $('#salaSheet').hidden = false; return; }
+    if (v === 'ocup') return salaCambiarOcupada();
+    if (v === 'como') return cajaComo();
+    if (v === 'plan') return salaAjustar();
+    if (v === 'camb') return salaCambiar();
+  });
+  $('#cajaPill').addEventListener('click', () => { CAJA.chica = false; cajaRender(); });
+  $('#salaSheet').addEventListener('click', e => {
+    const S = SALA;
+    if (e.target.closest('[data-cjcomo]')) return cajaComo();
+    const rc = e.target.closest('[data-cjrec]'); if (rc && S) { const v = rc.dataset.cjrec; CAR_PEND = { cuando:v }; S.carAfuera = true; S.cronoOn = false; $('#salaSheet').hidden = true; return salaCerrar(); }
+    const sg = e.target.closest('[data-cjseg]'); if (sg && S) { SEG = sg.dataset.cjseg; sgSync(); $('#salaSheet').hidden = true; return renderSala(); }
+    if (e.target.closest('[data-cjacort]') && S) { acortar(); $('#salaSheet').hidden = true; renderEntHoy(); return renderSala(); }
+    if (e.target.closest('[data-cjprofe]') && S) { $('#salaSheet').hidden = true; toast('Listo. Lucas sabe que estás en ' + cajaQue()); }
+  });
+  // Panel de demo: seguimiento (preguntar · Guiame · Voy solo)
+  function sgSync(){ $$('#sgPick [data-sgm]').forEach(x => x.setAttribute('aria-pressed', x.dataset.sgm === (SEG || 'p'))); }
+  $('#sgPick').addEventListener('click', e => { const b = e.target.closest('[data-sgm]'); if (!b) return; SEG = b.dataset.sgm === 'p' ? null : b.dataset.sgm; SEG_DICHO = false; sgSync(); toast(SEG === null ? 'La caja va a preguntar cómo acompañar' : SEG === 'solo' ? 'Seguimiento: Voy solo' : 'Seguimiento: Guiame'); if (SALA) renderSala(); });
+  // Reloj de la etapa (activación guiada y Voy solo) y refresco de la caja
+  setInterval(() => {
+    const S = SALA; if (!S || S.cerrada || MOM !== 'sesion') { if (CAJA.abierta && !S) cajaCerrar(); return; }
+    const st = steps()[S.step], k = SEG === 'solo' ? etapaDe(st) : st;
+    if (S.etK !== k) { S.etK = k; S.etapaT = 0; }
+    if (!S.pausa && (SEG === 'solo' || (st === 'act' && S.actGo))) S.etapaT = (S.etapaT || 0) + mtVel();
+    if (CAJA.abierta) cajaRender();
+  }, 1000);
