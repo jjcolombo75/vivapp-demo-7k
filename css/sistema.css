@@ -72,3 +72,36 @@
    En la sesión (sala, entrenando, cierre) y en Progreso no hay trama ni esquinas detrás del contenido,
    aunque el panel las encienda en el resto. Colores de marca, rayo y componentes siguen el sistema. */
 .app:is([data-scr="sala"],[data-scr="entrenando"],[data-scr="cierre"],[data-scr="progreso"]) :is(.tramaFondo,.esqFondo,.tcj,.ecj){ display:none!important }
+
+/* ===== v81 · Fundamentos (T16-instrumentos § 0 y § 1.3): color = significado ===== 
+   cian = acción e información · magenta = lo que lográs · amarillo = advertencia (y el rayo = firma de Viva)
+   espectro = VIVA Flow y lo que hace la IA · gris = neutro · rojo = SOLO la franja de deuda.
+   Los colores propios de un dato (ocupación, zonas del cuerpo) solo viven dentro de los medidores. */
+.app{ --info:var(--lime); --info-bg:rgba(7,176,242,.07); --logro:var(--dat); --logro-bg:rgba(244,0,160,.08);
+  --adv:var(--yel); --adv-bg:rgba(255,233,74,.08); --deuda:#c62828;
+  --t1:30px; --t3:22px }
+/* Aviso: una forma, tres naturalezas (.note = informativo · .note.lime = felicitación · .note.ojo = advertencia).
+   Franja lateral e ícono en el color; el texto siempre claro (magenta en texto chico no pasa AA). Sin tubo ni brillo: no se toca. */
+.app .note{ --aviso:var(--info); background:var(--info-bg)!important; color:var(--txt)!important; border-left:3px solid var(--aviso);
+  border-radius:4px 12px 12px 4px; padding:10px 12px!important; box-shadow:none }
+.app .note.lime{ --aviso:var(--logro); background:var(--logro-bg)!important }
+.app .note.ojo{ --aviso:var(--adv); background:var(--adv-bg)!important }
+.app .note svg{ filter:none } .app .note svg[stroke]{ stroke:var(--aviso) }
+.app .note :is(strong,b){ color:var(--txt) } .app .note .vbolt{ color:var(--yel) }
+/* Etiquetas: el color de su significado. Rojo y violeta salen; IA = espectro VIVA */
+.app .pill.bad,.app .pill.warn{ background:var(--adv-bg); color:var(--adv); box-shadow:inset 0 0 0 1px rgba(255,233,74,.4) }
+.app .pill.ia{ background:var(--zflow); color:#04131a }
+.app .spin{ border-top-color:var(--z1); border-right-color:var(--z2); border-bottom-color:var(--z3) }
+.app .alert{ background:var(--adv-bg); border-color:rgba(255,233,74,.4) }
+/* Franja de deuda: angosta, abajo, sobre la navegación; área táctil de 44 px con el ::after */
+.deudabar{ position:relative; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; flex-shrink:0; min-height:34px; padding:0 14px;
+  border:none; background:var(--deuda); color:#fff; font:inherit; font-size:13px; font-weight:700; cursor:pointer; z-index:2 }
+.deudabar[hidden]{ display:none } .deudabar u{ text-underline-offset:2px } .deudabar::after{ content:""; position:absolute; inset:-5px 0 }
+/* Tipografía: tres niveles. 1 = título de pantalla (.h1; el saludo de Inicio no es título) · 2 = firma (.sig: Black + Expanded Light)
+   · 3 = título de caja (.h2, .sh). Los festejos (.h1.fiesta) son un instrumento aparte. Ningún tamaño de título escrito a mano. */
+.app .h1,.app .title:not(#inicio .title){ font-family:var(--display); font-weight:900; font-stretch:100%; font-size:var(--t1); line-height:1.05; text-transform:uppercase; letter-spacing:0 }
+.app .h1.fiesta{ font-size:44px }
+.app :is(.h2,.sh){ font-family:var(--display); font-weight:900; font-stretch:100%; font-size:var(--t3); line-height:1.08; text-transform:uppercase; letter-spacing:0 }
+.app .mtitle.sig{ font-size:24px }
+.app .day.done span{ color:var(--txt) }   /* "Hecho": el borde dice el logro; el texto chico va claro */
+.app .dotn{ background:var(--lime); color:#04131a }  /* contador de novedad: cian (información), no rojo */

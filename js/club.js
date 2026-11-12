@@ -4,11 +4,15 @@
 //#bloque 090
   // Plan: ejemplo con deuda (también pausa el club)
   let deuda = false;
+  // T16 · Franja de deuda (T16-instrumentos § 0.5): único rojo de la app. Fuente: estado de deuda del socio en EVO
+  // (GET v1/receivables/debtors; cuota con estado 4 = atrasada; sin probar contra la API real). Nunca en la sesión ni en Tu plan.
+  var DEUDA_SCR = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','semana','forma','fit','evolucion','beneficio','matches','chat','ia'];
+  function deudaFranja(){ const b = $('#deudaBar'); if (b) b.hidden = !(deuda && DEUDA_SCR.includes(curScr)); }
   $('#deudaToggle').addEventListener('click', () => {
     deuda = !deuda;
     $('#deudaBox').hidden = !deuda;
     const p = $('#estadoPill'); p.textContent = deuda ? 'CON SALDO' : 'AL DÍA'; p.className = 'pill ' + (deuda ? 'bad' : 'ok');
-    $('#deudaToggle').textContent = deuda ? 'Ver ejemplo al día' : 'Ver ejemplo con saldo pendiente';
+    $('#deudaToggle').textContent = deuda ? 'Ver ejemplo al día' : 'Ver ejemplo con saldo pendiente'; deudaFranja();
     renderClub(); renderAvisoPlan();
   });
 

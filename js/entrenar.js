@@ -448,9 +448,9 @@
       return '<div class="cls' + (res ? ' res' : '') + '"><span class="t">' + c.h + '</span><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + c.n + '</span><span class="small muted">' + c.prof + ' · ' + c.sede + '</span>' + est + '</span><button data-cls="' + c.id + '" data-acc="' + acc[0] + '" class="' + acc[2] + '">' + acc[1] + '</button></div>';
     }).join('') : '<p class="muted" style="text-align:center">No hay clases este día.</p>';
     const mis = [...reservas].map(claseId).sort((a, b) => a.dia - b.dia || a.h.localeCompare(b.h));
-    $('#myRes').innerHTML = mis.length ? '<span class="lbl">Tus reservas</span>' + mis.map(c => '<div class="note lime"><span><strong>' + diaLbl(c.dia) + ' · ' + c.h + '</strong> · ' + c.n + ' en ' + c.sede + '</span></div>').join('') : '';
+    $('#myRes').innerHTML = mis.length ? '<span class="lbl">Tus reservas</span>' + mis.map(c => '<div class="note"><span><strong>' + diaLbl(c.dia) + ' · ' + c.h + '</strong> · ' + c.n + ' en ' + c.sede + '</span></div>').join('') : '';
     const nx = mis[0], card = $('#nextCls'); card.hidden = true; // Viva no tiene clases
-    if (false) card.innerHTML = '<div class="between"><span class="lbl">Tu próxima clase</span><button class="link lime" data-go="clases" style="padding:0;font-size:14px">Ver clases</button></div><span class="h2" style="font-size:26px">' + diaLbl(nx.dia) + ' · ' + nx.h + ' · ' + nx.n + '</span><span class="small muted">Prof. ' + nx.prof + ' · Sede ' + nx.sede + '</span>';
+    if (false) card.innerHTML = '<div class="between"><span class="lbl">Tu próxima clase</span><button class="link lime" data-go="clases" style="padding:0;font-size:14px">Ver clases</button></div><span class="h2">' + diaLbl(nx.dia) + ' · ' + nx.h + ' · ' + nx.n + '</span><span class="small muted">Prof. ' + nx.prof + ' · Sede ' + nx.sede + '</span>';
   }
   $('#clsDays').addEventListener('click', e => { const b = e.target.closest('[data-cday]'); if (b) { cDay = +b.dataset.cday; renderClases(); } });
   $('#clsFil').addEventListener('click', e => { const b = e.target.closest('[data-cfil]'); if (b) { cFil = b.dataset.cfil; renderClases(); } });
@@ -471,7 +471,7 @@
   $$('#recMap .m').forEach(m => m.setAttribute('class', 'm ' + (recState[m.dataset.m] || '')));
   const correcciones = [ { ex:'Sentadilla goblet', fecha:'Sáb', txt:'Bajá un poco más y mantené el pecho arriba. ¡La espalda está perfecta!', ok:true } ];
   function renderCorr(){
-    $('#corrList').innerHTML = correcciones.map(c => '<div class="note' + (c.ok ? '' : ' lime') + '" style="align-items:flex-start"><span class="avatar" style="width:30px;height:30px;font-size:11px">LP</span><span class="stack" style="gap:2px"><span class="small" style="font-weight:700">' + c.ex + ' · ' + c.fecha + '</span><span class="small">' + (c.ok ? '"' + c.txt + '"' : 'Video enviado. Lucas te responde en 48 h.') + '</span></span></div>').join('');
+    $('#corrList').innerHTML = correcciones.map(c => '<div class="note" style="align-items:flex-start"><span class="avatar" style="width:30px;height:30px;font-size:11px">LP</span><span class="stack" style="gap:2px"><span class="small" style="font-weight:700">' + c.ex + ' · ' + c.fecha + '</span><span class="small">' + (c.ok ? '"' + c.txt + '"' : 'Video enviado. Lucas te responde en 48 h.') + '</span></span></div>').join('');
   }
   $('#vidBtn').addEventListener('click', () => $('#vidFile').click());
   $('#vidFile').addEventListener('change', e => {
@@ -531,8 +531,8 @@
   }
   function chkAnswer(v){
     if (v === 'cuidar') {
-      if (esMenor()) { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Contale a tu profe</span><span class="muted" style="line-height:1.45">Lucas te arma la sesión para cuidarte. No guardamos nada de esto.</span><button class="btn" data-mz="avisa">Avisale a Lucas</button><button class="btn ghost" data-mz="no">Ahora no</button>'; $('#salaSheet').hidden = false; return; }
-      $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">¿Qué querés cuidar hoy?</span><span class="muted" style="line-height:1.45">Hoy armamos la sesión sin cargar esa zona. Es solo por hoy, salvo que nos pidas recordarlo.</span><div class="opts g2" id="sZona">' + ['Hombro', 'Codo', 'Muñeca', 'Espalda', 'Cadera', 'Rodilla', 'Tobillo', 'Otra'].map(z => '<button class="opt" data-z="' + z + '">' + z + '</button>').join('') + '</div><button class="link lime" data-z="profe" style="min-height:44px">Prefiero hablarlo con mi profe</button>'; $('#salaSheet').hidden = false; return;
+      if (esMenor()) { $('#salaSheetIn').innerHTML = '<span class="h2">Contale a tu profe</span><span class="muted" style="line-height:1.45">Lucas te arma la sesión para cuidarte. No guardamos nada de esto.</span><button class="btn" data-mz="avisa">Avisale a Lucas</button><button class="btn ghost" data-mz="no">Ahora no</button>'; $('#salaSheet').hidden = false; return; }
+      $('#salaSheetIn').innerHTML = '<span class="h2">¿Qué querés cuidar hoy?</span><span class="muted" style="line-height:1.45">Hoy armamos la sesión sin cargar esa zona. Es solo por hoy, salvo que nos pidas recordarlo.</span><div class="opts g2" id="sZona">' + ['Hombro', 'Codo', 'Muñeca', 'Espalda', 'Cadera', 'Rodilla', 'Tobillo', 'Otra'].map(z => '<button class="opt" data-z="' + z + '">' + z + '</button>').join('') + '</div><button class="link lime" data-z="profe" style="min-height:44px">Prefiero hablarlo con mi profe</button>'; $('#salaSheet').hidden = false; return;
     }
     if (v === 'bien') { MOLESTIA.bien = (MOLESTIA.bien || 0) + 1; CUIDA = null; PEOR = false; RESOLVER = MOLESTIA.bien >= 2; }
     if (v === 'igual') { MOLESTIA.bien = 0; CUIDA = MOLESTIA.zona; PEOR = false; }
@@ -732,7 +732,7 @@
     if (sd) { marcarSerie(+sd.dataset.set); return; }
     if (e.target.closest('#sSkipRest')) { S.rest = 0; clearInterval(restT); volverAlGrupo(); renderSala(); return; }
     if (e.target.closest('#sAjustar')) return salaAjustar();
-    if (e.target.closest('#sAjCar')) { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Minutos de cardio</span><div class="sadj"><button class="opt" data-cm="-5">−5</button><b id="sCarMin">' + S.carMin + ' min</b><button class="opt" data-cm="5">+5</button></div><button class="btn" data-close>Listo</button>'; $('#salaSheet').hidden = false; return; }
+    if (e.target.closest('#sAjCar')) { $('#salaSheetIn').innerHTML = '<span class="h2">Minutos de cardio</span><div class="sadj"><button class="opt" data-cm="-5">−5</button><b id="sCarMin">' + S.carMin + ' min</b><button class="opt" data-cm="5">+5</button></div><button class="btn" data-close>Listo</button>'; $('#salaSheet').hidden = false; return; }
     if (e.target.closest('#sCrono')) { S.cronoOn = !S.cronoOn; clearInterval(cronoT); if (S.cronoOn) cronoT = setInterval(() => { if (!SALA || !SALA.cronoOn) { clearInterval(cronoT); return; } if (SALA.pausa) return; SALA.crono += mtVel(); if (curScr === 'sala') renderSala(); if (BLOQ) lockRen(); }, 1000); renderSala(); return; }
     if (e.target.closest('#sCambiar')) return salaCambiar();
   });
@@ -742,19 +742,19 @@
   $('#salaBody').addEventListener('touchend', e => { if (tx === null || !SALA) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (dx > 70 && SALA.step > 0) { SALA.step--; SALA.rest = 0; renderSala(); } else if (dx < -70 && SALA.step < steps().length - 1) { SALA.step++; SALA.rest = 0; renderSala(); } });
   function salaAjustar(){
     const F = SALA.F[curF()], f = fx(curF());
-    $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">' + f.n + '</span><span class="small muted">Corregí solo lo que cambió. Sin teclado.</span>' +
+    $('#salaSheetIn').innerHTML = '<span class="h2">' + f.n + '</span><span class="small muted">Corregí solo lo que cambió. Sin teclado.</span>' +
       F.reps.map((r, j) => '<div class="sadjrow"><span class="small muted">Serie ' + (j + 1) + '</span>' + (F.kg ? '<span class="sadj"><button class="opt" data-ak="-2.5">−</button><b>' + fmtKg(F.kg) + ' kg</b><button class="opt" data-ak="2.5">+</button></span>' : '') + '<span class="sadj"><button class="opt" data-ar="' + j + ':-1">−</button><b>' + r + ' rep</b><button class="opt" data-ar="' + j + ':1">+</button></span></div>').join('') +
       '<button class="btn" data-close>Listo</button>';
     $('#salaSheet').hidden = false;
   }
   function salaCambiarOcupada(){
     const base = SALA.P.fue[curF()];
-    $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Otras de tu sede</span><span class="small muted">' + (actual === 'profe' ? 'Las eligió Lucas para tu rutina. ' : 'Trabajan lo mismo. ') + 'Es solo por hoy y el registro sigue.</span>' + (actual === 'profe' && base.alt.length ? '<button class="link lime" data-siempre="1" style="min-height:44px;align-self:flex-start;padding:0">¿Siempre está ocupada? Pedile a Lucas que la cambie</button>' : '') + (base.alt.length ? base.alt.map((a, i) => '<button class="scmb" data-alt="' + i + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button>').join('') : '<span class="muted">Hoy no tenemos otra igual en tu sede.</span>') + (curF() < SALA.F.length - 1 ? '<button class="scmb" data-despues="1"><b>Hacerlo después</b><span>Va al final de la fuerza</span></button>' : '');
+    $('#salaSheetIn').innerHTML = '<span class="h2">Otras de tu sede</span><span class="small muted">' + (actual === 'profe' ? 'Las eligió Lucas para tu rutina. ' : 'Trabajan lo mismo. ') + 'Es solo por hoy y el registro sigue.</span>' + (actual === 'profe' && base.alt.length ? '<button class="link lime" data-siempre="1" style="min-height:44px;align-self:flex-start;padding:0">¿Siempre está ocupada? Pedile a Lucas que la cambie</button>' : '') + (base.alt.length ? base.alt.map((a, i) => '<button class="scmb" data-alt="' + i + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button>').join('') : '<span class="muted">Hoy no tenemos otra igual en tu sede.</span>') + (curF() < SALA.F.length - 1 ? '<button class="scmb" data-despues="1"><b>Hacerlo después</b><span>Va al final de la fuerza</span></button>' : '');
     $('#salaSheet').hidden = false;
   }
   function salaCambiar(){
     const f = fx(curF());
-    $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">¿Qué pasa con ' + f.n.toLowerCase() + '?</span>' +
+    $('#salaSheetIn').innerHTML = '<span class="h2">¿Qué pasa con ' + f.n.toLowerCase() + '?</span>' +
       '<button class="scmb" data-cm2="ocupada"><b>Está ocupada</b><span>Te damos otra de tu sede que trabaja lo mismo</span></button>' +
       '<button class="scmb" data-cm2="molesta"><b>Me molesta</b><span>Una alternativa que no carga esa zona</span></button>' +
       '<button class="scmb" data-cm2="nose"><b>No sé cómo se hace</b><span>El video de tu profe, o que te ayude en la sala</span></button>' +
@@ -779,16 +779,16 @@
     const c2 = e.target.closest('[data-cm2]');
     if (c2) { const f = fx(curF()), base = S.P.fue[curF()], v = c2.dataset.cm2;
       if (v === 'ocupada') { return salaCambiarOcupada(); }
-      if (v === 'ocupada-old') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Otras de tu sede</span><span class="small muted">Trabajan lo mismo. Es solo por hoy y el registro sigue.</span>' + base.alt.map((a, i) => '<button class="scmb" data-alt="' + i + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button>').join(''); return; }
-      if (v === 'molesta') { const a = base.alt[base.alt.length - 1]; $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Probá con esta</span><button class="scmb" data-alt="' + (base.alt.length - 1) + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button><p class="shint">Si duele, pará: no hace falta forzar.</p><span style="font-weight:700">¿Le avisamos a tu profe?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-avisa="1">Avisale a Lucas</button><button class="btn ghost sm" data-close>No, gracias</button></div>'; return; }
-      if (v === 'nose') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">' + f.n + '</span>' + (esMenor() ? '<span class="muted" style="line-height:1.45">Tu profe te lo muestra en la sala.</span>' : '<button class="btn ghost" data-como="1">Ver cómo se hace</button>') + '<button class="btn sm" data-avisa="1">Pedile ayuda a tu profe</button>'; return; }
+      if (v === 'ocupada-old') { $('#salaSheetIn').innerHTML = '<span class="h2">Otras de tu sede</span><span class="small muted">Trabajan lo mismo. Es solo por hoy y el registro sigue.</span>' + base.alt.map((a, i) => '<button class="scmb" data-alt="' + i + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button>').join(''); return; }
+      if (v === 'molesta') { const a = base.alt[base.alt.length - 1]; $('#salaSheetIn').innerHTML = '<span class="h2">Probá con esta</span><button class="scmb" data-alt="' + (base.alt.length - 1) + '"><b>' + a.n + '</b><span>' + a.zona + (a.kg ? ' · ' + fmtKg(a.kg) + ' kg' : '') + '</span></button><p class="shint">Si duele, pará: no hace falta forzar.</p><span style="font-weight:700">¿Le avisamos a tu profe?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-avisa="1">Avisale a Lucas</button><button class="btn ghost sm" data-close>No, gracias</button></div>'; return; }
+      if (v === 'nose') { $('#salaSheetIn').innerHTML = '<span class="h2">' + f.n + '</span>' + (esMenor() ? '<span class="muted" style="line-height:1.45">Tu profe te lo muestra en la sala.</span>' : '<button class="btn ghost" data-como="1">Ver cómo se hace</button>') + '<button class="btn sm" data-avisa="1">Pedile ayuda a tu profe</button>'; return; }
       if (v === 'saltear') { const F = S.F[curF()]; F.salteado = true; if (S.F.every(x => x.done || x.salteado) && !S.fueSumada && S.F.some(x => x.done)) { S.fueSumada = true; WK.fue++; } S.step = Math.min(steps().length - 1, S.step + 1); toast('Salteado. Seguimos'); renderForma(); return close(); } }
     const al = e.target.closest('[data-alt]'); if (al) { const F = S.F[curF()], a = S.P.fue[curF()].alt[+al.dataset.alt]; F.swap = a; F.kg = a.kg; toast('Listo: hoy hacés ' + a.n.toLowerCase()); return close(); }
     if (e.target.closest('[data-avisa]')) { toast('Listo. Lucas sabe que estás en ' + fx(curF()).n.toLowerCase() + ''); return close(); }
     if (e.target.closest('[data-como]')) { S.pan = 'como'; S.panStep = S.step; return close(); }
     if (e.target.closest('[data-fin]')) { $('#salaSheet').hidden = true; return salaCerrar(); }
   });
-  $('#salaMenu').addEventListener('click', () => { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Tu sesión</span><button class="btn ghost" data-close>Seguir entrenando</button><button class="btn ghost" data-fin="1">Terminar acá</button><span class="small muted" style="line-height:1.45">Guardamos lo que marcaste. Si la dejás abierta, se cierra sola a las 3 horas.</span>'; $('#salaSheet').hidden = false; });
+  $('#salaMenu').addEventListener('click', () => { $('#salaSheetIn').innerHTML = '<span class="h2">Tu sesión</span><button class="btn ghost" data-close>Seguir entrenando</button><button class="btn ghost" data-fin="1">Terminar acá</button><span class="small muted" style="line-height:1.45">Guardamos lo que marcaste. Si la dejás abierta, se cierra sola a las 3 horas.</span>'; $('#salaSheet').hidden = false; });
   // ---- Cierre: una pantalla y una pregunta ----
   function salaCerrar(){
     const S = SALA; if (!S) return;
@@ -823,7 +823,7 @@
       const lim = fl.dataset.fl === 'limite'; CIERRE_K.forEach(k => { LIM[k] = lim ? (LIM[k] || 0) + 1 : 0; });
       const dos = lim && CIERRE_K.some(k => LIM[k] >= 2);
       toast(dos ? 'Anotado. Dos veces al límite: la próxima repetimos la carga' : lim ? 'Anotado. Si se repite, la próxima no sube la carga' : 'Anotado ⚡'); renderEntHoy(); return; }
-    const cq = e.target.closest('[data-cq]'); if (cq) { if (cq.dataset.cq === 'si') { $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina; lo ve tu profe solo si vos querés, y se borra cuando lo das por resuelto.</span><div class="grid2" style="gap:8px"><button class="btn sm" data-guardar="1">Guardar</button><button class="btn ghost sm" data-noguardar="1">No guardar</button></div>'; $('#salaSheet').hidden = false; } else { CUIDA = null; renderEntHoy(); toast('Listo, era por hoy'); } cq.closest('.ciq').innerHTML = '<span class="small muted">Gracias.</span>'; return; }
+    const cq = e.target.closest('[data-cq]'); if (cq) { if (cq.dataset.cq === 'si') { $('#salaSheetIn').innerHTML = '<span class="h2">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina; lo ve tu profe solo si vos querés, y se borra cuando lo das por resuelto.</span><div class="grid2" style="gap:8px"><button class="btn sm" data-guardar="1">Guardar</button><button class="btn ghost sm" data-noguardar="1">No guardar</button></div>'; $('#salaSheet').hidden = false; } else { CUIDA = null; renderEntHoy(); toast('Listo, era por hoy'); } cq.closest('.ciq').innerHTML = '<span class="small muted">Gracias.</span>'; return; }
     if (e.target.closest('#ciShare')) openStory({ type:'ach', a:{ big:'42,5', unit:'KG EN REMO ⚡', cap:'mi récord en remo sentado', feedT:'Récord en remo' }, noSede:true });
   });
 //#bloque 305
@@ -867,7 +867,7 @@
         h = obTop() + '<span class="h2 obq">¿Hay algo que tengamos que cuidar?</span><p class="obsub">Una lesión, un dolor o algo que te molesta. Si hay algo, contáselo a tu profe: Lucas te arma la sesión.</p>' +
           '<div class="oblist"><button class="objopt" data-obc="no"><span style="font-weight:700;font-size:16px">No, nada</span></button><button class="objopt" data-obc="profe"><span style="font-weight:700;font-size:16px">Sí, quiero contarle a mi profe</span><small>No guardamos nada en la app</small></button></div>';
       } else if (OB.zona) {
-        h = obTop() + '<span class="h2 obq">' + (OB.zona === 'Otra' ? 'Lo cuidamos' : 'Cuidamos ' + zonaTxt(OB.zona)) + '</span><div class="obcons"><span class="h2" style="font-size:22px">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina; lo ve tu profe solo si vos querés, y se borra cuando lo das por resuelto.</span>' +
+        h = obTop() + '<span class="h2 obq">' + (OB.zona === 'Otra' ? 'Lo cuidamos' : 'Cuidamos ' + zonaTxt(OB.zona)) + '</span><div class="obcons"><span class="h2">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina; lo ve tu profe solo si vos querés, y se borra cuando lo das por resuelto.</span>' +
           '<div class="grid2" style="gap:8px"><button class="btn sm" data-obg="1">Guardar</button><button class="btn ghost sm" data-obg="0">No guardar</button></div></div>';
       } else {
         h = obTop() + '<span class="h2 obq">¿Hay algo que tengamos que cuidar?</span><p class="obsub">Una lesión, un dolor o una zona que te molesta.</p>' +
@@ -1061,7 +1061,7 @@
     const pre = () => $('#salaSheetIn').insertAdjacentHTML('afterbegin', oido);
     if (DECI === 'duele') { // "me duele" siempre va al protocolo fijo de Cambiar · Me molesta; el modelo nunca responde sobre dolor
       if (fi >= 0) { salaCambiar(); const b = $('#salaSheetIn [data-cm2="molesta"]'); if (b) b.click(); pre(); return; }
-      $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Si duele, pará</span><span class="muted" style="line-height:1.45">No hace falta forzar. Seguí solo con lo que no moleste, o terminá acá.</span><span style="font-weight:700">¿Le avisamos a tu profe?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-avisa2="1">Avisale a Lucas</button><button class="btn ghost sm" data-close>No, gracias</button></div>';
+      $('#salaSheetIn').innerHTML = '<span class="h2">Si duele, pará</span><span class="muted" style="line-height:1.45">No hace falta forzar. Seguí solo con lo que no moleste, o terminá acá.</span><span style="font-weight:700">¿Le avisamos a tu profe?</span><div class="grid2" style="gap:8px"><button class="btn sm" data-avisa2="1">Avisale a Lucas</button><button class="btn ghost sm" data-close>No, gracias</button></div>';
       pre(); $('#salaSheet').hidden = false; return;
     }
     if (DECI === 'ocupada') { if (fi >= 0) { salaCambiarOcupada(); pre(); } else toast('Eso va en la fuerza: ahora estás en ' + pasoCorto(st)); return; }
@@ -1404,9 +1404,9 @@
     const ds = e.target.closest('[data-hds]'); if (ds) { const [i, d] = ds.dataset.hds.split(':').map(Number), f = P.fue[i], cur = f.grp ? (f.descG || 90) : (f.desc != null ? f.desc : 90), n = Math.min(300, Math.max(30, cur + d)); if (n !== cur) cambio(dk, f.k, f.n, 'Descanso: ' + cur + ' → ' + n + ' s', { desc:n }); renderEntHoy(); return true; }
     const q = e.target.closest('[data-hquitar]'); if (q) { const f = P.fue[+q.dataset.hquitar]; cambio(dk, f.k, f.n, 'Sacaste ' + f.n.toLowerCase(), { quitar:true }); HR = -1; renderEntHoy(); toast('Fuera de hoy. Queda en Rutinas, cambiado por vos'); return true; }
     if (e.target.closest('[data-hadd]')) { const en = P.fue.map(f => kBase(f.k)), libres = Object.keys(lib).filter(k => !en.includes(k));
-      $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Agregar un ejercicio</span><span class="small muted">De la biblioteca de Viva. Queda en tu rutina de hoy, cambiado por vos.</span>' + (libres.length ? libres.map(k => '<button class="scmb" data-hlib="' + k + '"><b>' + lib[k].n + '</b><span>' + lib[k].grupo + '</span></button>').join('') : '<span class="muted">Ya están todos los de la biblioteca de la demo.</span>'); $('#salaSheet').hidden = false; return true; }
+      $('#salaSheetIn').innerHTML = '<span class="h2">Agregar un ejercicio</span><span class="small muted">De la biblioteca de Viva. Queda en tu rutina de hoy, cambiado por vos.</span>' + (libres.length ? libres.map(k => '<button class="scmb" data-hlib="' + k + '"><b>' + lib[k].n + '</b><span>' + lib[k].grupo + '</span></button>').join('') : '<span class="muted">Ya están todos los de la biblioteca de la demo.</span>'); $('#salaSheet').hidden = false; return true; }
     const pd = e.target.closest('[data-hpide]'); if (pd) { const i = +pd.dataset.hpide, f = P.fue[i];
-      $('#salaSheetIn').innerHTML = '<span class="h2" style="font-size:24px">Pedirle a Lucas</span><span class="small muted">' + f.n + '. Lucas lo ve en su tablero y te responde; mientras, seguís con lo que está.</span>' + [['mas', 'Una serie más'], ['menos', 'Una serie menos'], ['cambiar', 'Cambiarlo por otro ejercicio'], ['desc', 'Más descanso'], ['otra', 'Otra cosa: se lo cuento en la sala']].map(o => '<button class="scmb" data-hped="' + i + ':' + o[0] + '"><b>' + o[1] + '</b></button>').join(''); $('#salaSheet').hidden = false; return true; }
+      $('#salaSheetIn').innerHTML = '<span class="h2">Pedirle a Lucas</span><span class="small muted">' + f.n + '. Lucas lo ve en su tablero y te responde; mientras, seguís con lo que está.</span>' + [['mas', 'Una serie más'], ['menos', 'Una serie menos'], ['cambiar', 'Cambiarlo por otro ejercicio'], ['desc', 'Más descanso'], ['otra', 'Otra cosa: se lo cuento en la sala']].map(o => '<button class="scmb" data-hped="' + i + ':' + o[0] + '"><b>' + o[1] + '</b></button>').join(''); $('#salaSheet').hidden = false; return true; }
     return false;
   }
   $('#salaSheet').addEventListener('click', e => {

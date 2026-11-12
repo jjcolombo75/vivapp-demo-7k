@@ -101,7 +101,7 @@
     </div>
 
     <div class="stack" id="iaForm" style="gap:18px;flex:1">
-      <h1 class="h1" style="font-size:36px" id="iaH1">Contanos cómo querés entrenar</h1>
+      <h1 class="h1" id="iaH1">Contanos cómo querés entrenar</h1>
       <p class="muted" id="iaSub" hidden style="margin:-8px 0 0;line-height:1.5">Gratis y sin registrarte. Comenzá la experiencia Viva.</p>
       <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">Objetivo</span>
         <div class="opts" data-group="obj"><button class="opt" aria-pressed="true">Ganar músculo</button><button class="opt" aria-pressed="false">Bajar grasa</button><button class="opt" aria-pressed="false">Fuerza</button><button class="opt" aria-pressed="false">Salud general</button></div></div>
@@ -126,11 +126,11 @@
     <div class="stack" id="iaResult" hidden style="gap:14px;flex:1">
       <div class="stack" style="gap:6px">
         <span class="small muted">Tu rutina está lista</span>
-        <h1 class="h1" style="font-size:36px" id="resTitle">Ganar músculo · 4 días</h1>
+        <h1 class="h1" id="resTitle">Ganar músculo · 4 días</h1>
         <span class="small muted" id="resSub">Nivel intermedio · 60 min por sesión · 8 semanas</span>
       </div>
       <div class="list" id="resDays"></div>
-      <div class="note" id="resLesion" hidden>
+      <div class="note ojo" id="resLesion" hidden>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
         <span id="resLesionTxt"></span>
       </div>
@@ -138,7 +138,7 @@
       <div class="stack" id="leadPrev" hidden style="gap:12px">
         <div class="card" style="gap:10px">
           <div class="between"><span class="lbl">Vista previa · Día A</span><span class="small muted">Máquinas de Sarmiento</span></div>
-          <span class="h2" style="font-size:26px" id="lpName">Tren inferior</span>
+          <span class="h2" id="lpName">Tren inferior</span>
           <div id="lpList"></div>
           <button class="btn light sm" id="lpTry"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Ver el Día A paso a paso</button>
         </div>
@@ -165,7 +165,7 @@
     <div class="anim">
       <div class="animfig">
         <div id="fig3d" role="img" aria-label="Maniquí 3D del ejercicio con los músculos que trabajan. Arrastrá para girarlo."></div>
-        <div class="figoff" id="figOff"><span class="h2" style="font-size:24px">Mirá cómo se hace</span><button class="btn sm" id="fig3dOn" style="width:auto;padding:0 20px">Ver en 3D</button><span class="small muted">Usa unos 600 KB de datos</span></div>
+        <div class="figoff" id="figOff"><span class="h2">Mirá cómo se hace</span><button class="btn sm" id="fig3dOn" style="width:auto;padding:0 20px">Ver en 3D</button><span class="small muted">Usa unos 600 KB de datos</span></div>
         <span class="cue" id="cue" hidden>Arrastrá para girar · tocá Play</span>
         <span class="repn" id="repN" hidden>Rep 0</span>
         <button class="animplay2" id="animPlay" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg><span>Play</span></button>
@@ -205,12 +205,12 @@
     </div>
 
     <div class="stack" style="gap:4px">
-      <h1 class="h2" style="font-size:32px" id="exName">Remo sentado</h1>
+      <h1 class="h2" id="exName">Remo sentado</h1>
       <span class="small muted" id="exTip">Espalda alta y dorsales · Tip del profe: espalda neutra, tirá hacia el ombligo.</span>
     </div>
     <button class="btn ghost sm" id="vidBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/></svg>Mandale un video a tu profe</button>
     <input type="file" id="vidFile" accept="video/*" capture="environment" hidden>
-    <div class="note lime" id="exSug">
+    <div class="note" id="exSug">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><path d="M7 17L17 7M9 7h8v8"/></svg>
       <span id="exSugTxt">Probá 42,5 kg: la última vez completaste todas las repeticiones.</span>
     </div>
@@ -243,7 +243,7 @@
 </div>
 <div class="sheet" id="setSheet" hidden role="dialog" aria-labelledby="ssTitle">
   <div class="sheetin">
-    <div class="stack" style="gap:2px"><span class="lbl" id="ssEx">Remo sentado</span><span class="h2" style="font-size:28px" id="ssTitle">Serie 2</span></div>
+    <div class="stack" style="gap:2px"><span class="lbl" id="ssEx">Remo sentado</span><span class="h2" id="ssTitle">Serie 2</span></div>
     <div class="stack" style="gap:8px">
       <label class="small muted" for="ssKg" id="ssKgLbl" style="font-weight:700">Peso (kg)</label>
       <div class="stepper"><button type="button" class="stb" data-step-kg="-2.5" aria-label="Restar 2,5 kg">−</button><input class="input stin" id="ssKg" inputmode="decimal" autocomplete="off"><button type="button" class="stb" data-step-kg="2.5" aria-label="Sumar 2,5 kg">+</button></div>
@@ -259,7 +259,7 @@
 
 <div class="sheet" id="missSheet" hidden role="dialog" aria-labelledby="msTitle">
   <div class="sheetin">
-    <span class="h2" style="font-size:28px" id="msTitle">Te quedaron 2 series sin marcar</span>
+    <span class="h2" id="msTitle">Te quedaron 2 series sin marcar</span>
     <span class="muted" style="line-height:1.45">¿Qué pasó? Lo usamos para que la IA ajuste tu próxima rutina.</span>
     <div class="stack" style="gap:8px" id="msOpts">
       <button type="button" class="msopt" data-motivo="cansancio">No pude completarlas</button>
@@ -274,7 +274,7 @@
 
 <div class="sheet" id="feelSheet" hidden role="dialog" aria-labelledby="fsTitle">
   <div class="sheetin">
-    <span class="h2" style="font-size:28px" id="fsTitle">¿Cómo te sentiste hoy?</span>
+    <span class="h2" id="fsTitle">¿Cómo te sentiste hoy?</span>
     <span class="muted" style="line-height:1.45" id="fsSub">Un toque. Lo ve tu profe para acompañarte mejor.</span>
     <div class="feel" id="feelOpts"></div>
     <div class="opts g3" id="microOpts" hidden><button class="opt" data-micro="si">Sí</button><button class="opt" data-micro="mas">Más o menos</button><button class="opt" data-micro="no">No</button></div>
@@ -285,17 +285,17 @@
 
 <div class="sheet" id="pausaSheet" hidden role="dialog" aria-labelledby="psTitle">
   <div class="sheetin">
-    <span class="h2" style="font-size:28px" id="psTitle">Pausar mi plan</span>
+    <span class="h2" id="psTitle">Pausar mi plan</span>
     <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">¿Por qué?</span><div class="opts" data-group="pmot"><button class="opt" aria-pressed="true">Vacaciones</button><button class="opt" aria-pressed="false">Lesión o salud</button><button class="opt" aria-pressed="false">Trabajo</button><button class="opt" aria-pressed="false">Otro</button></div></div>
     <div class="stack" style="gap:8px"><span class="small muted" style="font-weight:700">¿Cuántos días?</span><div class="opts g3" data-group="pdias"><button class="opt" aria-pressed="false">7 días</button><button class="opt" aria-pressed="true">15 días</button><button class="opt" aria-pressed="false">30 días</button></div></div>
-    <div class="note lime" id="psInfo"></div>
+    <div class="note" id="psInfo"></div>
     <div class="grid2" style="gap:10px"><button type="button" class="btn ghost sm" id="psCancel">Cancelar</button><button type="button" class="btn sm" id="psOk">Pausar</button></div>
   </div>
 </div>
 
 <div class="sheet" id="fichaSheet" hidden role="dialog" aria-labelledby="fcTitle">
   <div class="sheetin">
-    <span class="h2" style="font-size:28px" id="fcTitle">Antes de tu primer ingreso</span>
+    <span class="h2" id="fcTitle">Antes de tu primer ingreso</span>
     <span class="muted" style="line-height:1.45">Te lo pedimos una sola vez, porque vas a hacer actividad física en la sede.</span>
     <div class="grid2" style="gap:10px">
       <div class="field"><label for="fDni">DNI</label><input class="input" id="fDni" inputmode="numeric" placeholder="35123456"></div>
@@ -324,7 +324,7 @@
 <div class="sheet" id="salaSheet" hidden role="dialog" aria-label="Opciones de la sesión"><div class="sheetin" id="salaSheetIn" style="max-height:88%;overflow-y:auto"></div></div>
 <div class="sheet" id="cardioSheet" hidden role="dialog" aria-labelledby="cdTitle">
   <div class="sheetin">
-    <div class="between"><span class="h2" style="font-size:26px" id="cdTitle">Cardio de afuera</span><button class="link" id="cdX" style="min-height:44px">Cerrar</button></div>
+    <div class="between"><span class="h2" id="cdTitle">Cardio de afuera</span><button class="link" id="cdX" style="min-height:44px">Cerrar</button></div>
     <span class="muted" style="margin-top:-6px;line-height:1.45">Caminaste, pedaleaste o saliste a correr: sumalo a tu semana.</span>
     <div class="stack" style="gap:8px"><span class="small muted">¿Cuánto tiempo?</span>
       <div class="opts g4" id="cdMin"><button class="opt" data-min="15">15'</button><button class="opt" data-min="30" aria-pressed="true">30'</button><button class="opt" data-min="45">45'</button><button class="opt" data-min="60">60'</button></div></div>
@@ -335,7 +335,7 @@
 </div>
 <div class="sheet" id="objSheet" hidden role="dialog" aria-labelledby="obTitle">
   <div class="sheetin" style="max-height:88%;overflow-y:auto">
-    <div class="between"><span class="h2" style="font-size:26px" id="obTitle">Tu objetivo</span><button class="link" id="obX" style="min-height:44px">Cerrar</button></div>
+    <div class="between"><span class="h2" id="obTitle">Tu objetivo</span><button class="link" id="obX" style="min-height:44px">Cerrar</button></div>
     <span class="muted" style="margin-top:-6px;line-height:1.45">Elegí hasta dos. El primero que tocás es el principal: con ese tu profe arma tu semana.</span>
     <div class="stack" style="gap:8px" id="obOpts"></div>
     <button class="btn" id="obGo">Listo</button>

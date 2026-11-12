@@ -24,7 +24,7 @@
     <div class="stack" id="desafBox" style="gap:14px">
       <div class="card sedeMes" style="border-color:var(--dat);gap:12px">
         <div class="between"><span class="lbl">La sede del mes</span><span class="small muted" id="chLeft">Quedan 9 días</span></div>
-        <span class="h2" style="font-size:34px" id="chalName">Noviembre</span>
+        <span class="h2" id="chalName">Noviembre</span>
         <span class="small muted" style="line-height:1.45">Gana la sede con más socios que cierran el mes con <strong style="color:var(--txt)">Mes cumplido</strong> (4 semanas cumplidas). Premio para toda la sede: <strong style="color:var(--txt)">una noche con DJ en la sala</strong>.</span>
         <div class="stack" id="sedeRank" style="gap:10px"></div>
         <div class="note lime" id="chMine"></div>
@@ -56,7 +56,7 @@
 
     <div class="stack" id="deckBox" hidden style="gap:12px">
       <div class="card" id="genteOff" style="gap:12px">
-        <span class="h2" style="font-size:28px">Gente de Viva</span>
+        <span class="h2">Gente de Viva</span>
         <span class="muted" style="line-height:1.45">Conocé a otros socios para entrenar, hacer amigos o, si querés, algo más. Vos elegís qué buscás y quién te ve.</span>
         <div class="list" style="padding:0 14px">
           <div><span class="dot" style="background:var(--dat)"></span><span class="small" style="flex:1">Solo socios con plan activo y mayores de 18, verificados con su ficha.</span></div>
@@ -85,19 +85,19 @@
       <span class="lbl">Próximos</span>
       <div class="card">
         <div class="between"><span class="pill ok">SÁB 10:00</span><span class="small muted">Sarmiento</span></div>
-        <span class="h2" style="font-size:26px">Funcional en dúo</span>
+        <span class="h2">Funcional en dúo</span>
         <span class="small muted">Clase en parejas para conocer gente. 12 anotados de 20.</span>
         <button class="btn sm" data-toast="Te anotaste a Funcional en dúo">Anotarme</button>
       </div>
       <div class="card">
         <div class="between"><span class="pill ok">JUE 20:30</span><span class="small muted">López y Planes</span></div>
-        <span class="h2" style="font-size:26px">Spinning Night</span>
+        <span class="h2">Spinning Night</span>
         <span class="small muted">Spinning con luces y DJ. 18 anotados de 25.</span>
         <button class="btn ghost sm" data-toast="Te anotaste a Spinning Night">Anotarme</button>
       </div>
       <span class="lbl">Fuiste a</span>
       <div class="card">
-        <span class="h2" style="font-size:24px">After Train · 11/10</span>
+        <span class="h2">After Train · 11/10</span>
         <span class="small muted">Conocé a las 6 personas que también fueron y buscan compañeros para entrenar.</span>
         <button class="btn ghost sm" id="verAsist">Ver asistentes</button>
       </div>
@@ -127,7 +127,7 @@
   <div class="chmenu" id="chMenu" hidden>
     <button id="chUnmatch">Quitar de mis compañeros</button>
     <button id="chBlock">Bloquear</button>
-    <button id="chReport" style="color:var(--pink-txt)">Denunciar</button>
+    <button id="chReport" style="color:var(--yel)">Denunciar</button>
   </div>
   <div class="msgs" id="msgs"></div>
   <div class="quick">
@@ -142,7 +142,7 @@
   </form>
   <div class="sheet" id="invSheet" hidden>
     <div class="sheetin">
-      <span class="h2" style="font-size:26px">Invitar a entrenar</span>
+      <span class="h2">Invitar a entrenar</span>
       <div class="field"><label for="invDia">Día</label><select class="input" id="invDia"><option>Hoy</option><option selected>Mañana</option><option>Sábado</option></select></div>
       <div class="grid2" style="gap:10px">
         <div class="field"><label for="invHora">Hora</label><select class="input" id="invHora"><option>08:00</option><option>12:00</option><option selected>19:00</option><option>20:30</option></select></div>
@@ -178,7 +178,7 @@
 <!--#h12-->
 <!-- Pantalla de match -->
 <div class="overlay" id="matchOv" hidden role="dialog" aria-label="Nuevo compañero">
-  <span class="h1" style="color:var(--dat);font-size:46px" id="mvTitle">¡A entrenar!</span>
+  <span class="h1 fiesta" id="mvTitle">¡A entrenar!</span>
   <span class="muted" id="mvTxt">A Joaquín y a vos les interesa entrenar juntos.</span>
   <div style="display:flex;align-items:center"><span class="av lg" style="background:linear-gradient(160deg,#5b6ea8,#1c2238)">M</span><span class="av lg" id="mvAv" style="margin-left:-18px">S</span></div>
   <button class="btn sm" style="max-width:280px" id="mvMsg">Enviar mensaje</button>

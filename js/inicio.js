@@ -224,7 +224,7 @@
       : v >= 70 ? 'Elegida según cómo estás hoy (' + v + '): tus piernas descansan del lunes, la espalda está lista.'
       : v >= 45 ? 'Preparación ' + v + ': hacela completa, pero sin buscar récords hoy.'
       : 'Preparación ' + v + ': te bajamos 10% las cargas. Si preferís, cambiá a una rutina de movilidad.';
-    $('#todayWhy').style.color = v === null || v >= 70 ? 'var(--dat)' : v >= 45 ? 'var(--orange)' : 'var(--pink-txt, var(--pink))';
+    $('#todayWhy').style.color = v === null || v >= 70 ? 'var(--dat)' : v >= 45 ? 'var(--orange)' : 'var(--yel)';
   }
   $('#prepAsk').addEventListener('click', e => { if (typeof chkClick === 'function') chkClick(e); });
 
