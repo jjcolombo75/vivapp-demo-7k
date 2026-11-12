@@ -392,9 +392,12 @@
 .wtcn{display:block}
 .wtcn svg{display:block;width:100%;height:auto;overflow:visible}
 .wtcs text{font-family:var(--display);font-weight:600;font-stretch:118%;letter-spacing:3px;fill:none;stroke-linejoin:round;stroke-linecap:round}
-.wtcs .tb{stroke:#07b0f2;stroke-width:3.4}
-.wtcs .tc{stroke:#dcf7ff;stroke-width:1.1}
-.app:not([data-mode="light"]) .wtcs{filter:drop-shadow(0 0 2px #07b0f2) drop-shadow(0 0 7px rgba(7,176,242,.85)) drop-shadow(0 0 18px rgba(7,176,242,.5))}
+.wtcs .tb{stroke:#22c4ff;stroke-width:4.2}
+.wtcs .tc{stroke:#f2fcff;stroke-width:1.5}
+.app:not([data-mode="light"]) .wtcs{filter:drop-shadow(0 0 2px #7fdcff) drop-shadow(0 0 6px #07b0f2) drop-shadow(0 0 14px rgba(7,176,242,.95)) drop-shadow(0 0 30px rgba(7,176,242,.7)) drop-shadow(0 0 54px rgba(7,176,242,.4))}
+/* Titila (opción de demo): parpadeo irregular de tubo de neón, con caídas cortas */
+.app[data-wtcf="1"]:not([data-mode="light"]) .wtcs{animation:wtcFlick 4.5s linear infinite}
+@keyframes wtcFlick{0%,100%{opacity:1}8%{opacity:1}9%{opacity:.35}10%{opacity:1}11%{opacity:.5}12.5%{opacity:1}47%{opacity:1}48%{opacity:.25}49.5%{opacity:1}71%{opacity:1}72%{opacity:.6}73%{opacity:.2}75%{opacity:1}}
 .app[data-mode="light"] .wtcs .tc{display:none}
 .app[data-mode="light"] .wtcs .tb{stroke:#0b6c95}
 .wtcn[data-wttcb]{padding:4px 2px 10px}

@@ -337,7 +337,7 @@
   // ===== T-R v86 · WELCOME TO THE CLUB, para probar en cuatro lugares (decisiones.md 12/11) =====
   var WTTC = { entrada:true, inicio:false, comunidad:false, ingreso:false };
   (function () {
-    const txt = c => '<text class="' + c + '" x="0" y="80"><tspan font-size="84">WELCOME</tspan><tspan font-size="64" dx="26">TO THE CLUB</tspan></text>';
+    const txt = c => '<text class="' + c + '" x="0" y="80"><tspan font-size="84">WELCOME</tspan><tspan font-size="84" dx="30">TO THE CLUB</tspan></text>';
     const SIGN = '<svg class="wtcs" role="img" aria-label="Welcome to the club" viewBox="0 0 1100 100" preserveAspectRatio="xMidYMid meet">' + txt('tb') + txt('tc') + '</svg>';
     const band = k => '<div class="wtcn" data-wttcb="' + k + '" hidden>' + SIGN + '</div>';
     $('#inicio .body').insertAdjacentHTML('afterbegin', band('inicio'));
@@ -345,7 +345,11 @@
     $('#login .top').insertAdjacentHTML('afterend', band('ingreso'));
     $('.app').insertAdjacentHTML('beforeend', '<div id="wttcFull" hidden role="dialog" aria-label="Welcome to the club"><div class="wtcn">' + SIGN + '</div></div>');
   })();
-  function wtcFit(){ requestAnimationFrame(() => $$('svg.wtcs').forEach(s => { try { const b = s.querySelector('text').getBBox(); if (b.width) s.setAttribute('viewBox', [b.x - 10, b.y - 10, b.width + 20, b.height + 20].map(Math.round).join(' ')); } catch (e) {} })); }
+  // Se mide una copia invisible (una pantalla oculta mide cero) y el viewBox se aplica a todos los carteles
+  function wtcFit(){ requestAnimationFrame(() => { const all = $$('svg.wtcs'); if (!all.length) return;
+    const pr = all[0].cloneNode(true); pr.setAttribute('style', 'position:absolute;left:-9999px;top:0;width:600px;visibility:hidden'); $('.app').append(pr);
+    try { const b = pr.querySelector('text').getBBox(); if (b.width) { const vb = [b.x - 12, b.y - 12, b.width + 24, b.height + 24].map(Math.round).join(' '); all.forEach(s => s.setAttribute('viewBox', vb)); } } catch (e) {}
+    pr.remove(); }); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(wtcFit);
   function wttcSync(){
     ['inicio', 'comunidad', 'ingreso'].forEach(k => { const b = $('[data-wttcb="' + k + '"]'); if (b) { b.hidden = !WTTC[k]; b.classList.toggle('wttcOn', WTTC[k]); } });
@@ -362,6 +366,8 @@
     clearTimeout(wttcT); wttcT = setTimeout(wttcCerrar, 3000);
   }
   $('#wttcFull').addEventListener('click', wttcCerrar);
+  $('#wtcfPick').addEventListener('click', e => { const b = e.target.closest('[data-wtcf]'); if (!b) return; e.stopPropagation(); $('.app').dataset.wtcf = b.dataset.wtcf;
+    $$('#wtcfPick [data-wtcf]').forEach(x => x.setAttribute('aria-pressed', x === b)); toast(b.dataset.wtcf === '1' ? 'Welcome to the club: titila' : 'Welcome to the club: quieto'); });
   $('#wttcPick').addEventListener('click', e => { const b = e.target.closest('[data-wttc]'); if (!b) return; e.stopPropagation();
     const k = b.dataset.wttc; if (k === 'off') Object.keys(WTTC).forEach(x => WTTC[x] = false); else WTTC[k] = !WTTC[k]; wttcSync();
     const dest = { inicio:'inicio', comunidad:'social', ingreso:'login' }[k];
