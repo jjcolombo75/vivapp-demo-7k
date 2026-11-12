@@ -16,9 +16,10 @@
     'k-btn': '.btn:not(.ghost):not(.light),.qrbtn,.passbar,.sendb,.dbtn,.salalisto',
     'k-btn2': '.btn.ghost,.btn.light,.salamic,.qchip',
     'k-barra': '.bar,.occ,.ocb,.salaprog .sp,.msbar',
+    'k-seg': '.tabs,.seg,.prvistas',   // T16 v82: selector segmentado (pestañas y su tamaño chico)
     'k-columnas': '.chart',
     'k-barra-dato': '.eqb',
-    'k-elige': '.opt,.chk,.clap,.npsg button,.varopt,.tabs button,.seg button,.prvistas button,.day.sel'
+    'k-elige': '.opt,.chk,.clap,.npsg button,.varopt,.tabs button,.seg button,.prvistas button,.day,.hday,.choice,.sede'
   };
   function sistemaEstampar(){ Object.keys(SISTEMA).forEach(k => { $$(SISTEMA[k]).forEach(el => { if (!el.classList.contains(k)) el.classList.add(k); }); }); }
   sistemaEstampar();
@@ -60,7 +61,7 @@
   try {
     const d = ahora();
     const s = d.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' });
-    $('#hoy').textContent = s.charAt(0).toUpperCase() + s.slice(1);
+    $('#hoyFecha').textContent = s.charAt(0).toUpperCase() + s.slice(1);
   } catch(_){}
 
 //#bloque 230
@@ -343,6 +344,60 @@
   function semMarcarVisto(){ semSegs().forEach(b => semVisto[b.k] = b.on); }
   // Intensidad de cada barra según cuánto se llenó: arranca casi como vidrio apagado y llega a pleno al completarla
   const eqLuz = p => ({ bd:(0.32 + 0.68 * p).toFixed(2), co:(0.12 + 0.66 * p).toFixed(2), ha:(0.06 + 0.6 * p).toFixed(2), hb:(2.5 + 4 * p).toFixed(1) });
+
+  // ===== T16 v82 · Medidores: el dibujo de Tu semana (columna) y de Tu mes (fila), UNA vez. Inicio y el resto usan esto. =====
+  // Celda de columna (Tu semana): esquina 1,5; apagada al 22 % con borde al 50 %; encendida con brillo (filtro fid) y reflejo arriba.
+  function eqCeldaCol(x, y, w, h, on, F, L, fid, halo){
+    if (!on) return '<rect x="' + x + '" y="' + y.toFixed(1) + '" width="' + w + '" height="' + h.toFixed(1) + '" rx="1.5" fill="' + F + '" fill-opacity=".22" stroke="' + F + '" stroke-opacity=".5" stroke-width=".8"/>';
+    return '<rect class="rl-gl" x="' + (x - 2) + '" y="' + (y - 1.5).toFixed(1) + '" width="' + (w + 4) + '" height="' + (h + 3).toFixed(1) + '" rx="2" fill="' + F + '" opacity="' + (L.ha * (halo ? 1.4 : .7)).toFixed(2) + '" filter="url(#' + fid + ')"/>' +
+           '<rect x="' + x + '" y="' + y.toFixed(1) + '" width="' + w + '" height="' + h.toFixed(1) + '" rx="1.5" fill="' + F + '" opacity="' + L.bd + '"/>' +
+           '<rect class="rl-hi" x="' + (x + 2) + '" y="' + (y + .5).toFixed(1) + '" width="' + (w - 4) + '" height="' + Math.min(1.1, h * .3).toFixed(2) + '" fill="#fff" opacity="' + (.45 * L.bd).toFixed(2) + '"/>';
+  }
+  // Celda de fila (Tu mes): esquina 2; encendida con brillo más ancho y reflejo de 1,2.
+  function eqCeldaFila(x, y, w, h, on, F, L, fid){
+    if (!on) return '<rect x="' + x.toFixed(1) + '" y="' + y + '" width="' + w.toFixed(1) + '" height="' + h + '" rx="2" fill="' + F + '" fill-opacity=".22" stroke="' + F + '" stroke-opacity=".5" stroke-width=".8"/>';
+    return '<rect class="rl-gl" x="' + (x - 2).toFixed(1) + '" y="' + (y - 2) + '" width="' + (w + 4).toFixed(1) + '" height="' + (h + 4) + '" rx="3" fill="' + F + '" opacity="' + (L.ha * 1.2).toFixed(2) + '" filter="url(#' + fid + ')"/>' +
+           '<rect x="' + x.toFixed(1) + '" y="' + y + '" width="' + w.toFixed(1) + '" height="' + h + '" rx="2" fill="' + F + '" opacity="' + L.bd + '"/>' +
+           '<rect class="rl-hi" x="' + (x + 3).toFixed(1) + '" y="' + (y + .6) + '" width="' + Math.max(0, w - 6).toFixed(1) + '" height="1.2" fill="#fff" opacity="' + (.5 * L.bd).toFixed(2) + '"/>';
+  }
+  var eqUid = 0;
+  // Fila suelta: N celdas, las primeras `on` encendidas. col = un color o uno por celda (Equilibrio). Igual en la forma; N lo decide la métrica.
+  function eqFila(N, on, col, H){
+    H = H || 8; const W = 300, GP = N > 16 ? 3 : 5, sw = (W - GP * (N - 1)) / N, id = 'eqx' + (++eqUid), L = eqLuz(1);
+    let g = '<defs><filter id="' + id + '" filterUnits="userSpaceOnUse" x="-20" y="-20" width="' + (W + 40) + '" height="' + (H + 40) + '"><feGaussianBlur stdDeviation="2.4"/></filter></defs>';
+    g += '<rect class="rl-slot" x="-4" y="-4" width="' + (W + 8) + '" height="' + (H + 8) + '" rx="5"/>';
+    for (let i = 0; i < N; i++) { const c = Array.isArray(col) ? col[i] : col; g += eqCeldaFila(i * (sw + GP), 0, sw, H, Array.isArray(col) || i < on, c, L, id); }
+    return '<svg class="eqx" viewBox="-6 -6 ' + (W + 12) + ' ' + (H + 12) + '" preserveAspectRatio="none" aria-hidden="true">' + g + '</svg>';
+  }
+  // Columnas (Constancia): una columna por semana, N celdas por columna (una celda = una entrada). cols = [{on, col}].
+  function eqColumnas(N, cols, H){
+    const n = cols.length, W = 320, PX = W / n, CW = Math.min(22, PX - 14), GP = 2.2, sh = (H - GP * (N - 1)) / N;
+    let defs = '', g = '';
+    cols.forEach((c, i) => {
+      const x0 = +(PX * i + (PX - CW) / 2).toFixed(1), L = eqLuz(Math.min(1, c.on / N)), id = 'eqx' + (++eqUid);
+      defs += '<filter id="' + id + '" filterUnits="userSpaceOnUse" x="-30" y="-30" width="' + (W + 60) + '" height="' + (H + 60) + '"><feGaussianBlur stdDeviation="' + (L.hb * .45).toFixed(1) + '"/></filter>';
+      g += '<rect class="rl-slot" x="' + (x0 - 4) + '" y="-4" width="' + (CW + 8) + '" height="' + (H + 8) + '" rx="5"/>';
+      for (let j = 0; j < N; j++) g += eqCeldaCol(x0, H - (j + 1) * sh - j * GP, CW, sh, j < c.on, c.col, L, id, false);
+    });
+    return '<svg class="eqx eqcols" viewBox="0 -6 ' + W + ' ' + (H + 12) + '" preserveAspectRatio="none" aria-hidden="true"><defs>' + defs + '</defs>' + g + '</svg>';
+  }
+  // Barras sueltas (.k-barra, .k-barra-dato): en Ecualizador se dibujan con eqFila sobre el mismo elemento; la barra lisa queda debajo (Lisas).
+  // Cantidad de celdas: data-n en la barra, o una cada 10 % (ocupación, plan, partes de la rutina). La sesión (salaprog) es de T17: no se toca.
+  function eqHidratar(){
+    $$('.k-barra,.k-barra-dato').forEach(b => {
+      if (b.closest('.salaprog')) return;
+      const vi = b.querySelector(':scope>i.msv') || b.querySelector(':scope>i:not(.pvband)'); if (!vi) return;
+      const pct = Math.max(0, Math.min(100, parseFloat(vi.style.width) || 0)), N = +b.dataset.n || 10;
+      const c1 = getComputedStyle(vi).backgroundColor, dato = b.classList.contains('k-barra-dato'), c2 = dato ? 'var(--dat-dim)' : ''   /* el fondo de .eqb (entrenar.css); no se lee: en Ecualizador está apagado */;
+      const on = dato ? Math.round(pct / 100 * N) : pct > 0 ? Math.max(1, Math.round(pct / 100 * N)) : 0;
+      const k = N + '|' + on + '|' + c1 + '|' + c2; if (b.dataset.eqk === k) return; b.dataset.eqk = k;
+      const old = b.querySelector(':scope>svg.eqx'); if (old) old.remove();
+      b.insertAdjacentHTML('beforeend', eqFila(N, on, dato ? Array.from({ length:N }, (_, i) => i < on ? c1 : c2) : c1));
+    });
+  }
+  let eqPend = 0; const eqProg = () => { if (!eqPend) eqPend = requestAnimationFrame(() => { eqPend = 0; eqHidratar(); }); };
+  new MutationObserver(eqProg).observe(document.querySelector('.app'), { childList:true, subtree:true, attributes:true, attributeFilter:['style','class'] });
+  eqProg();
   var MH_POS = 'tumes'; let EQ_HALO = false, EQ_EST = 'real', eqCol = 'var(--z3)', eqFlow = false;
   function renderSemana(col, flow){
     if (col) { eqCol = col; eqFlow = !!flow; }
@@ -370,10 +425,7 @@
         const y = H0 + HB - (j + 1) * sh - j * GP, on = j < b.on, nw = on && j >= Math.max(0, semVisto[b.k]);
         let el;
         if (!BAR) {
-          el = on ? '<rect class="rl-gl" x="' + (x0 - 2) + '" y="' + (y - 1.5).toFixed(1) + '" width="' + (CW + 4) + '" height="' + (sh + 3).toFixed(1) + '" rx="2" fill="' + F + '" opacity="' + (L.ha * (EQ_HALO ? 1.4 : .7)).toFixed(2) + '" filter="url(#eqBl' + i + ')"/>' +
-                    '<rect x="' + x0 + '" y="' + y.toFixed(1) + '" width="' + CW + '" height="' + sh.toFixed(1) + '" rx="1.5" fill="' + F + '" opacity="' + L.bd + '"/>' +
-                    '<rect class="rl-hi" x="' + (x0 + 2) + '" y="' + (y + .5).toFixed(1) + '" width="' + (CW - 4) + '" height="' + Math.min(1.1, sh * .3).toFixed(2) + '" fill="#fff" opacity="' + (.45 * L.bd).toFixed(2) + '"/>'
-                  : '<rect x="' + x0 + '" y="' + y.toFixed(1) + '" width="' + CW + '" height="' + sh.toFixed(1) + '" rx="1.5" fill="' + F + '" fill-opacity=".22" stroke="' + F + '" stroke-opacity=".5" stroke-width=".8"/>';
+          el = eqCeldaCol(x0, y, CW, sh, on, F, L, 'eqBl' + i, EQ_HALO);   // T16: la misma celda que usan los demás medidores
         } else {
           // Barritas: tubos de neón cortos, con las mismas capas que los tubos del dial
           const cy = (y + sh / 2).toFixed(1), sw = Math.min(8.5, sh * .95), x1 = (x0 + sw / 2).toFixed(1), x2 = (x0 + CW - sw / 2).toFixed(1);

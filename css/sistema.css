@@ -39,9 +39,9 @@
   --reflejo:linear-gradient(rgba(255,255,255,.45),rgba(255,255,255,.45)) 0 2px/100% 1px no-repeat;
 }
 /* --- Componentes --- */
-.app[data-barras="eq"] .k-barra{ --tinte:var(--dat); position:relative; background:rgba(0,0,0,.4)!important; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)!important; border-radius:4px!important; overflow:hidden }
-.app[data-barras="eq"] .k-barra::before{ content:""; position:absolute; inset:0; background:var(--tinte); -webkit-mask:var(--celda-apagada) 0 0/6px 100% repeat-x; mask:var(--celda-apagada) 0 0/6px 100% repeat-x; pointer-events:none }
-.app[data-barras="eq"] .k-barra>i{ position:relative; border-radius:0!important; background-image:var(--reflejo); -webkit-mask:var(--celda) 0 0/6px 100% repeat-x; mask:var(--celda) 0 0/6px 100% repeat-x }
+.app[data-barras="eq"] .salaprog .k-barra{ --tinte:var(--dat); position:relative; background:rgba(0,0,0,.4)!important; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)!important; border-radius:4px!important; overflow:hidden }
+.app[data-barras="eq"] .salaprog .k-barra::before{ content:""; position:absolute; inset:0; background:var(--tinte); -webkit-mask:var(--celda-apagada) 0 0/6px 100% repeat-x; mask:var(--celda-apagada) 0 0/6px 100% repeat-x; pointer-events:none }
+.app[data-barras="eq"] .salaprog .k-barra>i{ position:relative; border-radius:0!important; background-image:var(--reflejo); -webkit-mask:var(--celda) 0 0/6px 100% repeat-x; mask:var(--celda) 0 0/6px 100% repeat-x }
 .app[data-barras="eq"] .salaprog .sp{ --tinte:var(--lime) }
 .app[data-barras="eq"] .tdb{ --tinte:var(--pc) }
 .app[data-barras="eq"] .occ:has(i.mid),.app[data-barras="eq"] .sede.mid .occ{ --tinte:var(--orange) }
@@ -105,3 +105,45 @@
 .app .mtitle.sig{ font-size:24px }
 .app .day.done span{ color:var(--txt) }   /* "Hecho": el borde dice el logro; el texto chico va claro */
 .app .dotn{ background:var(--lime); color:#04131a }  /* contador de novedad: cian (información), no rojo */
+
+/* ===== v82 · Paso 3: acción y elección (T16-instrumentos § 2 A y B) =====
+   Botón: dos tamaños, 56 y 44 (.sm). Enlace: texto cian 14/700, sin caja, 44 de alto; "salir" (Ahora no, Después vemos) en gris.
+   Segmentado: un instrumento (pestañas, Frente·Perfil·Espalda, Últimas 4 semanas·Hoy); 44 de alto, chico 36 con área de 44; activa en tubo cian.
+   Días: una forma (calendario de Rutinas y días de Hoy). Hoy = borde cian; elegido = tubo; hecho = borde magenta; sigue = rótulo cian. */
+.app .btn.sm{ min-height:44px; font-size:15px; border-radius:14px }
+.app :is(.link.lime,.toplink,.fvl,.ulink,.hcorto,.hcleg .link){ min-height:44px; padding:0; background:none; border:none;
+  color:var(--lime)!important; font-size:14px!important; font-weight:700; text-decoration:none }
+.app .fvl{ margin:-10px 0 }  .app .hcorto{ text-align:left } .app .hcorto b{ color:inherit }  .app .between>.link.lime{ white-space:nowrap }
+.app :is(.tabs,.seg,.prvistas){ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:4px; padding:4px; border-radius:14px; background:var(--panel); border:1px solid var(--line) }
+.app :is(.tabs,.seg,.prvistas) button{ min-height:44px; height:auto; border:none; border-radius:10px; background:none; color:var(--muted); font-size:14px; font-weight:600 }
+.app :is(.seg,.prvistas) button{ position:relative; min-height:36px; font-size:13px }
+.app :is(.seg,.prvistas) button::after{ content:""; position:absolute; inset:-4px 0 }
+.app :is(.day,.hday){ min-height:56px; border-radius:12px; background:var(--panel2); border:1.5px solid var(--line2); color:var(--txt); box-shadow:none }
+.app .hday{ min-height:44px }
+.app .day span{ color:var(--muted) }
+.app :is(.day.today,.hday.today){ background:var(--panel2); border-color:var(--lime); color:var(--txt) } .app .day.today span{ color:var(--lime); font-weight:700 }
+.app .day.done{ border-color:var(--dat) }
+.app .day.nextd{ box-shadow:none } .app .day.nextd span{ color:var(--lime); font-weight:700 }
+.app .hday.cur{ background:var(--sel-fondo)!important; color:var(--sel-texto)!important; border:var(--sel-borde)!important; box-shadow:var(--sel-brillo)!important }
+.app .opt{ border-radius:12px }
+/* Tarjeta elegible: el estado elegido es el de k-elige (.sel / aria-pressed); "destacada" (.hot) es solo el borde cian */
+.app .choice.hot{ border-color:var(--lime) }
+
+/* ===== v82 · Paso 4: medidores (T16-instrumentos § 2 D) =====
+   Ecualizador = las funciones de Inicio (comun.js: eqCeldaCol / eqCeldaFila, eqColumnas, eqFila). Ya no hay máscaras CSS imitándolas.
+   Lisas = la barra de siempre; el SVG del ecualizador no se muestra. */
+.eqx{ display:none }
+.eqx .rl-slot{ fill:rgba(0,0,0,.38); stroke:rgba(255,255,255,.07); stroke-width:1 }
+.app[data-mode="light"] .eqx .rl-slot{ fill:rgba(18,22,29,.05); stroke:rgba(18,22,29,.1) }
+.app[data-mode="light"] .eqx :is(.rl-gl,.rl-hi){ display:none }
+.app[data-barras="eq"] :is(.k-barra,.k-barra-dato):not(.salaprog .sp){ position:relative; overflow:visible!important; background:none!important; box-shadow:none!important; border-radius:0!important; -webkit-mask:none!important; mask:none!important }
+.app[data-barras="eq"] :is(.k-barra,.k-barra-dato):not(.salaprog .sp)::before,.app[data-barras="eq"] .k-barra-dato::after{ content:none!important }
+.app[data-barras="eq"] :is(.k-barra,.k-barra-dato):not(.salaprog .sp)>i:not(.pvband){ visibility:hidden }
+.app[data-barras="eq"] :is(.k-barra,.k-barra-dato)>.eqx{ display:block; position:absolute; left:0; top:50%; width:100%; height:12px; transform:translateY(-50%); overflow:visible; pointer-events:none }
+.app[data-barras="eq"] .msbar>.pvband{ top:-3px; bottom:-3px; border-radius:3px; background:rgba(170,190,220,.14)!important; visibility:visible }
+.app[data-barras="eq"] .occ b{ display:none }
+/* Constancia */
+.chart .eqcolbox{ display:none }
+.app[data-barras="eq"] .chart>i{ visibility:hidden }
+.app[data-barras="eq"] .chart .eqcolbox{ display:block; position:absolute; left:0; right:0; bottom:0; pointer-events:none }
+.app[data-barras="eq"] .chart .eqcolbox .eqx{ display:block; width:100%; height:100%; overflow:visible }

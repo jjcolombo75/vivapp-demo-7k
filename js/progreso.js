@@ -529,7 +529,7 @@
     $('#msB').innerHTML = 'promedio de 4 semanas · tu banda <b>' + b[0] + '–' + b[1] + '</b> · ' + TRAMO_TXT[tr];
     const mx = Math.max(b[1], ...MAPA.sem.map(S => S[k]));
     $('#msW').innerHTML = MAPA.sem.slice().reverse().map((S, i) => { const w = S[k], c = colorMus(w, b)[0];
-      return '<div><span class="small muted">' + (i === 3 ? 'Semana pasada' : 'Hace ' + (4 - i) + ' sem.') + '</span><span class="msbar"><i class="pvband" style="left:' + (b[0] / mx * 100).toFixed(1) + '%;width:' + ((b[1] - b[0]) / mx * 100).toFixed(1) + '%"></i><i class="msv" style="width:' + Math.max(1.5, w / mx * 100).toFixed(1) + '%;background:rgb(' + c.join(',') + ')"></i></span><b>' + fmtN(w) + '</b></div>'; }).join('');
+      return '<div><span class="small muted">' + (i === 3 ? 'Semana pasada' : 'Hace ' + (4 - i) + ' sem.') + '</span><span class="msbar" data-n="' + Math.ceil(mx) + '"><i class="pvband" style="left:' + (b[0] / mx * 100).toFixed(1) + '%;width:' + ((b[1] - b[0]) / mx * 100).toFixed(1) + '%"></i><i class="msv" style="width:' + Math.max(1.5, w / mx * 100).toFixed(1) + '%;background:rgb(' + c.join(',') + ')"></i></span><b>' + fmtN(w) + '</b></div>'; }).join('');
     const ej = PERFIL_MAPA ? [PERFILES[PERFIL_MAPA].ej + ' (perfil de demo)'] : Object.keys(hist).filter(e => (lib[e].mus || []).includes(k) || (lib[e].sec || []).includes(k)).map(e => lib[e].n + ((lib[e].mus || []).includes(k) ? '' : ' (½)'));
     $('#msE').textContent = PERFIL_MAPA ? ej[0] + '.' : ej.length ? ej.join(', ') + '. Una serie cuenta 1 si es el músculo principal y ½ si ayuda.' : 'Ningún ejercicio de tu rutina lo trabaja hoy.';
     $('#msH').innerHTML = (tr === 'sin' ? 'No está en tu rutina de ahora. Preguntale a tu profe si es a propósito. ' : tr === 'bajo' ? 'Si sigue por debajo dos semanas más, hablalo con tu profe en la revisión. ' : tr === 'alto' ? 'Lo ve tu profe: más no siempre suma. ' : 'Está donde tu profe lo quiere. ') + fvLink('vol', 'Ficha: series por semana');
@@ -790,7 +790,8 @@
     for (let d = 1; d <= off; d++) if (entrenoDia.has(d)) c++;
     const W = semWeeks().slice(1).map(x => ({ n:x.n, f:x.f })).concat([{ n:c, f:'Esta', now:true }]);
     $('#wkChart').innerHTML = '<span class="goal"></span>' + W.map(x => '<i class="' + (x.now ? 'now' : x.n >= META_SEM ? 'hit' : '') + '" style="height:' + Math.max(4, Math.min(118, Math.round(x.n / META_SEM * 100))) + 'px;--h:' + Math.min(120, Math.round(x.n / META_SEM * 100)) + 'px"></i>').join('');
-    $('#wkChart').style.setProperty('--cel', (100 / META_SEM).toFixed(2) + 'px'); $('#wkChart').style.setProperty('--alto', (Math.floor(120 / (100 / META_SEM)) * 100 / META_SEM).toFixed(2) + 'px'); // T16: en Ecualizador, una celda = una entrada
+    { const NC = Math.max(1, Math.floor(1.2 * META_SEM)), ALTO = NC * 100 / META_SEM;   // T16: en Ecualizador, una celda = una entrada; hasta el alto del gráfico
+      $('#wkChart').insertAdjacentHTML('beforeend', '<span class="eqcolbox" style="height:' + ALTO.toFixed(1) + 'px">' + eqColumnas(NC, W.map(x => ({ on:Math.min(NC, x.n), col:x.now ? 'var(--dat-dim)' : x.n >= META_SEM ? 'var(--dat)' : '#8f99ab' })), ALTO) + '</span>'); }
     $('#wkChart').setAttribute('aria-label', 'Últimas 8 semanas: ' + W.map(x => x.n).join(', ') + ' entrenamientos. Meta: ' + META_SEM + ' por semana');
     $('#wkAxis').innerHTML = W.map(x => '<span>' + x.f + '</span>').join('');
     $('#wkMeta').textContent = 'Meta: ' + META_SEM;

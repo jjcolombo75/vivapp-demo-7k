@@ -107,11 +107,7 @@
     for (let i = 0; i < 4; i++) {
       const st = i >= n ? 'off' : L[i] ? 'full' : 'half', x = i * (sw + GP), Lz = eqLuz(st === 'full' ? 1 : st === 'half' ? .45 : 0);
       if (!BAR) {
-        g += st === 'off'
-          ? '<rect x="' + x.toFixed(1) + '" y="0" width="' + sw.toFixed(1) + '" height="' + H + '" rx="2" fill="' + F + '" fill-opacity=".22" stroke="' + F + '" stroke-opacity=".5" stroke-width=".8"/>'
-          : '<rect x="' + (x - 2).toFixed(1) + '" y="-2" width="' + (sw + 4).toFixed(1) + '" height="' + (H + 4) + '" rx="3" fill="' + F + '" opacity="' + (Lz.ha * 1.2).toFixed(2) + '" filter="url(#msBl)"/>' +
-            '<rect x="' + x.toFixed(1) + '" y="0" width="' + sw.toFixed(1) + '" height="' + H + '" rx="2" fill="' + F + '" opacity="' + Lz.bd + '"/>' +
-            '<rect x="' + (x + 3).toFixed(1) + '" y=".6" width="' + (sw - 6).toFixed(1) + '" height="1.2" fill="#fff" opacity="' + (.5 * Lz.bd).toFixed(2) + '"/>';
+        g += eqCeldaFila(x, 0, sw, H, st !== 'off', F, Lz, 'msBl');   // T16: la misma celda que usan los demás medidores
       } else {
         const y = H / 2, x1 = (x + H / 2).toFixed(1), x2 = (x + sw - H / 2).toFixed(1), ln = (w, ex) => '<line x1="' + x1 + '" x2="' + x2 + '" y1="' + y + '" y2="' + y + '" stroke-width="' + w.toFixed(1) + '" stroke-linecap="round"' + ex + '/>';
         g += st === 'off'
