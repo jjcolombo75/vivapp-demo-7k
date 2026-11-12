@@ -960,7 +960,7 @@
   // v52 · T9: la frase sale del mismo cálculo que "Tu cuerpo hoy" (bloque 307), no de una tabla fija
   function descansoTxt(){ if (EXP === 'avanzado') return ''; const c = cuerpoHoy(); return c.rec.length ? recFrase(c.rec) : ''; }
   // Nunca "no vengas" a quien viene menos que su meta: el descanso total se propone solo con la semana ya cumplida
-  function fatigaTxt(){ return EXP !== 'avanzado' && DSEG >= 5 && semCumplida() && MOM !== 'sesion' ? 'Venís ' + DSEG + ' días seguidos y ya cumpliste tu semana ⚡ Mañana y pasado, descanso: tu cuerpo también entrena descansando.' : ''; }
+  function fatigaTxt(){ return EXP !== 'avanzado' && DSEG >= 5 && semCumplida() && MOM !== 'sesion' ? 'Venís ' + DSEG + ' días seguidos y ya cumpliste tu semana ⚡' + (CHK === 'todo' ? '' : CHK === 'sinen' ? ' Hoy venís sin energía: si mañana seguís así, descansar también cuenta.' : ' Si sentís el cuerpo cargado, mañana podés descansar: también cuenta.') : ''; }
   function mtSaludo(){
     const P = SALA.P, d = rutinas[actual].dias[rutinas[actual].next], ds = descansoTxt();
     return (NOENT ? 'Arrancamos.' : 'Llegaste a Sarmiento.') + (ETAPA === 'vuelvo' ? ' Volviste: hoy vamos al 80% de lo que hacías.' : ' Hoy toca el Día ' + d.k + (ds ? ' y ' + ds.charAt(0).toLowerCase() + ds.slice(1) : '') + ': arrancamos con ' + P.act.min + ' minutos de activación.');

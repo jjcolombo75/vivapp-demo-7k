@@ -49,7 +49,7 @@
   const cfg = { ventana:30, tope:90, base:5000, tramos:[[40,1],[70,1.3],[101,1.6]] };
   const sedesPPU = [
     { id:'sar', n:'Sarmiento', occ:34 }, { id:'lyp', n:'López y Planes', occ:57 },
-    { id:'cor', n:'Corrientes', occ:74 }, { id:'alb', n:'Alberdi', occ:92 }, { id:'sta', n:'Santa Ana', occ:22 }
+    { id:'cor', n:'Corrientes', occ:74 }, { id:'alb', n:'Alberdi', occ:92 }, { id:'sta', n:'Santa Ana', occ:22 }, { id:'pos', n:'Posadas', occ:41 }
   ];
   const money = n => '$' + Math.round(n).toLocaleString('es-AR');
   const precio = o => { if (o >= cfg.tope) return null; const t = cfg.tramos.find(x => o < x[0]); return Math.round(cfg.base * t[1] / 100) * 100; };

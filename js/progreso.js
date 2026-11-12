@@ -41,7 +41,7 @@
 
 //#bloque 130
   // ===== La sede del mes: % de socios con Mes completo por sede (agregado; en producción, de las entradas por molinete) =====
-  const sedesMes = [ ['Sarmiento', 34], ['López y Planes', 31], ['Alberdi', 27] ];
+  const sedesMes = [ ['Sarmiento', 34], ['López y Planes', 31], ['Corrientes', 29], ['Alberdi', 27], ['Santa Ana', 24], ['Posadas', 19] ];
   const diasRestantes = () => { const d = ahora(); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate() - d.getDate(); };
   const mesNombre = () => meses[ahora().getMonth()];
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);

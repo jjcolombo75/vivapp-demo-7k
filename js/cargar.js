@@ -1,9 +1,9 @@
-/* Vivapp · cargador (versión 43). Une las piezas en el orden original y arranca la app.
+/* Vivapp · cargador (la versión es V, abajo). Une las piezas en el orden original y arranca la app.
    html/*.html: bloques <!--#hNN--> que reemplazan a <template data-b="hNN"> de index.html.
    img/*.svg: símbolos (logo, sello, íconos, patrón) dentro de un único <svg> oculto.
    js/*.js: bloques //#bloque NNN, ordenados por número, dentro de la función principal; después js/halo.js. */
 (function () {
-  var V = '85';
+  var V = '86';
   var HTML = ["captacion", "inicio", "entrenar", "progreso", "club", "gestion", "comunidad", "demo"], SVG = ["logo", "sello", "iconos", "patron"], JS = ["datos", "comun", "inicio", "entrenar", "progreso", "club", "comunidad", "captacion", "demo"];
   var SVG_A = '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>', SVG_B = '</defs></svg>';
   function get(u) {

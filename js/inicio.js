@@ -6,7 +6,7 @@
   const lvTxt = { low:'Poca gente', mid:'Gente moderada', high:'Mucha gente', full:'Completa' };
   let occOpen = true;
   // Ocupación: mismo criterio de color que los tramos (amarillo · cian · magenta · espectro), por porcentaje
-  const OCC_S = [ { n:'Sarmiento', occ:34, f:1 }, { n:'López y Planes', occ:57, f:1.12 }, { n:'Alberdi', occ:92, f:1.22 }, { n:'Costanera', occ:null }, { n:'Santa Ana', occ:null }, { n:'Posadas', occ:null, pronto:true } ];
+  const OCC_S = [ { n:'Sarmiento', occ:34, f:1 }, { n:'López y Planes', occ:57, f:1.12 }, { n:'Alberdi', occ:92, f:1.22 }, { n:'Corrientes', occ:74, f:1.18 }, { n:'Santa Ana', occ:22, f:0.9 }, { n:'Posadas', occ:41, f:1.05 } ];
   // Promedio por hora (simulado con la forma de las entradas de Viva: picos a la mañana temprano y de 18 a 21)
   const OCC_H = { lv:[[5,10],[6,28],[7,52],[8,60],[9,45],[10,35],[11,30],[12,34],[13,30],[14,18],[15,16],[16,24],[17,46],[18,72],[19,86],[20,80],[21,62],[22,34]],
                   sa:[[8,30],[9,48],[10,62],[11,58],[12,44],[13,30],[14,20],[15,18],[16,22],[17,16]],
@@ -25,7 +25,6 @@
       $('#sedeChip').setAttribute('aria-label', 'Tu sede: ' + miSede + '. ' + OCC_T[k] + ' ahora, ' + mine.occ + '%. Ver todas las sedes y la gente por hora.'); }
     // Lista de sedes
     $('#occList').innerHTML = OCC_S.map(x => {
-      if (x.occ === null) return '<div class="occrow nod"><span class="ocn">' + x.n + '</span><span class="small muted">' + (x.pronto ? 'Abre pronto' : 'Sin datos todavía') + '</span></div>';
       const q = occLv(x.occ);
       return '<div class="occrow"><span class="ocn">' + x.n + (x.n === miSede ? ' <em>tu sede</em>' : '') + '</span><span class="ocb" style="--oc:' + occBg(q) + '"><i style="width:' + x.occ + '%"></i></span><span class="ocp" style="--oc:' + occBg(q) + '">' + x.occ + '%</span></div>';
     }).join('');
@@ -216,8 +215,8 @@
   });
   function updWhy(){
     const v = prep.score;
-    $('#todayWhy').textContent = v === null ? 'Elegida según tu recuperación: tus piernas todavía descansan del lunes.'
-      : v >= 70 ? 'Elegida según cómo estás hoy (' + v + '): tus piernas descansan del lunes, la espalda está lista.'
+    $('#todayWhy').textContent = v === null ? 'Elegida con lo que registraste: el lunes hiciste piernas.'
+      : v >= 70 ? 'Elegida según cómo venís hoy (' + v + ') y lo que registraste: el lunes hiciste piernas.'
       : v >= 45 ? 'Preparación ' + v + ': hacela completa, pero sin buscar récords hoy.'
       : 'Preparación ' + v + ': te bajamos 10% las cargas. Si preferís, cambiá a una rutina de movilidad.';
     $('#todayWhy').style.color = v === null || v >= 70 ? 'var(--dat)' : v >= 45 ? 'var(--orange)' : 'var(--yel)';

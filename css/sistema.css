@@ -177,6 +177,6 @@
 .app svg[viewBox="0 0 24 24"][fill="none"]:not(.eqx){ stroke-width:2 }
 
 /* ===== v83 · Paso 6: movimiento (T16-instrumentos § 2 J) =====
-   Solo se mueve lo que acaba de cambiar, una vez. Empezar: quieto por defecto (fuera la luz y el espectro que giran).
+   Solo se mueve lo que acaba de cambiar, una vez. Excepción (Juanjo, v85): Empezar, abajo, con el espectro que gira.
    El tramo del dial se enciende una vez al dibujarse y queda encendido (antes respiraba sin parar). */
 .app :is(.gauge,.vumeter) .tube.tz :is(.halo,.halo2){ animation-iteration-count:1!important; animation-fill-mode:forwards!important }

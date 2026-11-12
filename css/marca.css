@@ -388,6 +388,15 @@
 .notif .opt{min-height:44px;font-size:14px}
 @keyframes nIn{from{transform:translateY(-130%)}to{transform:none}}
 /* ===== v33 · Manual de marca oficial de Viva (claude/instruccion-prototipo-manual-marca.md) ===== */
+/* T-R v86 · WELCOME TO THE CLUB: la frase de la pared, en neón cian; siempre sobre fondo oscuro (manual) */
+.wtcn{font-family:var(--display);font-weight:800;font-stretch:80%;text-transform:uppercase;letter-spacing:.06em;text-align:center;line-height:1.05;color:#d9f5ff;
+  text-shadow:0 0 1px #fff,0 0 5px #07b0f2,0 0 12px #07b0f2,0 0 26px rgba(7,176,242,.65),0 0 44px rgba(7,176,242,.35)}
+.wttcBand{background:#07090d;border-radius:12px;padding:9px 10px;font-size:17px;border:1px solid rgba(7,176,242,.18)}
+#inicio .wttcBand{position:sticky;top:0;z-index:5}
+#wttcFull{position:absolute;inset:0;z-index:90;background:#05070a;display:flex;align-items:center;justify-content:center;padding:24px;cursor:pointer}
+#wttcFull .wtcn{font-size:46px;line-height:1.08}
+@media (prefers-reduced-motion: no-preference){ .wttcOn{animation:wttcOn .8s steps(1,end)} }
+@keyframes wttcOn{0%{opacity:.1}15%{opacity:1}25%{opacity:.3}40%{opacity:1}55%{opacity:.6}70%{opacity:1}}
 /* Títulos: Archivo Black; lo que era condensado (números, rótulos) sigue en Archivo Condensed */
 .h1,.h2,.sh,.mtitle{font-weight:900;font-stretch:100%;letter-spacing:0}
 .h1{font-size:31px;line-height:1.04}

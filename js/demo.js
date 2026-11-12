@@ -333,3 +333,34 @@
     if (id === 'chat') { openChat(conv[0].id); return; }
     go(id);
   } };
+//#bloque 990
+  // ===== T-R v86 · WELCOME TO THE CLUB, para probar en cuatro lugares (decisiones.md 12/11) =====
+  var WTTC = { entrada:false, inicio:false, comunidad:false, ingreso:false };
+  (function () {
+    const band = k => '<div class="wtcn wttcBand" data-wttcb="' + k + '" hidden aria-label="Welcome to the club">Welcome to the club</div>';
+    $('#inicio .body').insertAdjacentHTML('afterbegin', band('inicio'));
+    $('#social .body').insertAdjacentHTML('afterbegin', band('comunidad'));
+    $('#login .top').insertAdjacentHTML('afterend', band('ingreso'));
+    $('.app').insertAdjacentHTML('beforeend', '<div id="wttcFull" hidden role="dialog" aria-label="Welcome to the club"><span class="wtcn">Welcome<br>to the<br>club</span></div>');
+  })();
+  function wttcSync(){
+    ['inicio', 'comunidad', 'ingreso'].forEach(k => { const b = $('[data-wttcb="' + k + '"]'); if (b) { b.hidden = !WTTC[k]; b.classList.toggle('wttcOn', WTTC[k]); } });
+    const on = Object.keys(WTTC).filter(k => WTTC[k]);
+    $$('#wttcPick [data-wttc]').forEach(x => x.setAttribute('aria-pressed', x.dataset.wttc === 'off' ? !on.length : WTTC[x.dataset.wttc]));
+  }
+  let wttcT = null;
+  function wttcCerrar(){ clearTimeout(wttcT); $('#wttcFull').hidden = true; }
+  function wttcPrimera(){
+    // Verídico: solo con una entrada registrada por el molinete
+    if (NOENT) { toast('Sin entrada registrada no hay bienvenida'); return; }
+    const f = $('#wttcFull'), t = f.querySelector('.wtcn'); f.hidden = false; t.classList.remove('wttcOn'); void t.offsetWidth; t.classList.add('wttcOn');
+    clearTimeout(wttcT); wttcT = setTimeout(wttcCerrar, 3000);
+  }
+  $('#wttcFull').addEventListener('click', wttcCerrar);
+  $('#wttcPick').addEventListener('click', e => { const b = e.target.closest('[data-wttc]'); if (!b) return; e.stopPropagation();
+    const k = b.dataset.wttc; if (k === 'off') Object.keys(WTTC).forEach(x => WTTC[x] = false); else WTTC[k] = !WTTC[k]; wttcSync();
+    const dest = { inicio:'inicio', comunidad:'social', ingreso:'login' }[k];
+    if (dest && WTTC[k]) dmFin(dest, 'Welcome to the club: ' + b.textContent);
+    else if (k === 'entrada' && WTTC.entrada) toast('Primera entrada prendida: probala con "Simular primera entrada"'); });
+  $('#wttcSim').addEventListener('click', () => { WTTC.entrada = true; wttcSync(); setAnt('nueva'); dmFin('inicio', null); wttcPrimera(); });
+  wttcSync();
