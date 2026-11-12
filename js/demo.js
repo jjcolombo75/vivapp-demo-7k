@@ -354,7 +354,7 @@
   function wttcSync(){
     ['inicio', 'comunidad', 'ingreso'].forEach(k => { const b = $('[data-wttcb="' + k + '"]'); if (b) { b.hidden = !WTTC[k]; b.classList.toggle('wttcOn', WTTC[k]); } });
     const on = Object.keys(WTTC).filter(k => WTTC[k]);
-    $$('#wttcPick [data-wttc]').forEach(x => x.setAttribute('aria-pressed', x.dataset.wttc === 'off' ? !on.length : WTTC[x.dataset.wttc]));
+    $$('#wttcPick [data-wttc]').forEach(x => x.setAttribute('aria-pressed', !!WTTC[x.dataset.wttc]));
     wtcFit();
   }
   let wttcT = null;
@@ -368,10 +368,11 @@
   $('#wttcFull').addEventListener('click', wttcCerrar);
   $('#wtcfPick').addEventListener('click', e => { const b = e.target.closest('[data-wtcf]'); if (!b) return; e.stopPropagation(); $('.app').dataset.wtcf = b.dataset.wtcf;
     $$('#wtcfPick [data-wtcf]').forEach(x => x.setAttribute('aria-pressed', x === b)); toast(b.dataset.wtcf === '1' ? 'Welcome to the club: titila' : 'Welcome to the club: quieto'); });
-  $('#wttcPick').addEventListener('click', e => { const b = e.target.closest('[data-wttc]'); if (!b) return; e.stopPropagation();
+  // Lugares no excluyentes: cada toque prende o apaga el suyo y el panel queda abierto
+  const WTTC_N = { entrada:'Primera entrada', inicio:'Inicio', comunidad:'Comunidad', ingreso:'Ingreso' };
+  $('#demoSheet').addEventListener('click', e => { const b = e.target.closest('[data-wttc]'); if (!b) return; e.stopPropagation();
     const k = b.dataset.wttc; if (k === 'off') Object.keys(WTTC).forEach(x => WTTC[x] = false); else WTTC[k] = !WTTC[k]; wttcSync();
-    const dest = { inicio:'inicio', comunidad:'social', ingreso:'login' }[k];
-    if (dest && WTTC[k]) dmFin(dest, 'Welcome to the club: ' + b.textContent);
-    else if (k === 'entrada' && WTTC.entrada) toast('Primera entrada prendida: probala con "Simular primera entrada"'); });
+    const on = Object.keys(WTTC).filter(x => WTTC[x]).map(x => WTTC_N[x]);
+    toast(!on.length ? 'Cartel apagado' : on.length > 2 ? 'Cartel en ' + on.length + ' lugares' : 'Cartel en ' + on.join(' y ')); }, true);
   $('#wttcSim').addEventListener('click', () => { WTTC.entrada = true; wttcSync(); setAnt('nueva'); dmFin('inicio', null); wttcPrimera(); });
   wttcSync();
