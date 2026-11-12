@@ -335,7 +335,7 @@
   } };
 //#bloque 990
   // ===== T-R v86 · WELCOME TO THE CLUB, para probar en cuatro lugares (decisiones.md 12/11) =====
-  var WTTC = { entrada:false, inicio:false, comunidad:false, ingreso:false };
+  var WTTC = { entrada:true, inicio:false, comunidad:false, ingreso:false };
   (function () {
     const txt = c => '<text class="' + c + '" x="0" y="80"><tspan font-size="84">WELCOME</tspan><tspan font-size="64" dx="26">TO THE CLUB</tspan></text>';
     const SIGN = '<svg class="wtcs" role="img" aria-label="Welcome to the club" viewBox="0 0 1100 100" preserveAspectRatio="xMidYMid meet">' + txt('tb') + txt('tc') + '</svg>';
