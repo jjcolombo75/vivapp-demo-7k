@@ -34,7 +34,7 @@
   function renderRecords(){
     $('#recList').innerHTML = Object.keys(hist).map(k => {
       const h = hist[k], b = Math.max.apply(null, h.map(x => x[1])), nuevo = h[h.length - 1][0] === hoyLbl && h[h.length - 1][1] === b && b > prevBest(k);
-      return '<div><span style="flex:1;font-weight:500">' + lib[k].n + '</span>' + (nuevo ? '<span class="pill ok">NUEVO</span>' : '') + '<span class="num" style="font-size:22px">' + (b ? fmtN(b) + ' ' + unidad(k) : 'Corporal') + '</span></div>';
+      return '<div><span style="flex:1;font-weight:500">' + lib[k].n + '</span>' + (nuevo ? '<span class="pill">NUEVO</span>' : '') + '<span class="num" style="font-size:22px">' + (b ? fmtN(b) + ' ' + unidad(k) : 'Corporal') + '</span></div>';
     }).join('');
   }
   renderAvance(); renderRecords();

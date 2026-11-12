@@ -99,19 +99,11 @@
 .mssvg{width:100%;display:block;overflow:visible}
 .mssvg .rl-slot{fill:rgba(0,0,0,.38);stroke:rgba(255,255,255,.07);stroke-width:1}
 /* Botón Empezar: jerarquía con halo (respira, luz cian que gira o espectro que gira) */
-@property --aa{syntax:'<angle>';inherits:false;initial-value:0deg}
-@keyframes accSpin{to{--aa:360deg}}
 @keyframes accBreathe{0%,100%{box-shadow:0 0 0 1px rgba(64,196,255,.25),0 0 8px rgba(64,196,255,.3),inset 0 0 8px rgba(64,196,255,.15)}50%{box-shadow:0 0 0 1px rgba(64,196,255,.5),0 0 28px rgba(64,196,255,.9),inset 0 0 16px rgba(64,196,255,.35)}}
 .accbar{position:relative;isolation:isolate}
 .nav{isolation:isolate}
 .accbtn.go,.navacc.go .nai{position:relative}
 .app[data-ah="respira"] .accbtn.go,.app[data-ah="respira"] .navacc.go .nai{animation:accBreathe 2.4s ease-in-out infinite}
-.app[data-ah="gira"] .accbtn.go,.app[data-ah="gira"] .navacc.go .nai{border:2px solid transparent;box-shadow:none;background:linear-gradient(#0b1119,#0b1119) padding-box,conic-gradient(from var(--aa),rgba(7,176,242,.3) 0deg,rgba(7,176,242,.3) 190deg,#07b0f2 280deg,#e8faff 318deg,#07b0f2 340deg,rgba(7,176,242,.3) 360deg) border-box;animation:accSpin 3s linear infinite}
-.app[data-ah="espectro"] .accbtn.go,.app[data-ah="espectro"] .navacc.go .nai{border:2px solid transparent;box-shadow:none;background:linear-gradient(#0b1119,#0b1119) padding-box,conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a) border-box;animation:accSpin 4s linear infinite}
-.app[data-ah="gira"] .accbtn.go::after,.app[data-ah="gira"] .navacc.go .nai::after,.app[data-ah="espectro"] .accbtn.go::after,.app[data-ah="espectro"] .navacc.go .nai::after{content:"";position:absolute;inset:-4px;border-radius:inherit;z-index:-1;filter:blur(11px);opacity:.95;pointer-events:none;animation:accSpin 3s linear infinite}
-.app[data-ah="gira"] .accbtn.go::after,.app[data-ah="gira"] .navacc.go .nai::after{background:conic-gradient(from var(--aa),transparent 0deg,transparent 200deg,#07b0f2 285deg,#9be7ff 318deg,#07b0f2 345deg,transparent 360deg)}
-.app[data-ah="espectro"] .accbtn.go::after,.app[data-ah="espectro"] .navacc.go .nai::after{background:conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a);opacity:.75;animation-duration:4s}
-.app[data-ah="gira"] .accbtn.go,.app[data-ah="espectro"] .accbtn.go{text-shadow:0 0 10px rgba(64,196,255,.6)}
 /* Una sola animación: mientras gira o respira Empezar, el tubo del tramo queda quieto */
 .app[data-mom="sala"]:not([data-ah="quieto"]) .gauge .tube.tz .halo,.app[data-mom="sala"]:not([data-ah="quieto"]) .gauge .tube.tz .halo2,.app[data-mom="sala"]:not([data-ah="quieto"]) .vumeter .tube.tz .halo,.app[data-mom="sala"]:not([data-ah="quieto"]) .vumeter .tube.tz .halo2{animation:none!important}
 

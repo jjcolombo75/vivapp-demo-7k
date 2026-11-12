@@ -61,7 +61,7 @@
         return '<button class="day ' + st + (RUT_VER === rid + ':' + i ? ' sel' : '') + '" data-ver="' + rid + ':' + i + '" aria-expanded="' + (RUT_VER === rid + ':' + i) + '" aria-label="Día ' + d.k + ', ' + d.n + '"><b>' + d.k + '</b><span>' + lab + '</span></button>';
       }).join('');
       return '<div class="card rut' + (cur ? ' cur' : '') + '">' +
-        '<div style="display:flex;align-items:center;gap:10px">' + head + (cur ? '<span class="pill ok">EN CURSO</span>' : '<span class="pill" style="background:var(--panel2);color:var(--muted)">ACTIVA</span>') + '</div>' +
+        '<div style="display:flex;align-items:center;gap:10px">' + head + (cur ? '<span class="pill">EN CURSO</span>' : '<span class="pill gris">ACTIVA</span>') + '</div>' +
         '<div class="stack" style="gap:4px"><span class="h2">' + r.nombre + '</span><span class="small muted">' + r.sub + '</span></div>' +
         '<div class="days" style="grid-template-columns:repeat(' + r.dias.length + ',minmax(0,1fr))">' + days + '</div>' +
         (RUT_VER && RUT_VER.split(':')[0] === rid ? rutDetalle(rid, +RUT_VER.split(':')[1]) : '') +

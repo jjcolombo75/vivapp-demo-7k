@@ -11,7 +11,7 @@
   $('#deudaToggle').addEventListener('click', () => {
     deuda = !deuda;
     $('#deudaBox').hidden = !deuda;
-    const p = $('#estadoPill'); p.textContent = deuda ? 'CON SALDO' : 'AL DÍA'; p.className = 'pill ' + (deuda ? 'bad' : 'ok');
+    const p = $('#estadoPill'); p.textContent = deuda ? 'CON SALDO' : 'AL DÍA'; p.className = 'pill' + (deuda ? ' bad' : '');
     $('#deudaToggle').textContent = deuda ? 'Ver ejemplo al día' : 'Ver ejemplo con saldo pendiente'; deudaFranja();
     renderClub(); renderAvisoPlan();
   });
@@ -117,7 +117,7 @@
     const vig = canjes.filter(c => c.estado === 'vigente'), us = canjes.filter(c => c.estado === 'usado');
     $('#canjesList').innerHTML = vig.concat(us).map(c =>
       '<div><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + c.com + '</span><span class="small muted">' + c.t + ' · <span style="font-family:ui-monospace,Menlo,monospace">' + c.code + '</span></span></span>' +
-      (c.estado === 'vigente' ? '<span class="pill ok">VENCE EN 24 H</span>' : '<span class="small muted">Usado ' + c.fecha + '</span>') + '</div>').join('');
+      (c.estado === 'vigente' ? '<span class="pill warn">VENCE EN 24 H</span>' : '<span class="small muted">Usado ' + c.fecha + '</span>') + '</div>').join('');
   }
 
   function openBen(id){
@@ -188,7 +188,7 @@
     if (pausa) $('#pausaNote').textContent = 'Pausado del ' + ddmm(pausa.desde) + ' al ' + ddmm(pausa.hasta) + ' (' + pausa.mot.toLowerCase() + '). Tus semanas, tu mes y tus fichas quedan congelados: no perdés nada.';
     $('#pausaBtn').lastChild.textContent = pausa ? 'Reanudar mi plan ahora' : 'Pausar mi plan';
     $('#pausaHint').hidden = !!pausa;
-    if (!deuda) { const p = $('#estadoPill'); p.textContent = pausa ? 'PAUSADO' : 'AL DÍA'; p.className = 'pill' + (pausa ? '' : ' ok'); p.style.cssText = pausa ? 'background:var(--panel2);color:var(--muted)' : ''; }
+    if (!deuda) { const p = $('#estadoPill'); p.textContent = pausa ? 'PAUSADO' : 'AL DÍA'; p.className = 'pill' + (pausa ? ' gris' : ''); }
   }
   $('#venceDemo').addEventListener('click', () => { const corto = Math.round((VENCE - HOY0) / 864e5) > 5; VENCE = new Date(HOY0.getTime() + (corto ? 3 : 18) * 864e5); $('#venceDemo').textContent = corto ? 'Volver al plan al día' : 'Ver plan que vence en 3 días'; renderPlan(); $('#demoSheet').hidden = true; go('inicio'); toast(corto ? 'El plan vence en 3 días: aparece el aviso en Inicio' : 'Plan al día: el aviso no aparece'); });
   $('#pausaBtn').addEventListener('click', () => { if (pausa) { pausa = null; renderPlan(); toast('Tu plan está activo otra vez'); return; } updPs(); $('#pausaSheet').hidden = false; });

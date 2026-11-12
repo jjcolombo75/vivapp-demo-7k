@@ -166,9 +166,9 @@
     // Estado del pase de hoy
     let h = '';
     if (!pase) h = '<span class="lbl">Sin pase hoy</span><button class="btn sm" data-go="ppu">Pagar un ingreso</button>';
-    else if (pase.estado === 'activo') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill ok">ACTIVO</span></div><span class="h2">Entrá antes de las ' + hhmm(pase.until) + '</span><button class="btn sm" data-go="pase">Ver mi pase</button>';
-    else if (pase.estado === 'dentro') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill ok">USADO</span></div><span class="h2">Ingresaste a las ' + hhmm(pase.inAt || ahora()) + '</span><span class="small muted">¡Buen entrenamiento! Tu rutina está en la pestaña Entrenamientos.</span>';
-    else h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill" style="background:var(--panel2);color:var(--muted)">SIN USAR</span></div><span class="h2">Tenés ' + money(saldo) + ' de saldo a favor</span><span class="small muted">No llegaste a entrar a tiempo: no perdiste nada.</span><button class="btn sm" data-go="ppu">Usar mi saldo</button>';
+    else if (pase.estado === 'activo') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill">ACTIVO</span></div><span class="h2">Entrá antes de las ' + hhmm(pase.until) + '</span><button class="btn sm" data-go="pase">Ver mi pase</button>';
+    else if (pase.estado === 'dentro') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill gris">USADO</span></div><span class="h2">Ingresaste a las ' + hhmm(pase.inAt || ahora()) + '</span><span class="small muted">¡Buen entrenamiento! Tu rutina está en la pestaña Entrenamientos.</span>';
+    else h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill gris">SIN USAR</span></div><span class="h2">Tenés ' + money(saldo) + ' de saldo a favor</span><span class="small muted">No llegaste a entrar a tiempo: no perdiste nada.</span><button class="btn sm" data-go="ppu">Usar mi saldo</button>';
     $('#phPase').innerHTML = h;
     // Estadísticas del mes
     const now = ahora(), mes = consumos.filter(c => c.d.getMonth() === now.getMonth() && c.d.getFullYear() === now.getFullYear());
@@ -196,7 +196,7 @@
   function renderPpuTrain(){
     const r = rutinas.ppu;
     if (!r) { $('#ptList').innerHTML = '<div class="card" style="align-items:center;text-align:center"><span class="h2">Todavía no tenés rutina</span><span class="small muted">Contanos tu objetivo y la IA te arma una rutina con las máquinas de la sede.</span></div>'; return; }
-    $('#ptList').innerHTML = '<div class="card rut cur"><div class="between"><span class="pill ia">GENERADA CON IA</span><span class="pill ok">EN CURSO</span></div>' +
+    $('#ptList').innerHTML = '<div class="card rut cur"><div class="between"><span class="pill ia">GENERADA CON IA</span><span class="pill">EN CURSO</span></div>' +
       '<div class="stack" style="gap:4px"><span class="h2">' + r.nombre + '</span><span class="small muted">' + r.sub + '</span></div>' +
       '<div class="days" style="grid-template-columns:repeat(' + r.dias.length + ',minmax(0,1fr))">' +
       r.dias.map((d, i) => '<button class="day ' + (i < r.next ? 'done' : i === r.next ? 'today' : '') + '" data-pstart="' + i + '"><b>' + d.k + '</b><span>' + (i < r.next ? 'Hecho' : i === r.next ? 'Hoy' : d.lbl) + '</span></button>').join('') +
@@ -265,7 +265,7 @@
       '<div class="note"><span class="avatar" style="width:30px;height:30px;font-size:11px">LP</span><span>Prof. Lucas ajustó tu rutina: bajó el peso en sentadilla y sumó movilidad de cadera.</span></div>' +
       '<div class="note"><span><strong>Asociate antes del ' + vence48() + ':</strong> 20% en tu primer mes.</span></div>' +
       '<button class="btn sm" data-go="planes">Ver planes</button><span class="small muted" style="text-align:center">Tu cara ya quedó registrada: como socio entrás directo.</span>';
-    else if (trial) t.innerHTML = '<div class="between"><span class="lbl">' + (mitad() ? 'Tu entrenamiento a mitad de precio' : 'Tu entrenamiento gratis') + '</span><span class="pill ok">RESERVADO</span></div><span class="h2">' + trial.dia + ' · ' + trial.h + '</span><span class="small muted" style="line-height:1.45">Sede ' + trial.sede + ' · un profe te recibe con 15 minutos de bienvenida.' + (mitad() ? ' Pagás $2.500 al entrar.' : '') + '</span><button class="btn sm" id="nTrialQr">Preparar mi primer ingreso</button><button class="link" id="simVisita" style="min-height:44px;font-size:13px">Demo: simular que ya fui</button>';
+    else if (trial) t.innerHTML = '<div class="between"><span class="lbl">' + (mitad() ? 'Tu entrenamiento a mitad de precio' : 'Tu entrenamiento gratis') + '</span><span class="pill">RESERVADO</span></div><span class="h2">' + trial.dia + ' · ' + trial.h + '</span><span class="small muted" style="line-height:1.45">Sede ' + trial.sede + ' · un profe te recibe con 15 minutos de bienvenida.' + (mitad() ? ' Pagás $2.500 al entrar.' : '') + '</span><button class="btn sm" id="nTrialQr">Preparar mi primer ingreso</button><button class="link" id="simVisita" style="min-height:44px;font-size:13px">Demo: simular que ya fui</button>';
     $('#plNudge').hidden = !planOffer && $('#plNudge').hidden; if (planOffer) { $('#plNudge').hidden = false; $('#plNudge').innerHTML = '<span><strong>20% en tu primer mes</strong> por haber venido a tu primera visita. Válido hasta el ' + vence48() + '.</span>'; }
     const r = $('#nRut'), tiene = !!(rutinas.lead && leadSaved);
     r.hidden = !tiene;

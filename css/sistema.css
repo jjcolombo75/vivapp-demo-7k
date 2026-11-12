@@ -147,3 +147,36 @@
 .app[data-barras="eq"] .chart>i{ visibility:hidden }
 .app[data-barras="eq"] .chart .eqcolbox{ display:block; position:absolute; left:0; right:0; bottom:0; pointer-events:none }
 .app[data-barras="eq"] .chart .eqcolbox .eqx{ display:block; width:100%; height:100%; overflow:visible }
+
+/* ===== v83 · Paso 5: contenedores, etiquetas e íconos (T16-instrumentos § 2 C, E, G) =====
+   Caja: una forma (esquina 18, borde de caja); el relleno interior lo pone el contenido. La promo es una caja más (sin borde punteado).
+   Destacada: .dest = borde magenta sin brillo (lo que lográs); .dest.info = borde cian (una propuesta). Encendida (.lit) sigue siendo opción del panel. */
+.app .k-caja{ border-radius:18px }
+.app .promo{ border-style:solid; border-color:var(--caja-borde); background:var(--panel2) }
+.app .k-caja.dest{ border-color:var(--logro)!important; box-shadow:none }
+.app .k-caja.dest.info{ border-color:var(--info)!important }
+/* Etiqueta: una forma (12 px, 700, mayúsculas, esquina 8). Color = significado:
+   .pill = informa (cian) · .pill.ok = logro (borde magenta, texto claro: el magenta chico no pasa AA) · .gris = neutro · .warn/.bad = advertencia · .ia = espectro.
+   Fuente (.src, real o simulado), .tag, .mtag y medios de pago (.badge.deb/.ant): gris. Puntos (.badge.pts) y desbloqueado (.lockb.ok): cian; bloqueado (.lockb): advertencia. */
+.app :is(.pill,.tag,.badge,.mtag,.src,.lockb,.npill){ font-size:12px; font-weight:700; padding:4px 10px; border-radius:8px; line-height:1.25; white-space:nowrap; letter-spacing:.03em; text-transform:uppercase }
+.app :is(.pill,.badge.pts,.lockb.ok){ background:var(--info-bg); color:var(--lime); box-shadow:inset 0 0 0 1px rgba(7,176,242,.35) }
+.app .pill.ok{ background:var(--logro-bg); color:var(--txt); box-shadow:inset 0 0 0 1.5px var(--logro) }
+.app :is(.pill.gris,.tag,.mtag,.src,.src.real,.badge.deb,.badge.ant){ background:var(--panel2); color:var(--muted); box-shadow:none }
+.app .lockb:not(.ok){ background:var(--adv-bg); color:var(--adv); box-shadow:inset 0 0 0 1px rgba(255,233,74,.4) }
+.app .pill.ia{ box-shadow:none }
+.app[data-mode="light"] :is(.pill.bad,.pill.warn,.lockb:not(.ok)){ color:#6b5a00 }
+.app .mtag{ margin-left:4px }
+.app .tagi.sm{ font-size:12px }   /* festejo chico ("Completa"): piso de 12 px */
+/* Novedad y contador: un punto con número, cian (información) */
+.app :is(.dotn,#fitBox .fbnov){ background:var(--lime); color:#04131a; font-size:12px; font-weight:800; min-width:18px; border-radius:9px }
+/* Puntos de estado: tres tamaños (8 en "en vivo", 10 el común, 14 sobre un avatar); sin latido */
+.app .live i{ animation:none }
+/* Avatares: tres tamaños (40 · 56 · 96). .avatar = el chico */
+.app .avatar{ width:40px; height:40px; border-radius:50%; font-size:16px }
+/* Íconos de línea (24 × 24, sin relleno): un grosor, 2 */
+.app svg[viewBox="0 0 24 24"][fill="none"]:not(.eqx){ stroke-width:2 }
+
+/* ===== v83 · Paso 6: movimiento (T16-instrumentos § 2 J) =====
+   Solo se mueve lo que acaba de cambiar, una vez. Empezar: quieto por defecto (fuera la luz y el espectro que giran).
+   El tramo del dial se enciende una vez al dibujarse y queda encendido (antes respiraba sin parar). */
+.app :is(.gauge,.vumeter) .tube.tz :is(.halo,.halo2){ animation-iteration-count:1!important; animation-fill-mode:forwards!important }
