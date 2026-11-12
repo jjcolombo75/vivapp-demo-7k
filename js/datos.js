@@ -98,8 +98,16 @@
     $('#todayTags').innerHTML = d.ex.map(k => '<span class="tag">' + lib[k].n + '</span>').join('');
     // v57 · rutina en una línea + Empezar (entrenar-propuesta § 11.6); Empezar lleva a Hoy (§ 11.8)
     let nL = nEx, mL = tot; try { if (!prox && mm !== 'despues' && typeof salaPlan === 'function') { const SP = salaPlan(); nL = SP.fue.length; mL = planMin(SP); } } catch (_) {}
-    $('#todayLine').innerHTML = '<b>Día ' + d.k + ' · ' + d.n.toLowerCase() + '</b><span>' + nL + ' ejercicios · ~' + mL + ' min</span>';
-    $('#iniAcc').hidden = !(mm === 'antes' || mm === 'sala');
+    let SPd = null; try { if (!prox && mm !== 'despues' && typeof salaPlan === 'function') SPd = salaPlan(); } catch (_) {}
+    const fila = (a, b) => '<div><span>' + a + '</span><span>' + b + '</span></div>';
+    let det = '';
+    if (SPd) {
+      det = '<div class="tdsec">Activación</div>' + fila(SPd.act.items.length + ' movimientos', SPd.act.min + "'")
+        + '<div class="tdsec">Fuerza</div>' + SPd.fue.map(f => fila(f.n, f.sr + ' × ' + f.rep + (f.kg > 0 ? ' · ' + String(f.kg).replace('.', ',') + ' kg' : ''))).join('')
+        + '<div class="tdsec">Cardio</div>' + fila(SPd.car.maq + (SPd.car.txt ? ' · ' + SPd.car.txt : ''), SPd.car.min + "'");
+    } else det = d.ex.map(k => fila(lib[k].n, lib[k].sets.length + ' series')).join('');
+    $('#todayLine').innerHTML = '<b>Día ' + d.k + ' · ' + d.n.toLowerCase() + '</b><span>' + (r.tipo === 'profe' ? 'Prof. Lucas' : 'Generada con IA') + ' · ' + nL + ' ejercicios · ~' + mL + ' min</span><div class="tdex">' + det + '</div>';
+    $('#iniAcc').hidden = true;  // T-R v85 · Empezar vive abajo, a todo el ancho
   }
   $('#startToday').addEventListener('click', () => startDay(actual, rutinas[actual].next));
   $('#iniEmpezar').addEventListener('click', () => go('hoy'));

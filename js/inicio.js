@@ -287,7 +287,8 @@
     const r = rutinas[actual], dk = 'Día ' + r.dias[r.next].k;
     let lbl = null, cls = '', ico = '';
     if (!pausa) {
-      if (MOM === 'sesion') { lbl = 'Volver a tu sesión'; cls = 'on'; ico = ICO_SES; }
+      if (MOM === 'antes' || MOM === 'sala') { lbl = 'Empezar · ' + dk; cls = 'on go'; ico = ICO_PLAY; }
+      else if (MOM === 'sesion') { lbl = 'Volver a tu sesión'; cls = 'on'; ico = ICO_SES; }
     }
     const cen = ACC_POS === 'centro';
     $('#accBar').hidden = !lbl || cen;
@@ -309,7 +310,7 @@
     $('#demoSheet').hidden = true; go('inicio');
     toast({ antes:'Antes de ir: todavía no vino hoy', sala:'En la sala: entró por el molinete', sesion:'Sesión abierta: está entrenando', despues:'Después: ya entrenó hoy', descanso:'Día sin entrenar: la semana ya está cumplida' }[MOM]);
   });
-  $('.app').dataset.ah = 'quieto';
+  $('.app').dataset.ah = 'espectro';
   $('#haloPick').addEventListener('click', e => { const b = e.target.closest('[data-ah]'); if (!b) return; $('.app').dataset.ah = b.dataset.ah; $$('#haloPick [data-ah]').forEach(x => x.setAttribute('aria-pressed', x === b)); if (MOM !== 'sala') setMom('sala'); $('#demoSheet').hidden = true; go('inicio'); });
   $('#accPick').addEventListener('click', e => {
     const b = e.target.closest('[data-acc]'); if (!b) return; ACC_POS = b.dataset.acc;
