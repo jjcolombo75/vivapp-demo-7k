@@ -20,9 +20,10 @@ a{color:var(--lime)}
 
 .shell{height:100%;display:flex;justify-content:center;align-items:center}
 .app{position:relative;width:100%;max-width:440px;height:100%;background:var(--bg);color:var(--txt);display:flex;flex-direction:column;overflow:hidden}
-@media (min-width:600px) and (min-height:700px){
+/* Escritorio: marco de iPhone 15 Pro (pantalla 393×852 pt + bisel de 10 px). Sin condición de alto: si la ventana es baja, el marco se acorta pero no se ensancha */
+@media (min-width:600px){
   .shell{padding-block:24px}
-  .app{width:400px;height:min(860px,100%);border-radius:40px;border:10px solid #1a1f29;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+  .app{flex:0 0 auto;width:413px;max-width:413px;height:min(872px,100%);border-radius:55px;border:10px solid #1a1f29;box-shadow:0 30px 80px rgba(0,0,0,.55)}
 }
 
 .scr{flex:1;display:flex;flex-direction:column;min-height:0}
