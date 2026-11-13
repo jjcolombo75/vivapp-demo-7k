@@ -225,8 +225,8 @@
     if (p.k === 'dupla') return mvDupla(p);
     if (p.k === 'sede') return mvSede(p);
     if (p.k === 'grupo') { const on = !!MV.des.grupo;
-      return '<div class="post">' + '<div class="between"><span class="lbl">El grupo de Prof. Lucas</span>' + MV_EJ + '</div><span class="big">6 de 8 cumplieron su semana</span>' +
-        '<span class="small muted" style="margin-top:-6px;line-height:1.45">Es el total del grupo, sin nombres. Próximo entreno juntos: sábado 10:00.</span>' +
+      return '<div class="post">' + '<div class="between"><span class="lbl">El grupo de Prof. Lucas</span>' + MV_EJ + '</div><span class="big">El grupo sumó 6 semanas cumplidas</span>' +
+        '<span class="small muted" style="margin-top:-6px;line-height:1.45">Es lo que logró el grupo esta semana, sin nombres. Próximo entreno juntos: sábado 10:00.</span>' +
         '<button class="btn ghost sm" data-mvdes="grupo">' + (on ? '✓ Estás en el desafío del grupo' : 'Unirme al desafío del grupo') + '</button></div>'; }
     if (p.k === 'foto') return '<div class="post">' + mvCab(p.n, p.c, p.sub) + mvFoto(p.f, p.dato, p.det || (mvMesAnt() + ' · ' + p.sub.split(' · ')[0])) +
       '<span>' + p.txt + '</span><div class="mvacts">' + mvFit(p.id, p.n) +
@@ -291,7 +291,7 @@
   function mvDesHoja(k){
     const sede = k === 'sede', on = !!MV.des[k];
     mvHoja('<span class="lbl">Unirme a un desafío</span><span class="h2">' + (sede ? 'El desafío de ' + miSede : 'El desafío del grupo') + '</span>' +
-      '<span class="muted" style="line-height:1.45">' + (sede ? 'Que más socios de ' + miSede + ' cierren el mes con Mes cumplido. Sumás con el tuyo: nadie ve quién cumplió, solo el total.' : 'Que todo el grupo cumpla su semana, cada uno con su meta. Se ve el total del grupo, sin nombres, y arranca de nuevo cada lunes.') + '</span>' +
+      '<span class="muted" style="line-height:1.45">' + (sede ? 'Que más socios de ' + miSede + ' cierren el mes con Mes cumplido. Sumás con el tuyo: nadie ve quién cumplió, solo el total.' : 'Que todo el grupo cumpla su semana, cada uno con su meta. Se ve lo que suma el grupo, sin nombres ni cuántos son, y arranca de nuevo cada lunes.') + '</span>' +
       '<span class="mvdef">Los desafíos los arman tu profe, tu sede o Viva. Usan lo que ya medimos: tu semana cumplida, Tu ritmo y VIVA Flow.</span>' +
       mvPie('data-mvdesok="' + k + '"', on ? 'Salir del desafío' : 'Unirme'));
   }
