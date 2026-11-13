@@ -1,50 +1,21 @@
 <!--#h10-->
-<!-- 16. MURAL VIVA (T20, v95: reemplaza a Comunidad y sus cuatro pestañas) -->
+<!-- 16. MURAL VIVA (T20, v97: un mural para scrollear, con las secciones en íconos y la cámara flotante) -->
 <section class="scr" id="social" hidden aria-label="Mural VIVA">
-  <div class="body" style="padding-top:24px;gap:14px">
+  <div class="body mvbody" style="padding-top:24px;gap:16px">
     <div class="mvhead">
-      <button class="av sm mvyo" id="mvYo" aria-label="Tu mural: lo tuyo y quién lo ve" style="background:linear-gradient(160deg,#5b6ea8,#1c2238)">M</button>
-      <span class="stack" style="gap:2px;flex:1;min-width:0"><h1 class="h2">Mural VIVA</h1><span class="mvdef">Nombre a definir con marketing</span></span>
-      <button class="themebtn" data-go="people" aria-label="People: buscar gente y ver tu equipo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M16 14.2a5.5 5.5 0 0 1 5.5 5.8"/></svg></button>
-      <button class="themebtn" data-go="matches" aria-label="Mensajes" style="position:relative"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg><span class="dotn" id="mBadge">2</span></button>
+      <h1 class="mtitle sig"><b>Mural</b> <i>VIVA</i></h1>
+      <button class="mvfil k-btn2" id="mvFilBtn" aria-haspopup="dialog" aria-label="Elegir qué mural ves"><span id="mvFilLbl">Tu equipo</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
     </div>
-    <div class="note" id="mvMenor" hidden><span>Menores de 18: fotos, mensajes y People se definen con el dueño. En esta versión no tienen "Público".</span></div>
-
-    <div class="stack" style="gap:8px">
-      <span class="lbl">Lo que viene</span>
-      <div class="hrow mvrow" id="mvViene"></div>
+    <div class="mvsecs" role="navigation" aria-label="Secciones del mural">
+      <button class="mvsec" id="mvYo"><span class="mvsc yo" style="background:linear-gradient(160deg,#5b6ea8,#1c2238)">M</span><span>Tu mural</span></button>
+      <button class="mvsec" data-go="people"><span class="mvsc k-btn2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M16 14.2a5.5 5.5 0 0 1 5.5 5.8"/></svg></span><span>People</span></button>
+      <button class="mvsec" data-mvsec="desafios"><span class="mvsc k-btn2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4.5h12.5l-2.5 4 2.5 4H5"/></svg></span><span>Desafíos</span></button>
+      <button class="mvsec" data-mvsec="grupos"><span class="mvsc k-btn2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6.5 19.5a5.5 5.5 0 0 1 11 0"/><circle cx="4.8" cy="10.5" r="2"/><circle cx="19.2" cy="10.5" r="2"/><path d="M1.5 18a3.4 3.4 0 0 1 3.6-3.2M22.5 18a3.4 3.4 0 0 0-3.6-3.2"/></svg></span><span>Tus grupos</span></button>
+      <button class="mvsec" data-go="matches"><span class="mvsc k-btn2" style="position:relative"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg><span class="dotn" id="mBadge">2</span></span><span>Mensajes</span></button>
     </div>
-
-    <button class="mvcomp k-caja" id="mvPub"></button>
-
-    <div class="tabs t3" role="tablist" id="mvFil" aria-label="Qué mural ves">
-      <button role="tab" aria-selected="true" data-mvf="eq">Tu equipo</button>
-      <button role="tab" aria-selected="false" data-mvf="sede">Tu sede</button>
-      <button role="tab" aria-selected="false" data-mvf="viva">VIVA</button>
-    </div>
-    <span class="small muted" id="mvFilTxt" style="margin-top:-6px"></span>
-
-    <div class="stack" id="mvFeed" style="gap:12px"></div>
-
-    <details class="mvpend k-caja">
-      <summary>Lo que falta definir</summary>
-      <span class="lbl">Con marketing, el 20/11</span>
-      <ul>
-        <li>El nombre de la sección: Mural VIVA o En VIVO.</li>
-        <li>Cómo se suma a un amigo: "¿Entrenamos?" o "Sumar a mi mural".</li>
-        <li>"Fit" como nombre del aplauso.</li>
-        <li>Quién ve una publicación si no elegís: la propuesta es tus amigos.</li>
-      </ul>
-      <span class="lbl">Con el dueño</span>
-      <ul>
-        <li>Otras personas en la foto y el rincón de los vestuarios.</li>
-        <li>Menores de 18: fotos, mensajes y People.</li>
-        <li>Quién modera el mural y quién responde los mensajes a Viva.</li>
-        <li>Si "conocer gente" sigue, cambia o espera.</li>
-      </ul>
-    </details>
-    <p class="small muted" style="margin:0;text-align:center;line-height:1.45">Nada se publica solo. Nadie ve cuándo estás en el gimnasio.</p>
+    <div class="mvfeed" id="mvFeed" aria-label="El mural"></div>
   </div>
+  <button class="mvfab k-btn" id="mvPub" aria-label="Publicar: tu foto con el marco de VIVA"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><i class="mvfabdot" id="mvFabDot" hidden></i></button>
   <div class="sheet" id="mvHoja" hidden><div class="sheetin" id="mvHojaIn"></div></div>
 </section>
 

@@ -505,38 +505,64 @@ select.input{appearance:auto;-webkit-appearance:auto}
 .ibgrid b{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .ibgrid span:nth-child(3n+1){color:var(--muted)}
 
-/* ===== T20 · Mural VIVA (v95). Cajas, botones y elegibles salen del sistema (k-*); acá solo la forma propia del mural. ===== */
-.mvhead{display:flex;align-items:center;gap:10px}
-.mvyo.av{width:44px;height:44px;border:2px solid var(--lime);padding:0;cursor:pointer;font-family:inherit}
-.mvdef{font-size:12px;line-height:1.35;color:var(--muted)}
-.mvrow{gap:12px;padding:2px 2px 4px}
-.mvev{flex:0 0 76px;display:flex;flex-direction:column;align-items:center;gap:6px;border:none;background:none;color:var(--txt);padding:0;scroll-snap-align:start;font-family:inherit}
-.mvring{width:68px;height:68px;border-radius:50%;border:2px solid var(--lime);background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1}
-.mvring b{font-size:12px;letter-spacing:.08em;color:var(--muted)}
-.mvring i{font-style:normal;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
-.mvev.on .mvring{background:var(--lime);color:var(--ink)}
-.mvev.on .mvring b{color:var(--ink)}
-.mvev .mvevt{font-size:12px;line-height:1.2;text-align:center;color:var(--muted)}
-.mvcomp{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 14px;background:var(--panel);border:1px solid var(--line);color:var(--txt);text-align:left;width:100%;font-family:inherit}
-.mvcomp .mvcam{width:44px;height:44px;border-radius:14px;background:var(--panel2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--lime)}
+/* ===== T20 · Mural VIVA (v97). Un mural para scrollear: firma, tubos, trama y rayo, como Inicio. Botones y elegibles salen del sistema (k-*),
+   así que las opciones de Apariencia del panel (Rellenos · Tubos · Neón, modo claro) lo cambian igual que al resto. ===== */
+.app{ --mv-tubo-m:0 0 5px rgba(244,0,160,.75),0 0 16px rgba(244,0,160,.4),inset 0 0 8px rgba(244,0,160,.22); --mv-tubo-c:0 0 5px rgba(64,196,255,.75),0 0 16px rgba(64,196,255,.4),inset 0 0 8px rgba(64,196,255,.22) }
+.app[data-btn="rellenos"],.app[data-mode="light"]{ --mv-tubo-m:none; --mv-tubo-c:none }
+#social{position:relative}
+.mvbody{padding-bottom:120px}
+.mvhead{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
+.mvfil{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 12px 0 14px;border-radius:22px;font-size:14px;font-weight:700;font-family:inherit;flex-shrink:0}
+.mvsecs{display:flex;justify-content:space-between;gap:4px}
+.mvsec{display:flex;flex-direction:column;align-items:center;gap:6px;border:none;background:none;color:var(--txt);padding:0;font-family:inherit;font-size:12px;line-height:1.15;min-width:60px}
+.mvsc{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:#fff}
+.mvsc.yo{border:2.5px solid var(--dat);box-shadow:var(--mv-tubo-m)}
+.mvfeed{display:flex;flex-direction:column;gap:26px}
+.mvp{display:flex;flex-direction:column;gap:10px}
 .mvcab{display:flex;align-items:center;gap:10px}
 .mvduo{display:flex;flex-shrink:0}
-.mvduo .av+.av{margin-left:-12px;border:2px solid var(--panel)}
-.mvfoto{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.mvfoto.prev{aspect-ratio:auto;height:220px}
-.mvlogo{position:absolute;top:14px;left:14px;color:#fff}
-.mvph{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5)}
-.mvmarco{position:absolute;left:0;right:0;bottom:0;padding:34px 14px 14px;display:flex;flex-direction:column;gap:3px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.78));color:#fff}
-.mvmarco::before{content:"";width:40px;height:3px;background:var(--dat);margin-bottom:4px}
-.mvmarco b{font-family:var(--display);font-weight:900;font-size:24px;line-height:1;text-transform:uppercase}
-.mvmarco span{font-size:13px}
+.mvduo .av+.av{margin-left:-14px;border:2px solid var(--bg)}
+.mvmedia{margin-inline:-8px;border-radius:18px;position:relative;overflow:hidden}
+/* La foto: escena de ejemplo (luces de neón y espejo) con el marco de Viva encima */
+.mvfoto{aspect-ratio:4/5;background:radial-gradient(circle at 18% 14%,color-mix(in srgb,var(--a) 42%,transparent),transparent 58%),radial-gradient(circle at 84% 12%,color-mix(in srgb,var(--b) 42%,transparent),transparent 58%),linear-gradient(#0e121b,#06080c)}
+.mvfoto.prev{aspect-ratio:auto;height:236px;margin-inline:0}
+.mvfoto svg.mvesc{position:absolute;inset:0;width:100%;height:100%}
+.mvfoto::after{content:"";position:absolute;inset:10px;border:2px solid var(--dat);border-radius:12px;box-shadow:var(--mv-tubo-m);pointer-events:none}
+.mvlogo{position:absolute;top:24px;left:24px;color:#fff}
+.mvph{position:absolute;top:28px;right:24px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.mvmarco{position:absolute;left:10px;right:10px;bottom:10px;padding:44px 16px 16px;display:flex;flex-direction:column;gap:4px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.82));color:#fff;border-radius:0 0 12px 12px}
+.mvdato{font-family:var(--display);font-size:22px;line-height:1.05;text-transform:uppercase;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mvdato .bolt-ico{color:var(--yel);filter:drop-shadow(0 0 6px rgba(255,233,74,.7));width:.55em;height:.9em;margin:0}
+.mvmarco small{font-size:13px;color:rgba(255,255,255,.85)}
+/* El cartel: lo que no es foto se ve como un cartel de Viva (tubo de su color, trama, firma) */
+.mvpos{min-height:190px;padding:22px 20px;display:flex;flex-direction:column;justify-content:space-between;gap:16px;background:var(--panel);border:2.5px solid var(--lime);box-shadow:var(--mv-tubo-c)}
+.mvpos.m{border-color:var(--dat);box-shadow:var(--mv-tubo-m)}
+.mvpos.f{border-color:transparent;background:linear-gradient(var(--panel),var(--panel)) padding-box,var(--zflow,linear-gradient(90deg,#ffe94a,#07b0f2,#f400a0)) border-box;box-shadow:none}
+.mvpos>*{position:relative}
+.mvpos svg.mvtr{position:absolute;inset:0;width:100%;height:100%;opacity:.5;pointer-events:none}
+.mvk{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.mvbig{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;font-family:var(--display);text-transform:uppercase;line-height:.95}
+.mvnum{font-weight:900;font-size:76px;line-height:.85;color:var(--dat);text-shadow:0 0 18px rgba(244,0,160,.55)}
+.mvpos.c .mvnum{color:var(--txt);text-shadow:none;font-size:58px}
+.mvfirma{font-family:var(--display);text-transform:uppercase;font-size:27px;line-height:1.02}
+.mvfirma .bolt-ico{color:var(--yel);filter:drop-shadow(0 0 6px rgba(255,233,74,.7));width:.5em;height:.82em;margin:0}
+.mvfirma.flow b,.mvfirma.flow i{background:var(--zflow,linear-gradient(90deg,#ffe94a,#07b0f2,#f400a0));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.mvfirma.flow{font-size:40px}
+.mvpos .mvsub{font-size:14px;line-height:1.4;color:var(--muted)}
+.mvpos .btn{align-self:stretch}
 .mvacts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .mvacts .clap{min-height:44px}
 .mvacts .clap svg{flex-shrink:0}
-.mvpend{background:var(--panel);border:1px solid var(--line);padding:4px 16px}
-.mvpend summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;font-weight:700;cursor:pointer;list-style:none}
-.mvpend summary::-webkit-details-marker{display:none}
-.mvpend summary::after{content:"+";font-size:20px;color:var(--muted)}
-.mvpend[open] summary::after{content:"–"}
-.mvpend ul{margin:6px 0 14px;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.4;color:var(--muted)}
+.mvtxt{font-size:15px;line-height:1.4}
+.mvtxt b{font-weight:700}
+.mvfin{display:flex;justify-content:center;padding:6px 0;color:var(--muted);font-size:13px}
+/* La cámara: flotante, abajo y al centro */
+.mvfab{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;z-index:5}
+.app:not([data-btn="rellenos"]):not([data-mode="light"]) .mvfab.k-btn{background:#0b1119!important}
+.mvfab:active{transform:translateX(-50%) scale(.96)}
+.mvfabdot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:7px;background:var(--dat);box-shadow:0 0 8px var(--dat)}
+.mvdef{font-size:12px;line-height:1.35;color:var(--muted)}
 .mvhrow{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;border:none;background:none;color:var(--txt);text-align:left;padding:0;font-size:15px;font-family:inherit}
+.mvopt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;min-height:60px;padding:10px 16px;border-radius:16px;border:1px solid var(--line2);background:var(--panel);color:var(--txt);text-align:left;font-family:inherit;font-size:15px}
+.mvfila{display:flex;align-items:center;gap:12px}
+.mvfila .btn{width:auto;min-height:44px;padding:0 14px;font-size:14px;flex-shrink:0}

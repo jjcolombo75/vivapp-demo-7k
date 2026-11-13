@@ -147,170 +147,176 @@
   $('#qEvt').addEventListener('click', () => pushCard('<span class="lbl">Invitación a un evento</span><span class="h2">Spinning Night · Jue 20:30</span><span class="small muted">López y Planes</span><span class="small" style="color:var(--dat);font-weight:700">Esperando respuesta</span>', 'Invitación a un evento'));
 
 //#bloque 225
-  // ===== T20 · Mural VIVA: la sección social en una pantalla (v95, primera publicación) =====
-  // Seis piezas: Tu mural (avatar) · People · Mensajes · Lo que viene · filtro · Publicar. Todo simulado.
+  // ===== T20 · Mural VIVA (v97): un mural para scrollear, como Instagram =====
+  // La pantalla es el mural. Arriba, las secciones en íconos (Tu mural · People · Desafíos · Tus grupos · Mensajes) y qué mural ves
+  // (Tu equipo · Tu sede · VIVA); abajo y al centro, la cámara flotante para publicar. Todo simulado.
   // En real: publicaciones, amigos y Fits, base propia de Vivapp · entrenos de grupo, el tablero del profe · eventos, lo que cargue
   // marketing · el dato del marco, entradas verificadas (semCumplida, mesMarcas) · mayoría de edad, Viva Gestión.
-  // Piso: ninguna tarjeta muestra presencia, horario ni kilos de otro socio; los Fits no se cuentan en público; nada se publica solo.
-  var MV = { fil:'eq', fit:{}, anot:{}, duo:{}, des:{}, vis:'amigos', mios:[] };
+  // Piso: nada muestra presencia, horario ni kilos de otro socio; los Fits no se cuentan en público; nada se publica solo.
+  var MV = { fil:'eq', fit:{}, anot:{}, duo:{}, des:{}, vis:'amigos', mios:[], extra:{ eq:[], sede:[], viva:[] }, hoja:null };
   const MV_YO = ['#5b6ea8','#1c2238'];
   const MV_BRAZO = '<svg width="18" height="18" aria-hidden="true"><use href="#pi-brazo" width="18" height="18"/></svg>';
-  const MV_CAM = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
-  const MV_EJ = '<span class="pill gris">EJEMPLO</span>';
+  const MV_RAYO = '<svg class="bolt-ico" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg>';
+  const MV_TRAMA = '<svg class="mvtr" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#patTileW)"/></svg>';
+  const MV_FIL = { eq:['Tu equipo', 'Tus amigos y el grupo de tu profe'], sede:['Tu sede', 'Lo público de ' + miSede], viva:['VIVA', 'Lo público de todas las sedes y lo que publica Viva'] };
   // Lo que viene: entrenos de grupo (los publica el profe) y eventos (los publica Viva). Se muestran totales, nunca quién se anotó.
   const MV_VIENE = [
-    { id:'e1', dia:'SÁB', hora:'10:00', t:'Entreno de grupo', d:'Piernas, todos juntos. Lo arma tu profe para su grupo.', donde:'Sarmiento', quien:'Prof. Lucas, para su grupo', n:5, cupo:8 },
-    { id:'e2', dia:'JUE', hora:'20:30', t:'Spinning Night', d:'Spinning con luces y DJ.', donde:'López y Planes', quien:'Viva', n:18, cupo:25 },
-    { id:'e3', dia:'SÁB', hora:'11:30', t:'Funcional en dúo', d:'Clase en parejas: venís con alguien de tu equipo o se arma la dupla ahí.', donde:'Sarmiento', quien:'Viva', n:12, cupo:20 },
-    { id:'e4', dia:'VIE', hora:'21:00', t:'After Train', d:'Un rato para conocerse después de entrenar.', donde:'Sarmiento', quien:'Viva', n:9, cupo:30 }
+    { id:'e1', dia:'SÁB', hora:'10:00', k:'Entreno de grupo', t:'Piernas, todos juntos', donde:'Sarmiento', n:5, cupo:8 },
+    { id:'e2', dia:'JUE', hora:'20:30', k:'Evento', t:'Spinning Night', donde:'López y Planes', n:18, cupo:25 },
+    { id:'e3', dia:'SÁB', hora:'11:30', k:'Evento', t:'Funcional en dúo', donde:'Sarmiento', n:12, cupo:20 },
+    { id:'e4', dia:'VIE', hora:'21:00', k:'Evento', t:'After Train', donde:'Sarmiento', n:9, cupo:30 }
   ];
-  // en: en qué filtros se ve. k: aviso (profe o Viva, con "Me anoto") · foto (con el marco) · logro (compartido) · bien (la bienvenida) ·
-  // dupla · y las cuatro tarjetas de ejemplo: grupo, sede, flow, cartel.
-  const MV_POSTS = [
-    { id:'p1', en:['eq'], k:'aviso', n:'Prof. Lucas', sub:'Tu profe · para su grupo', c:['#2a6f7f','#0c2229'], ev:'e1' },
-    { id:'p2', en:['eq'], k:'foto', n:'Valentina', sub:'Corrientes · ayer · la ven sus amigos', c:['#a85a5a','#2e1212'], f:['#7d5a86','#1c1622'], dato:'Semana cumplida', det:'3 de 3 · Corrientes', txt:'Semana adentro. ¡Vamos!', amiga:true },
-    { id:'p3', en:['eq'], k:'bien', n:'Sofi', sub:'Nueva en el grupo de Prof. Lucas', c:['#c08a3a','#33230c'], t:'Primera semana cumplida', s:'Arrancó hace una semana y la cumplió. Lo compartió con su grupo.' },
-    { id:'p4', en:['eq'], k:'dupla', n:'Ramiro', c:['#5a7aa8','#141e2e'] },
-    { id:'p5', en:['eq'], k:'grupo' },
-    { id:'p6', en:['sede'], k:'aviso', n:'Viva', sub:'Lo publica Viva · Sarmiento', c:['#3c4658','#12161d'], ev:'e3' },
-    { id:'p7', en:['sede','viva'], k:'logro', n:'Joaquín', sub:'Sarmiento · hoy', c:['#4f7d3a','#152410'], t:'12 semanas cumplidas', s:'Sumó la ficha de las 12 semanas a su mural.' },
-    { id:'p8', en:['sede'], k:'sede' },
-    { id:'p9', en:['viva'], k:'aviso', n:'Viva', sub:'Lo publica Viva · López y Planes', c:['#3c4658','#12161d'], ev:'e2' },
-    { id:'p10', en:['viva'], k:'foto', n:'Agustina', sub:'López y Planes · hoy · pública', c:['#a0603a','#301a0c'], f:['#3f6f86','#101c24'], dato:'Mes cumplido', det:'', txt:'Otro mes adentro.' },
-    { id:'p11', en:['viva'], k:'flow', n:'Florencia', sub:'Santa Ana · ayer', c:['#3a6a9a','#0f2034'] },
-    { id:'p12', en:['viva'], k:'cartel', n:'Carla', sub:'Alberdi · ayer', c:['#9a4f8a','#2c1028'] }
-  ];
-  const mvCab = (n, c, sub, tag) => '<div class="mvcab"><span class="av sm" style="background:' + grad(c) + '">' + inicial(n) + '</span>' +
-    '<span class="stack" style="gap:0;flex:1;min-width:0"><span style="font-weight:700">' + n + '</span><span class="small muted">' + sub + '</span></span>' + (tag || '') + '</div>';
-  const mvFit = (id, n, txt) => { const on = !!MV.fit[id];
-    return '<button class="clap" data-mvfit="' + id + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Sacarle el Fit a ' : 'Darle un Fit a ') + n + '">' + MV_BRAZO + (on ? 'Le diste un Fit' : (txt || 'Dale un Fit')) + '</button>'; };
-  const mvFoto = (f, dato, det, prev) => '<div class="mvfoto' + (prev ? ' prev' : '') + '" style="background:' + grad(f) + '" role="img" aria-label="Foto de ejemplo con el marco de VIVA: ' + dato + '">' +
-    '<svg class="mvlogo" width="66" height="32" aria-hidden="true"><use href="#vLogo" width="66" height="32"/></svg><span class="mvph">Foto de ejemplo</span>' +
-    '<span class="mvmarco"><b>' + dato + '</b><span>' + det + '</span></span></div>';
+  // k: foto (con el marco) · aviso (del profe o de Viva, con "Me anoto") · logro (compartido: ficha, bienvenida, cartel, VIVA Flow) · dupla.
+  const MV_JOAQUIN = { id:'p7', k:'logro', n:'Joaquín', sub:'Sarmiento · hoy', c:['#4f7d3a','#152410'], lbl:'Ficha', num:'12', firma:['semanas', 'cumplidas'], txt:'Sumó la ficha de las 12 semanas a su mural.' };
+  const MV_POSTS = {
+    eq: [
+      { id:'p2', k:'foto', n:'Valentina', sub:'Corrientes · ayer · la ven sus amigos', c:['#a85a5a','#2e1212'], f:['#f400a0','#07b0f2'], dato:['Semana', 'cumplida'], det:'3 de 3 · Corrientes', txt:'Semana adentro. ¡Vamos!', amiga:true },
+      { id:'p1', k:'aviso', n:'Prof. Lucas', sub:'Tu profe · para su grupo', c:['#2a6f7f','#0c2229'], ev:'e1' },
+      { id:'p3', k:'logro', n:'Sofi', sub:'Nueva en el grupo de Prof. Lucas', c:['#c08a3a','#33230c'], lbl:'Bienvenida', firma:['Primera semana', 'cumplida'], txt:'Arrancó hace una semana y la cumplió.', fit:'Dale la bienvenida con un Fit' },
+      { id:'p4', k:'dupla', n:'Ramiro', c:['#5a7aa8','#141e2e'] },
+      { id:'p5', k:'foto', n:'Diego', sub:'Sarmiento · hace 2 días · la ven sus amigos', c:['#7a7a3a','#262610'], f:['#07b0f2','#ffe94a'], dato:['12 semanas', 'cumplidas'], det:'en Viva · Sarmiento', txt:'Tres meses viniendo.', amiga:true }
+    ],
+    sede: [
+      { id:'p6', k:'foto', n:'Cami', sub:'Sarmiento · hoy · pública', c:['#8a4f9a','#22102c'], f:['#07b0f2','#f400a0'], dato:['Semana', 'cumplida'], det:'4 de 4 · Sarmiento', txt:'Cuatro de cuatro.' },
+      MV_JOAQUIN,
+      { id:'p8', k:'aviso', n:'Viva', sub:'Lo publica Viva · Sarmiento', c:['#3c4658','#12161d'], ev:'e3' }
+    ],
+    viva: [
+      { id:'p10', k:'foto', n:'Agustina', sub:'López y Planes · hoy · pública', c:['#a0603a','#301a0c'], f:['#ffe94a','#f400a0'], dato:['Mes', 'cumplido'], det:'@mes · López y Planes', txt:'Otro mes adentro.' },
+      { id:'p9', k:'aviso', n:'Viva', sub:'Lo publica Viva · López y Planes', c:['#3c4658','#12161d'], ev:'e2' },
+      { id:'p11', k:'logro', n:'Florencia', sub:'Santa Ana · ayer', c:['#3a6a9a','#0f2034'], flow:true, lbl:'Tu ritmo VIVA', firma:['VIVA', 'Flow'], txt:'Cuatro semanas seguidas con su ritmo bien arriba.' },
+      MV_JOAQUIN,
+      { id:'p12', k:'logro', n:'Carla', sub:'Alberdi · ayer', c:['#9a4f8a','#2c1028'], lbl:'Cartel del mes', firma:['@mes', 'cumplido'], txt:'Cerró el mes con Mes cumplido y sumó el cartel a su mural.' }
+    ]
+  };
   const mvVisTxt = { solo:'solo la ves vos', amigos:'la ven tus amigos', publico:'pública, dentro de Viva' };
   const mvVisOk = { solo:'Publicada: solo la ves vos', amigos:'Publicada: la ven tus amigos', publico:'Publicada: la ve todo Viva' };
-  const mvMesAnt = () => mesTxt(ahora().getMonth() - 1);
+  const mvMes = s => s.replace('@mes', mesTxt(ahora().getMonth() - 1));
+  const mvCab = (n, c, sub) => '<div class="mvcab"><span class="av sm" style="background:' + grad(c) + '">' + inicial(n) + '</span>' +
+    '<span class="stack" style="gap:0;flex:1;min-width:0"><span style="font-weight:700">' + n + '</span><span class="small muted">' + sub + '</span></span></div>';
+  const mvFit = (id, n, txt) => { const on = !!MV.fit[id];
+    return '<button class="clap" data-mvfit="' + id + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Sacarle el Fit a ' : 'Darle un Fit a ') + n + '">' + MV_BRAZO + (on ? 'Le diste un Fit' : (txt || 'Dale un Fit')) + '</button>'; };
+  // La foto es una escena de ejemplo (tubos de neón y alguien frente al espejo); encima, el marco de Viva con el dato verificado.
+  const mvFoto = (f, dato, det, prev) => '<div class="mvmedia mvfoto' + (prev ? ' prev' : '') + '" style="--a:' + f[0] + ';--b:' + f[1] + '" role="img" aria-label="Foto de ejemplo con el marco de VIVA: ' + dato.join(' ') + '">' +
+    '<svg class="mvesc" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="5"><path d="M-10 96 170 64" stroke="' + f[0] + '"/><path d="M230 56 410 90" stroke="' + f[1] + '"/><path d="M52 150V520" stroke="' + f[0] + '" opacity=".28"/><path d="M348 150V520" stroke="' + f[1] + '" opacity=".28"/></g>' +
+    '<g fill="#161c28" stroke="rgba(255,255,255,.1)" stroke-width="2"><circle cx="200" cy="212" r="46"/><path d="M96 520C96 372 142 292 200 292s104 80 104 228z"/><rect x="250" y="246" width="36" height="66" rx="8" fill="#232c3c"/></g></svg>' +
+    '<svg class="mvlogo" width="66" height="32" aria-hidden="true"><use href="#vLogo" width="66" height="32"/></svg><span class="mvph">Foto de ejemplo</span>' +
+    '<span class="mvmarco"><span class="mvdato sig"><b>' + dato[0] + '</b> <i>' + dato[1] + '</i>' + MV_RAYO + '</span><small>' + det + '</small></span></div>';
+  const mvPos = (cls, html) => '<div class="mvmedia mvpos ' + cls + '">' + MV_TRAMA + html + '</div>';
   // El dato del marco sale de lo que Viva verifica: la semana cumplida o las semanas cumplidas que ya tiene el mural del socio.
   function mvMiDato(){
     const m = semMetas().vis, n = typeof semAcum === 'function' ? semAcum() : 0;
-    if (semCumplida()) return { dato:'Semana cumplida', det:m + ' de ' + m + ' · ' + miSede };
-    if (n > 0) return { dato:n + (n === 1 ? ' semana cumplida' : ' semanas cumplidas'), det:'en Viva · ' + miSede };
-    return { dato:'Entreno en Viva', det:miSede };
+    if (semCumplida()) return { dato:['Semana', 'cumplida'], det:m + ' de ' + m + ' · ' + miSede };
+    if (n > 0) return { dato:n === 1 ? ['1 semana', 'cumplida'] : [n + ' semanas', 'cumplidas'], det:'en Viva · ' + miSede };
+    return { dato:['Entreno', 'en Viva'], det:miSede };
   }
-  function mvAviso(p){
-    const e = MV_VIENE.find(x => x.id === p.ev), on = !!MV.anot[e.id];
-    return '<div class="post">' + mvCab(p.n, p.c, p.sub) +
-      '<div class="between" style="align-items:flex-start"><span class="big">' + e.t + '</span><span class="pill">' + e.dia + ' ' + e.hora + '</span></div>' +
-      '<span class="small muted" style="margin-top:-4px;line-height:1.45">' + e.d + ' En ' + e.donde + '.</span>' +
-      '<button class="btn sm' + (on ? ' ghost' : '') + '" data-mvanot="' + e.id + '">' + (on ? '✓ Te anotaste · Bajarme' : 'Me anoto') + '</button>' +
-      '<span class="small muted">' + (e.n + (on ? 1 : 0)) + ' anotados · ' + e.cupo + ' lugares</span></div>';
-  }
-  function mvDupla(p){
-    const ok = semCumplida(), f = Math.max(1, semMetas().vis - WK.vis);
-    return '<div class="post' + (ok ? ' dest' : '') + '"><div class="mvcab"><span class="mvduo"><span class="av sm" style="background:' + grad(MV_YO) + '">M</span><span class="av sm" style="background:' + grad(p.c) + '">' + inicial(p.n) + '</span></span>' +
-      '<span class="stack" style="gap:0;flex:1;min-width:0"><span style="font-weight:700">' + p.n + ' y vos</span><span class="small muted">Dupla de la semana · la ven ustedes dos</span></span></div>' +
-      '<span class="big">' + (ok ? 'Dupla cumplida' : 'Dupla en marcha') + '</span>' +
-      '<span class="small muted" style="margin-top:-6px;line-height:1.45">' + (ok ? 'Los dos cumplieron la semana, cada uno con su meta.' : p.n + ' ya cumplió su semana. Con ' + f + (f === 1 ? ' entrenamiento más' : ' entrenamientos más') + ' de los tuyos, cumplen los dos.') + ' Arranca de nuevo cada lunes.</span>' +
-      '<div class="mvacts">' + mvFit(p.id, p.n) + '</div></div>';
-  }
-  function mvSede(p){
-    const s = sedesMes.slice().sort((a, b) => b[1] - a[1]), pos = s.findIndex(x => x[0] === miSede), n = Math.min(3, mesMarcas()), on = !!MV.des.sede;
-    return '<div class="post">' + '<div class="between"><span class="lbl">Tu sede · ' + miSede + '</span>' + MV_EJ + '</div>' +
-      '<span class="big">' + s[pos][1] + '% va camino a su Mes cumplido</span>' +
-      '<span class="small muted" style="margin-top:-6px;line-height:1.45">Es el total de la sede: nadie ve quién cumplió. ' + (pos === 0 ? 'Va primera' : 'Va ' + (pos + 1) + 'ª') + ' entre las ' + s.length + ' sedes. Vos llevás ' + n + ' de 3 semanas de ' + mesTxt(ahora().getMonth()) + '.</span>' +
-      '<button class="btn ghost sm" data-mvdes="sede">' + (on ? '✓ Estás en el desafío de la sede' : 'Unirme al desafío de la sede') + '</button></div>';
-  }
+  const mvAnotBtn = e => { const on = !!MV.anot[e.id]; return '<button class="btn sm' + (on ? ' ghost' : '') + '" data-mvanot="' + e.id + '">' + (on ? '✓ Te anotaste' : 'Me anoto') + '</button>'; };
   function mvPost(p){
-    if (p.k === 'aviso') return mvAviso(p);
-    if (p.k === 'dupla') return mvDupla(p);
-    if (p.k === 'sede') return mvSede(p);
-    if (p.k === 'grupo') { const on = !!MV.des.grupo;
-      return '<div class="post">' + '<div class="between"><span class="lbl">El grupo de Prof. Lucas</span>' + MV_EJ + '</div><span class="big">El grupo sumó 6 semanas cumplidas</span>' +
-        '<span class="small muted" style="margin-top:-6px;line-height:1.45">Es lo que logró el grupo esta semana, sin nombres. Próximo entreno juntos: sábado 10:00.</span>' +
-        '<button class="btn ghost sm" data-mvdes="grupo">' + (on ? '✓ Estás en el desafío del grupo' : 'Unirme al desafío del grupo') + '</button></div>'; }
-    if (p.k === 'foto') return '<div class="post">' + mvCab(p.n, p.c, p.sub) + mvFoto(p.f, p.dato, p.det || (mvMesAnt() + ' · ' + p.sub.split(' · ')[0])) +
-      '<span>' + p.txt + '</span><div class="mvacts">' + mvFit(p.id, p.n) +
-      (p.amiga ? '<button class="clap" data-mvduo="' + p.n + '" aria-pressed="' + !!MV.duo[p.n] + '">' + (MV.duo[p.n] ? 'Dupla propuesta' : 'Desafiar') + '</button>' : '') + '</div></div>';
-    if (p.k === 'mio') return '<div class="post">' + mvCab('Martina', MV_YO, 'Vos · ahora · ' + mvVisTxt[p.vis]) + mvFoto(['#5b6ea8','#151a2c'], p.dato, p.det) +
-      '<span class="small muted">Todavía sin Fits. Cuántos recibís lo ves solo vos.</span></div>';
-    const t = p.k === 'flow' ? 'Entró en VIVA Flow' : p.k === 'cartel' ? 'Cartel de ' + mvMesAnt() : p.t;
-    const s = p.k === 'flow' ? 'Cuatro semanas seguidas con su ritmo bien arriba.' : p.k === 'cartel' ? 'Cerró ' + mvMesAnt() + ' con Mes cumplido y sumó el cartel a su mural.' : p.s;
-    return '<div class="post">' + mvCab(p.n, p.c, p.sub, p.k === 'flow' || p.k === 'cartel' ? MV_EJ : '') +
-      (p.k === 'flow' ? '<span class="pill ia" style="align-self:flex-start">VIVA FLOW</span>' : '') +
-      '<span class="big">' + t + '</span><span class="small muted" style="margin-top:-6px;line-height:1.45">' + s + '</span>' +
-      '<div class="mvacts">' + mvFit(p.id, p.n, p.k === 'bien' ? 'Dale la bienvenida con un Fit' : '') + '</div></div>';
+    if (p.k === 'foto') return '<article class="mvp">' + mvCab(p.n, p.c, p.sub) + mvFoto(p.f, p.dato, mvMes(p.det)) +
+      '<div class="mvacts">' + mvFit(p.id, p.n) + (p.amiga ? '<button class="clap" data-mvduo="' + p.n + '" aria-pressed="' + !!MV.duo[p.n] + '">' + (MV.duo[p.n] ? 'Dupla propuesta' : 'Desafiar') + '</button>' : '') + '</div>' +
+      '<span class="mvtxt"><b>' + p.n + '</b> ' + p.txt + '</span></article>';
+    if (p.k === 'mio') return '<article class="mvp">' + mvCab('Martina', MV_YO, 'Vos · ahora · ' + mvVisTxt[p.vis]) + mvFoto(['#07b0f2','#f400a0'], p.dato, p.det) +
+      '<span class="mvtxt muted">Todavía sin Fits. Cuántos recibís lo ves solo vos.</span></article>';
+    if (p.k === 'aviso') { const e = MV_VIENE.find(x => x.id === p.ev), on = !!MV.anot[e.id];
+      return '<article class="mvp">' + mvCab(p.n, p.c, p.sub) + mvPos('c', '<span class="mvk">' + e.k + ' · ' + e.donde + '</span>' +
+        '<span class="stack" style="gap:8px"><span class="mvbig"><span class="mvfirma sig"><i>' + e.dia + '</i></span><span class="mvnum">' + e.hora + '</span></span><span class="mvfirma sig" style="font-size:22px"><b>' + e.t + '</b></span></span>' +
+        '<span class="stack" style="gap:8px">' + mvAnotBtn(e) + '<span class="mvsub">' + (e.n + (on ? 1 : 0)) + ' anotados · ' + e.cupo + ' lugares</span></span>') + '</article>'; }
+    if (p.k === 'dupla') { const ok = semCumplida(), f = Math.max(1, semMetas().vis - WK.vis);
+      return '<article class="mvp"><div class="mvcab"><span class="mvduo"><span class="av sm" style="background:' + grad(MV_YO) + '">M</span><span class="av sm" style="background:' + grad(p.c) + '">' + inicial(p.n) + '</span></span>' +
+        '<span class="stack" style="gap:0;flex:1;min-width:0"><span style="font-weight:700">' + p.n + ' y vos</span><span class="small muted">La ven ustedes dos</span></span></div>' +
+        mvPos(ok ? 'm' : 'c', '<span class="mvk">Dupla de la semana</span><span class="mvfirma sig"><b>Dupla</b> <i>' + (ok ? 'cumplida' : 'en marcha') + '</i>' + (ok ? ' ' + MV_RAYO : '') + '</span>' +
+        '<span class="mvsub">' + (ok ? 'Los dos cumplieron la semana, cada uno con su meta.' : p.n + ' ya cumplió su semana. Con ' + f + (f === 1 ? ' entrenamiento más' : ' entrenamientos más') + ' de los tuyos, cumplen los dos.') + '</span>') +
+        '<div class="mvacts">' + mvFit(p.id, p.n) + '</div></article>'; }
+    if (p.k === 'invita') return '<article class="mvp">' + mvPos('m', '<span class="mvk">Tu semana</span><span class="mvfirma sig"><b>Cumpliste</b> <i>tu semana</i> ' + MV_RAYO + '</span>' +
+      '<span class="stack" style="gap:10px"><span class="mvsub">Tu foto con el marco de VIVA está lista.</span><button class="btn sm" data-mvpub>Sacar la foto</button></span>') + '</article>';
+    return '<article class="mvp">' + mvCab(p.n, p.c, p.sub) + mvPos(p.flow ? 'f' : 'm', '<span class="mvk">' + p.lbl + '</span>' +
+      '<span class="mvbig">' + (p.num ? '<span class="mvnum">' + p.num + '</span>' : '') + '<span class="mvfirma sig' + (p.flow ? ' flow' : '') + '"><b>' + mvMes(p.firma[0]) + '</b> <i>' + p.firma[1] + '</i></span></span>' +
+      '<span class="mvsub">' + p.txt + '</span>') + '<div class="mvacts">' + mvFit(p.id, p.n, p.fit) + '</div></article>';
+  }
+  // Mural sin fin: al acercarse al final se suma otra tanda (simulada: las mismas formas, otra gente).
+  const MV_GENTE = { eq:[['Ramiro','Sarmiento',['#5a7aa8','#141e2e']], ['Sofi','Sarmiento',['#c08a3a','#33230c']], ['Valentina','Corrientes',['#a85a5a','#2e1212']], ['Diego','Sarmiento',['#7a7a3a','#262610']]],
+    sede:[['Nico','Sarmiento',['#3a8a7a','#0e2a24']], ['Flor','Sarmiento',['#3a6a9a','#0f2034']], ['Tomás','Sarmiento',['#8a5a3a','#2a180c']], ['Cami','Sarmiento',['#8a4f9a','#22102c']]],
+    viva:[['Martín','López y Planes',['#3a8a7a','#0e2a24']], ['Lu','Alberdi',['#9a4f8a','#2c1028']], ['Santi','Posadas',['#5a7aa8','#141e2e']], ['Juli','Santa Ana',['#a0603a','#301a0c']]] };
+  const MV_LUZ = [['#f400a0','#07b0f2'], ['#07b0f2','#ffe94a'], ['#ffe94a','#f400a0'], ['#07b0f2','#f400a0']];
+  function mvTanda(){
+    const fil = MV.fil, ya = MV.extra[fil]; if (ya.length >= 40) return null;
+    const g = MV_GENTE[fil], vis = fil === 'eq' ? 'la ven sus amigos' : 'pública', n0 = ya.length, out = [];
+    for (let i = 0; i < 5; i++) { const j = n0 + i, q = g[j % g.length], sub = q[1] + ' · hace ' + (3 + Math.floor(j / 2)) + ' días', id = 'x' + fil + j, sem = [4, 12, 24][j % 3];
+      out.push(j % 5 === 1 ? { id:id, k:'logro', n:q[0], sub:sub, c:q[2], lbl:'Ficha', num:String(sem), firma:['semanas', 'cumplidas'], txt:'Sumó la ficha de las ' + sem + ' semanas a su mural.' }
+        : j % 5 === 3 ? { id:id, k:'logro', n:q[0], sub:sub, c:q[2], lbl:'Cartel del mes', firma:['@mes', 'cumplido'], txt:'Cerró el mes con Mes cumplido.' }
+        : { id:id, k:'foto', n:q[0], sub:sub + ' · ' + vis, c:q[2], f:MV_LUZ[j % 4], dato:j % 2 ? ['Mes', 'cumplido'] : ['Semana', 'cumplida'], det:(j % 2 ? '@mes' : '3 de 3') + ' · ' + q[1], txt:j % 2 ? 'Mes adentro.' : 'Semana adentro.', amiga:fil === 'eq' }); }
+    out.forEach(p => ya.push(p)); return out;
   }
   function muralRender(){
     if (!$('#mvFeed')) return;
-    const menor = typeof esMenor === 'function' && esMenor(), ok = semCumplida();
-    $$('#mvFil [data-mvf]').forEach(b => b.setAttribute('aria-selected', b.dataset.mvf === MV.fil));
-    $('#mvFilTxt').textContent = { eq:'Tus amigos y el grupo de tu profe.', sede:'Lo público de ' + miSede + '.', viva:'Lo público de todas las sedes y lo que publica Viva.' }[MV.fil];
-    $('#mvMenor').hidden = !menor; $('#peMenor').hidden = !menor; $('#deckBox').hidden = menor;
-    $('#mvViene').innerHTML = MV_VIENE.map(e => '<button class="mvev' + (MV.anot[e.id] ? ' on' : '') + '" data-mvev="' + e.id + '" aria-label="' + e.t + ', ' + e.dia + ' ' + e.hora + (MV.anot[e.id] ? ', te anotaste' : '') + '">' +
-      '<span class="mvring"><b>' + e.dia + '</b><i>' + e.hora + '</i></span><span class="mvevt">' + (MV.anot[e.id] ? '✓ ' : '') + e.t + '</span></button>').join('');
-    const pub = $('#mvPub'); pub.classList.toggle('dest', ok);
-    pub.innerHTML = '<span class="mvcam">' + MV_CAM + '</span><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + (ok ? 'Cumpliste tu semana' : 'Publicar') + '</span>' +
-      '<span class="small muted">' + (ok ? 'Tu foto con el marco de VIVA está lista' : 'Tu foto con el marco de VIVA y un dato tuyo') + '</span></span>' +
-      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+    const menor = typeof esMenor === 'function' && esMenor(), ok = semCumplida(), cuerpo = $('#social .body'), y = cuerpo.scrollTop;
+    $('#mvFilLbl').textContent = MV_FIL[MV.fil][0];
+    $('#peMenor').hidden = !menor; $('#deckBox').hidden = menor; $('#mvFabDot').hidden = !ok;
     const mios = MV.mios.filter(p => p.vis !== 'amigos' || MV.fil === 'eq');
-    $('#mvFeed').innerHTML = mios.concat(MV_POSTS.filter(p => p.en.includes(MV.fil))).map(mvPost).join('');
+    $('#mvFeed').innerHTML = (ok && !MV.mios.length ? [{ k:'invita' }] : []).concat(mios, MV_POSTS[MV.fil], MV.extra[MV.fil]).map(mvPost).join('');
+    cuerpo.scrollTop = y;
+    if (MV.hoja === 'grupos') mvGrupos(); if (MV.hoja === 'desafios') mvDesafios();
   }
-  // Hojas: una sola, con el contenido de cada pieza.
-  function mvHoja(html){ $('#mvHojaIn').innerHTML = html; $('#mvHoja').hidden = false; }
+  $('#social .body').addEventListener('scroll', e => { const b = e.currentTarget;
+    if (b.scrollTop + b.clientHeight > b.scrollHeight - 700) { const t = mvTanda(); if (t) $('#mvFeed').insertAdjacentHTML('beforeend', t.map(mvPost).join('')); } });
+  // Hojas: una sola, con el contenido de cada sección.
+  function mvHoja(html, cual){ MV.hoja = cual || null; $('#mvHojaIn').innerHTML = html; $('#mvHoja').hidden = false; }
+  const mvCerrar = '<button class="btn ghost sm" data-mvx type="button">Cerrar</button>';
   const mvPie = (attr, txt) => '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-mvx type="button">Cerrar</button><button class="btn sm" ' + attr + ' type="button">' + txt + '</button></div>';
-  function mvEvento(id){
-    const e = MV_VIENE.find(x => x.id === id), on = !!MV.anot[id];
-    mvHoja('<span class="lbl">Lo que viene</span><span class="h2">' + e.t + '</span><span class="muted" style="line-height:1.45">' + e.d + '</span>' +
-      '<div class="list"><div><span class="small muted" style="flex:1">Cuándo</span><span>' + e.dia + ' ' + e.hora + '</span></div><div><span class="small muted" style="flex:1">Dónde</span><span>' + e.donde + '</span></div>' +
-      '<div><span class="small muted" style="flex:1">Lo publica</span><span>' + e.quien + '</span></div><div><span class="small muted" style="flex:1">Anotados</span><span>' + (e.n + (on ? 1 : 0)) + ' · ' + e.cupo + ' lugares</span></div></div>' +
-      mvPie('data-mvanot="' + id + '"', on ? 'Bajarme' : 'Me anoto'));
+  function mvFiltro(){
+    mvHoja('<span class="mtitle sig"><b>Qué</b> <i>mural ves</i></span>' + Object.keys(MV_FIL).map(k => '<button class="mvopt k-elige" data-mvf="' + k + '" aria-pressed="' + (MV.fil === k) + '"><span style="font-weight:700">' + MV_FIL[k][0] + '</span><span class="small muted">' + MV_FIL[k][1] + '</span></button>').join('') + mvCerrar);
   }
   function mvPublicar(){
     const d = mvMiDato(), menor = typeof esMenor === 'function' && esMenor(); if (menor && MV.vis === 'publico') MV.vis = 'amigos';
     const op = (k, t) => '<button class="opt" data-mvvis="' + k + '" aria-pressed="' + (MV.vis === k) + '">' + t + '</button>';
-    mvHoja('<div class="between"><span class="h2">Publicar</span><span class="pill gris">FOTO DE EJEMPLO</span></div>' + mvFoto(['#5b6ea8','#151a2c'], d.dato, d.det, true) +
-      '<span class="small muted" style="line-height:1.45">El marco lleva la marca de Viva y un dato tuyo que Viva verifica. La cámara y los marcos para elegir llegan en la próxima versión.</span>' +
+    mvHoja('<span class="mtitle sig"><b>Tu</b> <i>foto</i></span>' + mvFoto(['#07b0f2','#f400a0'], d.dato, d.det, true) +
       '<span class="lbl">Quién la ve</span><div class="opts ' + (menor ? 'g2' : 'g3') + '">' + op('solo', 'Solo vos') + op('amigos', 'Tus amigos') + (menor ? '' : op('publico', 'Público')) + '</div>' +
-      '<span class="mvdef">"Público" es dentro de Viva, nunca afuera. Cuál viene elegida: a definir con marketing. Otras personas en la foto: reglas a definir con el dueño.</span>' +
-      '<label class="swrow" for="mvIg" style="border-bottom:none"><span class="stack" style="gap:2px;flex:1"><span>También a tu historia de Instagram</span><span class="small muted">Con el marco de Viva y @vivafithouse</span></span><input type="checkbox" class="sw" id="mvIg" checked></label>' +
+      '<label class="swrow" for="mvIg" style="border-bottom:none;padding:0"><span class="stack" style="gap:2px;flex:1"><span>También a tu historia de Instagram</span><span class="small muted">Con el marco de Viva y @vivafithouse</span></span><input type="checkbox" class="sw" id="mvIg" checked></label>' +
       mvPie('data-mvpubok', 'Publicar'));
   }
   function mvTuMural(){
     const fila = (go, t, s) => '<div><button class="mvhrow" data-go="' + go + '"><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">' + t + '</span><span class="small muted">' + s + '</span></span>' +
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>';
-    mvHoja('<div class="between"><span class="h2">Tu mural</span><span class="pill gris">EN CONSTRUCCIÓN</span></div>' +
-      '<span class="small muted" style="line-height:1.45">Tu espacio: carteles, fichas y fotos, y quién ve cada cosa. Por ahora te lleva a lo que ya existe.</span>' +
-      '<div class="list">' + fila('muralScr', 'Tus carteles y fichas', 'Lo que juntaste viniendo') + fila('evolucion', 'Tus fotos', 'Tu progreso en fotos · privadas') + fila('socialPerfil', 'Tu perfil', 'Qué mostrás y quién te ve') + '</div>' +
-      '<button class="btn ghost sm" data-mvx type="button">Cerrar</button>');
+    mvHoja('<span class="mtitle sig"><b>Tu</b> <i>mural</i></span>' +
+      '<div class="list">' + fila('muralScr', 'Tus carteles y fichas', 'Lo que juntaste viniendo') + fila('evolucion', 'Tus fotos', 'Tu progreso en fotos · privadas') + fila('socialPerfil', 'Tu perfil', 'Qué mostrás y quién te ve') + '</div>' + mvCerrar);
+  }
+  function mvGrupos(){
+    mvHoja('<span class="mtitle sig"><b>Tus</b> <i>grupos</i></span>' +
+      '<div class="stack" style="gap:2px"><span style="font-weight:700">El grupo de Prof. Lucas</span><span class="small muted">Esta semana el grupo sumó 6 semanas cumplidas.</span></div>' +
+      '<span class="lbl">Lo que viene</span><div class="list">' + MV_VIENE.map(e => '<div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + e.dia + ' ' + e.hora + ' · ' + e.t + '</span>' +
+        '<span class="small muted">' + e.k + ' · ' + e.donde + ' · ' + (e.n + (MV.anot[e.id] ? 1 : 0)) + ' anotados</span></span>' + mvAnotBtn(e) + '</div>').join('') + '</div>' + mvCerrar, 'grupos');
+  }
+  function mvDesafios(){
+    const ok = semCumplida(), s = sedesMes.slice().sort((a, b) => b[1] - a[1]), pos = s.findIndex(x => x[0] === miSede), n = Math.min(3, mesMarcas());
+    const fila = (k, t, d) => '<div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + t + '</span><span class="small muted" style="line-height:1.4">' + d + '</span></span>' +
+      (k ? '<button class="btn sm' + (MV.des[k] ? ' ghost' : '') + '" data-mvdesok="' + k + '">' + (MV.des[k] ? '✓ Adentro' : 'Unirme') + '</button>' : '') + '</div>';
+    mvHoja('<span class="mtitle sig"><b>Tus</b> <i>desafíos</i></span><div class="list">' +
+      fila('', 'Dupla con Ramiro · ' + (ok ? 'cumplida' : 'en marcha'), 'Cada uno con su meta. Arranca de nuevo cada lunes.') +
+      fila('sede', 'El desafío de ' + miSede, s[pos][1] + '% de la sede va camino a su Mes cumplido. Vos llevás ' + n + ' de 3 semanas.') +
+      fila('grupo', 'El desafío del grupo', 'Que todo el grupo de Prof. Lucas cumpla su semana.') + '</div>' +
+      '<span class="mvdef">Para desafiar a un amigo, tocá "Desafiar" en su foto. Los desafíos los arman tu profe, tu sede o Viva.</span>' + mvCerrar, 'desafios');
   }
   function mvDuoHoja(n){
-    mvHoja('<span class="lbl">Desafiar a un amigo</span><span class="h2">Dupla con ' + n + '</span>' +
+    mvHoja('<span class="lbl">Desafiar a un amigo</span><span class="mtitle sig"><b>Dupla</b> <i>con ' + n + '</i></span>' +
       '<span class="muted" style="line-height:1.45">Cada uno con su propia meta de la semana. La dupla se cumple si cumplen los dos, y arranca de nuevo cada lunes. Se arma si ' + n + ' acepta.</span>' +
       mvPie('data-mvduook="' + n + '"', MV.duo[n] ? 'Retirar la propuesta' : 'Proponer la dupla'));
   }
-  function mvDesHoja(k){
-    const sede = k === 'sede', on = !!MV.des[k];
-    mvHoja('<span class="lbl">Unirme a un desafío</span><span class="h2">' + (sede ? 'El desafío de ' + miSede : 'El desafío del grupo') + '</span>' +
-      '<span class="muted" style="line-height:1.45">' + (sede ? 'Que más socios de ' + miSede + ' cierren el mes con Mes cumplido. Sumás con el tuyo: nadie ve quién cumplió, solo el total.' : 'Que todo el grupo cumpla su semana, cada uno con su meta. Se ve lo que suma el grupo, sin nombres ni cuántos son, y arranca de nuevo cada lunes.') + '</span>' +
-      '<span class="mvdef">Los desafíos los arman tu profe, tu sede o Viva. Usan lo que ya medimos: tu semana cumplida, Tu ritmo y VIVA Flow.</span>' +
-      mvPie('data-mvdesok="' + k + '"', on ? 'Salir del desafío' : 'Unirme'));
-  }
   $('#social').addEventListener('click', e => {
-    const q = s => e.target.closest(s), cerrar = () => { $('#mvHoja').hidden = true; };
+    const q = s => e.target.closest(s), cerrar = () => { $('#mvHoja').hidden = true; MV.hoja = null; };
     let b;
-    if ((b = q('[data-mvf]'))) { MV.fil = b.dataset.mvf; muralRender(); return; }
+    if ((b = q('[data-mvf]'))) { MV.fil = b.dataset.mvf; cerrar(); $('#social .body').scrollTop = 0; muralRender(); return; }
     if ((b = q('[data-mvfit]'))) { const id = b.dataset.mvfit; MV.fit[id] = !MV.fit[id]; muralRender(); return; }
-    if ((b = q('[data-mvanot]'))) { const id = b.dataset.mvanot, ev = MV_VIENE.find(x => x.id === id); MV.anot[id] = !MV.anot[id]; cerrar(); muralRender();
+    if ((b = q('[data-mvanot]'))) { const id = b.dataset.mvanot, ev = MV_VIENE.find(x => x.id === id); MV.anot[id] = !MV.anot[id]; muralRender();
       toast(MV.anot[id] ? 'Te anotaste a ' + ev.t + ' · ' + ev.dia + ' ' + ev.hora : 'Te bajaste de ' + ev.t); return; }
-    if ((b = q('[data-mvev]'))) { mvEvento(b.dataset.mvev); return; }
-    if (q('#mvPub')) { mvPublicar(); return; }
+    if (q('#mvFilBtn')) { mvFiltro(); return; }
+    if (q('#mvPub') || q('[data-mvpub]')) { mvPublicar(); return; }
     if (q('#mvYo')) { mvTuMural(); return; }
+    if ((b = q('[data-mvsec]'))) { if (b.dataset.mvsec === 'grupos') mvGrupos(); else mvDesafios(); return; }
     if ((b = q('[data-mvduo]'))) { mvDuoHoja(b.dataset.mvduo); return; }
     if ((b = q('[data-mvduook]'))) { const n = b.dataset.mvduook; MV.duo[n] = !MV.duo[n]; cerrar(); muralRender(); toast(MV.duo[n] ? 'Le propusiste una dupla a ' + n : 'Retiraste la propuesta'); return; }
-    if ((b = q('[data-mvdes]'))) { mvDesHoja(b.dataset.mvdes); return; }
-    if ((b = q('[data-mvdesok]'))) { const k = b.dataset.mvdesok; MV.des[k] = !MV.des[k]; cerrar(); muralRender(); toast(MV.des[k] ? 'Estás en el desafío' : 'Saliste del desafío'); return; }
+    if ((b = q('[data-mvdesok]'))) { const k = b.dataset.mvdesok; MV.des[k] = !MV.des[k]; mvDesafios(); toast(MV.des[k] ? 'Estás en el desafío' : 'Saliste del desafío'); return; }
     if ((b = q('[data-mvvis]'))) { MV.vis = b.dataset.mvvis; $$('#mvHoja [data-mvvis]').forEach(x => x.setAttribute('aria-pressed', x === b)); return; }
-    if (q('[data-mvpubok]')) { const d = mvMiDato(), ig = $('#mvIg').checked; MV.mios.unshift({ id:'m' + MV.mios.length, k:'mio', vis:MV.vis, dato:d.dato, det:d.det }); cerrar(); muralRender();
-      $('#social .body').scrollTop = 0; toast(mvVisOk[MV.vis] + (ig ? '. Lista para tu historia' : '')); return; }
+    if (q('[data-mvpubok]')) { const d = mvMiDato(), ig = $('#mvIg').checked; MV.mios.unshift({ id:'m' + MV.mios.length, k:'mio', vis:MV.vis, dato:d.dato, det:d.det }); cerrar(); $('#social .body').scrollTop = 0; muralRender();
+      toast(mvVisOk[MV.vis] + (ig ? '. Lista para tu historia' : '')); return; }
     if (e.target.id === 'mvHoja' || q('[data-mvx]') || q('#mvHoja [data-go]')) cerrar();
   });
