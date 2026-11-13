@@ -200,7 +200,7 @@
     if (modo !== 'ppu') { cargaHist[cargaHist.length - 1] += sum.kg; showSum(sum); if (!visHoy) { visHoy = true; } semSesion(); hoyEntreno = true; MOM = 'despues'; sesHecha = true; syncMomPick(); renderForma(); renderHoy(); renderAcc(); }
     stopRest(); renderRoutines(); renderToday(); renderAvance(); renderRecords(); renderProg();
     if (modo === 'ppu') renderPpuTrain(); else renderDesafios();
-    go(modo === 'ppu' ? 'ppuTrain' : 'progreso'); toast(feelMsg || (modo !== 'ppu' && Object.keys(ses.prs).length ? '¡Récord! Compartilo en Logros' : 'Entrenamiento guardado')); feelMsg = null;
+    go(modo === 'ppu' ? 'ppuTrain' : 'progreso'); toast(feelMsg || (modo !== 'ppu' && Object.keys(ses.prs).length ? '¡Récord! Guardado en tu progreso' : 'Entrenamiento guardado')); feelMsg = null;
   }
 
 //#bloque 080

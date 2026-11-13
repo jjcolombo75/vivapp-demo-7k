@@ -340,7 +340,7 @@
     const cp = $('#clubPromo'); if (cp && !cp.hidden && cp.parentElement.lastElementChild !== cp) cp.parentElement.appendChild(cp); // Club Viva: siempre la última caja
     const fbx = $('#fitBox'); fbx.classList.toggle('nov', !!FIT_NOV); $('#fitNov').textContent = FIT_NOV ? (nIB === 1 ? 'tu punto de partida' : 'medición nueva') : '';
   }
-  setSmode('desafios'); renderMatches(); renderEvol(); renderCorr(); renderGente(); syncInt();
+  muralRender(); renderMatches(); renderEvol(); renderCorr(); renderGente(); syncInt();
   renderOcc(); renderClases(); renderPlan(); renderNuevo(); renderFit(); renderForma(); renderHoy(); renderCarga(); renderLanding();
 
 

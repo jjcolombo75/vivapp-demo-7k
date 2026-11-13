@@ -49,77 +49,8 @@
   const misEntrenos = () => +$('#mesCount').textContent || 0;
   const segsHtml = (n, tot) => Array.from({ length:tot }, (_, i) => '<i' + (i < n ? ' class="on"' : '') + '></i>').join('');
   const entr = n => n + (n === 1 ? ' entrenamiento' : ' entrenamientos');
-  function renderDesafios(){
-    const left = diasRestantes();
-    $('#chLeft').textContent = left === 0 ? 'Último día' : left === 1 ? 'Queda 1 día' : 'Quedan ' + left + ' días';
-    $('#chalName').textContent = cap(mesNombre());
-    { const m0 = ahora().getMonth(); $('#mesAnt1').textContent = cap(mesTxt(m0 - 1)) + ' · Sarmiento, tu sede'; $('#mesAnt2').textContent = cap(mesTxt(m0 - 2)) + ' · López y Planes'; }
-    const sorted = sedesMes.slice().sort((a, b) => b[1] - a[1]), pos = sorted.findIndex(x => x[0] === miSede);
-    $('#sedeRank').innerHTML = sorted.map((x, i) => '<div class="rank' + (x[0] === miSede ? ' me' : '') + '"><span>' + (i + 1) + '. ' + x[0] + '</span><span class="occ"><i style="width:' + x[1] * 2 + '%"></i></span><b>' + x[1] + '%</b></div>').join('') +
-      '<span class="small muted">De cada sede, cuántos socios van camino a su Mes cumplido. ' + (pos === 0 ? miSede + ' va primera.' : miSede + ' va ' + (pos + 1) + 'ª.') + '</span>';
-    const n = mesMarcas();
-    $('#chMine').innerHTML = '<span>' + (n >= 3 ? '¡Tu Mes cumplido ya suma para ' + miSede + '! ⚡' : 'Llevás <strong>' + n + ' de 3</strong> semanas cumplidas en ' + mesNombre() + '. Con tu Mes cumplido, sumás para ' + miSede + '.') + '</span>';
-  }
-
-  // ===== Logros: se arman solos con los datos; el socio elige qué se ve =====
-  const trophy = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>';
-  const igIco = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>';
-  const clapIco = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.5.6-2.6 1.5-3.5.2 1.6 1 2.5 2 2.5 0-3-1-4.5.5-7.5zM6 14a6 6 0 0 0 12 0"/></svg>';
-  const published = new Set();
-  const feed = [
-    { n:'Joaquín', sede:'Sarmiento', c:['#4f7d3a','#152410'], t:'12 semanas cumplidas', s:'Encendió su rayo en el mural', when:'Hace 2 h', claps:18 },
-    { n:'Carla', sede:'Alberdi', c:['#9a4f8a','#2c1028'], t:'Primer mes cumplido', s:'Cumplió su primer mes en Viva', when:'Hace 5 h', claps:31 },
-    { n:'Diego', sede:'Sarmiento', c:['#7a7a3a','#262610'], t:'Récord en sentadilla', s:'Superó su mejor marca personal', when:'Ayer', claps:12 },
-    { n:'Florencia', sede:'Sarmiento', c:['#3a6a9a','#0f2034'], t:'Mes cumplido de ' + mesTxt(ahora().getMonth() - 1), s:'3 semanas cumplidas', when:'Ayer', claps:22 },
-    { n:'Joaquín', sede:'Sarmiento', c:['#4f7d3a','#152410'], t:'Terminó el Día B · Espalda', s:'6 ejercicios · 52 min · se sintió genial', when:'Hace 1 h', claps:7 },
-    { n:'Martín', sede:'López y Planes', c:['#3a8a7a','#0e2a24'], t:'Terminó Boxeo recreativo', s:'Clase de 45 min · Prof. Martín', when:'Hace 3 h', claps:5 }
-  ];
-  let achList = [];
-  function misLogros(){
-    const mine = misEntrenos(), mes = mesNombre(), prKeys = Object.keys(ses.prs || {});
-    let pr;
-    if (prKeys.length) {
-      const k = prKeys[prKeys.length - 1], u = unidad(k);
-      pr = { id:'pr-' + k, t:'Récord en ' + lib[k].n, s:'Hoy · ' + fmtN(ses.prs[k]) + ' ' + u, big:fmtN(ses.prs[k]), unit:u === 'kg' ? 'KG' : 'SEGUNDOS', cap:'nuevo récord en ' + lib[k].n.toLowerCase(), feedT:'Récord en ' + lib[k].n };
-    } else pr = { id:'pr-jalon', t:'Récord en Jalón al pecho', s:'45 kg · +5 kg desde ' + mesTxt(+hist.jalon[0][0].split('/')[1] - 1), big:'45', unit:'KG', cap:'récord en jalón al pecho', feedT:'Récord en Jalón al pecho' };
-    return [
-      { id:'racha', ico:'5', t:'5 semanas cumplidas', s:'Cumpliste tu meta 5 semanas desde ' + mesTxt(diaAtras(35).getMonth()), big:'5', unit:'SEMANAS', cap:'cumplidas, sin vueltas a cero', feedT:'5 semanas cumplidas' },
-      { id:'mes-' + mine, ico:String(mine), t:entr(mine) + ' en ' + mes, s:'Tu mejor mes desde que estás en Viva', big:String(mine), unit:'ENTRENAMIENTOS', cap:'en ' + mes + '. Constancia ante todo.', feedT:entr(mine) + ' en ' + mes },
-      pr
-    ];
-  }
-  function renderLogros(){
-    achList = misLogros();
-    $('#myAch').innerHTML = !$('#swAch').checked
-      ? '<p class="small muted" style="margin:12px 0 4px">Desactivaste las sugerencias de logros en tu perfil.</p>'
-      : achList.map((a, i) => { const on = published.has(a.id);
-          return '<div class="ach"><span class="achi">' + (a.id.indexOf('pr') === 0 ? trophy : a.ico) + '</span>' +
-            '<span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + a.t + '</span><span class="small muted">' + a.s + '</span></span>' +
-            '<span class="achb"><button data-pub="' + i + '"' + (on ? ' class="done"' : '') + ' aria-label="' + (on ? 'Sacar del muro de Viva' : 'Publicar en el muro de Viva') + '">' + (on ? '✓ Muro' : 'Muro') + '</button>' +
-            '<button data-story="' + i + '" aria-label="Compartir en historias de Instagram">' + igIco + '</button></span></div>'; }).join('');
-    $$('#feedFil .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.ff === feedMode));
-    const vis = feed.map((p, i) => [p, i]).filter(([p]) => feedMode === 'todos' || p.me || siguiendo.has(p.n));
-    $('#feed').innerHTML = !vis.length ? '<p class="small muted" style="text-align:center;margin:8px 0;line-height:1.45">Seguí a gente desde la pestaña Gente para ver acá sus logros y entrenamientos.</p>' : vis.map(([p, i]) => '<div class="post"><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:' + grad(p.c) + '">' + inicial(p.n) + '</span>' +
-      '<span class="stack" style="gap:0;flex:1"><span style="font-weight:700">' + p.n + (p.me ? ' <span class="mtag">Vos</span>' : '') + '</span><span class="small muted">' + p.sede + ' · ' + p.when + '</span></span></div>' +
-      '<span class="big">' + p.t + '</span><span class="small muted" style="margin-top:-6px">' + p.s + '</span>' +
-      '<button class="clap" data-clap="' + i + '" aria-pressed="' + !!p.clapped + '" aria-label="Aplaudir a ' + p.n + '">' + clapIco + ' ' + (p.claps + (p.clapped ? 1 : 0)) + '</button></div>').join('');
-  }
-  $('#myAch').addEventListener('click', e => {
-    const p = e.target.closest('[data-pub]'), s = e.target.closest('[data-story]');
-    if (p) {
-      const a = achList[+p.dataset.pub];
-      if (published.has(a.id)) { published.delete(a.id); const i = feed.findIndex(f => f.aid === a.id); if (i >= 0) feed.splice(i, 1); toast('Lo sacaste del muro'); }
-      else { published.add(a.id); feed.unshift({ aid:a.id, me:true, n:'Martina', sede:miSede, c:['#5b6ea8','#1c2238'], t:a.feedT, s:a.s, when:'Ahora', claps:0 }); toast('Publicado en el muro de Viva'); }
-      renderLogros();
-    }
-    if (s) openStory({ type:'ach', a:achList[+s.dataset.story] });
-  });
-  $('#feed').addEventListener('click', e => {
-    const b = e.target.closest('[data-clap]'); if (!b) return;
-    const p = feed[+b.dataset.clap];
-    if (p.me) { toast('Los aplausos son de los demás'); return; }
-    p.clapped = !p.clapped; renderLogros();
-  });
+  // T20: la sede del mes es una tarjeta del mural (mvSede, js/comunidad.js bloque 225); el nombre queda porque el panel de demo lo llama.
+  function renderDesafios(){ if (typeof muralRender === 'function') muralRender(); }
 
   // ===== Mi evolución: álbum privado (fotos de ejemplo) =====
   const evFotos = [ { d:'23/07', c:['#39424f','#161b24'] }, { d:'20/08', c:['#3f4958','#161b24'] }, { d:'17/09', c:['#465163','#161b24'] }, { d:'15/10', c:['#4d596e','#161b24'] } ];
@@ -152,7 +83,7 @@
     evSel = [0, evFotos.length - 1]; e.target.value = ''; renderEvol(); toast('Foto guardada en tu álbum privado');
   });
   $('#evShare').addEventListener('click', () => { const s = evSel.slice().sort((a, b) => a - b); openStory({ type:'cmp', a:evFotos[s[0]], b:evFotos[s[1]] }); });
-  $('#evBack').addEventListener('click', () => { go('social'); setSmode('logros'); });
+  $('#evBack').addEventListener('click', () => go('social'));
   $('#swProfe').addEventListener('change', e => toast(e.target.checked ? 'Lucas va a poder ver tus fotos' : 'Tus fotos son solo tuyas'));
 
   // ===== Historia para Instagram: imagen 1080 × 1920 armada en el teléfono =====

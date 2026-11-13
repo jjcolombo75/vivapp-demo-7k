@@ -505,3 +505,38 @@ select.input{appearance:auto;-webkit-appearance:auto}
 .ibgrid b{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .ibgrid span:nth-child(3n+1){color:var(--muted)}
 
+/* ===== T20 · Mural VIVA (v95). Cajas, botones y elegibles salen del sistema (k-*); acá solo la forma propia del mural. ===== */
+.mvhead{display:flex;align-items:center;gap:10px}
+.mvyo.av{width:44px;height:44px;border:2px solid var(--lime);padding:0;cursor:pointer;font-family:inherit}
+.mvdef{font-size:12px;line-height:1.35;color:var(--muted)}
+.mvrow{gap:12px;padding:2px 2px 4px}
+.mvev{flex:0 0 76px;display:flex;flex-direction:column;align-items:center;gap:6px;border:none;background:none;color:var(--txt);padding:0;scroll-snap-align:start;font-family:inherit}
+.mvring{width:68px;height:68px;border-radius:50%;border:2px solid var(--lime);background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1}
+.mvring b{font-size:12px;letter-spacing:.08em;color:var(--muted)}
+.mvring i{font-style:normal;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.mvev.on .mvring{background:var(--lime);color:var(--ink)}
+.mvev.on .mvring b{color:var(--ink)}
+.mvev .mvevt{font-size:12px;line-height:1.2;text-align:center;color:var(--muted)}
+.mvcomp{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 14px;background:var(--panel);border:1px solid var(--line);color:var(--txt);text-align:left;width:100%;font-family:inherit}
+.mvcomp .mvcam{width:44px;height:44px;border-radius:14px;background:var(--panel2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--lime)}
+.mvcab{display:flex;align-items:center;gap:10px}
+.mvduo{display:flex;flex-shrink:0}
+.mvduo .av+.av{margin-left:-12px;border:2px solid var(--panel)}
+.mvfoto{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.mvfoto.prev{aspect-ratio:auto;height:220px}
+.mvlogo{position:absolute;top:14px;left:14px;color:#fff}
+.mvph{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.mvmarco{position:absolute;left:0;right:0;bottom:0;padding:34px 14px 14px;display:flex;flex-direction:column;gap:3px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.78));color:#fff}
+.mvmarco::before{content:"";width:40px;height:3px;background:var(--dat);margin-bottom:4px}
+.mvmarco b{font-family:var(--display);font-weight:900;font-size:24px;line-height:1;text-transform:uppercase}
+.mvmarco span{font-size:13px}
+.mvacts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mvacts .clap{min-height:44px}
+.mvacts .clap svg{flex-shrink:0}
+.mvpend{background:var(--panel);border:1px solid var(--line);padding:4px 16px}
+.mvpend summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;font-weight:700;cursor:pointer;list-style:none}
+.mvpend summary::-webkit-details-marker{display:none}
+.mvpend summary::after{content:"+";font-size:20px;color:var(--muted)}
+.mvpend[open] summary::after{content:"–"}
+.mvpend ul{margin:6px 0 14px;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.4;color:var(--muted)}
+.mvhrow{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;border:none;background:none;color:var(--txt);text-align:left;padding:0;font-size:15px;font-family:inherit}

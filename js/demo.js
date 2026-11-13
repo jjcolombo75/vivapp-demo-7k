@@ -379,7 +379,7 @@
   $('#wtcfPick').addEventListener('click', e => { const b = e.target.closest('[data-wtcf]'); if (!b) return; e.stopPropagation(); $('.app').dataset.wtcf = b.dataset.wtcf;
     $$('#wtcfPick [data-wtcf]').forEach(x => x.setAttribute('aria-pressed', x === b)); toast(b.dataset.wtcf === '1' ? 'Welcome to the club: titila' : 'Welcome to the club: quieto'); });
   // Lugares no excluyentes: cada toque prende o apaga el suyo y el panel queda abierto
-  const WTTC_N = { entrada:'Primera entrada', inicio:'Inicio', comunidad:'Comunidad', ingreso:'Ingreso' };
+  const WTTC_N = { entrada:'Primera entrada', inicio:'Inicio', comunidad:'Mural', ingreso:'Ingreso' };
   $('#demoSheet').addEventListener('click', e => { const b = e.target.closest('[data-wttc]'); if (!b) return; e.stopPropagation();
     const k = b.dataset.wttc; if (k === 'off') Object.keys(WTTC).forEach(x => WTTC[x] = false); else WTTC[k] = !WTTC[k]; wttcSync();
     const on = Object.keys(WTTC).filter(x => WTTC[x]).map(x => WTTC_N[x]);
