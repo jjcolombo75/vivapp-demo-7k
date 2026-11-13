@@ -66,20 +66,22 @@
 
 //#bloque 230
   // ===== Tu forma · fuente: ingresos por molinete (entries de EVO) + base propia =====
-  // Modelo de forma y fatiga (Banister): forma = promedio de 42 días, cansancio = promedio de 7 días.
+  // T11 · Tu ritmo asimétrico (registro 13/11; auditorias/2026-11-13-tu-ritmo.md; referencia tools/simular_ritmo.py):
+  // el número persigue "tus últimos 7 días contra tu meta"; sube con constante de 4 días y baja con 42. Sin modelo de fatiga aparte.
   const cargaHist = [9800, 11200, 10400, 11900, 7600];
   // Meta personal: con plan limitado, la de su plan; con plan libre, la elige el socio (2 a 5). Martina eligió 4.
-  let META_SEM = 4; const TAU_F = 42, TAU_C = 7, PLAN_TOPE = null;
+  let META_SEM = 4; const TAU_SUBE = 4, TAU_BAJA = 42, TAU_F = TAU_BAJA, PLAN_TOPE = null;
+  var META_PROX = null; // T11 · el cambio de meta rige desde el lunes siguiente: la semana en curso cierra con la meta con la que empezó
   // Variantes de nombre (decisión 45): el número y el modelo son los mismos; cambian nombre, zonas y textos.
   const ZC = ['var(--z1)', 'var(--z2)', 'var(--z3)', 'var(--z4)'];
   const VARS = {
     P:{ nom:'Tus pilas VIVA', tu:'tus pilas', pl:true, z:[[0,'Pila baja'],[30,'Con pila'],[60,'Pila cargada'],[85,'A full']], col:[0,1,2,3],
-        sub:'Se cargan cada vez que venís', subeT:'Se cargan cada día que venís', bajaT:'Se gastan de a poco si dejás de venir', bajaD:'Descansar un día no las gasta; una semana sin venir, sí.',
+        sub:'Se cargan cada vez que venís', subeT:'Se cargan cada día que venís', bajaT:'Se gastan de a poco si dejás de venir', bajaD:'Suben rápido cuando venís y se gastan despacio: una semana sin venir se nota poco; un mes, sí.',
         up:(a, b) => '¡Cargaste pila! ⚡ Pasaste de ' + a + ' a ' + b + '.', hoy:'Hoy cargaste pila ⚡ Ahora toca descansar bien.',
         down:n => 'Se te están bajando las pilas. ' + (n ? 'Con ' + (n === 1 ? 'una visita' : n + ' visitas') + ' esta semana recargás ⚡' : 'Con una visita esta semana empezás a recargar ⚡'),
         paso2:'Cargá pila', baja:'bajaron', noMide:'No miden tu cuerpo ni cuánto levantás: miden cuán seguido venís. Tu cuerpo lo mide el Índice FIT, con tu medición InBody, que es voluntaria.' },
     R:{ nom:'Tu ritmo VIVA', tu:'tu ritmo', z:[[0,'Tranqui'],[30,'Parejo'],[60,'Firme'],[85,'Imparable']], col:[0,1,2,3],
-        sub:'Sube cada vez que venís', subeT:'Sube cada día que venís', bajaT:'Baja de a poco si dejás de venir', bajaD:'Un día de descanso casi no se nota. Una semana sin venir, sí.',
+        sub:'Sube cada vez que venís', subeT:'Sube cada día que venís', bajaT:'Baja de a poco si dejás de venir', bajaD:'Sube rápido cuando venís y baja despacio cuando faltás: una semana sin venir se nota poco; un mes, sí.',
         up:(a, b) => '¡Subió tu ritmo! ⚡ Pasaste de ' + a + ' a ' + b + '.', hoy:'Hoy sumaste ritmo ⚡ Ahora toca descansar bien.',
         down:n => 'Estás perdiendo ritmo. ' + (n ? 'Con ' + (n === 1 ? 'una visita' : n + ' visitas') + ' esta semana lo recuperás ⚡' : 'Con una visita esta semana vuelve a subir ⚡'),
         paso2:'Agarrá ritmo', baja:'bajó', noMide:'No mide tu cuerpo ni cuánto levantás: mide cuán seguido venís. Tu cuerpo lo mide el Índice FIT, con tu medición InBody, que es voluntaria.' }
@@ -103,18 +105,24 @@
   cerrado.forEach((v, d) => entrenoDia.delete(d));
   { const o = (todayWd + 6) % 7; let t = 0; for (let d = o + 1; d <= o + 28; d++) if (entrenoDia.has(d)) t++; META_SEM = Math.min(META_SEM, Math.round(t / 4) + 1); } // T12: la meta simulada no supera lo que viene haciendo + 1
   let hoyEntreno = false, fFmt = 'aguja';
-  function serie(){
-    const out = []; let ctl = 0, atl = 0;
-    for (let d = 120; d >= 0; d--) {
-      const L = d === 0 ? (hoyEntreno ? 1 : 0) : (entrenoDia.has(d) ? 1 : 0), fr = cerrado.has(d);
-      if (!fr) { ctl += (L - ctl) / TAU_F; atl += (L - atl) / TAU_C; }
-      out.push({ d:d, ctl:ctl, atl:atl, L:L, fr:fr, f:Math.min(100, Math.round(ctl / REFv() * 100)) });
+  function ritmoCorre(Ls, frs){ // v de 0 a 1 por día; los días congelados (feriado, pausa) no lo mueven
+    let v = 0; const o = [];
+    for (let i = 0; i < Ls.length; i++) {
+      if (!frs[i]) { let n = 0; for (let j = Math.max(0, i - 6); j <= i; j++) n += Ls[j]; const r = Math.min(1, n / META_SEM); v += (r - v) / (r > v ? TAU_SUBE : TAU_BAJA); }
+      o.push(v);
     }
-    return out;
+    return o;
+  }
+  const patMeta = n => Array.from({ length:n }, (_, i) => Math.floor((i + 1) * META_SEM / 7) > Math.floor(i * META_SEM / 7) ? 1 : 0); // venir a la meta, repartido en la semana
+  function serie(){
+    const Ls = [], frs = [], ds = [];
+    for (let d = 120; d >= 0; d--) { ds.push(d); Ls.push(d === 0 ? (hoyEntreno ? 1 : 0) : (entrenoDia.has(d) ? 1 : 0)); frs.push(cerrado.has(d)); }
+    const vs = ritmoCorre(Ls, frs);
+    return ds.map((d, i) => ({ d:d, ctl:vs[i], L:Ls[i], fr:frs[i], f:Math.min(100, Math.round(vs[i] * 100)) }));
   }
   const zona = v => { let r = zonas()[0]; zonas().forEach(q => { if (v >= q[0]) r = q; }); return [r[1], r[2]]; };
   // Semanas para llegar a un valor viniendo a la meta, desde el estado actual
-  const semA = u => { let c = serie().slice(-1)[0].ctl / REFv(), d = 0; while (c * 100 < u && d < 400) { c += (1 - c) / TAU_F; d++; } return Math.max(1, Math.round(d / 7)); };
+  const semA = u => { const s = serie(), L = s.map(x => x.L).concat(patMeta(400)), vs = ritmoCorre(L, s.map(x => x.fr).concat(patMeta(400).map(() => false))).slice(s.length), k = vs.findIndex(v => v * 100 >= u); return Math.max(1, Math.ceil((k < 0 ? 400 : k + 1) / 7)); };
   // InBody simulado (solo variante B): siempre contra la primera medición del socio
   const IB = [{ f:'12/08', m:24.1, g:31.0 }, { f:'18/09', m:24.6, g:29.8 }, { f:'20/10', m:25.0, g:28.9 }];
   let fitPromoNo = false, fitPedido = false;
@@ -132,13 +140,9 @@
   const vez = n => n === 1 ? '1 vez' : n + ' veces';
   // Forma el domingo si entrena n veces más (en los últimos días que quedan)
   function alDomingo(n){
-    const s = serie(); let ctl = s[s.length - 2].ctl;
-    const dias = ((7 - todayWd) % 7) + 1;
-    for (let i = 0; i < dias; i++) {
-      const L = (i === 0 && hoyEntreno) ? 1 : (dias - i <= n && !(i === 0 && hoyEntreno) ? 1 : 0);
-      ctl += (L - ctl) / TAU_F;
-    }
-    return Math.min(100, Math.round(ctl / REFv() * 100));
+    const s = serie().slice(0, -1), dias = ((7 - todayWd) % 7) + 1, Ls = s.map(x => x.L), frs = s.map(x => x.fr);
+    for (let i = 0; i < dias; i++) { Ls.push((i === 0 && hoyEntreno) ? 1 : (dias - i <= n && !(i === 0 && hoyEntreno) ? 1 : 0)); frs.push(false); }
+    const vs = ritmoCorre(Ls, frs); return Math.min(100, Math.round(vs[vs.length - 1] * 100));
   }
   function metaSemana(v){
     const dias = ((7 - todayWd) % 7) + 1, libres = dias - (hoyEntreno ? 1 : 0);
@@ -224,7 +228,7 @@
       const nx = zs.find(q => q[0] > v);
       let stops = ''; zs.forEach((q, i) => { stops += '<span class="cstop' + (v >= q[0] ? ' on' : '') + (i === n - 1 ? ' flow' : '') + (i % 2 ? ' up' : '') + (i === 0 ? ' first' : '') + (i === n - 1 ? ' last' : '') + '" style="left:' + (i * 100 / (n - 1)) + '%;--c:' + q[2] + '"><i></i><em>' + q[1] + '</em></span>'; });
       h = big() + '<div class="camino" aria-hidden="true"><div class="ctrack"><i style="width:' + pos(v).toFixed(1) + '%"></i></div>' + stops + '<span class="cme" style="left:' + pos(v).toFixed(1) + '%"></span></div>' +
-        '<span class="small" style="line-height:1.45">' + (nx ? 'Próxima parada: <strong>' + nx[1] + '</strong>, a ' + (nx[0] - v) + ' puntos. Viniendo a tu meta, en unas <strong>' + semA(nx[0]) + ' semanas</strong>.' : 'Llegaste a la última parada: ahora se trata de sostenerla.') + '</span>';
+        '<span class="small" style="line-height:1.45">' + (nx ? 'Próxima parada: <strong>' + nx[1] + '</strong>. Viniendo a tu meta, ' + (semA(nx[0]) === 1 ? '<strong>esta semana</strong>' : 'en unas <strong>' + semA(nx[0]) + ' semanas</strong>') + '.' : 'Llegaste a la última parada: ahora se trata de sostenerla.') + '</span>';
     } else if (fFmt === 'curva') {
       const pts = s.slice(-57), W = 320, H = 130, L = 26, R = 10, T = 10, B = 22, X = i => L + i * (W - L - R) / (pts.length - 1), Y = val => T + (1 - val / 100) * (H - T - B);
       const line = pts.map((p, i) => X(i).toFixed(1) + ',' + Y(p.f).toFixed(1)).join(' ');
@@ -253,7 +257,7 @@
     const rec = recupera(s[s.length - 8].f);
     renderSemana(z[1], top && !!V().flow);
     const wmsg = EQ_ON ? semMsg(dv, rec) : null;
-    $('#formaGoal').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>' + (wmsg !== null ? wmsg :
+    $('#formaGoal').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>' + (nvGoal(dv) !== null ? nvGoal(dv) : wmsg !== null ? wmsg :
       (dv < 0 ? V().down(rec) : top && V().flow ? '<strong>¡Estás en VIVA Flow! ⚡</strong> Sostenelo viniendo a tu meta.' : g.sube ? (g.n ? 'Venís <strong>' + vez(g.n) + ' más</strong> esta semana y llegás a <strong>' + g.meta + '</strong> el domingo.' : 'Vas bien: llegás a <strong>' + g.meta + '</strong> el domingo.')
         : (g.n ? 'Venís <strong>' + vez(g.n) + ' más</strong> esta semana y ' + V().tu + vb(' se mantiene', ' se mantienen') + ' en ' + g.meta + '.' : 'Esta semana ya cumpliste. Descansar también suma.'))) + '</span>';
     $('#flowShare').hidden = !top;
@@ -511,6 +515,7 @@
     const lw = e.target.closest('[data-lw]');
     if (lw) {
       lunesVisto = true; const m = semMetas();
+      META_PROX = null;
       if (lw.dataset.lw === 'up') { META_SEM = Math.min(5, m.vis + 1); toast('Meta: ' + META_SEM + ' por semana. ¡Vamos! ⚡'); }
       else if (lw.dataset.lw === 'down') { META_SEM = Math.max(2, LAST_WK); toast('Meta: ' + META_SEM + ' por semana'); }
       else toast('Seguimos con ' + m.vis + ' por semana ⚡');

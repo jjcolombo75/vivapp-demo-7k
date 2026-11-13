@@ -904,7 +904,7 @@
   function obNext(){
     const i = OB_STEPS.indexOf(OB.step);
     if (OB.step === 'obj' && OB.obj.length) { OBJ = OB.obj.slice(); OB.res.obj = OBJ.slice(); }
-    if (OB.step === 'meta') { const antes = META_SEM; META_SEM = OB.meta; OB.res.meta = OB.meta; if (antes !== META_SEM) renderForma(); }
+    if (OB.step === 'meta') { const antes = META_SEM; META_SEM = OB.meta; META_PROX = null; OB.res.meta = OB.meta; if (antes !== META_SEM) renderForma(); }
     OB.step = i < OB_STEPS.length - 1 ? OB_STEPS[i + 1] : 'fin';
     if (OB.step === 'fin') obFin(); obRender();
   }
@@ -1200,7 +1200,7 @@
   function rutDetalle(rid, i){
     const r = rutinas[rid], d = r.dias[i];
     return '<div class="rdet"><span class="rdt">Día ' + d.k + ' · ' + d.n + '</span>' + rutEx(rid, i).map(x => {
-      const a = RUT_AJ[x.k] || {}, kg = a.kg != null ? a.kg : x.kg, ds = a.desc || 90, v = (VARIANTES[d.k] || {})[x.k], vt = varTxt(v);
+      const a = RUT_AJ[x.k] || {}, kg = a.kg != null ? a.kg : x.kg, ds = a.desc || 90, v = nvVer('variantes') ? (VARIANTES[d.k] || {})[x.k] : null, vt = varTxt(v);
       return '<div class="rdex"><span class="rdn"><b>' + x.n + (vt ? '<span class="vpill">' + vt + '</span>' : '') + '</b><span class="small muted">' + (v && v.gt === 'circuito' ? v.vueltas + ' vueltas' : x.sr + ' × ' + (v && v.obj === 'rango' ? v.rango.join('–') : v && v.repsS ? v.repsS.join('/') : x.rep)) + (x.seg || (v && v.seg) ? ' s' : '') + (v && v.kgs ? ' · ' + v.kgs.map(fmtKg).join(' → ') + ' kg' : '') + '</span></span>' +
         (kg != null ? '<span class="sadj"><button class="opt" data-rk="' + x.k + ':-2.5:' + kg + '" aria-label="Bajar 2,5 kg">−</button><b>' + fmtKg(kg) + ' kg</b><button class="opt" data-rk="' + x.k + ':2.5:' + kg + '" aria-label="Subir 2,5 kg">+</button></span>' : '<span class="small muted">Peso corporal</span>') +
         '<span class="sadj"><button class="opt" data-rd="' + x.k + ':-15:' + ds + '" aria-label="Menos descanso">−</button><b>' + ds + ' s</b><button class="opt" data-rd="' + x.k + ':15:' + ds + '" aria-label="Más descanso">+</button></span></div>';
@@ -1283,7 +1283,7 @@
   const kBase = k => lib[k] ? k : lib[String(k).replace(/H$/, '')] ? String(k).replace(/H$/, '') : null;
   function fueDeLib(k){ const st = lib[k].sets[0], kg = parseFloat(String(st[1]).replace(',', '.')); return { k:k, n:lib[k].n, maq:'generic', zona:'Zona musculación', sr:lib[k].sets.length, rep:parseInt(String(st[2]), 10) || 12, kg:isNaN(kg) ? null : kg, prev:null, seg:esTiempo(k), alt:(ALT_G[k] || []).map(n => ({ n:n, zona:'Zona musculación', kg:null, maq:'generic' })) }; }
   function varOverlay(P, dk){
-    const VD = (typeof VARIANTES !== 'undefined' && VARIANTES[dk]) || {};
+    const VD = (nvVer('variantes') && typeof VARIANTES !== 'undefined' && VARIANTES[dk]) || {};   // T11 · el socio nuevo: series simples
     P.fue.forEach(f => { const v = VD[f.k]; if (v) Object.assign(f, JSON.parse(JSON.stringify(v))); if (f.gt === 'circuito' && f.vueltas) f.sr = f.vueltas; if (f.kgs) f.kg = f.kgs[0]; });
     if (!P.car.int) P.car.int = CARDIO_DEMO.int;
   }

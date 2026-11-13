@@ -796,7 +796,7 @@
     $('#wkMeta').textContent = 'Meta: ' + META_SEM;
   }
   function renderProg(){
-    const x = expProg(), hoy = ahora(), dm = hoy.getDate(); let n = 0, mins = 0;
+    const x = expMas(), hoy = ahora(), dm = hoy.getDate(); let n = 0, mins = 0;
     for (let d = 1; d < dm; d++) if (entrenoDia.has(d)) { n++; mins += durDia(d); }
     if (hoyEntreno) { n++; mins += PROG_MIN || 55; }
     $('#mesCount').textContent = n; $('#mesLbl').textContent = 'entrenamientos en ' + mesTxt(hoy.getMonth());
@@ -809,6 +809,6 @@
     $('#pvList').innerHTML = pv.slice(0, 4).map(p => '<div><span style="flex:1;font-weight:500">' + p.t + '</span><span class="small muted">' + (p.dd === 0 ? 'Hoy' : p.f) + '</span></div>').join('');
     const ap = avancePalabras();
     $('#palList').innerHTML = ap.length ? ap.slice(0, 4).map(t => '<div><span style="flex:1;line-height:1.4">' + t + '</span></div>').join('') : '<div><span class="muted" style="flex:1">Cuando registres tus series, acá ves cuánto avanzás.</span></div>';
-    renderInforme(x, n);
+    renderInforme(x, n); nvProg(x);
   }
   renderProg();

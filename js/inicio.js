@@ -91,7 +91,7 @@
   }
   function renderMuralHome(){
     const c = $('#mesCard'); if (!c) return;
-    c.hidden = !MUR; if (!MUR) return;
+    c.hidden = !MUR || !nvVer('mes'); if (c.hidden) return;   // T11 · Mes cumplido aparece en la semana 4
     const L = mesSemanas(), n = L.length, comp = n >= 3 && L.filter(x => x).length >= 3, mes = meses[HOY_D.getMonth()];
     const col = eqFlow ? 'var(--z2)' : eqCol;
     $('#mesNm').textContent = MES_ABR[HOY_D.getMonth()];
@@ -133,7 +133,8 @@
 //#bloque 290
   // ===== Métrica principal · detalle =====
   // Semanas desde 0 hasta cada zona viniendo a la meta (no depende de la meta: la escala es relativa a ella)
-  const semHasta = u => { let c = 0, d = 0; while (c < u / 100 && d < 400) { c += (1 - c) / TAU_F; d++; } return Math.round(d / 7); };
+  const lunesProx = () => { const d = new Date(+ahora() + (((8 - todayWd) % 7) || 7) * 864e5); return d.getDate() + '/' + (d.getMonth() + 1); };
+  const semHasta = u => { const L = patMeta(400), vs = ritmoCorre(L, L.map(() => false)), k = vs.findIndex(v => v * 100 >= u); return Math.max(1, Math.ceil((k + 1) / 7)); };
   function renderFormaDet(){
     const s = serie(), v = s[s.length - 1].f, dv = v - s[s.length - 8].f, z = zona(v), zs = zonas(), nom = V().nom;
     const pts = s.slice(-85), W = 320, H = 150, L = 26, R = 8, T = 8, B = 22, X = i => L + i * (W - L - R) / (pts.length - 1), Y = val => T + (1 - val / 100) * (H - T - B);
@@ -148,32 +149,32 @@
     $('#fdHead').innerHTML = '<div class="between" style="align-items:flex-end"><span class="fhito' + (v >= zs[zs.length - 1][0] ? ' flow' : '') + '" style="color:' + z[1] + '">' + z[0] + '</span><span class="stack" style="gap:4px;align-items:flex-end;flex-shrink:0"><span class="fnumsm">' + v + '<small> de 100</small></span><span class="fdelta" style="color:' + (dv >= 0 ? 'var(--dat)' : 'var(--orange)') + '">' + (dv > 0 ? '▲ +' + dv + ' contra la semana pasada' : dv < 0 ? '▼ ' + dv + ' contra la semana pasada' : '= igual que la semana pasada') + '</span></span></div>' + svg +
       '<div class="flegend"><span><i style="background:var(--txt)"></i>' + nom + '</span><span><i style="background:var(--blue);opacity:.5"></i>Feriado (no cuenta)</span></div>' +
       '<span class="small muted" style="line-height:1.45">La caída de hace unas 7 semanas son tus 12 días de vacaciones. Si la próxima vez pausás tu plan, no baja.</span>';
-    $$('#fdMeta .opt').forEach(b => { const m = +b.dataset.m; b.setAttribute('aria-pressed', m === META_SEM); b.disabled = PLAN_TOPE !== null && m > PLAN_TOPE; });
+    $$('#fdMeta .opt').forEach(b => { const m = +b.dataset.m; b.setAttribute('aria-pressed', m === (META_PROX || META_SEM)); b.disabled = PLAN_TOPE !== null && m > PLAN_TOPE; });
     $('#fdPlan').textContent = PLAN_TOPE ? 'Tu plan: ' + PLAN_TOPE + ' veces por semana' : 'Plan Mensual libre';
-    $('#fdMetaTxt').textContent = Cap(V().tu) + vb(' se mide', ' se miden') + ' contra esta meta: 100 es venir ' + META_SEM + ' veces todas las semanas. Si la cambiás, el número se recalcula con la nueva meta.';
+    $('#fdMetaTxt').textContent = Cap(V().tu) + vb(' se mide', ' se miden') + ' contra esta meta: 100 es venir ' + META_SEM + ' veces en 7 días. ' + (META_PROX ? 'Desde el lunes ' + lunesProx() + ', tu meta es ' + META_PROX + ': esta semana cierra con ' + META_SEM + '.' : 'Si la cambiás, rige desde el lunes: esta semana cierra con la meta con la que empezó.');
     $('#fdZonas').innerHTML = zs.map((q, i) => { const top = i < zs.length - 1 ? zs[i + 1][0] - 1 : 100, cur = v >= q[0] && v <= top, sem = q[0] ? semHasta(q[0]) : 0;
-      return '<div class="zrow' + (cur ? ' cur' : '') + '"><i' + (i === zs.length - 1 ? ' class="flow"' : '') + ' style="background:' + q[2] + '"></i><span><b>' + q[1] + (cur ? ' · estás acá' : '') + '</b><small>' + (sem ? 'Viniendo a tu meta, desde cero: unas ' + sem + ' semanas' : 'Las primeras semanas') + '</small></span><span class="small muted">' + q[0] + '–' + top + '</span></div>'; }).join('');
+      return '<div class="zrow' + (cur ? ' cur' : '') + '"><i' + (i === zs.length - 1 ? ' class="flow"' : '') + ' style="background:' + q[2] + '"></i><span><b>' + q[1] + (cur ? ' · estás acá' : '') + '</b><small>' + (sem === 1 ? 'Con tu primera semana completa' : sem ? 'Viniendo a tu meta, desde cero: unas ' + sem + ' semanas' : 'Las primeras semanas') + '</small></span><span class="small muted">' + q[0] + '–' + top + '</span></div>'; }).join('');
     const row = (sym, col, t, d) => '<div class="howrow"><span style="color:' + col + ';font-weight:700;width:30px;flex-shrink:0;text-align:center">' + sym + '</span><span><b>' + t + '</b>' + d + '</span></div>';
     $('#fdHow').innerHTML = row('+', 'var(--dat)', V().subeT, 'Entrás por el molinete, en cualquier sede, y suma. Cuenta igual si entrenás liviano o pesado. Dos veces el mismo día cuentan como una.') +
       row('−', 'var(--orange)', V().bajaT, V().bajaD) +
       row('=', 'var(--blue)', 'No cuenta cuando no depende de vos', 'Con tu plan pausado, en los feriados y los días que tu sede está cerrada no ' + vb('baja', 'bajan') + '.') +
-      row('100', 'var(--txt)', 'Es venir a tu meta todas las semanas, sin cortar', 'Se llega en unos 6 meses. Mucho antes ya llegás a "' + zs[2][1] + '"' + (V().flow ? ', y a las 11 semanas, a "VIVA Flow".' : '.')) +
+      row('100', 'var(--txt)', 'Es cumplir tu meta en los últimos 7 días', 'Tu primera semana completa ya es "' + zs[2][1] + '"' + (V().flow ? '; a las 2 semanas, "VIVA Flow". Faltar una semana no te saca de ahí.' : '.')) +
       row('?', 'var(--muted)', 'Lo que no mide', V().noMide + ' <button class="inlink" data-fitgo>Ver Índice FIT</button>');
     $('#fdPausa').hidden = !pausa;
     if (pausa) $('#fdPausa').textContent = 'Tu plan está pausado del ' + ddmm(pausa.desde) + ' al ' + ddmm(pausa.hasta) + ': mientras tanto ' + V().tu + vb(' no baja', ' no bajan') + ' (' + v + ').';
   }
   $('#fdMeta').addEventListener('click', e => {
-    const b = e.target.closest('[data-m]'); if (!b || b.disabled) return; const m = +b.dataset.m; if (m === META_SEM) return;
-    const antes = serie().slice(-1)[0].f; META_SEM = m; const ahora = serie().slice(-1)[0].f;
-    renderFormaDet(); renderForma(); toast('Meta: ' + m + ' por semana · ' + V().tu + vb(' pasa', ' pasan') + ' de ' + antes + ' a ' + ahora);
+    const b = e.target.closest('[data-m]'); if (!b || b.disabled) return; const m = +b.dataset.m; if (m === (META_PROX || META_SEM)) return;
+    META_PROX = m === META_SEM ? null : m; renderFormaDet(); renderForma();   // T11 · rige desde el lunes: el número de hoy no cambia
+    toast(META_PROX ? 'Desde el lunes ' + lunesProx() + ', tu meta es ' + m + ' por semana. Esta semana cierra con ' + META_SEM + '.' : 'Tu meta sigue en ' + META_SEM + ' por semana');
   });
 
   // ===== Hoy: preparación del día (chequeo de 3 toques + cansancio de los últimos 7 días) =====
   const prep = { done:false, skip:false, score:null, resp:{} };
   function prepBaja(){ return prep.score !== null && prep.score < 45; }
-  function cargaPts(){ // 0–40: cansancio de corto plazo contra la forma
-    const s = serie(), h = s[s.length - 1], ratio = h.atl / Math.max(0.05, h.ctl);
-    let p = ratio > 1.4 ? 18 : ratio > 1.15 ? 26 : 34; if (Object.values(recState).includes('mid')) p -= 4;
+  function cargaPts(){ // 0–40: cuánto vino en los últimos 7 días contra su meta (T11: sin modelo de fatiga aparte)
+    let n = hoyEntreno ? 1 : 0; for (let d = 1; d <= 6; d++) if (entrenoDia.has(d)) n++;
+    let p = n > META_SEM + 1 ? 18 : n > META_SEM ? 26 : 34; if (Object.values(recState).includes('mid')) p -= 4;
     return Math.max(0, Math.min(40, p));
   }
   function calcPrep(){
@@ -324,8 +325,8 @@
     const cands = [
       ['clubPromo', PREM_N > 0],
       ['planAviso', PLAN_AV],
-      ['fitBox', nIB > 0 && !!FIT_NOV],
-      ['fitPromo', nIB === 0 && !fitPromoNo],
+      ['fitBox', nIB > 0 && !!FIT_NOV && nvVer('fit')],
+      ['fitPromo', nIB === 0 && !fitPromoNo && nvVer('fit')],
       ['npsCard', (MOM === 'despues' || MOM === 'descanso') && !npsDone && !prep.done]
     ];
     let shown = 0, last = ref;
@@ -342,3 +343,122 @@
   setSmode('desafios'); renderMatches(); renderEvol(); renderCorr(); renderGente(); syncInt();
   renderOcc(); renderClases(); renderPlan(); renderNuevo(); renderFit(); renderForma(); renderHoy(); renderCarga(); renderLanding();
 
+
+//#bloque 318
+  // ===== T11 · Primeras 8 semanas: un estado de la app, no otra app (tickets/T11-primeras-8-semanas.md, propuesta del 13/11) =====
+  // Fuentes: fecha de alta (EVO members) + entries (un día de atraso) + base propia (meta, cómo se sintió, comentario y revisión del profe).
+  // NUEVO = semana del programa (0 = día del alta … 8) o null fuera de la etapa. Lo que se esconde vuelve solo en su semana (revelado de a uno, registro 13/11).
+  var NUEVO = null, NV_VOLVIO = false, NV_PREV = null, PR_MAS = false, VMN = { toca:0 };
+  var NV_PROFE = 'Lucas', NV_COM = 'Vas muy bien con la sentadilla: bajás derecha y sin apuro. El jueves sumamos el remo.';
+  function nvVer(k){ return NUEVO == null || ({ mes:4, fit:4, mas:4, bandas:4, sede:9, variantes:9 }[k] || 0) <= NUEVO; }
+  function nvTiene(d){ return d === 0 ? hoyEntreno : entrenoDia.has(d); }
+  function nvSemCount(a, b){ let n = 0; for (let d = a; d <= b; d++) if (nvTiene(d)) n++; return n; }   // entradas entre a y b días atrás
+  function nvVino(){ return nvSemCount(0, NUEVO * 7) > 0; }
+  function nvFecha(n){ const d = new Date(+ahora() + n * 864e5); return ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'][d.getDay()] + ' ' + d.getDate() + '/' + (d.getMonth() + 1); }
+  function nvRev(k){ return k === NUEVO ? 'mañana, ' + nvFecha(1) + ', 18 h' : nvFecha((k - NUEVO) * 7 + 1) + ', 18 h'; }   // el turno lo da Viva Gestión (simulado)
+  // Disparadores (punto 7): día 7 sin primera visita → un mensaje · 14 → bandera · 7 ya viniendo → nada · 10 a 14 → un mensaje sin culpa + bandera · 28 → silencio · vuelve → "Volviste"
+  function nvDisp(){
+    if (NUEVO == null) return null;
+    if (NV_VOLVIO) return 'volvio';
+    if (!nvVino()) return NUEVO * 7 >= 14 ? 'sin14' : NUEVO * 7 >= 7 ? 'sin7' : 'alta';
+    const a = AUS_N || 0; return a >= 28 ? 'silencio' : a >= 10 ? 'falta' : null;
+  }
+  function nvGoal(dv){   // el texto bajo Tu ritmo: en las primeras semanas, nunca "estás perdiendo ritmo"
+    if (NUEVO == null) return null;
+    if (!nvVino()) return 'Tu ritmo arranca con tu primera visita y sube rápido: tu primera semana completa ya es <strong>Firme</strong>.';
+    if (dv < 0) return 'Sube rápido cuando venís y baja despacio cuando faltás.';
+    return null;
+  }
+  function nvAplicar(s){
+    if (s == null) { if (NUEVO != null) { NUEVO = null; NV_VOLVIO = false; PR_MAS = false; entrenoDia.clear(); NV_PREV.dias.forEach(d => entrenoDia.add(d)); META_SEM = NV_PREV.meta; META_PROX = null; NV_PREV = null; WK = semPreset(semKey); } }
+    else {
+      if (NUEVO == null) NV_PREV = { dias:[...entrenoDia], meta:META_SEM };
+      NUEVO = s; NV_VOLVIO = false; META_SEM = 3; META_PROX = null; sacados.length = 0; ausente = false; AUS_N = 0;
+      entrenoDia.clear(); for (let d = 1; d < s * 7; d++) { const wd = ((todayWd - d) % 7 + 7) % 7; if ([1, 3, 5].includes(wd) && !cerrado.has(d)) entrenoDia.add(d); }
+    }
+    nvRefresh();
+  }
+  function nvVolvio(){ for (let d = 2; d <= 15; d++) if (entrenoDia.has(d)) { entrenoDia.delete(d); sacados.push(d); } entrenoDia.add(1); NV_VOLVIO = true; ausente = false; AUS_N = 0; nvRefresh(); }
+  function nvRefresh(){
+    if (NUEVO != null) { const m = semMetas(), off = (todayWd + 6) % 7; let c = hoyEntreno ? 1 : 0; for (let d = 1; d <= off; d++) if (entrenoDia.has(d)) c++;
+      WK = { vis:c, act:Math.min(c, m.act), fue:Math.min(c, m.fue), car:Math.min(m.car, c * 20), reg:c > 0 }; }
+    const db = $('#desafBox'); if (db) db.hidden = !nvVer('sede');   // La sede del mes, después de la semana 8
+    renderForma(); renderMuralHome(); renderAvisos(); nvRender(); renderProg(); if (typeof renderEntHoy === 'function') renderEntHoy();
+  }
+  // La caja "Tus primeras 8 semanas": ocupa el lugar de Tu mes hasta la semana 4; después va arriba de Tu mes
+  function nvRender(){
+    let c = $('#nvCard'); if (!c) { c = document.createElement('div'); c.className = 'card'; c.id = 'nvCard'; c.style.gap = '10px'; $('#mesCard').insertAdjacentElement('beforebegin', c); }
+    const dp = nvDisp(); c.hidden = NUEVO == null || dp === 'silencio'; if (c.hidden) return;
+    const s = NUEVO, P = 'tu profe <b>' + NV_PROFE + '</b>', rev = s === 4 || s === 8;
+    const arriba = !!dp || rev || s === 3, ref = arriba ? $('#formaCard') : $('#mesCard'); if (c.nextElementSibling !== ref) ref.insertAdjacentElement('beforebegin', c);   // con algo que hacer o leer hoy, arriba de Tu ritmo
+    const t = dp === 'alta' ? '<b>Bienvenida a Viva ⚡</b> En tu primera visita, ' + P + ' te recibe, te muestra la sala y te deja la rutina lista. Tu meta: <b>' + META_SEM + ' por semana</b>. Tu profe sabe cuando llegás, para recibirte.'
+      : dp === 'sin7' || dp === 'sin14' ? 'Tu rutina está lista y ' + P + ' te espera para tu primera visita, el día que te quede bien.'
+      : dp === 'falta' ? 'Cuando quieras volver, tu rutina está lista y ' + P + ' también.'
+      : dp === 'volvio' ? '<b>Volviste ⚡</b> Tu rutina sigue lista y ' + P + ' sabe que llegaste.'
+      : rev ? '<b>Tu revisión de la semana ' + s + '</b> con ' + P + ': ' + nvRev(s) + ', en tu sede. Tu resumen ya está armado.'
+      : s === 3 ? '<b>' + NV_PROFE + ':</b> “' + NV_COM + '”'
+      : s === 6 ? 'Tus primeras 3 semanas: <b>' + nvSemCount(22, 42) + ' visitas</b>. Las últimas 3: <b>' + nvSemCount(0, 21) + '</b>. Tu próxima revisión: semana 8, ' + nvRev(8) + '.'
+      : s < 4 ? 'Tu profe <b>' + NV_PROFE + '</b> te acompaña en tus primeras visitas. Tu revisión con él: <b>semana 4</b>, ' + nvRev(4) + '.'
+      : 'Tu próxima revisión con ' + P + ': <b>semana 8</b>, ' + nvRev(8) + '.';
+    c.innerHTML = '<div class="between"><span class="wktit"><span class="sig"><b>Tus</b> <i>primeras 8 semanas</i></span></span><span class="small muted">' + (s ? 'Semana ' + s + ' de 8' : 'Hoy arrancás') + '</span></div>' +
+      '<span style="line-height:1.5">' + t + '</span>' + (rev && !dp ? '<button class="btn ghost sm" id="nvRevGo">Ver tu resumen</button>' : '');
+  }
+  // La revisión de las semanas 4 y 8 (reemplaza al premio "Tu punto de partida con tu profe"; registro 13/11)
+  const nvSh = document.createElement('div'); nvSh.className = 'sheet'; nvSh.id = 'nvRevSheet'; nvSh.hidden = true; nvSh.setAttribute('role', 'dialog'); nvSh.setAttribute('aria-labelledby', 'nvRevT');
+  nvSh.innerHTML = '<div class="sheetin" id="nvRevIn" style="gap:14px"></div>'; $('#demoSheet').insertAdjacentElement('beforebegin', nvSh);
+  const NV_MIRA = { bien:'Tu movilidad: cómo te movés y qué conviene cuidar.', forma:'Tu rutina, y una medición InBody si la querés.', ver:'Tu primera medición InBody: tu punto de partida.', musc:'Tu primera medición InBody: tu punto de partida.', rend:'Una evaluación funcional pensada para tu deporte.' };
+  function nvRevAbrir(){
+    const k = NUEVO >= 8 ? 8 : 4, base = NUEVO * 7, W = []; for (let i = 1; i <= k; i++) W.push(nvSemCount(base - i * 7 + 1, base - (i - 1) * 7));
+    const tot = W.reduce((a, b) => a + b, 0), pv = primerasVeces().length, fila = (l, n) => '<div class="between"><span>' + l + '</span><span><b>' + n + '</b> ' + (n === 1 ? 'visita' : 'visitas') + (n >= META_SEM ? ' ⚡' : '') + '</span></div>';
+    const blk = (t, h) => '<div class="card" style="gap:8px"><span class="lbl">' + t + '</span>' + h + '</div>';
+    $('#nvRevIn').innerHTML = '<div class="between"><h2 class="h2" id="nvRevT">Tu revisión de la semana ' + k + '</h2><button class="link lime" id="nvRevX" style="min-height:44px">Listo</button></div>' +
+      '<span class="small muted" style="line-height:1.45">Con tu profe ' + NV_PROFE + ' · ' + nvRev(k) + ', en tu sede. La app arma este resumen y tu profe lo ve antes.</span>' +
+      blk('Tus visitas · tu meta: ' + META_SEM + ' por semana', W.map((n, i) => fila('Semana ' + (i + 1), n)).join('')) +
+      (k === 8 ? blk('Tu mes 1 y tu mes 2', '<span>Semanas 1 a 4: <b>' + W.slice(0, 4).reduce((a, b) => a + b, 0) + '</b> visitas · semanas 5 a 8: <b>' + W.slice(4).reduce((a, b) => a + b, 0) + '</b></span>') : '') +
+      blk('Lo que hiciste', '<span style="line-height:1.5">' + tot + ' entrenamientos registrados · ' + pv + (pv === 1 ? ' primera vez' : ' primeras veces') + '. Cómo te sentiste: casi siempre <b>Justa</b>; una vez <b>Al límite</b>.</span><span class="src">Ejemplo</span>') +
+      blk('Qué miran juntos', '<span style="line-height:1.5">' + NV_MIRA[OBJ[0] || 'forma'] + (k === 4 ? ' Y tu profe te explica tu informe de Progreso: desde la revisión lo ves completo.' : '') + '</span>') +
+      blk('Después, elegís tu meta', '<div class="opts" id="nvRevMeta" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">' + [2, 3, 4, 5].map(m => '<button class="opt" data-nvm="' + m + '" aria-pressed="' + (m === (META_PROX || META_SEM)) + '">' + m + '</button>').join('') + '</div><span class="small muted">Por semana. Rige desde el lunes ' + lunesProx() + '; bajarla también está bien.</span>') +
+      (k === 8 ? '<span class="small" style="line-height:1.45">Tu próxima revisión, la de la semana 12, ya quedó agendada: ' + nvFecha(29) + ', 18 h.</span>' : '');
+    nvSh.hidden = false;
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('#nvRevGo')) { nvRevAbrir(); return; }
+    if (e.target.closest('#nvRevX') || e.target === nvSh) { nvSh.hidden = true; return; }
+    const b = e.target.closest('[data-nvm]'); if (b) { const m = +b.dataset.nvm; META_PROX = m === META_SEM ? null : m; nvRevAbrir(); renderForma(); toast(META_PROX ? 'Desde el lunes ' + lunesProx() + ', tu meta es ' + m + ' por semana' : 'Tu meta sigue en ' + META_SEM + ' por semana'); return; }
+    if (e.target.closest('#vmnBtn')) { PR_MAS = !PR_MAS; if (PR_MAS) VMN.toca++; renderProg(); return; }
+  });
+  // Progreso: hasta la revisión de la semana 4, lo que hizo y su profe arriba; nada de bandas, "por debajo" ni ceros (punto 11)
+  function expMas(){ const e = expProg(); return e === 'arranco' && PR_MAS && nvVer('mas') && !(typeof esMenor === 'function' && esMenor()) ? 'habitual' : e; }
+  var NV_ANC = null;
+  function nvProg(x){
+    const pf = $('#prProfe'), bc = $('#bienCard'), mp = $('#prMapa'); if (!pf || !bc || !mp) return;
+    if (!NV_ANC) { NV_ANC = [document.createComment('prProfe'), document.createComment('bienCard')]; pf.before(NV_ANC[0]); bc.before(NV_ANC[1]); }
+    const ve = nvVer('bandas');
+    mp.hidden = !ve; $('#prEq').hidden = !ve; if (!ve) { $('#prVol').hidden = true; mp.before(pf); mp.before(bc); bc.hidden = false; } else { NV_ANC[0].after(pf); NV_ANC[1].after(bc); }
+    if (NUEVO != null) {
+      $$('#pvList > div > .small').forEach(e => e.textContent = '');   // las fechas de la demo son anteriores al alta simulada: se omiten antes que mostrar algo que no pasó
+      $('#prProfeF').textContent = NUEVO >= 3 ? 'semana 3' : '';
+      $('#prProfeTxt').textContent = NUEVO >= 3 ? NV_COM : 'En tu semana 3, tu profe te deja un comentario sobre lo que registraste.';
+      $('#prProfeRev').innerHTML = NUEVO < 8 ? '<b>Tu revisión: semana ' + (NUEVO < 4 ? 4 : 8) + '</b><span>Con ' + NV_PROFE + ', en tu sede · ' + nvRev(NUEVO < 4 ? 4 : 8) + '.</span>' : '<b>Tu próxima revisión: semana 12</b><span>Con ' + NV_PROFE + ', ya agendada.</span>';
+    }
+    let vb = $('#vmnBtn'); if (!vb) { vb = document.createElement('button'); vb.className = 'link lime'; vb.id = 'vmnBtn'; vb.style.cssText = 'min-height:44px;align-self:center'; bc.parentElement.lastElementChild.insertAdjacentElement('beforebegin', vb); }
+    const ar = expProg() === 'arranco' && !(typeof esMenor === 'function' && esMenor()) && nvVer('mas');
+    vb.hidden = !ar; vb.textContent = PR_MAS ? 'Ver menos números' : 'Ver más números';
+  }
+  // Lo que ve el profe (punto 12): solo en el panel de demo
+  function nvProfeTxt(){
+    if (NUEVO == null) return 'Elegí una semana para ver lo que le llega al profe.';
+    const dp = nvDisp(), s = NUEVO, L = [];
+    if (dp === 'alta') L.push('Alta nueva asignada a vos: recibila en su primera visita y dejale la rutina cargada en 48 h.');
+    else if (dp === 'sin7') L.push('Día 7 sin primera visita: el encargado la contacta. A vos no te llega nada todavía.');
+    else if (dp === 'sin14') L.push('<b>Bandera:</b> 14 días desde el alta sin primera visita.');
+    else if (dp === 'falta') L.push('<b>Bandera:</b> ' + AUS_N + ' días sin venir. A la socia le salió un mensaje sin culpa.');
+    else if (dp === 'silencio') L.push('28 días sin venir: la app no le escribe más. Queda en la lista de gestión.');
+    else if (dp === 'volvio') L.push('Aviso de entrada: volvió después de 14 días. Saludala como siempre, sin contar los días.');
+    else if (AUS_N >= 7) L.push('7 días sin venir: nada. Es normal al arrancar.');
+    else if (s <= 2) L.push('Aviso de entrada en cada visita de las dos primeras semanas: saludala y preguntale cómo le fue.');
+    if (s === 3 && !dp) L.push('Pedido: una línea de comentario. La app te arma el dato: ' + nvSemCount(0, 21) + ' visitas y ' + primerasVeces().length + ' primeras veces.');
+    if ((s === 4 || s === 8) && !dp) L.push('Revisión de la semana ' + s + ': resumen listo (visitas contra la meta, sesiones, cómo se sintió).');
+    L.push('Avisos a la socia esta semana: ' + (s === 0 ? 'ninguno; la bienvenida está en la app.' : s <= 2 ? 'hasta 2 (la víspera del día que eligió y la pregunta del lunes).' : '1 (la pregunta del lunes).') + ' Nunca el fin de semana.');
+    return L.join('<br>');
+  }

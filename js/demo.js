@@ -149,7 +149,7 @@
   window.demoCuerpo = () => { $('#genMs').textContent = 'Cuerpo de Progreso: modelo ' + (MAPA.genero === 'F' ? 'femenino' : 'masculino') + (GENERO === 'F' ? ' (el mismo para todos: el femenino llega con la compra)' : '') + ', cargó en ' + (MAPA.ms / 1000).toFixed(1).replace('.', ',') + ' s. El género sale de EVO y nunca se pregunta.'; };
   $('#expPick').addEventListener('click', e => { const b = e.target.closest('[data-exp]'); if (!b) return; EXP = b.dataset.exp; renderProg(); $$('#expPick [data-exp]').forEach(x => x.setAttribute('aria-pressed', x === b)); SALA && salaRehacer(); entDemo('hoy', { arranco:'Arranco: la carga no sube en las primeras 4 semanas', habitual:'Habitual', avanzado:'Avanzado' }[EXP]); });
   $('#etPick').addEventListener('click', e => {
-    const b = e.target.closest('[data-et]'); if (!b) return; ETAPA = b.dataset.et; $('.app').dataset.etapa = ETAPA;
+    const b = e.target.closest('[data-et]'); if (!b) return; ETAPA = b.dataset.et; $('.app').dataset.etapa = ETAPA; if (NUEVO != null && b.closest('[data-etg="etapa"]')) nvAplicar(null);
     $$('#etPick [data-et]').forEach(x => x.setAttribute('aria-pressed', x === b));
     MOLESTIA = ETAPA === 'molestia' ? { zona:'Hombro', bien:0 } : null; chkReset();
     if (MOM !== 'antes' && MOM !== 'sala') setMom('antes', true);
@@ -218,7 +218,7 @@
     if (v === 'saltear' && SALA) { SALA.rest = 0; renderSala(); }
     if (v === 'cambiar' && SALA) { lockCerrar(); salaCambiar(); return; } // puede tocar salud: pide desbloquear
     if (v.indexOf('chk-') === 0) { NOTI.chk = true; chkAnswer(v.slice(4)); }
-    if (v.indexOf('lun-') === 0) { NOTI.lun = true; if (v !== 'lun-rep') { META_SEM = v === 'lun-sub' ? META_SEM + 1 : LAST_WK; renderForma(); renderHoy(); renderAcc(); } }
+    if (v.indexOf('lun-') === 0) { NOTI.lun = true; META_PROX = null; if (v !== 'lun-rep') { META_SEM = v === 'lun-sub' ? META_SEM + 1 : LAST_WK; renderForma(); renderHoy(); renderAcc(); } }
     if (v === 'olv-cerrar' && SALA) { NOTI.olv = true; salaCerrar(); LK_FIN = true; }
     if (v === 'olv-sigo') NOTI.olv = true;
     lockRen();
@@ -241,8 +241,10 @@
   // Agregar un escenario = una línea en ESCENARIOS (nombre, lo que fija, a dónde lleva). Lo que no fija queda como en BASE.
   // Agregar un control = una fila en html/demo.html, en su sección; si es transversal, también su clave en BASE y en aplicar().
   const ESCENARIOS = [
-    ['Socia nueva, semana 1', { ant:'nueva', est:0, fit:0 }, 'inicio'],
-    ['Socia nueva, día 14 sin entrar', { ant:'nueva', est:0, aus:14, fit:0 }, 'inicio'],
+    ['Socia nueva, día del alta', { ant:'nueva', nv:0, fit:0 }, 'inicio'],
+    ['Socia nueva, semana 1', { ant:'nueva', nv:1, fit:0 }, 'inicio'],
+    ['Socia nueva, día 14 sin primera visita', { ant:'nueva', nv:2, aus:14, fit:0 }, 'inicio'],
+    ['Socia nueva, revisión de la semana 4', { ant:'nueva', nv:4, fit:0 }, 'inicio'],
     ['Habitual que viene menos: 10 días sin venir', { exp:'habitual', est:1, aus:10 }, 'inicio'],
     ['Habitual en la sala, noche llena, con auriculares', { exp:'habitual', mom:'sala', sl:1, voz:1, au:1 }, 'hoy'],
     ['Avanzado, semana completa, VIVA Flow', { ant:'1a', est:3, sem:'completa' }, 'inicio'],
@@ -268,7 +270,7 @@
   const ANT_EXP = { nueva:'arranco', '3m':'arranco', '6m':'habitual', '1a':'avanzado' };
   const antAct = () => { const p = PERFIL_MAPA || ''; return Object.keys(ANT).find(k => ANT[k][0] === p) || '3m'; };
   function setAnt(k){ dmTap('[data-perf="' + ANT[k][0] + '"]'); dmTap('[data-mur="' + ANT[k][1] + '"]'); }
-  function setAus(n){ sacados.splice(0).forEach(d => entrenoDia.add(d)); for (let d = 1; d <= n; d++) if (entrenoDia.has(d)) { entrenoDia.delete(d); sacados.push(d); } ausente = n > 0; AUS_N = n; renderForma(); renderHoy(); }
+  function setAus(n){ sacados.splice(0).forEach(d => entrenoDia.add(d)); for (let d = 1; d <= n; d++) if (entrenoDia.has(d)) { entrenoDia.delete(d); sacados.push(d); } ausente = n > 0; AUS_N = n; NV_VOLVIO = false; renderForma(); renderHoy(); if (NUEVO != null) nvRefresh(); }
   function setObj(k){ OBJ.length = 0; if (k) OBJ.push(k); renderForma(); renderProg(); }
   function setDia(i){ rutinas.profe.next = i; HR = -1; renderEntHoy(); renderToday(); renderRoutines(); }
   const venceCorto = () => Math.round((VENCE - HOY0) / 864e5) <= 5;
@@ -284,10 +286,13 @@
     $$('#saldoPick [data-saldo]').forEach(x => x.setAttribute('aria-pressed', (x.dataset.saldo === '1') === deuda));
     const di = rutinas.profe.next; $$('#diaPick [data-dia]').forEach(x => x.setAttribute('aria-pressed', +x.dataset.dia === di));
     $$('#escPick [data-esc]').forEach(x => x.setAttribute('aria-pressed', +x.dataset.esc === DM_ESC));
+    $$('#nvPick [data-nv]').forEach(x => x.setAttribute('aria-pressed', +x.dataset.nv === (NUEVO == null ? -1 : NUEVO)));
+    $('#nvProfe').innerHTML = nvProfeTxt(); $('#vmnCnt').textContent = 'Progreso de Arranco, desde la semana 4: ' + VMN.toca + (VMN.toca === 1 ? ' toque' : ' toques') + ' en "Ver más números". La prueba: más del 30 % de las aperturas → Arranco ve más.';
   }
   function dmFin(dest, msg){ $('#demoSheet').hidden = true; if (dest) go(dest); if (msg) toast(msg); dmSync(); }
   function aplicar(c){
     c = Object.assign({}, BASE, c);
+    if (NUEVO != null) nvAplicar(null);
     if (NOENT) $('#noEnt').click();
     for (const k in LIM) delete LIM[k];
     setAnt(c.ant); dmTap('[data-exp="' + (c.exp || ANT_EXP[c.ant]) + '"]');
@@ -300,6 +305,7 @@
     dmTap('[data-ac="voz' + c.voz + '"]'); dmTap('[data-ac="au' + c.au + '"]'); dmTap('[data-ac="rap' + c.rap + '"]');
     dmTap('[data-ds="' + c.ds + '"]'); dmTap('[data-fit="' + c.fit + '"]');
     setObj(c.obj); setDia(c.dia); setPlan(c.plan); setSaldo(c.saldo);
+    if (c.nv != null) { dmTap('[data-exp="arranco"]'); nvAplicar(c.nv); setAus(c.aus); }
   }
   $('#escPick').innerHTML = ESCENARIOS.map((s, i) => '<button data-esc="' + i + '" aria-pressed="false">' + s[0] + '</button>').join('');
   $('#escPick').addEventListener('click', e => { const b = e.target.closest('[data-esc]'); if (!b) return; const s = ESCENARIOS[+b.dataset.esc];
@@ -314,6 +320,11 @@
     if ((b = t.closest('[data-objd]'))) { setObj(b.dataset.objd); return dmFin('inicio', 'Objetivo: ' + b.textContent); }
     if ((b = t.closest('[data-plan]'))) { setPlan(b.dataset.plan === 'vence'); return dmFin('inicio', venceCorto() ? 'El plan vence en 3 días: aviso en Inicio' : 'Plan al día'); }
     if ((b = t.closest('[data-saldo]'))) { setSaldo(b.dataset.saldo === '1'); return dmFin('inicio', deuda ? 'Con saldo pendiente' : 'Sin saldo pendiente'); }
+    if ((b = t.closest('[data-nv]'))) { const k = +b.dataset.nv;   // T11 · semana del programa de las primeras 8 semanas
+      if (k >= 0) { if (ETAPA !== 'normal') dmB('[data-etg="etapa"] [data-et="normal"]').click(); setAnt('nueva'); dmTap('[data-exp="arranco"]'); dmTap('[data-fit="0"]'); }
+      nvAplicar(k < 0 ? null : k); return dmFin('inicio', k < 0 ? 'Fuera de las primeras 8 semanas' : k ? 'Socia nueva · semana ' + k + ' de 8' : 'Socia nueva · día del alta'); }
+    if (t.closest('#nvVolvio')) { if (NUEVO == null || NUEVO < 3) { setAnt('nueva'); dmTap('[data-exp="arranco"]'); dmTap('[data-fit="0"]'); nvAplicar(5); } else nvAplicar(NUEVO);
+      nvVolvio(); return dmFin('inicio', 'Volvió hoy después de 14 días'); }
     if ((b = t.closest('[data-dia]'))) { setDia(+b.dataset.dia); return dmFin('hoy', 'Hoy: Día ' + b.textContent); }
     setTimeout(dmSync, 0); });
   $('#demoFab').addEventListener('click', dmSync);
