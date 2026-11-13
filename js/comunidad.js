@@ -170,8 +170,9 @@
   const MV_JOAQUIN = { id:'p7', k:'logro', n:'Joaquín', sub:'Sarmiento · hoy', c:['#4f7d3a','#152410'], lbl:'Ficha', num:'12', firma:['semanas', 'cumplidas'], txt:'Sumó la ficha de las 12 semanas a su mural.' };
   const MV_POSTS = {
     eq: [
+      // El primero queda fijo arriba del mural hasta que pase (decisión 13/11): es lo que trae al socio al gimnasio.
+      { id:'p1', k:'aviso', n:'Prof. Lucas', sub:'Tu profe · para su grupo · fijado', c:['#2a6f7f','#0c2229'], ev:'e1' },
       { id:'p2', k:'foto', n:'Valentina', sub:'Corrientes · ayer · la ven sus amigos', c:['#a85a5a','#2e1212'], f:['#f400a0','#07b0f2'], dato:['Semana', 'cumplida'], det:'3 de 3 · Corrientes', txt:'Semana adentro. ¡Vamos!', amiga:true },
-      { id:'p1', k:'aviso', n:'Prof. Lucas', sub:'Tu profe · para su grupo', c:['#2a6f7f','#0c2229'], ev:'e1' },
       { id:'p3', k:'logro', n:'Sofi', sub:'Nueva en el grupo de Prof. Lucas', c:['#c08a3a','#33230c'], lbl:'Bienvenida', firma:['Primera semana', 'cumplida'], txt:'Arrancó hace una semana y la cumplió.', fit:'Dale la bienvenida con un Fit' },
       { id:'p4', k:'dupla', n:'Ramiro', c:['#5a7aa8','#141e2e'] },
       { id:'p5', k:'foto', n:'Diego', sub:'Sarmiento · hace 2 días · la ven sus amigos', c:['#7a7a3a','#262610'], f:['#07b0f2','#ffe94a'], dato:['12 semanas', 'cumplidas'], det:'en Viva · Sarmiento', txt:'Tres meses viniendo.', amiga:true }
@@ -253,7 +254,8 @@
     $('#mvFilLbl').textContent = MV_FIL[MV.fil][0];
     $('#peMenor').hidden = !menor; $('#deckBox').hidden = menor; $('#mvFabDot').hidden = !ok;
     const mios = MV.mios.filter(p => p.vis !== 'amigos' || MV.fil === 'eq');
-    $('#mvFeed').innerHTML = (ok && !MV.mios.length ? [{ k:'invita' }] : []).concat(mios, MV_POSTS[MV.fil], MV.extra[MV.fil]).map(mvPost).join('');
+    const base = MV_POSTS[MV.fil], fijo = MV.fil === 'eq' ? 1 : 0;
+    $('#mvFeed').innerHTML = base.slice(0, fijo).concat(ok && !MV.mios.length ? [{ k:'invita' }] : [], mios, base.slice(fijo), MV.extra[MV.fil]).map(mvPost).join('');
     cuerpo.scrollTop = y;
     if (MV.hoja === 'grupos') mvGrupos(); if (MV.hoja === 'desafios') mvDesafios();
   }
