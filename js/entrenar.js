@@ -885,7 +885,7 @@
       const n = OB.meta;
       h = obTop() + '<span class="h2 obq">¿Nos ponemos una meta?</span>' +
         '<div class="obmeta"><button data-obm="-1" aria-label="Una vez menos"' + (n <= 2 ? ' disabled' : '') + '>−</button><b>' + n + '</b><button data-obm="1" aria-label="Una vez más"' + (n >= 5 ? ' disabled' : '') + '>+</button></div>' +
-        '<p class="sv big">' + OB_BOLT + '<span>Venir ' + n + ' veces por semana. Con 4 semanas así es tu Mes cumplido y encendés tu cartel ⚡</span></p>' +
+        '<p class="sv big">' + OB_BOLT + '<span>Venir ' + n + ' veces por semana. Con 3 semanas así en el mes, tu Mes cumplido enciende tu cartel ⚡</span></p>' +
         '<p class="obsub" style="margin:0">La cambiás cuando quieras.</p>';
       ft = '<button class="accbtn on" data-ob="next"><span>Dale</span></button>';
     } else if (OB.step === 'fin') {

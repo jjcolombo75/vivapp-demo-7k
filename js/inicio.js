@@ -80,21 +80,19 @@
 
 //#bloque 250
   // ----- Tu mes en Inicio: 4 segmentos, uno por semana del mes (apagado · tenue = cumplida · pleno con ⚡ = completa) -----
-  // Semanas cumplidas de este mes, en orden, con si fueron completas (cada semana cuenta para el mes en que termina)
+  // Semanas cumplidas de este mes, en orden, con si fueron completas (cada semana cuenta para el mes de su jueves)
   function mesSemanas(){
     if (!MUR) return [];
     let L = (MUR.prevW || []).slice(0, MUR.prevMes);
     while (L.length < MUR.prevMes) L.push(false);
     if (semCumplida()) L.push(semCompleta());
-    if (MUR.cerrado) { if (MUR.cerradoC) L = [true, true, true, true]; else while (L.length < 4) L.push(false); }
+    if (MUR.cerrado) { if (MUR.cerradoC) L = L.map(() => true); while (L.length < 3) L.push(!!MUR.cerradoC); }
     return L.slice(0, 4);
   }
-  // Semanas que todavía pueden contar este mes (simulado: el mes de la demo tiene 4 semanas)
-  const mesQuedan = () => Math.max(0, 4 - (MUR ? MUR.prevMes + (MUR.prevMiss || 0) : 0));
   function renderMuralHome(){
     const c = $('#mesCard'); if (!c) return;
     c.hidden = !MUR; if (!MUR) return;
-    const L = mesSemanas(), n = L.length, comp = n >= 4 && L.every(x => x), mes = meses[HOY_D.getMonth()];
+    const L = mesSemanas(), n = L.length, comp = n >= 3 && L.filter(x => x).length >= 3, mes = meses[HOY_D.getMonth()];
     const col = eqFlow ? 'var(--z2)' : eqCol;
     $('#mesNm').textContent = MES_ABR[HOY_D.getMonth()];
     const BAR = EQ_EST === 'barras', W = 340, H = BAR ? 16 : 18, GP = BAR ? 10 : 6, sw = (W - 3 * GP) / 4, F = eqFlow ? 'url(#msFlow)' : eqCol;
@@ -117,13 +115,12 @@
     }
     const bar = $('#mesBar'); bar.innerHTML = '<svg class="mssvg" viewBox="-6 -6 ' + (W + 12) + ' ' + (H + 12) + '" aria-hidden="true">' + g + '</svg>';
     const nc = L.filter(x => x).length;
-    bar.setAttribute('aria-label', 'Tu mes, ' + mes + ': ' + n + ' de 4 semanas cumplidas' + (nc ? ', ' + nc + (nc === 1 ? ' completa' : ' completas') : '') + '. Ver tu mural.');
-    const falta = 4 - n, quedan = mesQuedan() - (semCumplida() ? 0 : 0);
+    bar.setAttribute('aria-label', 'Tu mes, ' + mes + ': ' + (n >= 3 ? 'Mes cumplido, ' + n + ' semanas cumplidas' : n + ' de 3 semanas cumplidas') + (nc ? ', ' + nc + (nc === 1 ? ' completa' : ' completas') : '') + '. Ver tu mural.');
     $('#mesTxt').innerHTML = pausa ? 'Plan en pausa: tu mes no pierde nada.'
-      : comp ? '<strong>¡Mes completo! ⚡</strong> Tu cartel de ' + mes + ' brilla con todo.'
-      : n >= 4 ? '<strong>¡Mes cumplido!</strong> Tu cartel de ' + mes + ' ya es tuyo ⚡'
-      : falta > quedan ? 'Este mes ya no llega al cartel. Cada semana igual suma a tu ritmo y a tus fichas.'
-      : 'Te ' + (falta === 1 ? 'falta <strong>1 semana</strong>' : 'faltan <strong>' + falta + ' semanas</strong>') + ' para tu neón de ' + mes + ' ⚡';
+      : comp ? '<strong>Mes cumplido ⚡</strong> Tu cartel de ' + mes + ' brilla con todo.'
+      : n >= 3 ? '<strong>¡Mes cumplido!</strong> Tu cartel de ' + mes + ' ya es tuyo.'
+      : n === 0 ? 'Tu neón de ' + mes + ' arranca con tu primera semana cumplida ⚡'
+      : 'Llevás <strong>' + n + ' de 3</strong> semanas cumplidas en ' + mes + ' ⚡';
   }
   const irMural = () => { renderMural(); go('muralScr'); };
   $('#mesVer').addEventListener('click', irMural); $('#mesBar').addEventListener('click', irMural);

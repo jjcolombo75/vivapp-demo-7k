@@ -206,15 +206,10 @@
     if (!MUR) return;
     const n = MUR.sem, L = [];
     const it = (ico, t, s, done) => '<div class="prem' + (done ? ' done' : '') + '"><span class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICO[ico] + '</svg></span><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + t + '</span><span class="small muted" style="line-height:1.4">' + s + '</span></span></div>';
-    if (BEN_MES && (MUR.cerrado || MUR.meses.length)) L.push(it('regalo', '25% en Mili Integral', 'Beneficio del mes de Club VIVA, por tu Mes cumplido. Pedí el código en Descuentos.', false));
-    if (n === 0) L.push(it('pulso', 'InBody de punto de partida, gratis', 'Si venís 8 veces en tus primeras 4 semanas. Llevás 2.', false));
-    else L.push(it('pulso', 'InBody de punto de partida', n >= 12 ? 'Ganado en tu primer mes · usado' : 'Ganado en tu primer mes · pedí tu turno en recepción', n >= 12));
     [[12, 'Pin VIVA + InBody de control', 'rayo'], [24, 'Remera VIVA + InBody de control', 'corazon'], [36, 'InBody de control', 'mancuerna'], [48, 'InBody de control + premio VIVA', 'estrella']].forEach(([u, t, ico]) => {
       if (n >= u) L.push(it(ico, t, 'Ficha de ' + u + ' semanas · ' + (u === Math.max.apply(null, [12, 24, 36, 48].filter(x => x <= n)) ? 'para retirar en recepción' : 'retirado'), u !== Math.max.apply(null, [12, 24, 36, 48].filter(x => x <= n))));
     });
-    const prox = [12, 24, 36, 48].find(u => u > n);
-    if (prox) L.push(it('estrella', 'Próximo: ' + (prox === 12 ? 'pin VIVA + InBody de control' : prox === 24 ? 'remera VIVA + InBody de control' : 'InBody de control'), 'Con tu ficha de ' + prox + ' semanas cumplidas. Te faltan ' + (prox - n) + '.', true));
-    $('#premList').innerHTML = L.join('');
+    $('#premList').innerHTML = L.length ? L.join('') : '<span class="small muted" style="padding:10px 4px">Por ahora no tenés premios para retirar.</span>';
     const porRetirar = L.filter(x => x.includes('para retirar') || x.includes('pedí tu turno')).length; PREM_N = porRetirar; avisosLater();
     $('#promoTxt').innerHTML = porRetirar ? 'Club Viva: tenés <strong>' + porRetirar + (porRetirar === 1 ? ' premio' : ' premios') + '</strong> para retirar en recepción' : 'Club Viva: beneficios en más de 1.000 comercios';
   }

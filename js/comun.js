@@ -50,7 +50,7 @@
   function toast(msg){ const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(tt); tt = setTimeout(() => el.hidden = true, 2200); }
 
   // ===== Calendario de la demo: la FECHA se fija acá y todo lo demás se deriva (la hora es la real del teléfono) =====
-  // Miércoles 18/11/2026: tercera semana del mes, dos semanas cumplidas cerradas (Tu mes 2 de 4) y Mes cumplido todavía alcanzable.
+  // Miércoles 18/11/2026: tercera semana del mes, dos semanas cumplidas cerradas (Tu mes 2 de 3) y Mes cumplido todavía alcanzable.
   function ahora(){ const r = new Date(); return new Date(2026, 10, 18, r.getHours(), r.getMinutes(), r.getSeconds(), r.getMilliseconds()); }
   function diaAtras(n){ const d = ahora(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return d; }
   function dmLbl(d){ return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); }
@@ -455,12 +455,12 @@
     if (pausa) return 'Semana en pausa: ' + V().tu + vb(' no baja', ' no bajan') + ' mientras tanto.';
     if (dv < 0) return V().down(rec);
     const m = semMetas();
-    const fx = fichaProx(), fT = fx ? ' Te ' + (fx.falta === 1 ? 'falta 1 semana' : 'faltan ' + fx.falta + ' semanas') + ' para ' + fx.art + '.' : '';
+    const fx = fichaProx(), fT = fx ? ' Llevás ' + (fx.f.n - fx.falta) + ' de ' + fx.f.n + (fx.f.n === 1 ? ' semana' : ' semanas') + ' cumplidas para ' + fx.art + '.' : '';
     if (semCompleta()) return '<strong>¡Semana completa! ⚡</strong>' + (fT || ' Así se entrena.');
     if (semKey === 'lunes' && WK.vis === 0) return LAST_WK >= m.vis ? 'La semana pasada fue <strong>semana cumplida</strong>. ¡Vamos por otra! ⚡' : 'La semana pasada viniste ' + LAST_WK + ' de ' + m.vis + '. ¡Vamos con esta! ⚡';
-    if (!semCumplida()) { const f = m.vis - WK.vis, fv = 'Te ' + (f === 1 ? 'falta <strong>1 visita</strong>' : 'faltan <strong>' + f + ' visitas</strong>');
-      if (fx && fx.falta === 1) return fv + ' y esta semana te da ' + fx.art + ' ⚡';
-      if (mesMarcas() === 3 && !MUR.cerrado) return fv + ' y cerrás tu <strong>Mes cumplido</strong> ⚡';
+    if (!semCumplida()) { const fv = 'Llevás <strong>' + WK.vis + ' de ' + m.vis + ' visitas</strong>';
+      if (fx && fx.falta === 1) return fv + ' para la semana cumplida, que te da ' + fx.art + ' ⚡';
+      if (mesMarcas() === 2 && !MUR.cerrado) return fv + ' para la semana cumplida, que cierra tu <strong>Mes cumplido</strong> ⚡';
       return fv + ' para la semana cumplida ⚡'; }
     if (!WK.reg) return '<strong>¡Semana cumplida! ⚡</strong>' + (fT || ' Registrá tu sesión y mirá cómo entrenás.');
     const falta = [];

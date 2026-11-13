@@ -119,12 +119,11 @@
     const now = HOY_D, id = 'm' + now.getFullYear() + '-' + now.getMonth();
     const v = serie().slice(-1)[0].f; let ti = 0; zonas().forEach((q, k) => { if (v >= q[0]) ti = k; });
     const prevM = MUR.meses.find(m => m.m === now.getMonth() && m.y === now.getFullYear()); if (prevM) prevM.c = CIERRE_C;
-    if (!prevM) { MUR.meses.push({ m:now.getMonth(), y:now.getFullYear(), t:ti, c:CIERRE_C }); MUR.sem += Math.max(0, 4 - MUR.prevMes - (semCumplida() ? 1 : 0)); }
+    if (!prevM) { MUR.meses.push({ m:now.getMonth(), y:now.getFullYear(), t:ti, c:CIERRE_C }); MUR.sem += Math.max(0, 3 - MUR.prevMes - (semCumplida() ? 1 : 0)); }
     MUR.cerrado = true; MUR.cerradoC = CIERRE_C; muralNuevo = id;
     renderMural(); renderPremios(); renderForma(); renderDesafios(); go('inicio');
     abrirCartel(muralEventos().find(x => x.id === id));
   }
-  $('#benPick').addEventListener('click', e => { const b = e.target.closest('[data-bm]'); if (!b) return; BEN_MES = b.dataset.bm === '1'; $$('#benPick [data-bm]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderPremios(); toast(BEN_MES ? 'Con beneficio del mes de un aliado del Club' : 'Sin beneficio del mes'); });
   renderMural(); renderPremios(); renderDesafios();
   $('#demoFab').addEventListener('click', () => $('#demoSheet').hidden = false);
   $('#demoClose').addEventListener('click', () => $('#demoSheet').hidden = true);

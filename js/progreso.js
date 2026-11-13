@@ -40,7 +40,7 @@
   renderAvance(); renderRecords();
 
 //#bloque 130
-  // ===== La sede del mes: % de socios con Mes completo por sede (agregado; en producción, de las entradas por molinete) =====
+  // ===== La sede del mes: % de socios con Mes cumplido por sede (agregado; en producción, de las entradas por molinete) =====
   const sedesMes = [ ['Sarmiento', 34], ['López y Planes', 31], ['Corrientes', 29], ['Alberdi', 27], ['Santa Ana', 24], ['Posadas', 19] ];
   const diasRestantes = () => { const d = ahora(); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate() - d.getDate(); };
   const mesNombre = () => meses[ahora().getMonth()];
@@ -58,7 +58,7 @@
     $('#sedeRank').innerHTML = sorted.map((x, i) => '<div class="rank' + (x[0] === miSede ? ' me' : '') + '"><span>' + (i + 1) + '. ' + x[0] + '</span><span class="occ"><i style="width:' + x[1] * 2 + '%"></i></span><b>' + x[1] + '%</b></div>').join('') +
       '<span class="small muted">De cada sede, cuántos socios van camino a su Mes cumplido. ' + (pos === 0 ? miSede + ' va primera.' : miSede + ' va ' + (pos + 1) + 'ª.') + '</span>';
     const n = mesMarcas();
-    $('#chMine').innerHTML = '<span>' + (n >= 4 ? '¡Tu Mes cumplido ya suma para ' + miSede + '! ⚡' : 'Llevás <strong>' + n + ' de 4</strong> semanas cumplidas en ' + mesNombre() + '. Con tu Mes cumplido, sumás para ' + miSede + '.') + '</span>';
+    $('#chMine').innerHTML = '<span>' + (n >= 3 ? '¡Tu Mes cumplido ya suma para ' + miSede + '! ⚡' : 'Llevás <strong>' + n + ' de 3</strong> semanas cumplidas en ' + mesNombre() + '. Con tu Mes cumplido, sumás para ' + miSede + '.') + '</span>';
   }
 
   // ===== Logros: se arman solos con los datos; el socio elige qué se ve =====
@@ -70,7 +70,7 @@
     { n:'Joaquín', sede:'Sarmiento', c:['#4f7d3a','#152410'], t:'12 semanas cumplidas', s:'Encendió su rayo en el mural', when:'Hace 2 h', claps:18 },
     { n:'Carla', sede:'Alberdi', c:['#9a4f8a','#2c1028'], t:'Primer mes cumplido', s:'Cumplió su primer mes en Viva', when:'Hace 5 h', claps:31 },
     { n:'Diego', sede:'Sarmiento', c:['#7a7a3a','#262610'], t:'Récord en sentadilla', s:'Superó su mejor marca personal', when:'Ayer', claps:12 },
-    { n:'Florencia', sede:'Sarmiento', c:['#3a6a9a','#0f2034'], t:'Mes cumplido de ' + mesTxt(ahora().getMonth() - 1), s:'4 semanas cumplidas', when:'Ayer', claps:22 },
+    { n:'Florencia', sede:'Sarmiento', c:['#3a6a9a','#0f2034'], t:'Mes cumplido de ' + mesTxt(ahora().getMonth() - 1), s:'3 semanas cumplidas', when:'Ayer', claps:22 },
     { n:'Joaquín', sede:'Sarmiento', c:['#4f7d3a','#152410'], t:'Terminó el Día B · Espalda', s:'6 ejercicios · 52 min · se sintió genial', when:'Hace 1 h', claps:7 },
     { n:'Martín', sede:'López y Planes', c:['#3a8a7a','#0e2a24'], t:'Terminó Boxeo recreativo', s:'Clase de 45 min · Prof. Martín', when:'Hace 3 h', claps:5 }
   ];
@@ -262,11 +262,11 @@
     '3m': () => ({ sem:10, alta:semAtras(13), meses:[Object.assign(mesAtras(2), { t:1 }), Object.assign(mesAtras(1), { t:2, c:true })], sorp:[['semcomp', semAtras(9)], ['afuera', semAtras(4)]], prevMes:2, prevW:[false, true] }),
     '1a': () => ({ sem:49, alta:semAtras(54), meses:[[11,0],[10,1],[8,1],[7,2],[6,2],[4,2],[3,3],[2,3],[1,3]].map(([k, t]) => Object.assign(mesAtras(k), { t:t, c:[7, 3, 1].includes(k) })), sorp:[['semcomp', semAtras(50)], ['afuera', semAtras(44)], ['inbody', semAtras(41)], ['record', semAtras(30)], ['sede', semAtras(12)]], prevMes:2, prevW:[true, false] })
   };
-  var MURK = '3m', MUR = Object.assign(MURALES['3m'](), { cerrado:false }), BEN_MES = true, muralLista = false, muralNuevo = null;
+  var MURK = '3m', MUR = Object.assign(MURALES['3m'](), { cerrado:false }), muralLista = false, muralNuevo = null;
   // Semanas cumplidas acumuladas: las cerradas + la de esta semana si ya está cumplida
   const semAcum = () => MUR ? MUR.sem + (semCumplida() ? 1 : 0) : 0;
   function fichaProx(){ if (!MUR) return null; const n = semAcum(); let f = FICHAS.find(x => x.n > n); if (!f) { const k = Math.floor(n / 48) + 1; f = { n:k * 48, k:'viva', nom:(k === 2 ? 'tu segundo VIVA' : 'tu VIVA número ' + k), art:(k === 2 ? 'tu segundo VIVA' : 'tu VIVA número ' + k) }; } return { f:f, falta:f.n - n, art:f.art }; }
-  // El mes: semanas cumplidas que ya cerraron en este mes + la actual si está cumplida (cada semana cuenta para el mes en que termina)
+  // El mes: semanas cumplidas que ya cerraron en este mes + la actual si está cumplida (cada semana cuenta para el mes de su jueves)
   function mesMarcas(){ if (!MUR) return 0; return MUR.cerrado ? 4 : Math.min(4, MUR.prevMes + (semCumplida() ? 1 : 0)); }
   function mesHtml(){
     if (!MUR) return '';
@@ -275,7 +275,7 @@
     for (let i = 0; i < 4; i++) { const cx = 6 + i * 15.3;
       d += i < n ? (dk ? '<circle cx="' + cx + '" cy="6" r="5" fill="' + c + '" opacity=".7" filter="url(#mmGl)"/>' : '') + '<circle cx="' + cx + '" cy="6" r="4.4" fill="' + c + '"/>' + (dk ? '<circle cx="' + cx + '" cy="6" r="1.6" fill="#fff" opacity=".7"/>' : '')
                  : '<circle cx="' + cx + '" cy="6" r="4.2" fill="' + c + '" fill-opacity=".1" stroke="' + c + '" stroke-opacity=".35" stroke-width="1.1"/>'; }
-    return '<button class="mesHit" id="mesHit" aria-label="' + Cap(mesNombre()) + ': ' + n + ' de 4 semanas cumplidas para tu Mes cumplido. Ver tu mural.">' + MES_ABR[HOY_D.getMonth()] + d + '</svg></button>';
+    return '<button class="mesHit" id="mesHit" aria-label="' + Cap(mesNombre()) + ': ' + (n >= 3 ? 'Mes cumplido, ' + n + ' semanas cumplidas' : n + ' de 3 semanas cumplidas para tu Mes cumplido') + '. Ver tu mural.">' + MES_ABR[HOY_D.getMonth()] + d + '</svg></button>';
   }
 
   // ----- El mural: papel tapiz de íconos apagados + piezas de neón en collage -----
@@ -358,7 +358,7 @@
     const h = ev.findIndex(e => e.tipo !== 'sorp'); if (h > 0) ev.unshift(ev.splice(h, 1)[0]);
     return ev;
   }
-  const evNombre = e => e.tipo === 'mes' ? Cap(meses[e.m]) + (e.c ? ' · Mes completo ⚡' : ' · Mes cumplido') : e.tipo === 'ficha' ? (e.f.n === 0 ? 'Bienvenida · Welcome to the club' : e.f.n + (e.f.n === 1 ? ' semana cumplida' : ' semanas cumplidas') + ' · ' + e.f.nom) : SORP[e.s][1];
+  const evNombre = e => e.tipo === 'mes' ? Cap(meses[e.m]) + (e.c ? ' · Mes cumplido ⚡' : ' · Mes cumplido') : e.tipo === 'ficha' ? (e.f.n === 0 ? 'Bienvenida · Welcome to the club' : e.f.n + (e.f.n === 1 ? ' semana cumplida' : ' semanas cumplidas') + ' · ' + e.f.nom) : SORP[e.s][1];
   const evFecha = e => meses[e.d.getMonth()].slice(0, 3) + ' ' + e.d.getFullYear();
   function muralSvg(evs, W, seed){
     // Collage: filas con piezas levemente giradas; la más nueva, más grande y más brillante
@@ -388,14 +388,14 @@
     $('#mural').innerHTML = muralSvg(evs, 360, 11);
     $('#semAcum').textContent = semAcum();
     $('#muralNext').innerHTML = '<svg width="16" height="22" viewBox="0 0 16 24" aria-hidden="true" style="flex-shrink:0"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="var(--yel)"/></svg><span>' +
-      (semAcum() === 0 ? 'Tu primera ficha es <b>el smile</b>: se enciende con tu primera semana cumplida.' : 'Tu próxima ficha: <b>' + fx.f.nom + '</b>. Te ' + (fx.falta === 1 ? 'falta 1 semana cumplida' : 'faltan ' + fx.falta + ' semanas cumplidas') + '.') + '</span>';
+      (semAcum() === 0 ? 'Tu primera ficha es <b>el smile</b>: se enciende con tu primera semana cumplida.' : 'Tu próxima ficha: <b>' + fx.f.nom + '</b>. Llevás ' + (fx.f.n - fx.falta) + ' de ' + fx.f.n + ' semanas cumplidas.') + '</span>';
     $('#muralList').innerHTML = evs.map(e => '<div><span class="mli">' + (e.tipo === 'mes' ? icoSm(MES_ICO[e.m], e.t === 3 ? '#07b0f2' : NEON[TRAMO_NEON[e.t]], 28) : e.tipo === 'ficha' ? icoSm({ welcome:'regalo', smile:'smile', yeah:'yeah', rayo:'rayo', corazon:'corazon', reloj:'reloj', mancuerna:'mancuerna', viva:'rayo' }[e.f.k], '#07b0f2', 28) : icoSm(SORP[e.s][0], '#f400a0', 24)) + '</span>' +
       '<span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + evNombre(e) + '</span><span class="small muted">' + Cap(evFecha(e)) + (e.tipo === 'mes' ? ' · terminaste en ' + zonas()[e.t][1] : '') + '</span></span><button data-mshare="' + e.id + '">Compartir</button></div>').join('');
     $('#muralList').hidden = !muralLista; $('#mural').hidden = muralLista;
     $('#muralLista').textContent = muralLista ? 'Ver el mural' : 'Ver como lista';
   }
   function shareEv(e){
-    const a = e.tipo === 'mes' ? (e.c ? { big:MES_ABR[e.m], unit:'MES COMPLETO ⚡', cap:'4 semanas completas en el mes', feedT:'Mes completo' } : { big:MES_ABR[e.m], unit:'MES CUMPLIDO ⚡', cap:'4 semanas cumplidas en el mes', feedT:'Mes cumplido' })
+    const a = e.tipo === 'mes' ? (e.c ? { big:MES_ABR[e.m], unit:'MES CUMPLIDO ⚡', cap:'3 semanas completas en el mes', feedT:'Mes cumplido ⚡' } : { big:MES_ABR[e.m], unit:'MES CUMPLIDO', cap:'3 semanas cumplidas en el mes', feedT:'Mes cumplido' })
       : e.tipo === 'ficha' ? (e.f.n === 0 ? { big:'VIVA', unit:'ARRANQUÉ ⚡', cap:'empecé mi mural VIVA', feedT:'Bienvenida' } : { big:String(e.f.n), unit:(e.f.n === 1 ? 'SEMANA CUMPLIDA' : 'SEMANAS CUMPLIDAS') + ' ⚡', cap:'mi ficha VIVA: ' + e.f.nom.toLowerCase(), feedT:e.f.n + ' semanas cumplidas' })
       : { big:'⚡', unit:SORP[e.s][1].toUpperCase(), cap:'en mi mural VIVA', feedT:SORP[e.s][1] };
     openStory({ type:'ach', a:a, noSede:true });
@@ -407,15 +407,14 @@
   document.addEventListener('click', e => { if (e.target.closest('#mesHit')) { renderMural(); go('muralScr'); setTimeout(() => { const c = $('#muralCard'); if (c) c.scrollIntoView({ block:'start' }); }, 30); } });
 
 //#bloque 260
-  // ----- El momento del cartel: al cerrarse un Mes completo -----
+  // ----- El momento del cartel: al cerrarse un Mes cumplido -----
   function abrirCartel(e){
     const pc = pieza(e, true), W = 340, H = 190;
     $('#cartelWall').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true"><defs><filter id="mgB1" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feGaussianBlur stdDeviation="1.6"/></filter><filter id="mgB2" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feGaussianBlur stdDeviation="5"/></filter><filter id="mgB3" filterUnits="userSpaceOnUse" x="-400" y="-240" width="800" height="480"><feGaussianBlur stdDeviation="11"/></filter><filter id="mgH" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feMorphology operator="dilate" radius="1.6"/><feGaussianBlur stdDeviation="3.5"/></filter><linearGradient id="mgFlow" x1="0" x2="1"><stop offset="0" stop-color="#ffe94a"/><stop offset=".5" stop-color="#07b0f2"/><stop offset="1" stop-color="#f400a0"/></linearGradient></defs>' +
       tapiz(W, H, 29) + '<g class="cpiece" transform="translate(' + W / 2 + ' ' + H / 2 + ') scale(1.35)">' + pc.g + '</g></svg>';
-    $('#cartelTag').innerHTML = '<span>' + (e.c ? '¡Mes completo! ⚡' : '¡Mes cumplido!') + '</span>';
-    $('#cartelTxt').textContent = Cap(meses[e.m]) + (e.c ? ': 4 semanas completas. Terminaste el mes en ' + zonas()[e.t][1] + ' y tu cartel suma el rayo y brilla con todo.' : ': 4 semanas cumplidas. Terminaste el mes en ' + zonas()[e.t][1] + ' y tu cartel ya está encendido en tu mural.');
-    $('#cartelBen').hidden = !BEN_MES;
-    $('#cartelBen').innerHTML = '<span><strong>Tu beneficio del mes:</strong> 25% en Mili Integral (Club VIVA), por tu Mes cumplido. Lo tenés en Tus premios.</span>';
+    $('#cartelTag').innerHTML = '<span>' + (e.c ? '¡Mes cumplido! ⚡' : '¡Mes cumplido!') + '</span>';
+    $('#cartelTxt').textContent = Cap(meses[e.m]) + (e.c ? ': 3 semanas completas. Terminaste el mes en ' + zonas()[e.t][1] + ' y tu cartel suma el rayo y brilla con todo.' : ': 3 semanas cumplidas. Terminaste el mes en ' + zonas()[e.t][1] + ' y tu cartel ya está encendido en tu mural.');
+    $('#cartelBen').hidden = true;
     $('#cartelOv').hidden = false; $('#cartelOv').dataset.ev = e.id;
   }
   $('#cartelX').addEventListener('click', () => { $('#cartelOv').hidden = true; });
