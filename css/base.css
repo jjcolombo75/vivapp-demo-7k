@@ -20,10 +20,11 @@ a{color:var(--lime)}
 
 .shell{height:100%;display:flex;justify-content:center;align-items:center}
 .app{position:relative;width:100%;max-width:440px;height:100%;background:var(--bg);color:var(--txt);display:flex;flex-direction:column;overflow:hidden}
-/* Escritorio: marco de iPhone 15 Pro (pantalla 393×852 pt + bisel de 10 px). Sin condición de alto: si la ventana es baja, el marco se acorta pero no se ensancha */
+/* Escritorio: marco de iPhone 15 Pro (pantalla 393×852 pt + bisel de 10 px), siempre en esa proporción.
+   Si la ventana no alcanza, la app entera se achica con zoom (--zm lo calcula js/cargar.js); nunca se acorta ni se ensancha */
 @media (min-width:600px){
-  .shell{padding-block:24px}
-  .app{flex:0 0 auto;width:413px;max-width:413px;height:min(872px,100%);border-radius:55px;border:10px solid #1a1f29;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+  .shell{padding:0}
+  .app{flex:0 0 auto;width:413px;max-width:none;height:872px;zoom:var(--zm,1);border-radius:55px;border:10px solid #1a1f29;box-shadow:0 30px 80px rgba(0,0,0,.55)}
 }
 
 .scr{flex:1;display:flex;flex-direction:column;min-height:0}
