@@ -5,7 +5,7 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
   let modo = 'socio';
-  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','plan'];
+  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','socialB','plan'];
   let curScr = 'login', prevScr = 'login';
 
 //#bloque 015
@@ -26,6 +26,7 @@
   new MutationObserver(sistemaEstampar).observe(document.querySelector('.app'), { childList:true, subtree:true });
 
   function go(id){
+    if (id === 'social' && typeof SOC_V !== 'undefined' && SOC_V !== 'A') id = 'social' + SOC_V;   // T21 · Versiones Social
     if (id !== curScr) { prevScr = curScr; curScr = id; }
     $$('.scr').forEach(s => s.hidden = s.id !== id);
     $('#nav').hidden = !withNav.includes(id);
@@ -33,12 +34,12 @@
     $('#nav2').hidden = !ppuIds.includes(id);
     if (withNav.includes(id)) modo = 'socio'; if (ppuIds.includes(id)) modo = 'ppu';
     $$('#nav2 button').forEach(b => { if (b.dataset.go === id) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
-    $$('#nav button').forEach(b => { if (b.dataset.go === (['progreso','clases','rutinas','ia','entrenando'].includes(id) ? 'hoy' : id === 'muralScr' ? 'inicio' : id)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+    $$('#nav button').forEach(b => { if (b.dataset.go === (['progreso','clases','rutinas','ia','entrenando'].includes(id) ? 'hoy' : id === 'muralScr' ? 'inicio' : id === 'socialB' ? 'social' : id)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
     const body = $('#'+id+' .body'); if (body) body.scrollTop = 0;
     if (id === 'entrenando') startClock();
     if (id === 'inicio' && typeof semMarcarVisto === 'function') semMarcarVisto();
     if (typeof renderAcc === 'function' && typeof MOM !== 'undefined') { renderAcc(); avisosLater(); }
-    $('.app').dataset.scr = id; if (typeof deudaFranja === 'function') deudaFranja(); if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy(); if (id === 'progreso') renderProg(); if (id === 'social' && typeof muralRender === 'function') muralRender();
+    $('.app').dataset.scr = id; if (typeof deudaFranja === 'function') deudaFranja(); if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy(); if (id === 'progreso') renderProg(); if (id === 'social' && typeof muralRender === 'function') muralRender(); if (id === 'socialB' && typeof sbRender === 'function') sbRender();
   }
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }

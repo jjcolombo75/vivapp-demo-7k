@@ -565,4 +565,13 @@ select.input{appearance:auto;-webkit-appearance:auto}
 .mvhrow{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;border:none;background:none;color:var(--txt);text-align:left;padding:0;font-size:15px;font-family:inherit}
 .mvopt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;min-height:60px;padding:10px 16px;border-radius:16px;border:1px solid var(--line2);background:var(--panel);color:var(--txt);text-align:left;font-family:inherit;font-size:15px}
 .mvfila{display:flex;align-items:center;gap:12px}
+/* T21 · Social VIVA, versión B (los grupos) */
+.sbint{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.sbper{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.sbper .small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbhitos{display:flex;align-items:center}
+.sbhito{width:44px;height:44px;border-radius:50%;border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:18px;color:var(--muted);flex-shrink:0}
+.sbhito.on{border-color:var(--dat);color:var(--txt);box-shadow:var(--mv-tubo-m)}
+.sbhl{flex:1;height:2px;background:var(--line2)}
+.sbstaff{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--lime)}
 .mvfila .btn{width:auto;min-height:44px;padding:0 14px;font-size:14px;flex-shrink:0}

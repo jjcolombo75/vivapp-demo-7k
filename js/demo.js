@@ -331,8 +331,35 @@
   // Plegado recordado entre visitas (nivel 1 y 2 abiertos, nivel 3 cerrado la primera vez)
   $$('#demoSheet details.dmdet').forEach(d => { if (dmMem.pleg && d.dataset.k in dmMem.pleg) d.open = dmMem.pleg[d.dataset.k];
     d.addEventListener('toggle', () => { (dmMem.pleg = dmMem.pleg || {})[d.dataset.k] = d.open; dmSave(); }); });
-  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC }); // para pruebas y T6
+  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC, social:SOC_V, socialB:SOC_B }); // para pruebas y T6
   dmSync();
+
+//#bloque 345
+  // ===== T21 · Versiones Social: la sección social en versiones completas e intercambiables =====
+  // Agregar una versión = una fila en SOC_VERS, su pantalla (#social + la letra; la A es #social) y su nota (data-socnota) en html/demo.html.
+  const SOC_VERS = [
+    ['A', 'Mural VIVA', 'A · El mural para scrollear de T20 (v98), sin cambios: publicaciones, íconos de sección y la cámara flotante.'],
+    ['B', 'Los grupos', 'B · Grupos chicos con alguien que los convoca (el profe), un encuentro por semana y nada que moderar. La charla vive en su WhatsApp.']
+  ];
+  const SOC_BE = { sin:['Sin grupo', 'El socio nuevo: "Quiero sumarme" (se lo dice a su profe), "Traé a alguien" y lo que viene en Viva.'],
+    primer:['Primer encuentro', 'Se sumó esta semana: el primer encuentro destacado y la presentación del profe.'],
+    con:['Con grupo', '12 encuentros: el próximo encuentro, el grupo, lo que logran juntos, el WhatsApp y la foto del encuentro.'] };
+  if (dmMem.soc) { if (SOC_VERS.some(v => v[0] === dmMem.soc.v)) SOC_V = dmMem.soc.v; if (dmMem.soc.b in SOC_BE) SOC_B = dmMem.soc.b; }
+  function socSync(){
+    $('#socVPick').innerHTML = SOC_VERS.map(v => '<button class="opt" data-socv="' + v[0] + '" aria-pressed="' + (SOC_V === v[0]) + '">' + v[0] + '<small>' + v[1] + '</small></button>').join('') +
+      (SOC_VERS.length < 3 ? '<button class="opt" disabled aria-pressed="false">' + String.fromCharCode(65 + SOC_VERS.length) + '<small>la próxima</small></button>' : '');
+    $('#socVTxt').textContent = SOC_VERS.find(v => v[0] === SOC_V)[2];
+    $('#socBRow').hidden = SOC_V !== 'B'; $('#socBTxt').textContent = SOC_BE[SOC_B][1];
+    $$('#socBPick [data-socb]').forEach(x => x.setAttribute('aria-pressed', x.dataset.socb === SOC_B));
+    $$('#demoSheet [data-socnota]').forEach(n => n.hidden = n.dataset.socnota !== SOC_V);
+    socNav();
+  }
+  const socSave = () => { dmMem.soc = { v:SOC_V, b:SOC_B }; dmSave(); };
+  $('#demoSheet').addEventListener('click', e => { let b;
+    if ((b = e.target.closest('[data-socv]'))) { SOC_V = b.dataset.socv; socSave(); socSync(); return dmFin('social', 'Social · versión ' + SOC_V + ': ' + SOC_VERS.find(v => v[0] === SOC_V)[1]); }
+    if ((b = e.target.closest('[data-socb]'))) { SOC_V = 'B'; SOC_B = b.dataset.socb; socSave(); socSync(); return dmFin('social', 'Versión B · ' + SOC_BE[SOC_B][0]); }
+  });
+  socSync();
 
 //#bloque 985
   // T16 · gancho de prueba para tools/barrido.py: abre pantallas que necesitan estado. Ninguna pantalla lo usa.

@@ -322,3 +322,103 @@
       toast(mvVisOk[MV.vis] + (ig ? '. Lista para tu historia' : '')); return; }
     if (e.target.id === 'mvHoja' || q('[data-mvx]') || q('#mvHoja [data-go]')) cerrar();
   });
+
+//#bloque 226
+  // ===== T21 · Social VIVA, versión B: los grupos (v99) =====
+  // Versiones Social (panel de demo, bloque 345 de demo.js) elige la versión: A = Mural VIVA (T20 v98, #social, sin cambios) · B = esta (#socialB).
+  // Estados del socio: sin grupo · primer encuentro (se sumó esta semana) · con grupo (12 encuentros). Todo simulado.
+  // En real: grupos, integrantes y encuentros, el tablero del profe (base de Vivapp) · Voy / No llego, declarado por el socio ·
+  // encuentros cumplidos y desafío del mes, entradas de EVO de noche (solo totales del grupo) · eventos, los que carga marketing · referidos, lo que Viva ya registra.
+  // Piso: ninguna pantalla muestra presencia, horario ni kilos de otro socio; "van N" es un número, sin quién; la app no cuenta ausencias;
+  // nada de lo que un socio escribe o fotografía queda guardado para que otro lo vea (la charla vive en su WhatsApp; la foto sale y no se guarda).
+  var SOC_V = 'A', SOC_B = 'con';
+  var SB = { voy:{ primer:null, con:'voy' }, quiero:false, anot:{} };
+  const SB_G = { nom:['Los del', 'jueves'], dia:'JUE', diaL:'jueves', hora:'19:00', sede:'Sarmiento', que:'Funcional en equipo', van:{ primer:4, con:3 }, enc:12, des:[38, 60],
+    gente:[['Vos', MV_YO], ['Sofi', ['#c08a3a','#33230c']], ['Ramiro', ['#5a7aa8','#141e2e']], ['Cami', ['#8a4f9a','#22102c']], ['Nico', ['#3a8a7a','#0e2a24']], ['Juli', ['#a0603a','#301a0c']]] };
+  const SB_PROFE = ['#2a6f7f','#0c2229'];
+  const SB_CAM = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+  const SB_WA = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.6 19z"/></svg>';
+  const sbMenor = () => typeof esMenor === 'function' && esMenor();
+  const sbProfe = sub => '<div class="mvcab"><span class="av sm sbstaff" style="background:' + grad(SB_PROFE) + '">LP</span>' +
+    '<span class="stack" style="gap:0;flex:1;min-width:0"><span style="font-weight:700">Prof. Lucas</span><span class="small muted">' + sub + '</span></span></div>';
+  function sbEncuentro(est){
+    const v = SB.voy[est], n = SB_G.van[est] + (v === 'voy' ? 1 : 0), prim = est === 'primer';
+    const op = (k, t) => '<button class="opt" data-sbvoy="' + k + '" aria-pressed="' + (v === k) + '">' + t + '</button>';
+    return mvPos(prim ? 'm' : 'c', '<span class="mvk">' + (prim ? 'Tu primer encuentro' : 'Próximo encuentro') + ' · ' + SB_G.sede + '</span>' +
+      (prim ? '<span class="stack" style="gap:8px"><span class="mvfirma sig"><b>El ' + SB_G.diaL + '</b> <i>te esperan</i> ' + MV_RAYO + '</span><span class="mvsub">' + SB_G.hora + ' h · ' + SB_G.que + ', con Prof. Lucas</span></span>'
+        : '<span class="stack" style="gap:8px"><span class="mvbig"><span class="mvfirma sig"><i>' + SB_G.dia + '</i></span><span class="mvnum">' + SB_G.hora + '</span></span><span class="mvsub">' + SB_G.que + ', con Prof. Lucas</span></span>') +
+      '<span class="stack" style="gap:10px"><div class="opts g2">' + op('voy', 'Voy') + op('no', 'No llego') + '</div>' +
+      '<span class="mvsub">' + (v === 'voy' ? 'Vamos ' + n : 'Van ' + n) + (v === 'no' ? ' · esta vez no llegás' : '') + '</span></span>');
+  }
+  const sbPresenta = () => '<div class="card" style="gap:12px">' + sbProfe('Tu profe · armó el grupo') +
+    '<span style="line-height:1.45">Hola, soy Lucas. Armé este grupo con gente que arrancó hace poco, como vos. El ' + SB_G.diaL + ' a las 19 te espero en la entrada de la sala y entrenamos juntos.</span></div>';
+  const sbCab = est => '<div class="stack" style="gap:12px"><span class="mvk">Tu grupo</span><span class="mvfirma sig"><b>' + SB_G.nom[0] + '</b> <i>' + SB_G.nom[1] + '</i></span>' +
+    (est === 'primer' ? '' : sbProfe('Lo convoca · ' + SB_G.sede)) + '</div>';   // en el primer encuentro, el profe ya se presentó arriba
+  const sbGente = est => '<div class="stack" style="gap:12px"><span class="lbl">' + (est === 'primer' ? 'Son 6, todos arrancando' : 'Son 6') + '</span><div class="sbint">' +
+    SB_G.gente.map(q => '<span class="sbper"><span class="av sm" style="background:' + grad(q[1]) + '">' + (q[0] === 'Vos' ? 'M' : inicial(q[0])) + '</span><span class="small">' + q[0] + '</span></span>').join('') + '</div></div>';
+  function sbLogros(est){
+    const n = est === 'con' ? SB_G.enc : 0, d = SB_G.des;
+    const hit = [4, 12, 24].map(h => '<span class="sbhito' + (n >= h ? ' on' : '') + '">' + h + '</span>').join('<i class="sbhl"></i>');
+    if (!n) return mvPos('c', '<span class="mvk">Lo que logran juntos</span><span class="mvfirma sig"><b>Arranca</b> <i>el ' + SB_G.diaL + '</i></span>' +
+      '<span class="stack" style="gap:10px"><div class="sbhitos">' + hit + '</div><span class="mvsub">Cada encuentro que cumplen juntos suma.</span></span>');
+    return mvPos('m', '<span class="mvk">Lo que logran juntos</span><span class="mvbig"><span class="mvnum">' + n + '</span><span class="mvfirma sig"><b>encuentros</b> <i>juntos</i> ' + MV_RAYO + '</span></span>' +
+      '<div class="sbhitos">' + hit + '</div>' +
+      '<span class="stack" style="gap:8px"><span class="between"><span style="font-weight:700">Desafío del mes</span><span class="small muted">' + d[0] + ' de ' + d[1] + '</span></span>' +
+      '<span class="bar"><i style="width:' + Math.round(d[0] / d[1] * 100) + '%"></i></span><span class="mvsub">Entrenamientos de todo el grupo, cada uno a su ritmo.</span></span>');
+  }
+  function sbAcciones(est){
+    if (sbMenor()) return '<span class="mvdef">Los cambios del encuentro te los avisa tu profe.</span>';   // matriz de riesgos, filas 2 y 3
+    return '<div class="stack" style="gap:10px"><button class="btn ghost" data-sbwa>' + SB_WA + 'Abrir el WhatsApp del grupo</button>' +
+      (est === 'con' ? '<button class="btn" data-sbfoto>' + SB_CAM + 'La foto del encuentro</button>' : '') + '</div>';
+  }
+  const sbTrae = sin => sin
+    ? mvPos('m', '<span class="mvk">Vení con un amigo</span><span class="mvfirma sig"><b>Traé</b> <i>a alguien</i></span>' +
+        '<span class="stack" style="gap:10px"><span class="mvsub">Arrancar con alguien que conocés hace todo más fácil.</span><button class="btn" data-sbtrae>Invitar a alguien</button></span>')
+    : '<div class="list"><div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">Traé a alguien</span>' +
+        '<span class="small muted">Invitalo a entrenar con vos</span></span><button class="btn sm" data-sbtrae>Invitar</button></div></div>';
+  const sbEventos = () => '<div class="stack" style="gap:12px"><span class="lbl">Lo que viene en Viva</span><div class="list">' +
+    MV_VIENE.filter(e => e.k === 'Evento').map(e => { const on = !!SB.anot[e.id];
+      return '<div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + e.dia + ' ' + e.hora + ' · ' + e.t + '</span>' +
+        '<span class="small muted">' + e.donde + ' · ' + (e.n + (on ? 1 : 0)) + ' anotados</span></span><button class="btn sm' + (on ? ' ghost' : '') + '" data-sbanot="' + e.id + '">' + (on ? '✓ Anotado' : 'Me anoto') + '</button></div>'; }).join('') + '</div></div>';
+  function sbSin(){
+    const q = SB.quiero;
+    return mvPos('c', '<span class="mvk">Grupos de gente nueva</span><span class="mvfirma sig"><b>¿Entrenás</b> <i>solo?</i></span>' +
+      '<span class="mvsub">Tu profe arma grupos chicos con gente que recién arranca: un encuentro por semana, con día y hora.</span>' +
+      '<span class="stack" style="gap:10px"><button class="btn' + (q ? ' ghost' : '') + '" data-sbquiero>' + (q ? '✓ Prof. Lucas ya sabe' : 'Quiero sumarme') + '</button>' +
+      '<span class="mvsub">' + (q ? 'Te va a proponer un grupo en tu horario. Queda entre vos y tu profe.' : 'Se lo decimos a tu profe. No lo ve ningún otro socio.') + '</span></span>');
+  }
+  function sbRender(){
+    const c = $('#sbCuerpo'); if (!c) return;
+    const e = SOC_B;
+    c.innerHTML = e === 'sin' ? sbSin() + sbTrae(true) + sbEventos()
+      : e === 'primer' ? sbEncuentro('primer') + sbPresenta() + sbCab('primer') + sbGente('primer') + sbLogros('primer') + sbAcciones('primer') + sbTrae(false) + sbEventos()
+      : sbCab('con') + sbEncuentro('con') + sbGente('con') + sbLogros('con') + sbAcciones('con') + sbTrae(false) + sbEventos();
+  }
+  function sbHoja(html){ $('#sbHojaIn').innerHTML = html; $('#sbHoja').hidden = false; }
+  const sbPie = (attr, txt) => '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-sbx type="button">Cerrar</button><button class="btn sm" ' + attr + ' type="button">' + txt + '</button></div>';
+  function sbFoto(){
+    sbHoja('<span class="mtitle sig"><b>La foto</b> <i>del grupo</i></span>' + mvFoto(['#07b0f2','#f400a0'], ['Encuentro ' + SB_G.enc, SB_G.nom.join(' ')], SB_G.sede + ' · ' + SB_G.diaL, true) +
+      '<span class="small muted" style="line-height:1.45">Sale con el marco de VIVA y no se guarda en Vivapp. Antes de compartirla, que estén de acuerdo todos los que salen.</span>' +
+      '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-sbcomp="wa" type="button">Al WhatsApp</button><button class="btn sm" data-sbcomp="ig" type="button">A tu Instagram</button></div>' +
+      '<button class="btn ghost sm" data-sbx type="button">Cerrar</button>');
+  }
+  function sbTraeHoja(){
+    sbHoja('<span class="mtitle sig"><b>Traé</b> <i>a alguien</i></span><span class="muted" style="line-height:1.45">Le mandás por WhatsApp una invitación de Viva para venir a entrenar con vos.</span>' +
+      sbPie('data-sbinv', 'Invitar'));
+  }
+  $('#socialB').addEventListener('click', e => {
+    const q = s => e.target.closest(s), cerrar = () => { $('#sbHoja').hidden = true; };
+    let b;
+    if ((b = q('[data-sbvoy]'))) { const k = b.dataset.sbvoy; SB.voy[SOC_B] = k; sbRender();
+      toast(k === 'voy' ? '¡Vamos! Te esperan el ' + SB_G.diaL + ' a las 19' : 'Listo, tu profe ya sabe. Te esperan en el próximo'); return; }
+    if (q('[data-sbquiero]')) { SB.quiero = !SB.quiero; sbRender(); toast(SB.quiero ? 'Le avisamos a Prof. Lucas que querés sumarte' : 'Listo, no le avisamos nada'); return; }
+    if ((b = q('[data-sbanot]'))) { const id = b.dataset.sbanot, ev = MV_VIENE.find(x => x.id === id); SB.anot[id] = !SB.anot[id]; sbRender();
+      toast(SB.anot[id] ? 'Te anotaste a ' + ev.t + ' · ' + ev.dia + ' ' + ev.hora : 'Te bajaste de ' + ev.t); return; }
+    if (q('[data-sbwa]')) { toast('Se abre el WhatsApp de ' + SB_G.nom.join(' ')); return; }
+    if (q('[data-sbfoto]')) { sbFoto(); return; }
+    if (q('[data-sbtrae]')) { sbTraeHoja(); return; }
+    if (q('[data-sbinv]')) { cerrar(); toast('Elegí a quién mandarle la invitación'); return; }
+    if ((b = q('[data-sbcomp]'))) { cerrar(); toast(b.dataset.sbcomp === 'ig' ? 'Lista para tu historia de Instagram' : 'Lista para mandar al WhatsApp del grupo'); return; }
+    if (e.target.id === 'sbHoja' || q('[data-sbx]')) cerrar();
+  });
+  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : 'Social'; }
