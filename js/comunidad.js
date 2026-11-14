@@ -331,7 +331,7 @@
   // encuentros cumplidos y desafío del mes, entradas de EVO de noche (solo totales del grupo) · eventos, los que carga marketing · referidos, lo que Viva ya registra.
   // Piso: ninguna pantalla muestra presencia, horario ni kilos de otro socio; "van N" es un número, sin quién; la app no cuenta ausencias;
   // nada de lo que un socio escribe o fotografía queda guardado para que otro lo vea (la charla vive en su WhatsApp; la foto sale y no se guarda).
-  var SOC_V = 'A', SOC_B = 'con';
+  var SOC_V = 'B', SOC_B = 'con';   // la B abre por defecto (Juanjo, 14/11)
   var SB = { voy:{ primer:null, con:'voy' }, quiero:false, anot:{} };
   const SB_G = { nom:['Los del', 'jueves'], dia:'JUE', diaL:'jueves', hora:'19:00', sede:'Sarmiento', que:'Funcional en equipo', van:{ primer:4, con:3 }, enc:12, des:[38, 60],
     gente:[['Vos', MV_YO], ['Sofi', ['#c08a3a','#33230c']], ['Ramiro', ['#5a7aa8','#141e2e']], ['Cami', ['#8a4f9a','#22102c']], ['Nico', ['#3a8a7a','#0e2a24']], ['Juli', ['#a0603a','#301a0c']]] };
