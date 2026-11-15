@@ -5,7 +5,7 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
   let modo = 'socio';
-  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','socialB','plan'];
+  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','socialB','socialC','plan'];
   let curScr = 'login', prevScr = 'login';
 
 //#bloque 015
@@ -34,12 +34,12 @@
     $('#nav2').hidden = !ppuIds.includes(id);
     if (withNav.includes(id)) modo = 'socio'; if (ppuIds.includes(id)) modo = 'ppu';
     $$('#nav2 button').forEach(b => { if (b.dataset.go === id) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
-    $$('#nav button').forEach(b => { if (b.dataset.go === (['progreso','clases','rutinas','ia','entrenando'].includes(id) ? 'hoy' : id === 'muralScr' ? 'inicio' : id === 'socialB' ? 'social' : id)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+    $$('#nav button').forEach(b => { if (b.dataset.go === (['progreso','clases','rutinas','ia','entrenando'].includes(id) ? 'hoy' : id === 'muralScr' ? 'inicio' : /^social[BC]$/.test(id) ? 'social' : id)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
     const body = $('#'+id+' .body'); if (body) body.scrollTop = 0;
     if (id === 'entrenando') startClock();
     if (id === 'inicio' && typeof semMarcarVisto === 'function') semMarcarVisto();
     if (typeof renderAcc === 'function' && typeof MOM !== 'undefined') { renderAcc(); avisosLater(); }
-    $('.app').dataset.scr = id; if (typeof deudaFranja === 'function') deudaFranja(); if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy(); if (id === 'progreso') renderProg(); if (id === 'social' && typeof muralRender === 'function') muralRender(); if (id === 'socialB' && typeof sbRender === 'function') sbRender();
+    $('.app').dataset.scr = id; if (typeof deudaFranja === 'function') deudaFranja(); if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy(); if (id === 'progreso') renderProg(); if (id === 'social' && typeof muralRender === 'function') muralRender(); if (id === 'socialB' && typeof sbRender === 'function') sbRender(); if (id === 'socialC' && typeof scRender === 'function') scRender();
   }
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }

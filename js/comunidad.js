@@ -421,4 +421,185 @@
     if ((b = q('[data-sbcomp]'))) { cerrar(); toast(b.dataset.sbcomp === 'ig' ? 'Lista para tu historia de Instagram' : 'Lista para mandar al WhatsApp del grupo'); return; }
     if (e.target.id === 'sbHoja' || q('[data-sbx]')) cerrar();
   });
-  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : 'Social'; }
+  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : 'Social'; }
+//#bloque 227
+  // ===== T22 · Social VIVA, versión C: En sincro (v101) =====
+  // Hilo conductor (Juanjo, 15/11): tu ritmo, cuando se acopla con el de otros. Versiones Social (panel, bloque 345 de demo.js) elige A, B o C.
+  // Estados: solo (socio nuevo) · dupla (con Cris) · grupo (Los del jueves, 12 fechas) · flow (16 fechas, 5 seguidas). Todo simulado.
+  // El pulso: una celda por semana (las últimas 8) con la celda de fila de Inicio (eqCeldaFila). Encendida = esa semana hubo sincro
+  // (la fecha del grupo se hizo, o los dos de la dupla cumplieron su semana); la semana en curso, borde cian; sin contador de faltas.
+  // Es del grupo o de la dupla: nunca de una persona, nunca dice quién. Con 4 seguidas, el espectro (único uso en la sección: espectro = Flow).
+  // En real: grupos, duplas y fechas, base de Vivapp y el tablero del profe · Voy / No llego, declarado · fechas cumplidas, semanas en sincro y
+  // meta del desafío, entradas de EVO confirmadas de noche, guardadas solo como total del grupo o de la dupla · Anfitrión: antigüedad y VIVA Flow
+  // (lo que ya calcula Tu ritmo), lo ve solo el profe y la invitación sale de él · eventos, los que carga marketing.
+  // Piso: ninguna pantalla muestra presencia, horario ni el ritmo de otro socio; la app no cuenta ausencias; nada que un socio escriba o
+  // fotografíe queda guardado para que otro lo vea; menores sin WhatsApp ni foto hacia afuera.
+  var SC = { e:'grupo', mes:false, anf:false, tab:'Sincro', voy:'voy', quiero:false, primer:false, anot:{}, anfR:null, contar:'cartel' };
+  const SC_TABS = ['Sincro', 'En VIVO', 'Juntos', 'Social'];
+  const SC_DUO = { n:'Cris', c:['#3a8a7a','#0e2a24'], sem:7, pulso:[1, 1, 0, 1, 1, 1, 1] };   // 7 semanas anteriores; la octava es la en curso
+  const SC_G = { grupo:{ fechas:12, pulso:[1, 1, 1, 0, 1, 1, 1], des:[14, 20] }, flow:{ fechas:16, pulso:[1, 0, 1, 1, 1, 1, 1], des:[17, 20] } };
+  const SC_OTRO = { nom:'Las de las 7', des:[13, 18] };   // el cruce del mes: el otro grupo, en % de su propia meta
+  const SC_SEDE = [['Las de', 'las 7'], ['Los', 'madrugadores'], ['Team', 'sábado'], ['Los del', 'mediodía'], ['Las', 'imparables']];
+  const scMenor = () => typeof esMenor === 'function' && esMenor();
+  const scSeguidas = p => { let n = 0; for (let i = p.length - 1; i >= 0 && p[i]; i--) n++; return n; };
+  const scFirma = (b, i) => '<span class="mvfirma sig"><b>' + b + '</b> <i>' + i + '</i></span>';
+  var scUid = 0;
+  // El pulso: la fila de celdas de Tu mes (Inicio). prev = semanas anteriores (1 encendida, 0 vacía); cur = la semana en curso.
+  function scPulso(prev, cur, flow, lbl){
+    const N = prev.length + 1, W = 300, H = 24, GP = 7, sw = (W - GP * (N - 1)) / N, id = 'scp' + (++scUid), L = eqLuz(1), F = flow ? 'url(#' + id + 'f)' : 'var(--dat)';
+    let g = '<defs><filter id="' + id + '" filterUnits="userSpaceOnUse" x="-20" y="-20" width="' + (W + 40) + '" height="' + (H + 40) + '"><feGaussianBlur stdDeviation="2.6"/></filter>' +
+      (flow ? '<linearGradient id="' + id + 'f" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="' + W + '" y2="0"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient>' : '') + '</defs>' +
+      '<rect class="rl-slot" x="-4" y="-4" width="' + (W + 8) + '" height="' + (H + 8) + '" rx="6"/>';
+    prev.concat([cur]).forEach((on, i) => { const x = i * (sw + GP);
+      g += eqCeldaFila(x, 0, sw, H, !!on, on ? F : 'var(--muted)', L, id);
+      if (i === N - 1) g += '<rect x="' + (x - 2.5).toFixed(1) + '" y="-2.5" width="' + (sw + 5).toFixed(1) + '" height="' + (H + 5) + '" rx="4" fill="none" stroke="var(--lime)" stroke-width="2"/>'; });
+    return '<div class="scpulso"><svg class="scpsvg" viewBox="-8 -8 ' + (W + 16) + ' ' + (H + 16) + '" preserveAspectRatio="none" role="img" aria-label="' + lbl + '">' + g + '</svg>' +
+      '<span class="scpie"><span>hace 8 semanas</span><span>esta semana</span></span></div>';
+  }
+  // Tu ritmo en chico: el mismo dial de Inicio (copia de #formaViz con sus id renombrados para no chocar con los de Inicio).
+  function scDial(){ const f = $('#formaViz'); if (!f || !f.innerHTML) return '';
+    return f.innerHTML.replace(/id="(n[fv]\w*)"/g, 'id="sc$1"').replace(/#(n[fv]\w*)/g, '#sc$1'); }
+  // El cartel del grupo: el neón del mural (tapiz + neonTxt de Progreso), con filtros propios para no depender de otra pantalla.
+  const scMgDefs = u => '<defs><filter id="' + u + 'B1" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feGaussianBlur stdDeviation="1.6"/></filter><filter id="' + u + 'B2" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feGaussianBlur stdDeviation="5"/></filter>' +
+    '<filter id="' + u + 'B3" filterUnits="userSpaceOnUse" x="-400" y="-240" width="800" height="480"><feGaussianBlur stdDeviation="11"/></filter><filter id="' + u + 'H" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feMorphology operator="dilate" radius="1.6"/><feGaussianBlur stdDeviation="3.5"/></filter></defs>';
+  const scNeon = (u, txt, col, fs, ls) => neonTxt(txt.toUpperCase(), col, fs, { white:true, ls:ls }).replace(/url\(#mg(B\d|H)\)/g, 'url(#' + u + '$1)');
+  function scCartelSvg(nom, W, H){
+    const u = 'scmg' + (++scUid), k = W / 300;
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + scMgDefs(u) + tapiz(W, H, 17) +
+      '<g transform="translate(' + W / 2 + ' ' + (H / 2 - 22 * k).toFixed(1) + ')">' + scNeon(u, nom[0], NEON.cian, 26 * k, 3) + '</g>' +
+      '<g transform="translate(' + W / 2 + ' ' + (H / 2 + 20 * k).toFixed(1) + ')">' + scNeon(u, nom[1], NEON.mag, 40 * k, 2) + '</g></svg>';
+  }
+  function scSedeSvg(){
+    const W = 640, H = 360, u = 'scmg' + (++scUid), L = (SC.mes ? [SB_G.nom] : []).concat(SC_SEDE).slice(0, 6);
+    let g = scMgDefs(u) + tapiz(W, H, 23) + '<g transform="translate(' + W / 2 + ' 42)">' + scNeon(u, 'En sincro', NEON.cian, 26, 6) + '</g>' +
+      '<text x="' + W / 2 + '" y="82" text-anchor="middle" font-family="Archivo, Arial Narrow, sans-serif" font-size="14" font-weight="700" letter-spacing="4" fill="#fff" opacity=".7">LOS GRUPOS DE SARMIENTO</text>';
+    L.forEach((n, i) => { const fila = Math.floor(i / 3), enFila = Math.min(3, L.length - fila * 3), cx = W / (2 * enFila) * (1 + 2 * (i % 3)), cy = 160 + fila * 118;
+      g += '<g transform="translate(' + cx.toFixed(1) + ' ' + (cy - 17) + ')">' + scNeon(u, n[0], NEON.cian, 17, 2) + '</g><g transform="translate(' + cx.toFixed(1) + ' ' + (cy + 15) + ')">' + scNeon(u, n[1], NEON.mag, 23, 1) + '</g>'; });
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="La pantalla de la sede: ' + L.map(n => n.join(' ')).join(', ') + '">' + g + '</svg>';
+  }
+  function scSedeAbrir(){ $('#scTv').innerHTML = scSedeSvg(); $('#scSede').hidden = false; }
+  function scCartelAbrir(){
+    $('#cartelWall').innerHTML = scCartelSvg(SB_G.nom, 340, 190);
+    $('#cartelTag').innerHTML = '<span>¡Mes del grupo!</span>';
+    $('#cartelTxt').textContent = SB_G.nom.join(' ') + ' hicieron su fecha tres semanas este mes. El cartel va a Tu mural de cada uno de los seis.';
+    $('#cartelBen').hidden = true; $('#cartelMural').hidden = true;
+    $('#cartelOv').dataset.ev = 'grupo'; $('#cartelOv').hidden = false;
+  }
+  $('#cartelX').addEventListener('click', () => { $('#cartelMural').hidden = false; });
+  $('#cartelShare').addEventListener('click', () => { if ($('#cartelOv').dataset.ev !== 'grupo') return; $('#cartelOv').hidden = true; $('#cartelMural').hidden = false; go('socialC'); scContar('grupo'); });
+  // La invitación de anfitrión: sale del profe (que la ve en su tablero por antigüedad y VIVA Flow sostenido), no de la app.
+  function scAnf(){
+    if (!SC.anf || SC.e === 'solo' || SC.anfR === 'no') return '';
+    if (SC.anfR === 'si') return '<div class="card" style="gap:10px">' + sbProfe('Tu profe') + '<span style="line-height:1.45">✓ Le dijiste que sí. Prof. Lucas te escribe antes del próximo primer jueves.</span></div>';
+    return '<div class="card" style="gap:12px">' + sbProfe('Tu profe te invita') + '<span style="line-height:1.45">Martina, hace meses que venís firme. ¿Me ayudás a recibir a los nuevos en el primer jueves? Es entrenar con ellos esa hora.</span>' +
+      '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-scanf="no">Ahora no</button><button class="btn sm" data-scanf="si">Acepto</button></div></div>';
+  }
+  const scQuiero = () => '<div class="list"><div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">Quiero sumarme a un grupo</span>' +
+    '<span class="small muted">' + (SC.quiero ? 'Prof. Lucas ya sabe. Queda entre vos y tu profe.' : 'Se lo decimos a tu profe. No lo ve otro socio.') + '</span></span>' +
+    '<button class="btn sm' + (SC.quiero ? ' ghost' : '') + '" data-scquiero>' + (SC.quiero ? '✓ Avisado' : 'Quiero') + '</button></div></div>';
+  const scEventos = () => '<div class="stack" style="gap:12px"><span class="lbl">Lo que viene en Viva</span><div class="list">' +
+    MV_VIENE.filter(e => e.k === 'Evento').map(e => { const on = !!SC.anot[e.id];
+      return '<div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + e.dia + ' ' + e.hora + ' · ' + e.t + '</span>' +
+        '<span class="small muted">' + e.donde + ' · ' + (e.n + (on ? 1 : 0)) + ' anotados</span></span><button class="btn sm' + (on ? ' ghost' : '') + '" data-scanot="' + e.id + '">' + (on ? '✓ Anotado' : 'Me anoto') + '</button></div>'; }).join('') + '</div></div>';
+  function scSolo(){
+    const p = SC.primer;
+    return '<div class="card" style="gap:14px"><span class="mvk">Tu ritmo</span><div class="fwrap scdial">' + scDial() + '</div>' +
+        '<span class="stack" style="gap:6px">' + scFirma('Tu ritmo', 'va solo') + '<span class="small muted" style="font-size:14px">¿Lo sumás a otro?</span></span></div>' +
+      mvPos('c', '<span class="mvk">Tu primer jueves · ' + SB_G.sede + '</span>' +
+        '<span class="stack" style="gap:8px"><span class="mvbig"><span class="mvfirma sig"><i>' + SB_G.dia + '</i></span><span class="mvnum">' + SB_G.hora + '</span></span>' +
+        '<span class="mvsub">Prof. Lucas recibe a los que arrancaron esta semana y entrenan juntos. Funcional, 50 minutos.</span></span>' +
+        '<span class="stack" style="gap:10px"><button class="btn' + (p ? ' ghost' : '') + '" data-scprimer>' + (p ? '✓ Anotado' : 'Me anoto') + '</button>' +
+        '<span class="mvsub">' + (p ? 'Te espera en la entrada de la sala.' : 'Esta semana arrancan 5.') + '</span></span>') +
+      (scMenor() ? '' : mvPos('m', '<span class="mvk">Vení con alguien</span>' + scFirma('Traé', 'a alguien') +
+        '<span class="stack" style="gap:10px"><span class="mvsub">Si viene, arrancan en dupla: cada uno con su meta, y la semana se enciende cuando cumplen los dos.</span><button class="btn ghost" data-sctrae>Invitar por WhatsApp</button></span>')) +
+      scQuiero() + scEventos();
+  }
+  function scDupla(){
+    const d = SC_DUO, cur = semCumplida(), n = d.sem + (cur ? 1 : 0), f = Math.max(1, semMetas().vis - WK.vis);
+    return scAnf() + mvPos('m', '<div class="mvcab"><span class="mvduo"><span class="av sm" style="background:' + grad(MV_YO) + '">M</span><span class="av sm" style="background:' + grad(d.c) + '">' + inicial(d.n) + '</span></span>' +
+        '<span class="stack" style="gap:0;flex:1;min-width:0"><span class="mvk">Tu dupla</span><span class="small muted">La ven ustedes dos</span></span></div>' +
+        scFirma('En sincro', 'con ' + d.n) +
+        scPulso(d.pulso, cur, false, 'El pulso de la dupla: una marca por cada semana en que cumplieron los dos') +
+        '<span class="mvbig"><span class="mvnum">' + n + '</span>' + scFirma('semanas', 'en sincro') + '</span>' +
+        '<span class="mvsub">' + (cur ? 'Esta semana ya están en sincro ⚡' : 'Esta semana, en marcha: se enciende cuando cumplan los dos, cada uno con su meta. Con ' + f + (f === 1 ? ' entrenamiento más tuyo' : ' entrenamientos más tuyos') + ', estás.') + '</span>' +
+        (scMenor() ? '' : '<button class="btn" data-sccontar="dupla">Contalo</button>')) +
+      scQuiero() + scEventos();
+  }
+  const scDesafio = g => '<div class="card" style="gap:10px"><span class="between"><span style="font-weight:700">Desafío del mes</span><span class="small muted">' + g.des[0] + ' de ' + g.des[1] + '</span></span>' +
+    '<span class="bar" data-n="10"><i style="width:' + Math.round(g.des[0] / g.des[1] * 100) + '%"></i></span><span class="small muted" style="line-height:1.4">Semanas cumplidas de todo el grupo, sumadas: cada uno con su meta. La meta es del grupo y se llena entre todos.</span></div>';
+  function scCruce(g){
+    const row = (nom, d, yo) => { const p = Math.round(d[0] / d[1] * 100);
+      return '<span class="stack" style="gap:6px"><span class="between"><span style="font-weight:700">' + nom + '</span><span class="small muted">' + p + ' % de su meta</span></span>' +
+        '<span class="bar' + (yo ? '' : ' scotro') + '" data-n="10"><i style="width:' + p + '%"></i></span></span>'; };
+    return '<div class="card" style="gap:14px"><span class="mvk">El cruce del mes</span>' + row(SB_G.nom.join(' '), g.des, true) + row(SC_OTRO.nom, SC_OTRO.des, false) +
+      '<span class="small muted" style="line-height:1.4">Dos grupos, cada uno contra su propia meta del mes. Llega más lejos el que más llena la suya.</span></div>';
+  }
+  function scGrupo(){
+    const g = SC_G[SC.e], flow = scSeguidas(g.pulso) >= 4, v = SC.voy, van = 3 + (v === 'voy' ? 1 : 0);
+    const op = (k, t) => '<button class="opt" data-scvoy="' + k + '" aria-pressed="' + (v === k) + '">' + t + '</button>';
+    const hit = [4, 12, 24].map(h => '<span class="sbhito' + (g.fechas >= h ? ' on' : '') + '">' + h + '</span>').join('<i class="sbhl"></i>');
+    return scAnf() +
+      '<div class="stack" style="gap:12px"><span class="mvk">Tu grupo' + (flow ? ' · En Flow' : '') + '</span>' + scFirma(SB_G.nom[0], SB_G.nom[1]) + sbProfe('Lo convoca · ' + SB_G.sede) + '</div>' +
+      mvPos('c', '<span class="mvk">Próxima fecha · ' + SB_G.sede + '</span>' +
+        '<span class="stack" style="gap:8px"><span class="mvbig"><span class="mvfirma sig"><i>' + SB_G.dia + '</i></span><span class="mvnum">' + SB_G.hora + '</span></span><span class="mvsub">' + SB_G.que + ', con Prof. Lucas</span></span>' +
+        '<span class="stack" style="gap:10px"><div class="opts g2">' + op('voy', 'Voy') + op('no', 'No llego') + '</div>' +
+        '<span class="mvsub">' + (v === 'voy' ? 'Vamos ' + van : 'Van ' + van) + (v === 'no' ? ' · esta vez no llegás: lo sabe tu profe' : '') + '</span></span>') +
+      mvPos(flow ? 'f' : 'm', '<span class="mvk">El pulso del grupo' + (flow ? ' · En Flow' : '') + '</span>' +
+        scPulso(g.pulso, 0, flow, 'El pulso del grupo: una marca por cada semana con fecha') +
+        '<span class="mvbig"><span class="mvnum">' + g.fechas + '</span>' + scFirma('fechas', 'juntos') + '</span>' +
+        '<div class="sbhitos">' + hit + '</div>' +
+        '<span class="mvsub">' + (flow ? scSeguidas(g.pulso) + ' semanas seguidas con fecha: el grupo está en Flow. ' : '') + 'Se enciende cada semana que el grupo hace su fecha.</span>') +
+      (SC.mes ? mvPos('m', '<span class="mvk">El mes del grupo</span><button class="sccartel" data-sccartel aria-label="Ver el cartel de ' + SB_G.nom.join(' ') + '">' + scCartelSvg(SB_G.nom, 300, 150) + '</button>' +
+          '<span class="stack" style="gap:6px">' + scFirma('Mes del grupo', 'cumplido') + '<span class="mvsub">Tres semanas con fecha este mes. El cartel va a Tu mural de cada uno de los seis.</span></span>')
+        : '<div class="card" style="gap:8px"><span class="mvk">El mes del grupo</span><span style="font-weight:700">Van 2 de 3 semanas con fecha</span><span class="small muted" style="line-height:1.4">Con la tercera, el grupo enciende su cartel y va a Tu mural de cada uno.</span></div>') +
+      (SC.e === 'flow' ? scCruce(g) : scDesafio(g)) +
+      (scMenor() ? '<span class="mvdef">Los cambios de la fecha te los avisa tu profe.</span>'
+        : '<div class="stack" style="gap:10px"><button class="btn" data-scfoto>' + SB_CAM + 'La foto de la fecha</button>' +
+          '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-scwa>' + SB_WA + 'Su WhatsApp</button><button class="btn ghost sm" data-sccontar="grupo">Contalo a tu grupo</button></div></div>') +
+      '<div class="stack" style="gap:12px"><span class="lbl">Son 6</span><div class="sbint">' +
+        SB_G.gente.map(q => '<span class="sbper"><span class="av sm" style="background:' + grad(q[1]) + '">' + (q[0] === 'Vos' ? 'M' : inicial(q[0])) + '</span><span class="small">' + q[0] + '</span></span>').join('') + '</div></div>' +
+      scEventos();
+  }
+  function scRender(){
+    const c = $('#scCuerpo'); if (!c) return;
+    c.innerHTML = SC.e === 'solo' ? scSolo() : SC.e === 'dupla' ? scDupla() : scGrupo();
+  }
+  function scHoja(html){ $('#scHojaIn').innerHTML = html; $('#scHoja').hidden = false; }
+  const scSale = (a, b) => '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-sccomp="wa" type="button">' + a + '</button><button class="btn sm" data-sccomp="ig" type="button">' + b + '</button></div><button class="btn ghost sm" data-scx type="button">Cerrar</button>';
+  function scContar(k){
+    if (k === 'dupla') { const n = SC_DUO.sem + (semCumplida() ? 1 : 0);
+      return scHoja('<span class="mtitle sig"><b>Contalo</b> <i>a tu dupla</i></span>' +
+        mvPos('m', '<span class="mvk">' + SC_DUO.n + ' y vos · ' + miSede + '</span><span class="mvbig"><span class="mvnum">' + n + '</span>' + scFirma('semanas', 'en sincro') + '</span><span class="mvsub">Cada uno con su meta, los dos cumplieron.</span>') +
+        '<span class="small muted" style="line-height:1.45">Sale con el marco de VIVA y no se guarda en Vivapp.</span>' + scSale('Al WhatsApp de los dos', 'A tu historia')); }
+    if (!SC.mes) SC.contar = 'ficha';
+    const fa = typeof semAcum === 'function' ? semAcum() : 0;
+    const op = (v, t, s) => '<button class="opt" data-sccq="' + v + '" aria-pressed="' + (SC.contar === v) + '">' + t + '<small>' + s + '</small></button>';
+    scHoja('<span class="mtitle sig"><b>Contalo</b> <i>a tu grupo</i></span><span class="muted" style="line-height:1.45">Sale al WhatsApp de ' + SB_G.nom.join(' ') + ', si querés. En Vivapp no queda nada.</span>' +
+      '<div class="opts g2">' + (SC.mes ? op('cartel', 'El cartel del grupo', 'Mes del grupo cumplido') : '') + op('ficha', 'Tu ficha', fa === 1 ? '1 semana cumplida' : fa + ' semanas cumplidas') + '</div>' +
+      '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-scx type="button">Cerrar</button><button class="btn sm" data-sccomp="wa" type="button">Al WhatsApp del grupo</button></div>');
+  }
+  function scFoto(){ const g = SC_G[SC.e] || SC_G.grupo;
+    scHoja('<span class="mtitle sig"><b>La foto</b> <i>de la fecha</i></span>' + mvFoto(['#07b0f2','#f400a0'], ['Fecha ' + g.fechas, SB_G.nom.join(' ')], SB_G.sede + ' · ' + SB_G.diaL, true) +
+      '<span class="small muted" style="line-height:1.45">Tu foto de fondo y el dato como sticker. Sale y no se guarda en Vivapp. Si sale alguien más, que esté de acuerdo.</span>' + scSale('Al WhatsApp del grupo', 'A tus historias'));
+  }
+  $('#socialC').addEventListener('click', e => {
+    const q = s => e.target.closest(s), cerrar = () => { $('#scHoja').hidden = true; };
+    let b;
+    if ((b = q('[data-scvoy]'))) { SC.voy = b.dataset.scvoy; scRender(); toast(SC.voy === 'voy' ? '¡Vamos! Te esperan el ' + SB_G.diaL + ' a las 19' : 'Listo, tu profe ya sabe. Te esperan en la próxima'); return; }
+    if (q('[data-scprimer]')) { SC.primer = !SC.primer; scRender(); toast(SC.primer ? 'Te anotaste al primer jueves · 19 h' : 'Te bajaste del primer jueves'); return; }
+    if (q('[data-scquiero]')) { SC.quiero = !SC.quiero; scRender(); toast(SC.quiero ? 'Le avisamos a Prof. Lucas que querés sumarte a un grupo' : 'Listo, no le avisamos nada'); return; }
+    if ((b = q('[data-scanot]'))) { const id = b.dataset.scanot, ev = MV_VIENE.find(x => x.id === id); SC.anot[id] = !SC.anot[id]; scRender();
+      toast(SC.anot[id] ? 'Te anotaste a ' + ev.t + ' · ' + ev.dia + ' ' + ev.hora : 'Te bajaste de ' + ev.t); return; }
+    if ((b = q('[data-scanf]'))) { SC.anfR = b.dataset.scanf; scRender(); toast(SC.anfR === 'si' ? 'Le avisamos a Prof. Lucas que aceptás' : 'Listo, se lo decimos a tu profe'); return; }
+    if (q('[data-scwa]')) { toast('Se abre el WhatsApp de ' + SB_G.nom.join(' ')); return; }
+    if (q('[data-scfoto]')) { scFoto(); return; }
+    if (q('[data-sctrae]')) { scHoja('<span class="mtitle sig"><b>Traé</b> <i>a alguien</i></span><span class="muted" style="line-height:1.45">Le mandás por WhatsApp una invitación de Viva para venir a entrenar con vos. Si viene, arrancan en dupla.</span>' +
+      '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-scx type="button">Cerrar</button><button class="btn sm" data-scinv type="button">Invitar</button></div>'); return; }
+    if (q('[data-scinv]')) { cerrar(); toast('Elegí a quién mandarle la invitación'); return; }
+    if ((b = q('[data-sccontar]'))) { scContar(b.dataset.sccontar); return; }
+    if ((b = q('[data-sccq]'))) { SC.contar = b.dataset.sccq; scContar('grupo'); return; }
+    if ((b = q('[data-sccomp]'))) { cerrar(); toast(b.dataset.sccomp === 'ig' ? 'Lista para tu historia de Instagram' : 'Lista para mandar al WhatsApp'); return; }
+    if (q('[data-sccartel]')) { scCartelAbrir(); return; }
+    if (q('[data-scsedex]')) { $('#scSede').hidden = true; return; }
+    if (e.target.id === 'scHoja' || q('[data-scx]')) cerrar();
+  });

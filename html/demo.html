@@ -184,6 +184,21 @@
       <div class="dmrow" id="socBRow"><span class="dmk">El socio de la demo, en la B</span>
         <div class="opts g3" id="socBPick"><button class="opt" data-socb="sin" aria-pressed="false">Sin grupo</button><button class="opt" data-socb="primer" aria-pressed="false">Primer encuentro</button><button class="opt" data-socb="con" aria-pressed="true">Con grupo<small>12 encuentros</small></button></div>
         <span class="dmayu" id="socBTxt"></span></div>
+      <div class="stack" id="socCRow" style="gap:14px" hidden>
+        <div class="dmrow"><span class="dmk">El socio de la demo, en la C</span>
+          <div class="opts g2" id="socCPick"><button class="opt" data-socc="solo" aria-pressed="false">Solo<small>socio nuevo</small></button><button class="opt" data-socc="dupla" aria-pressed="false">En dupla<small>con Cris</small></button><button class="opt" data-socc="grupo" aria-pressed="true">En grupo<small>12 fechas</small></button><button class="opt" data-socc="flow" aria-pressed="false">Grupo en Flow<small>16 fechas</small></button></div>
+          <span class="dmayu" id="socCTxt"></span></div>
+        <div class="dmrow"><span class="dmk">Mes del grupo</span>
+          <div class="opts g2"><button class="opt" data-sccmes="0" aria-pressed="true">Van 2 de 3</button><button class="opt" data-sccmes="1" aria-pressed="false">Cumplido<small>enciende el cartel</small></button></div></div>
+        <div class="dmrow"><span class="dmk">Anfitrión</span>
+          <div class="opts g2"><button class="opt" data-sccanf="0" aria-pressed="true">No</button><button class="opt" data-sccanf="1" aria-pressed="false">Su profe lo invita<small>antigüedad y VIVA Flow</small></button></div>
+          <span class="dmayu">Con dupla o grupo: al socio nuevo no le llega.</span></div>
+        <div class="dmrow"><span class="dmk">Nombre de la pestaña (prueba de 5 segundos)</span>
+          <div class="opts g2"><button class="opt" data-scctab="Sincro" aria-pressed="true">Sincro</button><button class="opt" data-scctab="En VIVO" aria-pressed="false">En VIVO</button><button class="opt" data-scctab="Juntos" aria-pressed="false">Juntos</button><button class="opt" data-scctab="Social" aria-pressed="false">Social</button></div></div>
+        <div class="dmrow"><span class="dmk">La pantalla de la sede</span>
+          <button class="btn ghost sm" id="socCSede" type="button">Ver los carteles en la pantalla del gimnasio</button>
+          <span class="dmayu">Solo los nombres de los grupos con su mes cumplido: sin fotos ni personas.</span></div>
+      </div>
       <div class="stack" data-socnota="A" style="gap:8px"><span class="dmk">Mural VIVA: lo que falta definir</span>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Con marketing, el 20/11:</b> el nombre de la sección (Mural VIVA o En VIVO) · cómo se suma a un amigo ("¿Entrenamos?" o "Sumar a mi mural") · "Fit" como nombre del aplauso · quién ve una publicación si el socio no elige (la propuesta es sus amigos; "Público" es dentro de Viva).</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Con el dueño:</b> otras personas en la foto y el rincón de los vestuarios · menores de 18 (fotos, mensajes y People; hoy no tienen "Público") · quién modera el mural y quién responde los mensajes a Viva · si "conocer gente" sigue, cambia o espera.</p>
@@ -193,6 +208,13 @@
       <p class="small muted" style="margin:0;line-height:1.5"><b>Lo que no está, a propósito:</b> muro de fotos, comentarios, mensajes entre socios, perfiles, contadores y rankings de personas. Moderación: cero (la columna verde de la matriz de riesgos). "Van 4" es un número: nadie ve quién dijo Voy o No llego, y la app no cuenta ausencias.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Detrás (no se construye acá):</b> el profe ve en su tablero a los nuevos sin grupo (edad, fecha de alta, "quiero sumarme") y la salud de cada grupo (encuentros cumplidos). Un encuentro cumplido y el desafío del mes se verifican con las entradas de EVO, de noche, y solo se muestran como total del grupo.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Con el dueño:</b> quién convoca los grupos (los profes) y cuánto tiempo les lleva · menores: sin WhatsApp con adultos ni foto hacia afuera hasta el abogado (con Etapa Menor, la B ya lo muestra así) · si "conocer gente" espera o entra como versión C.</p></div>
+      <div class="stack" data-socnota="C" style="gap:8px" hidden><span class="dmk">En sincro: lo que falta definir</span>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Con marketing y la prueba de 5 segundos:</b> el nombre de la pestaña (Sincro · En VIVO · Juntos · Social, arriba) y la palabra para el grupo ("grupo" o "banda"). "Tribu", "cacique" y "ritual" son palabras de trabajo: no van en pantalla.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Lo decide Juanjo navegándola:</b> si "Grupo en Flow" y el cruce del mes quedan (son mecánicas nuevas) · si la dupla puede ser con alguien de otra sede.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>El pulso:</b> una celda por semana, de las últimas 8, encendida si esa semana hubo sincro (la fecha del grupo se hizo, o los dos de la dupla cumplieron cada uno su meta). Es del grupo o de la dupla: nunca de una persona ni dice quién. Las semanas sin sincro quedan vacías, sin contador.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Lo que no está, a propósito:</b> mural de fotos, comentarios, mensajes entre socios, perfiles, presencia, rankings de personas y "conocer gente" (espera al dueño). "Vamos 4" es un número, sin quién. Moderación: cero.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Detrás (no se construye acá):</b> el tablero del profe suma la fecha de bienvenida de la sede con sus anotados, las duplas, quién pidió sumarse a un grupo, a quién invitar como anfitrión (antigüedad y VIVA Flow sostenido) y el aviso de que alguien de un grupo se está apagando (con las entradas, no con Tu ritmo). Fechas y semanas en sincro salen de las entradas de EVO, de noche, y se guardan solo como total del grupo o de la dupla.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Con el dueño:</b> las horas de profe (el primer jueves de cada sede y los grupos) · las pantallas de la sede · menores: sin WhatsApp ni foto hacia afuera (con Etapa Menor, la C lo muestra así).</p></div>
     </details>
     <details class="dmdet" data-k="captacion"><summary>Captación</summary>
       <div class="dmrow"><span class="dmk">Primer entrenamiento de la campaña</span>
