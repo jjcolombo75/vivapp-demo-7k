@@ -333,6 +333,7 @@
     d.addEventListener('toggle', () => { (dmMem.pleg = dmMem.pleg || {})[d.dataset.k] = d.open; dmSave(); }); });
   window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC, social:SOC_V, socialB:SOC_B, socialC:SC.e, socialD:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab } }); // para pruebas y T6
   dmSync();
+  $('#dmVer').textContent = 'Versión ' + (window.VK_V || '');
 
 //#bloque 345
   // ===== T21 · Versiones Social: la sección social en versiones completas e intercambiables =====
