@@ -331,7 +331,7 @@
   // Plegado recordado entre visitas (nivel 1 y 2 abiertos, nivel 3 cerrado la primera vez)
   $$('#demoSheet details.dmdet').forEach(d => { if (dmMem.pleg && d.dataset.k in dmMem.pleg) d.open = dmMem.pleg[d.dataset.k];
     d.addEventListener('toggle', () => { (dmMem.pleg = dmMem.pleg || {})[d.dataset.k] = d.open; dmSave(); }); });
-  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC, social:SOC_V, socialB:SOC_B, socialC:SC.e }); // para pruebas y T6
+  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC, social:SOC_V, socialB:SOC_B, socialC:SC.e, socialD:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab } }); // para pruebas y T6
   dmSync();
 
 //#bloque 345
@@ -340,8 +340,11 @@
   const SOC_VERS = [
     ['A', 'Mural VIVA', 'A · El mural para scrollear de T20 (v98), sin cambios: publicaciones, íconos de sección y la cámara flotante.'],
     ['B', 'Los grupos', 'B · Grupos chicos con alguien que los convoca (el profe), un encuentro por semana y nada que moderar. La charla vive en su WhatsApp.'],
-    ['C', 'En sincro', 'C · Tu ritmo, cuando se acopla con el de otros: solo, en dupla o en grupo, con el pulso (una celda por semana en sincro). El idioma de Inicio: ecualizador, neón y Flow.']
+    ['C', 'En sincro', 'C · Tu ritmo, cuando se acopla con el de otros: solo, en dupla o en grupo, con el pulso (una celda por semana en sincro). El idioma de Inicio: ecualizador, neón y Flow.'],
+    ['D', 'La vibra', 'D · Tres bloques: cuándo se ve tu banda, contra quién juega esta semana y lo último que logró, con la cuenta de Viva en Instagram. Pasa algo nuevo cada vez que entrás.']
   ];
+  const SOC_DE = { sin:['Sin banda', 'El que entrena solo: Traé a alguien (con uno ya son banda), Sumame a una banda (se lo decimos a su profe) y La vibra de Viva.'],
+    con:['Con banda', 'Los del jueves: La fecha, El pulso (el cruce de la semana) y La vibra de la banda y de Viva. Mensajes abre WhatsApp.'] };
   const SOC_CE = { solo:['Solo', 'El socio nuevo (pone a la socia en la semana 1 de sus primeras 8): su Tu ritmo en chico, el primer jueves de la sede, Traé a alguien y Quiero sumarme a un grupo.'],
     dupla:['En dupla', 'Con Cris: el pulso de la dupla se enciende la semana en que cumplen los dos, cada uno con su meta. Contalo sale al WhatsApp de los dos.'],
     grupo:['En grupo', 'Los del jueves, 12 fechas: la próxima fecha, el pulso, el mes del grupo, el desafío, la foto, el WhatsApp y Contalo a tu grupo.'],
@@ -350,7 +353,8 @@
     primer:['Primer encuentro', 'Se sumó esta semana: el primer encuentro destacado y la presentación del profe.'],
     con:['Con grupo', '12 encuentros: el próximo encuentro, el grupo, lo que logran juntos, el WhatsApp y la foto del encuentro.'] };
   if (dmMem.soc) { if (SOC_VERS.some(v => v[0] === dmMem.soc.v)) SOC_V = dmMem.soc.v; if (dmMem.soc.b in SOC_BE) SOC_B = dmMem.soc.b;
-    const c = dmMem.soc.c; if (c) { if (c.e in SOC_CE) SC.e = c.e; SC.mes = !!c.mes; SC.anf = !!c.anf; if (SC_TABS.includes(c.tab)) SC.tab = c.tab; } }
+    const c = dmMem.soc.c; if (c) { if (c.e in SOC_CE) SC.e = c.e; SC.mes = !!c.mes; SC.anf = !!c.anf; if (SC_TABS.includes(c.tab)) SC.tab = c.tab; }
+    const d = dmMem.soc.d; if (d) { if (d.e in SOC_DE) SD.e = d.e; if (d.dia in SD_CRUCE) SD.dia = d.dia; if (d.ig === 'ej' || d.ig === 'vivo') SD.ig = d.ig; if (SD_TABS.includes(d.tab)) SD.tab = d.tab; } }
   function socSync(){
     $('#socVPick').innerHTML = SOC_VERS.map(v => '<button class="opt" data-socv="' + v[0] + '" aria-pressed="' + (SOC_V === v[0]) + '">' + v[0] + '<small>' + v[1] + '</small></button>').join('') +
       (SOC_VERS.length < 3 ? '<button class="opt" disabled aria-pressed="false">' + String.fromCharCode(65 + SOC_VERS.length) + '<small>la próxima</small></button>' : '');
@@ -360,10 +364,13 @@
     $('#socCRow').hidden = SOC_V !== 'C'; $('#socCTxt').textContent = SOC_CE[SC.e][1];
     const pr = (s, v) => $$('#socCRow [' + s + ']').forEach(x => x.setAttribute('aria-pressed', x.getAttribute(s) === v));
     pr('data-socc', SC.e); pr('data-sccmes', SC.mes ? '1' : '0'); pr('data-sccanf', SC.anf ? '1' : '0'); pr('data-scctab', SC.tab);
+    $('#socDRow').hidden = SOC_V !== 'D'; $('#socDTxt').textContent = SOC_DE[SD.e][1];
+    const pd = (s, v) => $$('#socDRow [' + s + ']').forEach(x => x.setAttribute('aria-pressed', x.getAttribute(s) === v));
+    pd('data-socd', SD.e); pd('data-sddia', SD.dia); pd('data-sdig', SD.ig); pd('data-sdtab', SD.tab);
     $$('#demoSheet [data-socnota]').forEach(n => n.hidden = n.dataset.socnota !== SOC_V);
     socNav();
   }
-  const socSave = () => { dmMem.soc = { v:SOC_V, b:SOC_B, c:{ e:SC.e, mes:SC.mes, anf:SC.anf, tab:SC.tab } }; dmSave(); };
+  const socSave = () => { dmMem.soc = { v:SOC_V, b:SOC_B, c:{ e:SC.e, mes:SC.mes, anf:SC.anf, tab:SC.tab }, d:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab } }; dmSave(); };
   $('#demoSheet').addEventListener('click', e => { let b;
     if ((b = e.target.closest('[data-socv]'))) { SOC_V = b.dataset.socv; socSave(); socSync(); return dmFin('social', 'Social · versión ' + SOC_V + ': ' + SOC_VERS.find(v => v[0] === SOC_V)[1]); }
     if ((b = e.target.closest('[data-socb]'))) { SOC_V = 'B'; SOC_B = b.dataset.socb; socSave(); socSync(); return dmFin('social', 'Versión B · ' + SOC_BE[SOC_B][0]); }
@@ -379,6 +386,14 @@
       return aC(SC.anf ? 'Anfitrión: la invitación de su profe, arriba' : 'Sin invitación de anfitrión'); }
     if ((b = e.target.closest('[data-scctab]'))) { SC.tab = b.dataset.scctab; return aC('La pestaña dice "' + SC.tab + '"'); }
     if (e.target.closest('#socCSede')) { aC(); scSedeAbrir(); return; }
+    // T23 · la D: estado, día del cruce, Instagram, nombre de la pestaña y la pregunta al entrar a una banda
+    const aD = msg => { SOC_V = 'D'; socSave(); socSync(); return dmFin('social', msg); };
+    const DIA_N = { lun0:'Lunes: rival nuevo', jue:'Jueves: el cruce en juego', gano:'Lunes siguiente: ganaron', perdio:'Lunes siguiente: esta vez no' };
+    if ((b = e.target.closest('[data-socd]'))) { const antes = SD.e; SD.e = b.dataset.socd; if (antes === 'sin' && SD.e === 'con') SD.preg = true; return aD('Versión D · ' + SOC_DE[SD.e][0]); }
+    if ((b = e.target.closest('[data-sddia]'))) { SD.dia = b.dataset.sddia; SD.e = 'con'; return aD('El pulso · ' + DIA_N[SD.dia]); }
+    if ((b = e.target.closest('[data-sdig]'))) { SD.ig = b.dataset.sdig; return aD(SD.ig === 'vivo' ? 'Instagram de Viva: en vivo' : 'Instagram de Viva: ejemplo'); }
+    if ((b = e.target.closest('[data-sdtab]'))) { SD.tab = b.dataset.sdtab; return aD('La pestaña dice "' + SD.tab + '"'); }
+    if (e.target.closest('#socDPreg')) { SD.e = 'con'; SD.preg = true; return aD('Al entrar a una banda: qué compartís'); }
   });
   socSync();
 

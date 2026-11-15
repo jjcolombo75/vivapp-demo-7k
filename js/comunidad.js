@@ -95,7 +95,7 @@
   // ===== Gente: perfiles para seguir, interés privado y mutuo =====
   const gente = [
     { id:'g1', n:'Joaquín', e:34, sede:'Sarmiento', int:['entrenar','amigos'], tags:['Fuerza','Running'], c:['#4f7d3a','#152410'], likesMe:true, ev:true },
-    { id:'g2', n:'Carla', e:26, sede:'Alberdi', int:['amigos','conocer'], tags:['Cardio','Yoga'], c:['#9a4f8a','#2c1028'], ev:true },
+    { id:'g2', n:'Carla', e:26, sede:'Alberdi', int:['amigos','conocer'], tags:['Cardio','Running'], c:['#9a4f8a','#2c1028'], ev:true },
     { id:'g3', n:'Diego', e:41, sede:'Sarmiento', int:['entrenar'], tags:['Fuerza'], c:['#7a7a3a','#262610'], likesMe:true },
     { id:'g4', n:'Florencia', e:31, sede:'Sarmiento', int:['conocer','amigos'], tags:['Bici','Trekking'], c:['#3a6a9a','#0f2034'], likesMe:true },
     { id:'g5', n:'Martín', e:29, sede:'López y Planes', int:['entrenar','conocer'], tags:['Fútbol','Fuerza'], c:['#3a8a7a','#0e2a24'] }
@@ -121,7 +121,7 @@
     $('#genteOff').hidden = miGente.on; $('#genteOnBox').hidden = !miGente.on;
     $('#myInt').textContent = 'Buscás: ' + miGente.int.map(i => intLbl[i].toLowerCase()).join(' · ');
     const list = (asistMode ? gente.filter(p => p.ev) : gente).filter(p => !ocultos.has(p.id) && visibles(p).length && (fil === 'todas' || p.sede === miSede));
-    $('#deckNote').hidden = !asistMode; $('#deckNote').textContent = 'Asistentes de After Train · 11/10';
+    $('#deckNote').hidden = !asistMode; $('#deckNote').textContent = 'Asistentes de Social VIVA · 11/10';
     $('#gente').innerHTML = list.length ? list.map(p => {
       const v = visibles(p), conoce = v.includes('conocer') || v.includes('amigos'), sig = siguiendo.has(p.n), it = intereses.has(p.id);
       return '<div class="pcard"><div style="display:flex;gap:12px;align-items:center"><span class="av md" style="background:' + grad(p.c) + '">' + inicial(p.n) + '</span>' +
@@ -144,7 +144,7 @@
     }
   });
   $('#sedeFil').addEventListener('click', e => { const b = e.target.closest('[data-fil]'); if (!b) return; fil = b.dataset.fil; $$('#sedeFil .opt').forEach(x => x.setAttribute('aria-pressed', x === b)); renderGente(); });
-  $('#qEvt').addEventListener('click', () => pushCard('<span class="lbl">Invitación a un evento</span><span class="h2">Spinning Night · Jue 20:30</span><span class="small muted">López y Planes</span><span class="small" style="color:var(--dat);font-weight:700">Esperando respuesta</span>', 'Invitación a un evento'));
+  $('#qEvt').addEventListener('click', () => pushCard('<span class="lbl">Invitación a un evento</span><span class="h2">Social VIVA · Sáb 08:30</span><span class="small muted">López y Planes · running y desayuno</span><span class="small" style="color:var(--dat);font-weight:700">Esperando respuesta</span>', 'Invitación a un evento'));
 
 //#bloque 225
   // ===== T20 · Mural VIVA (v97): un mural para scrollear, como Instagram =====
@@ -162,9 +162,9 @@
   // Lo que viene: entrenos de grupo (los publica el profe) y eventos (los publica Viva). Se muestran totales, nunca quién se anotó.
   const MV_VIENE = [
     { id:'e1', dia:'SÁB', hora:'10:00', k:'Entreno de grupo', t:'Piernas, todos juntos', donde:'Sarmiento', n:5, cupo:8 },
-    { id:'e2', dia:'JUE', hora:'20:30', k:'Evento', t:'Spinning Night', donde:'López y Planes', n:18, cupo:25 },
-    { id:'e3', dia:'SÁB', hora:'11:30', k:'Evento', t:'Funcional en dúo', donde:'Sarmiento', n:12, cupo:20 },
-    { id:'e4', dia:'VIE', hora:'21:00', k:'Evento', t:'After Train', donde:'Sarmiento', n:9, cupo:30 }
+    { id:'e2', dia:'SÁB', hora:'08:30', k:'Evento', t:'Social VIVA · running y desayuno', donde:'López y Planes', n:18, cupo:25 },
+    { id:'e3', dia:'SÁB', hora:'11:00', k:'Evento', t:'Aniversario de Sarmiento', donde:'Sarmiento', n:12, cupo:20 },
+    { id:'e4', dia:'VIE', hora:'21:30', k:'Evento', t:'La fiesta de Viva', donde:'Alberdi', n:9, cupo:30 }
   ];
   // k: foto (con el marco) · aviso (del profe o de Viva, con "Me anoto") · logro (compartido: ficha, bienvenida, cartel, VIVA Flow) · dupla.
   const MV_JOAQUIN = { id:'p7', k:'logro', n:'Joaquín', sub:'Sarmiento · hoy', c:['#4f7d3a','#152410'], lbl:'Ficha', num:'12', firma:['semanas', 'cumplidas'], txt:'Sumó la ficha de las 12 semanas a su mural.' };
@@ -333,7 +333,7 @@
   // nada de lo que un socio escribe o fotografía queda guardado para que otro lo vea (la charla vive en su WhatsApp; la foto sale y no se guarda).
   var SOC_V = 'B', SOC_B = 'con';   // la B abre por defecto (Juanjo, 14/11)
   var SB = { voy:{ primer:null, con:'voy' }, quiero:false, anot:{} };
-  const SB_G = { nom:['Los del', 'jueves'], dia:'JUE', diaL:'jueves', hora:'19:00', sede:'Sarmiento', que:'Funcional en equipo', van:{ primer:4, con:3 }, enc:12, des:[38, 60],
+  const SB_G = { nom:['Los del', 'jueves'], dia:'JUE', diaL:'jueves', hora:'19:00', sede:'Sarmiento', que:'Cada uno su rutina, a la misma hora', van:{ primer:4, con:3 }, enc:12, des:[38, 60],
     gente:[['Vos', MV_YO], ['Sofi', ['#c08a3a','#33230c']], ['Ramiro', ['#5a7aa8','#141e2e']], ['Cami', ['#8a4f9a','#22102c']], ['Nico', ['#3a8a7a','#0e2a24']], ['Juli', ['#a0603a','#301a0c']]] };
   const SB_PROFE = ['#2a6f7f','#0c2229'];
   const SB_CAM = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
@@ -421,7 +421,7 @@
     if ((b = q('[data-sbcomp]'))) { cerrar(); toast(b.dataset.sbcomp === 'ig' ? 'Lista para tu historia de Instagram' : 'Lista para mandar al WhatsApp del grupo'); return; }
     if (e.target.id === 'sbHoja' || q('[data-sbx]')) cerrar();
   });
-  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : 'Social'; }
+  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : SOC_V === 'D' ? SD.tab : 'Social'; }
 //#bloque 227
   // ===== T22 · Social VIVA, versión C: En sincro (v101) =====
   // Hilo conductor (Juanjo, 15/11): tu ritmo, cuando se acopla con el de otros. Versiones Social (panel, bloque 345 de demo.js) elige A, B o C.
@@ -507,7 +507,7 @@
         '<span class="stack" style="gap:6px">' + scFirma('Tu ritmo', 'va solo') + '<span class="small muted" style="font-size:14px">¿Lo sumás a otro?</span></span></div>' +
       mvPos('c', '<span class="mvk">Tu primer jueves · ' + SB_G.sede + '</span>' +
         '<span class="stack" style="gap:8px"><span class="mvbig"><span class="mvfirma sig"><i>' + SB_G.dia + '</i></span><span class="mvnum">' + SB_G.hora + '</span></span>' +
-        '<span class="mvsub">Prof. Lucas recibe a los que arrancaron esta semana y entrenan juntos. Funcional, 50 minutos.</span></span>' +
+        '<span class="mvsub">Prof. Lucas recibe a los que arrancaron esta semana: cada uno su rutina, a la misma hora, con él en la sala.</span></span>' +
         '<span class="stack" style="gap:10px"><button class="btn' + (p ? ' ghost' : '') + '" data-scprimer>' + (p ? '✓ Anotado' : 'Me anoto') + '</button>' +
         '<span class="mvsub">' + (p ? 'Te espera en la entrada de la sala.' : 'Esta semana arrancan 5.') + '</span></span>') +
       (scMenor() ? '' : mvPos('m', '<span class="mvk">Vení con alguien</span>' + scFirma('Traé', 'a alguien') +
@@ -603,3 +603,170 @@
     if (q('[data-scsedex]')) { $('#scSede').hidden = true; return; }
     if (e.target.id === 'scHoja' || q('[data-scx]')) cerrar();
   });
+//#bloque 228
+  // ===== T23 · Social VIVA, versión D: La vibra (v102) =====
+  // Tres bloques y nada más: La fecha (cuándo se ve la banda) · El pulso (el cruce de la semana con otra banda) · La vibra (lo último que
+  // logró la banda, mezclado con la cuenta oficial de Viva en Instagram y Social VIVA). Estados: sin banda · con banda (Los del jueves).
+  // Día del cruce (panel): lunes (rival nuevo) · jueves (en juego) · lunes siguiente (ganaron / esta vez no). Todo simulado.
+  // En real: bandas, fechas y cruces, base de Vivapp y el tablero del profe (el profe arma las bandas) · Voy / No llego, declarado ·
+  // el pulso, entradas de EVO del mismo día (hoy dependen de Viva Gestión; con las de la noche, La vibra muestra lo de ayer), guardado solo
+  // como % de la banda · eventos, lo que la app ya calcula (semana cumplida, tramo, VIVA Flow, Mes cumplido, fichas, entrada del día),
+  // filtrado por el permiso de cada socio por tipo · publicaciones, la cuenta profesional de Viva en Instagram · Social VIVA, lo que carga marketing.
+  // Piso: solo cosas logradas, nunca faltas (sin "volvió": contaría que alguien dejó de venir); los eventos dicen el día, nunca la hora;
+  // nunca cuánto aportó cada uno al pulso; el ⚡ no se cuenta en público; nada que un socio escriba o fotografíe queda guardado;
+  // menores: sin eventos propios, sin WhatsApp y sin salida a Instagram.
+  var SD = { e:'con', dia:'jue', ig:/github\.io$/.test(location.hostname) ? 'vivo' : 'ej', tab:'Sincro', voy:'voy', quiero:false,
+    rayo:{}, anot:{}, comp:{ sem:true, tramo:true, mes:true, hoy:false }, preg:false };
+  const SD_TABS = ['Sincro', 'En VIVO', 'Banda', 'Vibra'];
+  const SD_IG = 'https://www.instagram.com/vivafithouse/';
+  const SD_GENTE = { Cris:['#3a8a7a','#0e2a24'], Lu:['#9a4f8a','#2c1028'], Nico:['#5a7aa8','#141e2e'], Sofi:['#c08a3a','#33230c'], Tomi:['#8a5a3a','#2a180c'], Vale:['#a85a5a','#2e1212'], Mica:['#3a6a9a','#0f2034'] };
+  // El cruce: cada banda en % de su propia meta de la semana (la de la banda = 80 % de la suma de las metas de sus integrantes).
+  const SD_RIVAL = ['Las de', 'las 7'], SD_RIVAL2 = ['Los', 'madrugadores'];
+  const SD_CRUCE = { lun0:[6, 4], jue:[62, 58], gano:[104, 88], perdio:[85, 92] };
+  const SD_HIST = [0, 1, 0, 1, 0, 1, 1, 1];   // los 8 cruces anteriores a esta semana (1 = ganado); el último se ganó el lunes
+  const sdLun1 = () => SD.dia === 'gano' || SD.dia === 'perdio';
+  const sdUltimos = () => SD.dia === 'gano' ? SD_HIST.slice(1).concat([1]) : SD.dia === 'perdio' ? SD_HIST.slice(1).concat([0]) : SD_HIST;
+  // La vibra: eventos que salen solos de los datos. a = días antes del jueves del cruce (negativo: después). "Entrenó hoy" vive solo ese día.
+  const SD_EV = [
+    { k:'hoy', n:'Tomi', a:3 }, { k:'hoy', n:'Mica', a:0 }, { k:'hoy', n:'Nico', a:-4 },
+    { k:'sem', n:'Lu', a:-1 }, { k:'ficha', n:'Mica', num:4, a:-2 }, { k:'tramo', n:'Cris', t:'Firme', a:-3 },
+    { k:'sem', n:'Cris', a:0 }, { k:'tramo', n:'Lu', t:'Firme', a:1 }, { k:'flow', n:'Nico', a:1 }, { k:'mes', n:'Sofi', a:2 }, { k:'ficha', n:'Tomi', num:12, a:2 },
+    { k:'gano', a:3 }, { k:'nuevo', n:'Vale', a:3 }, { k:'sem', n:'Sofi', a:5 }, { k:'ficha', n:'Lu', num:24, a:6 }
+  ];
+  const SD_DOW = ['el domingo', 'el lunes', 'el martes', 'el miércoles', 'el jueves', 'el viernes', 'el sábado'];
+  const sdBanda = x => x.k === 'gano' || x.k === 'cartel';
+  function sdEventos(){
+    const off = SD.dia === 'lun0' ? -3 : SD.dia === 'jue' ? 0 : 4, dow = SD.dia === 'jue' ? 4 : 1;
+    const ev = SD_EV.concat(SD.dia === 'gano' ? [{ k:'gano', a:-4 }, { k:'cartel', a:-4 }] : []);
+    return ev.map(x => Object.assign({ age:x.a + off, id:x.k + (x.n || '') + x.a }, x))
+      .filter(x => x.age >= 0 && x.age <= 6 && (x.k !== 'hoy' || x.age === 0))
+      .sort((p, q) => p.age - q.age || sdBanda(q) - sdBanda(p))
+      .map(x => Object.assign(x, { cuando:x.age === 0 ? 'hoy' : x.age === 1 ? 'ayer' : SD_DOW[(dow - x.age + 7) % 7] }));
+  }
+  const SD_TXT = { hoy:['Entrenó', 'hoy'], sem:['Cumplió', 'su semana'], nuevo:['Se sumó', 'a la banda'], gano:['Ganó', 'el cruce'], cartel:['Encendió', 'su cartel'] };
+  function sdEv(x){
+    const banda = sdBanda(x), yo = !!x.yo, on = !!SD.rayo[x.id];
+    const f = yo ? ['Cumpliste', 'tu semana'] : x.k === 'tramo' ? ['Subió a', x.t] : x.k === 'flow' ? ['Entró en', 'VIVA Flow'] : x.k === 'mes' ? ['Encendió', mesTxt(ahora().getMonth())]
+      : x.k === 'ficha' ? ['Llegó a', x.num + ' semanas'] : SD_TXT[x.k];
+    const cls = x.k === 'flow' ? 'f' : x.k === 'hoy' || x.k === 'nuevo' ? 'c' : 'm', quien = banda ? SB_G.nom.join(' ') : yo ? 'Vos' : x.n;
+    const av = banda ? '<span class="av sm sdbav" aria-hidden="true">' + MV_RAYO + '</span>'
+      : '<span class="av sm" style="background:' + grad(yo ? MV_YO : SD_GENTE[x.n]) + '">' + (yo ? 'M' : inicial(x.n)) + '</span>';
+    const acc = yo ? '<span class="small muted sdtuyo">3 ' + MV_RAYO + '<br>lo ves vos</span>'
+      : '<button class="clap sdrayo" data-sdrayo="' + x.id + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Sacarle el rayo a ' : 'Mandarle un rayo a ') + quien + '">' + MV_RAYO + '</button>';
+    return '<article class="mvpos sdev ' + cls + '"><div class="sdevrow">' + av +
+      '<span class="stack" style="gap:3px;flex:1;min-width:0"><span class="small muted"><b class="sdq">' + quien + '</b>' + (x.k === 'hoy' ? '' : ' · ' + x.cuando) + '</span>' +
+      '<span class="mvfirma sig' + (cls === 'f' ? ' flow' : '') + '"><b>' + f[0] + '</b> <i>' + f[1] + '</i>' + (x.k === 'sem' || banda ? ' ' + MV_RAYO : '') + '</span></span>' + acc + '</div>' +
+      (x.k === 'cartel' ? '<div class="sccartel sdcartel" role="img" aria-label="El cartel de ' + quien + '">' + scCartelSvg(SB_G.nom, 300, 150) + '</div>' +
+        '<span class="mvsub">Tres semanas del mes al 100 % de su meta. Va a Tu mural de cada uno.</span>' : '') + '</article>';
+  }
+  // La cuenta oficial de Viva en Instagram. Ejemplo: escenas dibujadas (como las de la A), sin copiar nada de Instagram. En vivo: el perfil incrustado.
+  const SD_IGEJ = [[['#f400a0','#07b0f2'], 'A veces con ganas. A veces no tanto. Pero en VIVA, siempre terminás mejor ⚡'], [['#07b0f2','#ffe94a'], 'Social VIVA: running y desayuno ⚡ ¿Te sumás?']];
+  function sdIgEj(i){
+    const P = SD_IGEJ[i % 2];
+    const esc = mvFoto(P[0], ['', ''], '').replace(/<span class="mvmarco">[\s\S]*<\/div>$/, '</div>')
+      .replace(/aria-label="[^"]*"/, 'aria-label="Publicación de ejemplo de Viva en Instagram"').replace('>Foto de ejemplo<', '>Ejemplo<');
+    return '<article class="mvp sdig">' + mvCab('VIVA en Instagram', ['#3c4658','#12161d'], '@vivafithouse · ejemplo') + esc +
+      '<span class="mvtxt">' + P[1] + '</span><a class="btn ghost sm" href="' + SD_IG + '" target="_blank" rel="noopener">Ver en Instagram</a></article>';
+  }
+  const sdIgVivo = () => '<article class="card sdigv"><span class="between"><span class="mvk">VIVA en Instagram</span><a class="link lime" href="' + SD_IG + '" target="_blank" rel="noopener">Abrir</a></span>' +
+    '<iframe class="sdigf" src="' + SD_IG + 'embed/" title="La cuenta de Viva en Instagram" loading="lazy"></iframe>' +
+    '<span class="small muted" style="line-height:1.4">' + (/github\.io$/.test(location.hostname) ? 'Si no carga, tocá Abrir.' : 'Acá Instagram no carga: probalo en la copia del iPhone.') + '</span></article>';
+  function sdSocial(){
+    const e = MV_VIENE.find(x => x.id === 'e2'), on = !!SD.anot.e2;
+    return '<article class="mvp">' + mvCab('Viva', ['#3c4658','#12161d'], 'Lo publica Viva · ' + e.donde) + mvPos('c', '<span class="mvk">Social VIVA · ' + e.donde + '</span>' +
+      '<span class="stack" style="gap:8px"><span class="mvbig"><span class="mvfirma sig"><i>' + e.dia + '</i></span><span class="mvnum">' + e.hora + '</span></span>' + scFirma('Running', 'y desayuno') + '</span>' +
+      '<span class="stack" style="gap:8px"><button class="btn sm' + (on ? ' ghost' : '') + '" data-sdanot>' + (on ? '✓ Te anotaste' : 'Me anoto') + '</button><span class="mvsub">' + (e.n + (on ? 1 : 0)) + ' anotados</span></span>') + '</article>';
+  }
+  function sdCab(con){
+    return '<div class="sdhead"><div class="stack" style="gap:6px;flex:1;min-width:0"><h1 class="mtitle sig"><b>En</b> <i>sincro</i></h1>' +
+      (con ? '<span class="sdbanda">' + SB_G.nom.join(' ') + '</span><span class="small muted">Tu banda · la convoca Prof. Lucas</span>' : '<span class="small muted">Tu ritmo, con el de otros.</span>') + '</div>' +
+      (scMenor() ? '' : '<button class="btn ghost sdmsg" data-sdmsg aria-label="Mensajes: abre WhatsApp">' + SB_WA + '<span>WhatsApp</span></button>') + '</div>';
+  }
+  // 1 · La fecha: una franja. En una sala sin clases, la banda se encuentra a la misma hora y cada uno hace su rutina.
+  function sdFecha(){
+    const v = SD.voy, van = 3 + (v === 'voy' ? 1 : 0), r = rutinas.profe, d = r && r.dias && r.dias[r.next];
+    const op = (k, t) => '<button class="opt" data-sdvoy="' + k + '" aria-pressed="' + (v === k) + '">' + t + '</button>';
+    return '<div class="card sdfecha"><div class="sdfrow"><span class="sdcuando"><i>' + (SD.dia === 'jue' ? 'Hoy' : 'Jue') + '</i><b>' + SB_G.hora + '</b></span>' +
+      '<span class="stack" style="gap:3px;flex:1;min-width:0"><span class="mvk">La fecha · ' + SB_G.sede + '</span><span class="small" style="line-height:1.35">Cada uno su rutina, a la misma hora.' + (d ? ' A vos te toca el Día ' + d.k + '.' : '') + '</span></span></div>' +
+      '<div class="sdfrow"><div class="opts g2" style="flex:1">' + op('voy', 'Voy') + op('no', 'No llego') + '</div><span class="sdvan">' + (v === 'voy' ? 'Vamos ' : 'Van ') + van + '</span></div></div>';
+  }
+  // 2 · El pulso: dos barras (ecualizador de Inicio), cada banda en % de su propia meta; debajo, los últimos 8 cruces (encendida = ganado).
+  function sdCeldas(arr){
+    const N = arr.length, W = 300, H = 18, GP = 7, sw = (W - GP * (N - 1)) / N, id = 'sdc' + (++scUid), L = eqLuz(1);
+    let g = '<defs><filter id="' + id + '" filterUnits="userSpaceOnUse" x="-20" y="-20" width="' + (W + 40) + '" height="' + (H + 40) + '"><feGaussianBlur stdDeviation="2.6"/></filter></defs>' +
+      '<rect class="rl-slot" x="-4" y="-4" width="' + (W + 8) + '" height="' + (H + 8) + '" rx="6"/>';
+    arr.forEach((on, i) => { g += eqCeldaFila(i * (sw + GP), 0, sw, H, !!on, on ? 'var(--dat)' : 'var(--muted)', L, id); });
+    return '<svg class="scpsvg sdcsvg" viewBox="-8 -8 ' + (W + 16) + ' ' + (H + 16) + '" preserveAspectRatio="none" role="img" aria-label="Los últimos 8 cruces: ' + arr.filter(Boolean).length + ' ganados">' + g + '</svg>';
+  }
+  function sdPulso(){
+    const c = SD_CRUCE[SD.dia], gano = SD.dia === 'gano', ult = sdUltimos();
+    const fila = (nom, p, yo) => '<span class="sdbarra"><span style="font-weight:700' + (yo ? '' : ';color:var(--muted)') + '">' + nom + '</span>' +
+      '<span class="bar ' + (yo ? 'sdyo' : 'scotro') + '" data-n="10"><i style="width:' + Math.min(100, p) + '%"></i></span></span>';
+    const tit = SD.dia === 'lun0' ? scFirma('Rival', 'nuevo') : SD.dia === 'jue' ? scFirma('Vamos ' + c[0] + ' %', '· ellos ' + c[1] + ' %')
+      : gano ? '<span class="mvfirma sig"><b>Ganaron</b> <i>' + c[0] + ' a ' + c[1] + '</i> ' + MV_RAYO + '</span>' : scFirma('Esta vez no:', c[1] + ' a ' + c[0]);
+    const sub = SD.dia === 'lun0' ? 'Arranca hoy. Cada entrenamiento de la banda suma.' : SD.dia === 'jue' ? 'Quedan 4 días. Cada entrenamiento suma.'
+      : gano ? 'Hoy arranca otro cruce, contra ' + SD_RIVAL2.join(' ') + '.' : 'Hoy arranca la revancha.';
+    return mvPos(gano ? 'm sdpulso' : 'c sdpulso', '<span class="mvk">El pulso · ' + (sdLun1() ? 'la semana pasada' : 'esta semana') + '</span>' +
+      '<span class="stack" style="gap:6px">' + tit + '<span class="mvsub">' + sub + '</span></span>' +
+      '<span class="stack" style="gap:12px">' + fila(SB_G.nom.join(' '), c[0], true) + fila(SD_RIVAL.join(' '), c[1], false) + '</span>' +
+      '<span class="stack" style="gap:6px">' + sdCeldas(ult) + '<span class="scpie"><span>Últimos 8 cruces</span><span>Cruces ganados: ' + ult.filter(Boolean).length + '</span></span></span>');
+  }
+  // 3 · La vibra: lo de la banda (7 días, del más nuevo al más viejo), con Instagram y Social VIVA mezclados. Termina: "Estás al día".
+  function sdVibra(con){
+    const L = con ? sdEventos() : [];
+    if (con && SD.dia === 'jue' && !scMenor() && SD.comp.sem && semCumplida()) L.unshift({ k:'sem', yo:true, id:'yo', cuando:'esta semana' });
+    const it = L.map(sdEv), ins = (pos, h) => it.splice(Math.min(pos, it.length), 0, h);
+    if (SD.ig === 'vivo') ins(2, sdIgVivo()); else ins(2, sdIgEj(0));
+    ins(5, sdSocial()); if (SD.ig !== 'vivo') ins(9, sdIgEj(1));
+    return '<div class="stack" style="gap:14px"><div class="between"><span class="stack" style="gap:2px"><span class="lbl">' + (con ? 'La vibra' : 'La vibra de Viva') + '</span>' +
+      '<span class="small muted">' + (con ? 'Lo último de tu banda y de Viva' : 'Lo último de Viva') + '</span></span>' + (con ? '<button class="link lime sdcomp" data-sdcomp>Qué compartís</button>' : '') + '</div>' +
+      '<div class="mvfeed" style="gap:14px">' + it.join('') + '</div><span class="mvfin">Estás al día ⚡</span></div>';
+  }
+  function sdSin(){
+    const q = SD.quiero;
+    return mvPos('c', '<span class="mvk">Tu banda</span><span class="stack" style="gap:8px">' + scFirma('Tu ritmo', 'va solo') + '<span style="font-size:17px;font-weight:700">¿Armás tu banda?</span></span>' +
+      '<span class="stack" style="gap:10px">' + (scMenor() ? '' : '<button class="btn" data-sdtrae>Traé a alguien</button><span class="mvsub">Con uno ya son banda.</span>') +
+      '<button class="btn ghost" data-sdquiero>' + (q ? '✓ Prof. Lucas ya sabe' : 'Sumame a una banda') + '</button>' +
+      '<span class="mvsub">' + (q ? 'Te va a proponer una banda en tu horario.' : 'Se lo decimos a tu profe. No lo ve otro socio.') + '</span></span>');
+  }
+  function sdRender(){
+    const c = $('#sdCuerpo'); if (!c) return;
+    const con = SD.e === 'con';
+    c.innerHTML = sdCab(con) + (con ? sdFecha() + sdPulso() : sdSin()) + sdVibra(con);
+    if (SD.preg && con) { SD.preg = false; sdCompartir(true); }
+  }
+  function sdHoja(html){ $('#sdHojaIn').innerHTML = html; $('#sdHoja').hidden = false; }
+  const SD_COMP = [['sem', 'Tu semana cumplida'], ['tramo', 'Tu tramo y VIVA Flow'], ['mes', 'Tu mes y tus fichas'], ['hoy', 'Que entrenaste hoy']];
+  function sdCompartir(primera){
+    sdHoja('<span class="mtitle sig"><b>' + (primera ? 'Entraste a' : 'Qué compartís') + '</b> <i>' + (primera ? SB_G.nom.join(' ') : 'con tu banda') + '</i></span>' +
+      (scMenor() ? '<span class="muted" style="line-height:1.45">Por ahora lo tuyo no sale a la banda: vos ves La vibra, la banda no ve lo tuyo.</span>'
+        : '<span class="muted" style="line-height:1.45">' + (primera ? '¿Qué querés que vea tu banda? ' : '') + 'Solo cosas logradas, nunca la hora. Lo que no compartís, no aparece.</span>' +
+          '<div>' + SD_COMP.map(x => '<label class="swrow" for="sdc_' + x[0] + '"><span style="flex:1">' + x[1] + '</span><input type="checkbox" class="sw" id="sdc_' + x[0] + '" data-sdsw="' + x[0] + '"' + (SD.comp[x[0]] ? ' checked' : '') + '></label>').join('') + '</div>' +
+          '<span class="small muted">Lo cambiás cuando quieras, desde La vibra.</span>') +
+      '<button class="btn" data-sdx type="button">Listo</button>');
+  }
+  function sdMsg(){
+    const fila = (k, t, s) => '<div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + t + '</span><span class="small muted">' + s + '</span></span><button class="btn sm" data-sdwa="' + k + '">Abrir</button></div>';
+    sdHoja('<span class="mtitle sig"><b>Mensajes</b> <i>por WhatsApp</i></span><div class="list">' + (SD.e === 'con' ? fila('banda', SB_G.nom.join(' '), 'El grupo de WhatsApp de tu banda') : '') +
+      fila('profe', 'Prof. Lucas', 'Tu profe, a su número de trabajo') + '</div>' +
+      '<span class="small muted" style="line-height:1.4">En Vivapp no hay chat: la charla vive en WhatsApp. Nunca ves el número de otro socio. En la demo, los enlaces son de ejemplo.</span>' +
+      '<button class="btn ghost sm" data-sdx type="button">Cerrar</button>');
+  }
+  $('#socialD').addEventListener('click', e => {
+    const q = s => e.target.closest(s), cerrar = () => { $('#sdHoja').hidden = true; };
+    let b;
+    if ((b = q('[data-sdvoy]'))) { SD.voy = b.dataset.sdvoy; sdRender(); toast(SD.voy === 'voy' ? '¡Vamos! Te esperan el jueves a las 19' : 'Listo, tu profe ya sabe. Te esperan en la próxima'); return; }
+    if ((b = q('[data-sdrayo]'))) { const id = b.dataset.sdrayo, nom = b.getAttribute('aria-label').replace(/^(Sacarle|Mandarle) (el|un) rayo a /, '');
+      SD.rayo[id] = !SD.rayo[id]; b.setAttribute('aria-pressed', !!SD.rayo[id]); b.setAttribute('aria-label', (SD.rayo[id] ? 'Sacarle el rayo a ' : 'Mandarle un rayo a ') + nom); return; }
+    if (q('[data-sdanot]')) { SD.anot.e2 = !SD.anot.e2; sdRender(); toast(SD.anot.e2 ? 'Te anotaste a Social VIVA · sábado 08:30' : 'Te bajaste de Social VIVA'); return; }
+    if (q('[data-sdmsg]')) { sdMsg(); return; }
+    if ((b = q('[data-sdwa]'))) { cerrar(); toast('Se abre WhatsApp: ' + (b.dataset.sdwa === 'banda' ? 'el grupo de ' + SB_G.nom.join(' ') : 'Prof. Lucas') + ' (enlace de ejemplo)'); return; }
+    if (q('[data-sdcomp]')) { sdCompartir(false); return; }
+    if (q('[data-sdquiero]')) { SD.quiero = !SD.quiero; sdRender(); toast(SD.quiero ? 'Le avisamos a Prof. Lucas que querés sumarte a una banda' : 'Listo, no le avisamos nada'); return; }
+    if (q('[data-sdtrae]')) { sdHoja('<span class="mtitle sig"><b>Traé</b> <i>a alguien</i></span><span class="muted" style="line-height:1.45">Le mandás por WhatsApp una invitación de Viva para venir a entrenar con vos. Si viene, ya son banda.</span>' +
+      '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-sdx type="button">Cerrar</button><button class="btn sm" data-sdinv type="button">Invitar</button></div>'); return; }
+    if (q('[data-sdinv]')) { cerrar(); toast('Elegí a quién mandarle la invitación'); return; }
+    if (e.target.id === 'sdHoja' || q('[data-sdx]')) cerrar();
+  });
+  $('#socialD').addEventListener('change', e => { const s = e.target.closest('[data-sdsw]'); if (!s) return;
+    SD.comp[s.dataset.sdsw] = s.checked; sdRender(); toast(s.checked ? 'Tu banda lo va a ver' : 'Tu banda ya no lo ve'); });

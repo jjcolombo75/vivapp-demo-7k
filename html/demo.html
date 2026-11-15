@@ -179,7 +179,7 @@
     </details>
     <details class="dmdet" data-k="social"><summary>Versiones Social</summary>
       <div class="dmrow"><span class="dmk">Versión de la sección social</span>
-        <div class="opts g3" id="socVPick"></div>
+        <div class="opts g2" id="socVPick"></div>
         <span class="dmayu" id="socVTxt"></span></div>
       <div class="dmrow" id="socBRow"><span class="dmk">El socio de la demo, en la B</span>
         <div class="opts g3" id="socBPick"><button class="opt" data-socb="sin" aria-pressed="false">Sin grupo</button><button class="opt" data-socb="primer" aria-pressed="false">Primer encuentro</button><button class="opt" data-socb="con" aria-pressed="true">Con grupo<small>12 encuentros</small></button></div>
@@ -199,6 +199,21 @@
           <button class="btn ghost sm" id="socCSede" type="button">Ver los carteles en la pantalla del gimnasio</button>
           <span class="dmayu">Solo los nombres de los grupos con su mes cumplido: sin fotos ni personas.</span></div>
       </div>
+      <div class="stack" id="socDRow" style="gap:14px" hidden>
+        <div class="dmrow"><span class="dmk">El socio de la demo, en la D</span>
+          <div class="opts g2" id="socDPick"><button class="opt" data-socd="sin" aria-pressed="false">Sin banda<small>entrena solo</small></button><button class="opt" data-socd="con" aria-pressed="true">Con banda<small>Los del jueves</small></button></div>
+          <span class="dmayu" id="socDTxt"></span></div>
+        <div class="dmrow"><span class="dmk">Día del cruce</span>
+          <div class="opts g2"><button class="opt" data-sddia="lun0" aria-pressed="false">Lunes<small>rival nuevo</small></button><button class="opt" data-sddia="jue" aria-pressed="true">Jueves<small>en juego</small></button><button class="opt" data-sddia="gano" aria-pressed="false">Lunes siguiente<small>ganaron</small></button><button class="opt" data-sddia="perdio" aria-pressed="false">Lunes siguiente<small>esta vez no</small></button></div></div>
+        <div class="dmrow"><span class="dmk">Instagram de Viva</span>
+          <div class="opts g2"><button class="opt" data-sdig="ej" aria-pressed="true">Ejemplo<small>tarjetas dibujadas</small></button><button class="opt" data-sdig="vivo" aria-pressed="false">En vivo<small>la cuenta incrustada</small></button></div>
+          <span class="dmayu">En claude.ai Instagram no carga dentro del artefacto: En vivo se prueba en la copia del iPhone (ahí abre así por defecto).</span></div>
+        <div class="dmrow"><span class="dmk">Nombre de la pestaña (prueba de 5 segundos)</span>
+          <div class="opts g2"><button class="opt" data-sdtab="Sincro" aria-pressed="true">Sincro</button><button class="opt" data-sdtab="En VIVO" aria-pressed="false">En VIVO</button><button class="opt" data-sdtab="Banda" aria-pressed="false">Banda</button><button class="opt" data-sdtab="Vibra" aria-pressed="false">Vibra</button></div></div>
+        <div class="dmrow"><span class="dmk">Al entrar a una banda</span>
+          <button class="btn ghost sm" id="socDPreg" type="button">Ver la pregunta de qué compartís</button>
+          <span class="dmayu">Se pregunta una vez, por tipo de evento; después se cambia desde La vibra.</span></div>
+      </div>
       <div class="stack" data-socnota="A" style="gap:8px"><span class="dmk">Mural VIVA: lo que falta definir</span>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Con marketing, el 20/11:</b> el nombre de la sección (Mural VIVA o En VIVO) · cómo se suma a un amigo ("¿Entrenamos?" o "Sumar a mi mural") · "Fit" como nombre del aplauso · quién ve una publicación si el socio no elige (la propuesta es sus amigos; "Público" es dentro de Viva).</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Con el dueño:</b> otras personas en la foto y el rincón de los vestuarios · menores de 18 (fotos, mensajes y People; hoy no tienen "Público") · quién modera el mural y quién responde los mensajes a Viva · si "conocer gente" sigue, cambia o espera.</p>
@@ -215,6 +230,12 @@
       <p class="small muted" style="margin:0;line-height:1.5"><b>Lo que no está, a propósito:</b> mural de fotos, comentarios, mensajes entre socios, perfiles, presencia, rankings de personas y "conocer gente" (espera al dueño). "Vamos 4" es un número, sin quién. Moderación: cero.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Detrás (no se construye acá):</b> el tablero del profe suma la fecha de bienvenida de la sede con sus anotados, las duplas, quién pidió sumarse a un grupo, a quién invitar como anfitrión (antigüedad y VIVA Flow sostenido) y el aviso de que alguien de un grupo se está apagando (con las entradas, no con Tu ritmo). Fechas y semanas en sincro salen de las entradas de EVO, de noche, y se guardan solo como total del grupo o de la dupla.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Con el dueño:</b> las horas de profe (el primer jueves de cada sede y los grupos) · las pantallas de la sede · menores: sin WhatsApp ni foto hacia afuera (con Etapa Menor, la C lo muestra así).</p></div>
+      <div class="stack" data-socnota="D" style="gap:8px" hidden><span class="dmk">La vibra: qué es propuesta y qué falta definir</span>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Tres bloques:</b> La fecha (cuándo se ven: cada uno su rutina, a la misma hora) · El pulso (el cruce de la semana con otra banda de la sede, cada una en % de su propia meta; resultado el lunes) · La vibra (lo que logró la banda en los últimos 7 días, mezclado con la cuenta de Viva en Instagram y Social VIVA). Nadie escribe: nada que moderar.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Propuesta del ticket:</b> la meta de la banda es el 80 % de la suma de las metas de sus integrantes (que falte uno no la tumba) · nunca se ve cuánto aportó cada uno · tres semanas del mes al 100 % encienden el cartel de la banda · el ⚡ se enciende sin contador (cuántos recibió lo ve solo cada uno) · "Estás al día" al final, sin scroll infinito · cada socio elige qué ve la banda, por tipo de evento.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Preguntas abiertas:</b> (1) qué hace una banda en su fecha: "cada uno su rutina, a la misma hora", a confirmar con la profe de Sarmiento y el dueño · (2) el cruce entre bandas, a validar con el dueño (la marca no usa rankings de socios; esto es entre dos bandas) · (3) el consentimiento para "entrené hoy": texto y edad, con el abogado (E11) · (4) el nombre de la pestaña y la palabra "banda": prueba de 5 segundos con socios de 18 a 24 y marketing.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Lo que no está, a propósito:</b> mural de fotos de socios, comentarios, chat propio (Mensajes abre WhatsApp), perfiles, horarios, faltas ("volvió" no sale: cuenta que alguien había dejado de venir), rankings de personas o de más de dos bandas, fotos guardadas de la banda y "conocer gente" (espera al dueño).</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Detrás (no se construye acá):</b> "entrenó hoy" y el pulso en el día necesitan las entradas del mismo día (hoy dependen de Viva Gestión; con las de la noche, La vibra muestra lo de ayer) · la cuenta de Instagram dentro de la app, el acceso a la cuenta profesional de Viva · el profe arma las bandas en su tablero.</p></div>
     </details>
     <details class="dmdet" data-k="captacion"><summary>Captación</summary>
       <div class="dmrow"><span class="dmk">Primer entrenamiento de la campaña</span>
