@@ -331,7 +331,7 @@
   // Plegado recordado entre visitas (nivel 1 y 2 abiertos, nivel 3 cerrado la primera vez)
   $$('#demoSheet details.dmdet').forEach(d => { if (dmMem.pleg && d.dataset.k in dmMem.pleg) d.open = dmMem.pleg[d.dataset.k];
     d.addEventListener('toggle', () => { (dmMem.pleg = dmMem.pleg || {})[d.dataset.k] = d.open; dmSave(); }); });
-  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC, social:SOC_V, socialB:SOC_B, socialC:SC.e, socialD:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab }, socialE:{ soc:SE.soc, mom:SE.mom, tam:SE.tam, neu:SE.neu, ig:SE.ig, vid:SE.vid, vivo:SE.vivo } }); // para pruebas y T6
+  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC, social:SOC_V, socialB:SOC_B, socialC:SC.e, socialD:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab }, socialE:{ soc:SE.soc, mom:SE.mom, tam:SE.tam, neu:SE.neu, ig:SE.ig, vid:SE.vid, vivo:SE.vivo }, socialF:{ puerta:SF.puerta, tipo:SF.tipo, est:SF.est, mom:SF.mom, ult:SF.ult, tab:SF.tab } }); // para pruebas y T6
   dmSync();
   $('#dmVer').textContent = 'Versión ' + (window.VK_V || '');
 
@@ -343,7 +343,8 @@
     ['B', 'Los grupos', 'B · Grupos chicos con alguien que los convoca (el profe), un encuentro por semana y nada que moderar. La charla vive en su WhatsApp.'],
     ['C', 'En sincro', 'C · Tu ritmo, cuando se acopla con el de otros: solo, en dupla o en grupo, con el pulso (una celda por semana en sincro). El idioma de Inicio: ecualizador, neón y Flow.'],
     ['D', 'La vibra', 'D · Tres bloques: cuándo se ve tu banda, contra quién juega esta semana y lo último que logró, con la cuenta de Viva en Instagram. Pasa algo nuevo cada vez que entrás.'],
-    ['E', 'El ecualizador', 'E · Una pantalla: el ecualizador de tu banda, una barra por integrante hacia su propia meta. Lo último, la fecha y el cruce son franjas de una línea; abajo, lo de Viva. Se mueve con cada entrenamiento.']
+    ['E', 'El ecualizador', 'E · Una pantalla: el ecualizador de tu banda, una barra por integrante hacia su propia meta. Lo último, la fecha y el cruce son franjas de una línea; abajo, lo de Viva. Se mueve con cada entrenamiento.'],
+    ['F', 'Las puertas', 'F · Una pantalla, dos puertas para que nadie entrene solo: Traé a tu gente o Viva te presenta (abajo, Puerta). Con banda es idéntica: la fecha, el cruce de la semana como protagonista (solo la barra de la banda) y lo de Viva. Es la que va a marketing el 20/11.']
   ];
   const SOC_EE = { sin:['Sin banda', 'El que llega solo (Mica, 19 años, semana 2): el ecualizador apagado con su lugar latiendo y una sola acción, Tu primer jueves.'],
     nueva:['Banda nueva', 'El jueves, en la bienvenida, el profe la suma a una banda: nombres recién sumados, la meta de la banda a la mitad la primera semana y la pregunta de si la banda ve su barra.'],
@@ -374,10 +375,11 @@
     const pd = (s, v) => $$('#socDRow [' + s + ']').forEach(x => x.setAttribute('aria-pressed', x.getAttribute(s) === v));
     pd('data-socd', SD.e); pd('data-sddia', SD.dia); pd('data-sdig', SD.ig); pd('data-sdtab', SD.tab);
     if (typeof seSync === 'function') seSync();
+    if (typeof sfSync === 'function') sfSync();
     $$('#demoSheet [data-socnota]').forEach(n => n.hidden = n.dataset.socnota !== SOC_V);
     socNav();
   }
-  const socSave = () => { dmMem.soc = { v:SOC_V, b:SOC_B, c:{ e:SC.e, mes:SC.mes, anf:SC.anf, tab:SC.tab }, d:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab }, e:{ soc:SE.soc, mom:SE.mom, tam:SE.tam, neu:SE.neu, ig:SE.ig, vid:SE.vid } }; dmSave(); };
+  const socSave = () => { dmMem.soc = { v:SOC_V, b:SOC_B, c:{ e:SC.e, mes:SC.mes, anf:SC.anf, tab:SC.tab }, d:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab }, e:{ soc:SE.soc, mom:SE.mom, tam:SE.tam, neu:SE.neu, ig:SE.ig, vid:SE.vid }, f:{ puerta:SF.puerta, est:SF.est, mom:SF.mom, ult:SF.ult, ig:SF.ig, tab:SF.tab } }; dmSave(); };
   $('#demoSheet').addEventListener('click', e => { let b;
     if ((b = e.target.closest('[data-socv]'))) { SOC_V = b.dataset.socv; socSave(); socSync(); return dmFin('social', 'Social · versión ' + SOC_V + ': ' + SOC_VERS.find(v => v[0] === SOC_V)[1]); }
     if ((b = e.target.closest('[data-socb]'))) { SOC_V = 'B'; SOC_B = b.dataset.socb; socSave(); socSync(); return dmFin('social', 'Versión B · ' + SOC_BE[SOC_B][0]); }
@@ -434,6 +436,54 @@
     if ((b = e.target.closest('[data-seesc]'))) { SE.vivo = false; seVivoProg(); return aE(SE_ESC[b.dataset.seesc]()); }
     if (e.target.closest('#seEsc1b')) { SE.soc = 'nueva'; SE.preg = true; SE.yoComp = true; seMomento('jue'); return aE('El jueves: el profe la suma a una banda'); }
     if (e.target.closest('#seEsc5b')) { seMomento('lun1'); return aE('El lunes siguiente'); }
+  });
+  socSync();
+
+//#bloque 347
+  // ===== T25 · la F en el panel: puerta, estado, momento, que entrene alguien, en vivo, lo último, lo de Viva, nombre de la pestaña y los seis escenarios =====
+  // [puerta 1, puerta 2, nombre corto]
+  var SOC_FE = {
+    sin:['Puerta 1 · "Entrená con alguien.": Invitá a un amigo (día, hora y sede, por WhatsApp) o Ya entreno con alguien de Viva (un código en persona). "No tengo con quién" lleva al primer jueves.',
+      'Puerta 2 · "Tu primer jueves": 19:00 en Sarmiento, te recibe Prof. Lucas, con Voy. "Prefiero traer a alguien" abre la invitación.', 'Sin banda'],
+    espera:['Invitó a alguien para el jueves 19:00: Reenviar o Cambiar el día. Sin cuenta regresiva ni recordatorios.', 'Anotado al primer jueves, con No llego.', 'En espera'],
+    nueva:['El amigo vino: banda de dos ("Vos y Cris"), con el jueves como fecha. Primera semana con la meta a la mitad; el lunes, su primer cruce. Una vez, la pregunta de qué ve la banda.',
+      'El jueves, Prof. Lucas armó "Los del jueves" (cinco). Primera semana con la meta a la mitad; el lunes, su primer cruce. Una vez, la pregunta de qué ve la banda.', 'Banda recién formada'],
+    con:['Idéntica en las dos puertas: la fecha, el cruce (la barra de la banda contra la de su rival, cada una en % de su meta), lo último y lo de Viva. Acá, la banda de dos.',
+      'Idéntica en las dos puertas: la fecha, el cruce (la barra de la banda contra la de su rival, cada una en % de su meta), lo último y lo de Viva. Acá, la banda de cinco.', 'Con banda'] };
+  const SF_MOMN = { lun:'Lunes: arranca el cruce', mie:'Miércoles: en camino', jue:'Jueves 19:10: la fecha', sab:'Sábado', dom:'Domingo: cierra la semana', lun1g:'Lunes siguiente: ganaron', lun1p:'Lunes siguiente: esta vez no' };
+  if (dmMem.soc && dmMem.soc.f) { const x = dmMem.soc.f;
+    if (x.puerta in SF_B) SF.puerta = x.puerta; if (x.est in SOC_FE) SF.est = x.est; if (x.mom in SF_MOM) SF.mom = x.mom; SF.ult = x.ult !== false;
+    if (x.ig === 'ej' || x.ig === 'vivo') SF.ig = x.ig; if (SF_TABS.includes(x.tab)) SF.tab = x.tab; sfEstado(SF.est); SF.preg = false; }
+  function sfSync(){
+    const r = $('#socFRow'); if (!r || !SOC_FE) return;   // socSync (bloque 345) llama antes de que exista
+    r.hidden = SOC_V !== 'F';
+    const pf = (s, v) => $$('#socFRow [' + s + ']').forEach(x => x.setAttribute('aria-pressed', x.getAttribute(s) === String(v)));
+    pf('data-sfpu', SF.puerta); pf('data-sfest', SF.est); pf('data-sfmom', SF.est === 'con' ? SF.mom : ''); pf('data-sfvivo', SF.vivo ? 1 : 0); pf('data-sfult', SF.ult ? 1 : 0); pf('data-sfig2', SF.ig); pf('data-sftab', SF.tab);
+    $('#socFTxt').textContent = SOC_FE[SF.est][SF.puerta === 'trae' ? 0 : 1];
+    $('#sfEsc1b').hidden = !(SF.puerta === 'presenta' && (SF.est === 'sin' || (SF.est === 'espera' && SF.tipo === 'presenta')));
+    $('#sfEsc2b').hidden = !(SF.est === 'espera' && SF.tipo === 'trae');
+  }
+  const SF_ESC = {
+    1:() => { SF.puerta = 'presenta'; sfEstado('sin'); return 'Escenario 1 · Mica, 19 años, semana 2: llega sola (puerta 2)'; },
+    2:() => { SF.puerta = 'trae'; sfEstado('sin'); return 'Escenario 2 · Tomi, semana 1: quiere traer a un amigo (puerta 1)'; },
+    3:() => { SF.puerta = 'trae'; sfEstado('sin'); sfTim.push(setTimeout(() => { SF.alt = true; sfRender(); toast('«No tengo con quién» lleva al primer jueves'); }, 1800)); return 'Escenario 3 · Puerta 1: no tengo con quién'; },
+    4:() => { SF.mom = 'mie'; sfEstado('con'); SF.voy = null; sfTim.push(setTimeout(() => sfEntrena('s1'), 1600)); return 'Escenario 4 · Miércoles: entrás a la sala'; },
+    5:() => { SF.mom = 'lun1g'; sfEstado('con'); return 'Escenario 5 · Lunes siguiente: ganaron'; },
+    6:() => { SF.mom = 'lun1p'; sfEstado('con'); return 'Escenario 6 · Lunes siguiente: esta vez no'; }
+  };
+  $('#demoSheet').addEventListener('click', e => { let b;
+    const aF = msg => { SOC_V = 'F'; socSave(); socSync(); return dmFin('social', msg); };
+    if ((b = e.target.closest('[data-sfesc]'))) { SF.vivo = false; sfVivoProg(); return aF(SF_ESC[b.dataset.sfesc]()); }
+    if (e.target.closest('#sfEsc1b')) { SF.puerta = 'presenta'; sfEstado('nueva'); return aF('El jueves: Prof. Lucas la suma a Los del jueves'); }
+    if (e.target.closest('#sfEsc2b')) { const t = SF.tipo; sfEstado('nueva'); SF.tipo = t; return aF('El amigo vino: ya son banda de dos'); }
+    if ((b = e.target.closest('[data-sfpu]'))) { SF.puerta = b.dataset.sfpu; sfEstado(SF.est); return aF('Puerta: ' + (SF.puerta === 'trae' ? 'Traé a tu gente' : 'Viva te presenta')); }
+    if ((b = e.target.closest('[data-sfest]'))) { sfEstado(b.dataset.sfest); return aF('Versión F · ' + SOC_FE[SF.est][2]); }
+    if ((b = e.target.closest('[data-sfmom]'))) { SF.mom = b.dataset.sfmom; sfEstado('con'); return aF('El momento · ' + SF_MOMN[SF.mom]); }
+    if (e.target.closest('#sfEntrena')) { SOC_V = 'F'; socSave(); socSync(); dmFin('social'); setTimeout(() => sfEntrena(), 500); return; }
+    if ((b = e.target.closest('[data-sfvivo]'))) { SF.vivo = b.dataset.sfvivo === '1'; SF.prisa = false; sfVivoProg(); return aF(SF.vivo ? 'En vivo: cada 20 a 40 segundos entrena alguien' : 'En vivo: apagado'); }
+    if ((b = e.target.closest('[data-sfult]'))) { SF.ult = b.dataset.sfult === '1'; return aF(SF.ult ? 'Lo último: una línea con lo más nuevo de la banda' : 'Sin Lo último'); }
+    if ((b = e.target.closest('[data-sfig2]'))) { SF.ig = b.dataset.sfig2; return aF(SF.ig === 'vivo' ? 'Lo de Viva: Instagram en vivo' : 'Lo de Viva: ejemplo ilustrado'); }
+    if ((b = e.target.closest('[data-sftab]'))) { SF.tab = b.dataset.sftab; return aF('La pestaña dice "' + SF.tab + '"'); }
   });
   socSync();
 

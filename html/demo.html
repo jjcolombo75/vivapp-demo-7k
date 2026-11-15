@@ -238,6 +238,33 @@
         <div class="dmrow"><span class="dmk">Video del profe (decisión pendiente)</span>
           <div class="opts g2"><button class="opt" data-sevid="1" aria-pressed="true">Sí</button><button class="opt" data-sevid="0" aria-pressed="false">No</button></div></div>
       </div>
+      <div class="stack" id="socFRow" style="gap:14px" hidden>
+        <div class="dmrow"><span class="dmk">Escenarios (un toque deja todo armado)</span>
+          <div class="opts g2"><button class="opt" data-sfesc="1" aria-pressed="false">1 · Mica, 19<small>llega sola</small></button><button class="opt" data-sfesc="2" aria-pressed="false">2 · Tomi<small>trae a un amigo</small></button><button class="opt" data-sfesc="3" aria-pressed="false">3 · Sin con quién<small>puerta 1</small></button><button class="opt" data-sfesc="4" aria-pressed="false">4 · Miércoles<small>entrás a la sala</small></button><button class="opt" data-sfesc="5" aria-pressed="false">5 · Lunes<small>ganaron</small></button><button class="opt" data-sfesc="6" aria-pressed="false">6 · Lunes<small>esta vez no</small></button></div>
+          <button class="btn ghost sm" id="sfEsc1b" type="button" hidden>Sigue: el jueves, el profe la suma a una banda</button>
+          <button class="btn ghost sm" id="sfEsc2b" type="button" hidden>Sigue: el amigo vino</button></div>
+        <div class="dmrow"><span class="dmk">Puerta</span>
+          <div class="opts g2"><button class="opt" data-sfpu="trae" aria-pressed="true">Traé a tu gente<small>puerta 1</small></button><button class="opt" data-sfpu="presenta" aria-pressed="false">Viva te presenta<small>puerta 2</small></button></div>
+          <span class="dmayu">Cambia una sola cosa: qué ve el socio sin banda y cómo nace la banda. Con banda, la pantalla es la misma.</span></div>
+        <div class="dmrow"><span class="dmk">Estado</span>
+          <div class="opts g2"><button class="opt" data-sfest="sin" aria-pressed="false">Sin banda</button><button class="opt" data-sfest="espera" aria-pressed="false">En espera<small>invitó o se anotó</small></button><button class="opt" data-sfest="nueva" aria-pressed="false">Banda recién formada<small>primera semana</small></button><button class="opt" data-sfest="con" aria-pressed="true">Con banda</button></div>
+          <span class="dmayu" id="socFTxt"></span></div>
+        <div class="dmrow"><span class="dmk">Momento de la semana (con banda)</span>
+          <div class="opts g2"><button class="opt" data-sfmom="lun" aria-pressed="false">Lunes<small>arranca</small></button><button class="opt" data-sfmom="mie" aria-pressed="false">Miércoles<small>en camino</small></button><button class="opt" data-sfmom="jue" aria-pressed="true">Jueves 19:10<small>la fecha</small></button><button class="opt" data-sfmom="sab" aria-pressed="false">Sábado</button><button class="opt" data-sfmom="dom" aria-pressed="false">Domingo<small>cierra</small></button><button class="opt" data-sfmom="lun1g" aria-pressed="false">Lunes siguiente<small>ganaron</small></button><button class="opt" data-sfmom="lun1p" aria-pressed="false">Lunes siguiente<small>esta vez no</small></button></div>
+          <span class="dmayu">La misma banda en otro día: todo sale de las entradas (ocho semanas de historia, la semana en curso y la de su rival).</span></div>
+        <div class="dmrow"><span class="dmk">Que pase algo</span>
+          <button class="btn sm" id="sfEntrena" type="button">Que entrene alguien ahora</button>
+          <div class="opts g2"><button class="opt" data-sfvivo="0" aria-pressed="true">En vivo: no</button><button class="opt" data-sfvivo="1" aria-pressed="false">En vivo: sí<small>cada 20 a 40 s</small></button></div>
+          <span class="dmayu">Mueve la barra de la banda. Fuera del horario de la sala no entra nadie.</span></div>
+        <div class="dmrow"><span class="dmk">Lo último</span>
+          <div class="opts g2"><button class="opt" data-sfult="1" aria-pressed="true">Sí<small>una línea</small></button><button class="opt" data-sfult="0" aria-pressed="false">No</button></div>
+          <span class="dmayu">Una línea con lo más nuevo de la banda; abre los últimos 7 días. Para decidir tocándolo si queda.</span></div>
+        <div class="dmrow"><span class="dmk">Lo de Viva</span>
+          <div class="opts g2"><button class="opt" data-sfig2="ej" aria-pressed="true">Ejemplo ilustrado</button><button class="opt" data-sfig2="vivo" aria-pressed="false">Instagram en vivo<small>solo iPhone</small></button></div></div>
+        <div class="dmrow"><span class="dmk">Nombre de la pestaña (prueba de 5 segundos)</span>
+          <div class="opts g2"><button class="opt" data-sftab="Sincro" aria-pressed="true">Sincro</button><button class="opt" data-sftab="Banda" aria-pressed="false">Banda</button><button class="opt" data-sftab="Tu tribu" aria-pressed="false">Tu tribu</button><button class="opt" data-sftab="Social" aria-pressed="false">Social</button></div>
+          <span class="dmayu">Cambia la pestaña y el título de la pantalla.</span></div>
+      </div>
       <div class="stack" data-socnota="A" style="gap:8px"><span class="dmk">Mural VIVA: lo que falta definir</span>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Con marketing, el 20/11:</b> el nombre de la sección (Mural VIVA o En VIVO) · cómo se suma a un amigo ("¿Entrenamos?" o "Sumar a mi mural") · "Fit" como nombre del aplauso · quién ve una publicación si el socio no elige (la propuesta es sus amigos; "Público" es dentro de Viva).</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Con el dueño:</b> otras personas en la foto y el rincón de los vestuarios · menores de 18 (fotos, mensajes y People; hoy no tienen "Público") · quién modera el mural y quién responde los mensajes a Viva · si "conocer gente" sigue, cambia o espera.</p>
@@ -266,6 +293,11 @@
       <p class="small muted" style="margin:0;line-height:1.5"><b>Cambia respecto de la D:</b> en la D nunca se veía cuánto aportó cada uno; en la E se ve el avance de cada uno hacia su propia meta. Es el riesgo de la E (comparación y presión). Si en las bandas que no llegan se va más el que quedó más abajo, se saca la barra individual y queda solo la de la banda.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Preguntas abiertas:</b> (1) el video del profe: ¿va? ¿quién lo graba? · (2) la meta a la mitad la primera semana: ¿sí? · (3) qué hace una banda junta en una sala sin clases, además de coincidir (profe de Sarmiento) · (4) con el dueño: mostrar el avance de cada uno (con permiso), quién arma las bandas y con cuántas horas · menores: opinión del abogado.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Detrás (no se construye acá):</b> la pantalla necesita la entrada del día en el día (sin verificar con Viva Gestión); con la de la noche se mueve con un día de atraso. El profe arma las bandas en su tablero y ve las semanas flojas como señal para mirar a la banda.</p></div>
+      <div class="stack" data-socnota="F" style="gap:8px" hidden><span class="dmk">Las puertas: qué se compara y qué falta definir</span>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Una sola variable, la puerta:</b> nombre, palabras, lenguaje visual, el cruce y lo de Viva son idénticos. Cambia qué ve el socio sin banda y cómo nace la banda (de dos con el amigo que trajo, o de cinco con su profe). Sin barra por integrante: del avance se ve el total de la banda.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Para marketing y el dueño:</b> (1) ¿Cuál es la puerta principal? La ordena la cuenta de los que ya vienen acompañados. (2) Pase de invitado: ¿existe? ¿Cuántos por socio? (3) ¿Quién arma las bandas del primer jueves y con cuántas horas? (4) ¿Qué hace una banda junta en una sala sin clases? (la profesora de Sarmiento). (5) "Busco una" (conocer gente) no está construida: el dueño elige el camino con la matriz de riesgos. (6) El nombre de la pestaña y la palabra para el grupo.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Piso:</b> la app no guarda el nombre ni el teléfono del invitado; sumarse entre socios es con un código en persona, sin buscador; "van N" es un número y no aparece en bandas de dos (diría quién falta); nunca quién falta ni la hora. Menores: solo la puerta 2, sin WhatsApp, invitación ni foto hacia afuera.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Es ejemplo:</b> nombres, bandas, rivales y entradas (ocho semanas simuladas), el código y el enlace del pase, y las fotos y los videos de Lo de Viva, ilustrados por código.</p></div>
     </details>
     <details class="dmdet" data-k="captacion"><summary>Captación</summary>
       <div class="dmrow"><span class="dmk">Primer entrenamiento de la campaña</span>

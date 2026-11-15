@@ -421,7 +421,7 @@
     if ((b = q('[data-sbcomp]'))) { cerrar(); toast(b.dataset.sbcomp === 'ig' ? 'Lista para tu historia de Instagram' : 'Lista para mandar al WhatsApp del grupo'); return; }
     if (e.target.id === 'sbHoja' || q('[data-sbx]')) cerrar();
   });
-  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : SOC_V === 'D' ? SD.tab : SOC_V === 'E' ? 'Sincro' : 'Social'; }
+  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : SOC_V === 'D' ? SD.tab : SOC_V === 'E' ? 'Sincro' : SOC_V === 'F' ? SF.tab : 'Social'; }
 //#bloque 227
   // ===== T22 · Social VIVA, versión C: En sincro (v101) =====
   // Hilo conductor (Juanjo, 15/11): tu ritmo, cuando se acopla con el de otros. Versiones Social (panel, bloque 345 de demo.js) elige A, B o C.
@@ -989,8 +989,8 @@
   // Los videos se insertan en la página (SMIL) para poder pausarlos; el bucle dura SE_VDUR segundos.
   const SE_VSVG = {};
   var seVActivo = null, seVRaf = 0;
-  function seVidCargar(){
-    $$('#seViva .sevid').forEach(el => { if (el.querySelector('svg.sevs')) return;
+  function seVidCargar(sel){   // T25: también lo usa la F
+    $$((sel || '#seViva') + ' .sevid').forEach(el => { if (el.querySelector('svg.sevs')) return;
       const k = el.dataset.sevid, poner = t => { if (el.querySelector('svg.sevs')) return; el.insertAdjacentHTML('afterbegin', t.replace('<svg ', '<svg class="sevs" '));
         const s = el.querySelector('svg.sevs'); if (s && s.pauseAnimations) { s.pauseAnimations(); try { s.setCurrentTime(1.2); } catch (e) {} } };
       if (SE_VSVG[k]) return poner(SE_VSVG[k]);
@@ -1154,3 +1154,418 @@
     if (q('[data-sdanot]')) { SD.anot.e2 = !SD.anot.e2; seRender(); toast(SD.anot.e2 ? 'Te anotaste a Social VIVA · sábado 08:30' : 'Te bajaste de Social VIVA'); return; }
     if (e.target.id === 'seHoja' || q('[data-sex]')) cerrar();
   });
+//#bloque 235
+  // ===== T25 · Social VIVA, versión F: Las puertas (v105) =====
+  // Una pantalla y un interruptor "Puerta" en el panel (Traé a tu gente · Viva te presenta). Cambia una sola cosa: qué ve el socio sin banda
+  // y cómo nace la banda (de dos con el amigo que trajo, o de cinco con su profe). Con banda, la pantalla es la misma: la fecha, el cruce
+  // (protagonista: la barra de la banda contra la de su rival, cada una en % de su propia meta), lo último, lo de Viva y la foto con marco.
+  // Sin barra por integrante (Juanjo, 15/11 a la noche): del avance solo se ve el total de la banda.
+  // Reutiliza: el motor de la E (entradas {socio, fecha}, meta = 80 % de la suma, cada uno suma hasta su meta, momentos, que entrene alguien,
+  // en vivo) · El pulso y los permisos de la D · la foto con marco de la A (mvFoto) · la invitación de la B · Lo de Viva de la E (seCar, SE_PUB).
+  // En real: entradas de EVO del mismo día (sin verificar) · el invitado que vino: cómo lo registra recepción en EVO (no documentado) · metas
+  // de Tu ritmo · banda, fecha, código, permisos y cruces, tablas de Vivapp · Lo de Viva, la cuenta oficial de Instagram.
+  // Piso: la app no pide ni guarda el nombre ni el teléfono del invitado; sumarse entre socios es con un código en persona, sin buscador;
+  // "van N" es un número y no aparece con menos de tres (con dos diría quién falta); nunca quién falta ni la hora; menores: solo la puerta 2,
+  // sin WhatsApp, sin invitación y sin foto hacia afuera.
+  var SF = { puerta:'trae', tipo:'trae', est:'con', mom:'jue', ult:true, ig:/github\.io$/.test(location.hostname) ? 'vivo' : 'ej', tab:'Sincro',
+    alt:false, vivo:false, prisa:false, now:0, extra:[], rec:{}, rayo:{}, flash:false, voy:'voy', inv:null, preg:false, rot:0,
+    comp:{ sem:true, tramo:true, mes:true, hoy:false } };
+  const SF_TABS = ['Sincro', 'Banda', 'Tu tribu', 'Social'];
+  const SF_TIT = { Sincro:['En', 'sincro'], Banda:['Tu', 'banda'], 'Tu tribu':['Tu', 'tribu'], Social:['Social', 'VIVA'] };
+  // Las dos bandas de la demo (nombres inventados). Hábitos: L M X J V S D + hora. salta = entradas que no ocurrieron esa semana (socio:orden).
+  // hoy = quiénes compartieron "entrené hoy" (arranca apagado para todos). La rival de la semana y la de la revancha comparten hábitos.
+  const SF_B = {
+    presenta:{ nom:SB_G.nom, conv:'Prof. Lucas', int:SE_INT.slice(0, 5), hoy:['s2', 's3', 's5'],
+      hab:{ s1:'M18:30 J19:12 S10:30', s2:SE_HAB.s2, s3:SE_HAB.s3, s4:SE_HAB.s4, s5:SE_HAB.s5 },
+      floja:{ s1:'M18:30 J19:12', s2:'L06:30 X06:40', s3:'L19:40 J19:20', s4:'M07:10 S10:00', s5:'L18:10 X18:05' },
+      salta:{ '-8':['s3:2', 's5:1', 's1:2'], '-7':['s2:2', 's4:1'], '-6':['s5:2', 's1:2', 's3:1'], '-5':['s2:2', 's3:1', 's5:0', 's4:1'], '-4':['s1:2'], '-3':['s1:1', 's3:2', 's5:1'], '-2':['s4:0', 's1:2'], '-1':['s1:2'] },
+      riv:{ nom:SE_RIV.nom, metas:SE_RIV.metas, hab:{ r1:'L07:00 X07:05 S08:30', r2:'M07:05 V07:00', r3:'L07:10 J07:00 S08:40', r4:'M07:00 J07:20', r5:'J07:15 S09:00' },
+        salta:{ '-8':['r2:1'], '-7':['r1:2', 'r3:2', 'r4:1', 'r5:1'], '-6':['r1:2', 'r3:1', 'r5:0'], '-5':['r4:0', 'r2:1'], '-4':['r1:0', 'r3:2', 'r5:1'], '-3':['r4:1'],
+          '-2':['r1:1', 'r2:0', 'r3:0', 'r5:1'], '-1':['r1:2', 'r3:2', 'r4:1'], '0':['r1:2', 'r3:2', 'r5:1'] } },
+      pas:['Team sábado', 'Los madrugadores', 'Las imparables', 'Los del mediodía', 'Team sábado', 'Las imparables', 'Los madrugadores', 'Los del mediodía'], prox:'Los madrugadores' },
+    trae:{ nom:['Vos y', 'Cris'], conv:null, int:[SE_INT[0], { id:'c1', n:'Cris', meta:3 }], hoy:['c1'],
+      hab:{ s1:'M18:30 J19:12 S10:30', c1:'L19:00 J19:05 S10:15' }, floja:{ s1:'M18:30 J19:12', c1:'L19:00 J19:05' },
+      salta:{ '-8':['s1:2'], '-7':['c1:0', 's1:0'], '-6':[], '-5':['s1:2', 'c1:2'], '-4':[], '-3':['c1:1'], '-2':[], '-1':['s1:0'] },
+      riv:{ nom:['Las del', 'mediodía'], metas:{ r1:3, r2:2 }, hab:{ r1:'L13:00 X13:10 V13:00', r2:'M13:05 J13:05' },
+        salta:{ '-8':['r2:1'], '-7':['r1:2'], '-6':['r1:1', 'r2:0'], '-5':[], '-4':['r1:0'], '-3':[], '-2':['r2:1', 'r1:2'], '-1':['r1:1', 'r2:1'], '0':['r2:1'] } },
+      pas:['Dúo de la mañana', 'Team sábado', 'Las del mediodía', 'Los de las 21', 'Dúo de la mañana', 'Team sábado', 'Los de las 21', 'Las del mediodía'], prox:'Los de las 21' }
+  };
+  const SF_GENTE = Object.assign({ Cris:SD_GENTE.Cris }, SE_GENTE);
+  const SF_MOM = { lun:360, mie:2 * SE_DIA + 19 * 60, jue:SE_JUE + 19 * 60 + 10, sab:5 * SE_DIA + 11 * 60, dom:6 * SE_DIA + 20 * 60, lun1g:SE_SEM + 360, lun1p:SE_SEM + 360 };
+  const SF_SIN = SE_DIA + 12 * 60, SF_NUEVA = SE_JUE + 20 * 60 + 15;   // sin banda: martes al mediodía · la banda nace el jueves, después de la fecha
+  const SF_SEDES = ['López y Planes', 'Sarmiento', 'Alberdi'];   // las de Resistencia (cultura-viva.md § 1)
+  const sfDia = m => ((Math.floor(m / SE_DIA) % 7) + 7) % 7;
+  const sfP = () => scMenor() ? 'presenta' : SF.puerta;          // menores: solo la puerta 2
+  const sfT = () => scMenor() ? 'presenta' : SF.tipo;            // la banda que nació (de la puerta o del camino que tomó el socio)
+  const sfB = () => SF_B[sfT()];
+  const sfNom = () => sfB().nom.join(' ');
+  const sfNueva = () => SF.est === 'nueva';
+  const sfLun1 = () => (SF.mom === 'lun1g' || SF.mom === 'lun1p') && SF.est === 'con' && Math.floor(SF.now / SE_SEM) === 1 && sfDia(SF.now) === 0;
+  // Las entradas, con la forma de EVO ({socio, fecha}): ocho semanas de historia, la semana de la demo (buena; floja solo en "esta vez no") y la siguiente.
+  function sfGen(hab, salta, floja){
+    const L = [];
+    for (let w = -8; w <= 1; w++) { const cur = w === 0 && floja ? floja : hab, sal = salta[w] || [];
+      Object.keys(cur).forEach(id => { const s = sal.filter(x => x.split(':')[0] === id).map(x => +x.split(':')[1]);
+        cur[id].split(' ').filter((t, i) => t && !s.includes(i)).forEach(t => L.push({ socio:id, fecha:seFm(seSlot(w, t)) })); }); }
+    return L;
+  }
+  function sfEntradas(){
+    const B = sfB();
+    return sfGen(B.hab, B.salta, SF.est === 'con' && SF.mom === 'lun1p' ? B.floja : null).concat(SF.extra)
+      .map(e => Object.assign({ m:seMin(e.fecha) }, e)).sort((a, b) => a.m - b.m);
+  }
+  const sfRivEnt = () => { const R = sfB().riv; return sfGen(R.hab, R.salta).map(e => ({ socio:e.socio, m:seMin(e.fecha) })); };
+  const sfDesde = w => sfNueva() && w === 0 ? SE_JUE : w * SE_SEM;
+  const sfMetaDe = metas => Math.round(0.8 * metas.reduce((a, b) => a + b, 0));
+  const sfMeta = w => { const m = sfMetaDe(sfB().int.map(x => x.meta)); return sfNueva() && w === 0 ? Math.round(m / 2) : m; };
+  const sfHechos = (E, id, w, h) => E.filter(e => e.socio === id && e.m >= sfDesde(w) && e.m < (w + 1) * SE_SEM && e.m <= h).length;
+  const sfTotal = (E, w, h) => sfB().int.reduce((a, m) => a + Math.min(m.meta, sfHechos(E, m.id, w, h)), 0);
+  const sfPct = (E, w, h) => Math.round(100 * sfTotal(E, w, h) / sfMeta(w));
+  function sfRivPct(w, h){
+    const R = sfB().riv, E = sfRivEnt();
+    const t = Object.keys(R.metas).reduce((a, id) => a + Math.min(R.metas[id], E.filter(e => e.socio === id && e.m >= w * SE_SEM && e.m < (w + 1) * SE_SEM && e.m <= h).length), 0);
+    return Math.round(100 * t / sfMetaDe(Object.values(R.metas)));
+  }
+  const sfFin = w => (w + 1) * SE_SEM - 1;
+  // Cada banda contra su propia meta; gana la que llega más arriba. Si perdieron, la semana siguiente es la revancha contra la misma.
+  function sfRes(E, w){ const a = sfPct(E, w, sfFin(w)), b = sfRivPct(w, sfFin(w)); return { a:a, b:b, gano:a > b, riv:sfRivNom(E, w) }; }
+  function sfRivNom(E, w){ const B = sfB();
+    if (w <= 0) return w === 0 ? B.riv.nom.join(' ') : B.pas[w + 8];
+    return sfRes(E, w - 1).gano ? B.prox : sfRivNom(E, w - 1); }
+  const sfCuando = m => { const d = Math.floor(SF.now / SE_DIA) - Math.floor(m / SE_DIA); return d <= 0 ? 'hoy' : d === 1 ? 'ayer' : 'el ' + SE_DIAS[sfDia(m)]; };
+  const sfNomDe = id => sfB().int.find(m => m.id === id).n;
+  // Lo último de la banda (7 días, del más nuevo al más viejo). Lo de los otros, solo si lo comparten; "entrené hoy" arranca apagado.
+  function sfEventos(E){
+    const B = sfB(), ids = B.int.map(m => m.id), desde = SF.now - 7 * SE_DIA, ev = [], cuenta = {}, tot = {};
+    const ve = (id, k) => id === 's1' ? (k === 'sem' ? SF.comp.sem : SF.comp.hoy) && !scMenor() : k === 'sem' || B.hoy.includes(id);
+    E.filter(e => ids.includes(e.socio) && e.m <= SF.now && e.m >= sfDesde(Math.floor(e.m / SE_SEM))).forEach(e => {
+      const w = Math.floor(e.m / SE_SEM), k = e.socio + w, meta = B.int.find(m => m.id === e.socio).meta, antes = tot[w] || 0;
+      cuenta[k] = (cuenta[k] || 0) + 1; if (cuenta[k] <= meta) tot[w] = antes + 1;
+      const tipo = cuenta[k] === meta ? 'sem' : 'ent';
+      if (e.m > desde && ve(e.socio, tipo)) ev.push({ k:tipo, id:e.socio, m:e.m, key:e.socio + '@' + e.m });
+      if (e.m > desde && antes < sfMeta(w) && tot[w] >= sfMeta(w)) ev.push({ k:'sincro', m:e.m + .5, key:'sincro@' + w });
+    });
+    if (sfNueva()) B.int.forEach((b, i) => { if (SF_NUEVA <= SF.now && SF_NUEVA > desde) ev.push({ k:'nuevo', id:b.id, m:SF_NUEVA + i * .01, key:'nuevo' + b.id }); });
+    else for (let w = Math.floor(desde / SE_SEM) + 1; w <= Math.floor(SF.now / SE_SEM); w++) { const r = sfRes(E, w - 1);
+      if (r.gano && w * SE_SEM > desde) ev.push({ k:'gano', m:w * SE_SEM + 1, key:'gano@' + w }); }
+    return ev.sort((a, b) => b.m - a.m);
+  }
+  function sfFirma(x){   // [verbo, resto, con rayo]
+    const yo = x.id === 's1';
+    if (x.k === 'sincro') return ['Entraron', 'en sincro', 1];
+    if (x.k === 'gano') return ['Ganaron', 'el cruce', 1];
+    if (x.k === 'nuevo') return yo ? ['Te sumaste', 'a la banda'] : ['Se sumó', 'a la banda'];
+    if (x.k === 'sem') return yo ? ['Cumpliste', 'tu semana', 1] : ['Cumplió', 'su semana', 1];
+    return [yo ? 'Entrenaste' : 'Entrenó', sfCuando(x.m)];
+  }
+  const sfQuien = x => x.id ? (x.id === 's1' ? 'Vos' : sfNomDe(x.id)) : sfNom();
+  const sfAv = x => !x.id ? '<span class="av sm sdbav" aria-hidden="true">' + MV_RAYO + '</span>'
+    : '<span class="av sm" style="background:' + grad(SF_GENTE[sfNomDe(x.id)]) + '">' + (x.id === 's1' ? 'M' : inicial(sfNomDe(x.id))) + '</span>';
+  function sfRayoBtn(x){
+    if (x.id === 's1') { const n = x.key in SF.rec ? SF.rec[x.key].length : 1 + Math.round(x.m) % 2; return n ? '<span class="small muted sdtuyo">' + n + ' ' + MV_RAYO + '<br>lo ves vos</span>' : ''; }
+    const on = !!SF.rayo[x.key], q = sfQuien(x);
+    return '<button class="clap sdrayo" data-sfrayo="' + x.key + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Sacarle el rayo a ' : 'Mandarle un rayo a ') + q + '">' + MV_RAYO + '</button>';
+  }
+  function sfEv(x){
+    const f = sfFirma(x), cls = x.k === 'ent' || x.k === 'nuevo' ? 'c' : 'm';
+    return '<article class="mvpos sdev ' + cls + '"><div class="sdevrow">' + sfAv(x) + '<span class="stack" style="gap:3px;flex:1;min-width:0"><span class="small muted"><b class="sdq">' + sfQuien(x) + '</b>' +
+      (x.k === 'ent' ? '' : ' · ' + sfCuando(x.m)) + '</span><span class="mvfirma sig"><b>' + f[0] + '</b> <i>' + f[1] + '</i>' + (f[2] ? ' ' + MV_RAYO : '') + '</span></span>' + sfRayoBtn(x) + '</div></article>';
+  }
+  // ---- la cabecera: el nombre de la sección (el de la pestaña), la banda y quién la convoca; cámara y WhatsApp
+  function sfCab(con){
+    const t = SF_TIT[SF.tab], B = sfB(), m = scMenor();
+    return '<div class="sdhead"><div class="stack" style="gap:6px;flex:1;min-width:0"><h1 class="mtitle sig"><b>' + t[0] + '</b> <i>' + t[1] + '</i></h1>' +
+      (con ? '<button class="sfbanda" data-sfbanda aria-label="Tu banda: ' + sfNom() + '"><span class="sdbanda">' + sfNom() + '</span>' + (B.conv ? '<span class="small muted">la convoca ' + B.conv + '</span>' : '') + '</button>' : '') + '</div>' +
+      (con && !m ? '<span class="sfcabb"><button class="btn ghost sdmsg" data-sffoto aria-label="La foto con el marco de Viva">' + SB_CAM + '<span>Foto</span></button>' +
+        '<button class="btn ghost sdmsg" data-sfmsg aria-label="Mensajes: abre WhatsApp">' + SB_WA + '<span>WhatsApp</span></button></span>' : '') + '</div>';
+  }
+  // ---- la fecha: una franja (día, hora y sede · Voy · No llego · "van N", solo con tres o más)
+  function sfFecha(){
+    const w = Math.floor(SF.now / SE_SEM), esta = SF.now < w * SE_SEM + SE_JUE + 20 * 60, hoy = esta && sfDia(SF.now) === 3, n = sfB().int.length;
+    const van = Math.max(1, Math.round((n - 1) * (esta ? .75 : .25))) + (SF.voy === 'voy' ? 1 : 0);
+    const op = (k, t) => '<button class="opt" data-sfvoy="' + k + '" aria-pressed="' + (SF.voy === k) + '">' + t + '</button>';
+    return '<div class="card sefrs"><div class="sefr"><span class="sefk">' + (hoy ? 'Hoy' : 'Jue') + ' ' + SB_G.hora + '</span><span class="sefx small"><span class="sefl">' + SB_G.sede + '</span>' +
+      (n >= 3 ? '<span class="sefl muted">van ' + van + '</span>' : '') + '</span><span class="opts sevoy">' + op('voy', 'Voy') + op('no', 'No llego') + '</span></div></div>';
+  }
+  // ---- el cruce: dos columnas de diez celdas (las de Tu semana de Inicio), cada banda en % de su propia meta. Nunca el aporte de cada uno.
+  function sfCol(p, nom, yo, flash){
+    const N = 10, lit = p == null ? 0 : Math.min(N, Math.floor(Math.min(100, p) / 10)), sin = yo && p >= 100, id = 'sfc' + (++scUid), GP = 5, sh = (200 - GP * (N - 1)) / N;
+    const C = yo ? 'var(--lime)' : 'var(--muted)', F = sin ? 'url(#' + id + 'z)' : C, L = eqLuz(Math.max(.4, lit / N));
+    let g = '<defs><filter id="' + id + '" filterUnits="userSpaceOnUse" x="-30" y="-30" width="100" height="270"><feGaussianBlur stdDeviation="' + (L.hb * .5).toFixed(1) + '"/></filter>' +
+      '<linearGradient id="' + id + 'z" gradientUnits="userSpaceOnUse" x1="0" y1="200" x2="0" y2="0"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient></defs>' +
+      '<rect class="rl-slot" x="-4" y="-4" width="48" height="208" rx="6"/>';
+    if (p == null) g += '<rect x="2" y="2" width="36" height="196" rx="4" fill="none" stroke="var(--muted)" stroke-opacity=".45" stroke-dasharray="4 5"/>';
+    else for (let j = 0; j < N; j++) { const c = eqCeldaCol(0, 200 - (j + 1) * sh - j * GP, 40, sh, j < lit, j < lit ? F : C, L, id, sin);
+      g += flash && j === lit - 1 ? '<g class="senuevo">' + c + '</g>' : c; }
+    return '<div class="sfcol' + (yo ? ' yo' : '') + (sin ? ' sin' : '') + '" role="img" aria-label="' + nom + ': ' + (p == null ? 'todavía sin cruce' : p + ' % de su meta') + '">' +
+      '<span class="sfp">' + (p == null ? '—' : p + ' %') + (sin ? MV_RAYO : '') + '</span><svg class="' + (yo && lit ? 'late' : '') + '" viewBox="-6 -6 52 212" preserveAspectRatio="none" aria-hidden="true">' + g + '</svg>' +
+      '<span class="senom">' + nom + '</span></div>';
+  }
+  const sfTit = (b, i) => '<span class="setit sftit sig">' + b + (i ? ' <i>' + i + '</i>' : '') + '</span>';
+  function sfUlt8(E, hasta){ const a = []; for (let w = sfNueva() ? 0 : -8; w < hasta; w++) a.push(sfRes(E, w).gano ? 1 : 0); return a.slice(-8); }
+  // El mes de la banda: semanas del mes (las que arrancan en el mes) llegadas al 100 %. Con tres, el cartel de la banda.
+  function sfMes(E){
+    const w = Math.floor(SF.now / SE_SEM), mes = new Date(SE_BASE + w * SE_SEM * 60000).getUTCMonth();
+    let n = 0; for (let p = sfNueva() ? 0 : -8; p <= w; p++) if (new Date(SE_BASE + p * SE_SEM * 60000).getUTCMonth() === mes && sfPct(E, p, Math.min(SF.now, sfFin(p))) >= 100) n++;
+    return n;
+  }
+  function sfCruce(E){
+    const w = Math.floor(SF.now / SE_SEM), dia = sfDia(SF.now), hora = SF.now % SE_DIA, nom = sfNom(), m = scMenor();
+    if (sfNueva() && w === 0) {
+      const p = sfPct(E, 0, SF.now), B = sfB();
+      return mvPos((p >= 100 ? 'f' : 'c') + ' seeqbox sfcruce', '<span class="mvk">Su primera semana</span><span class="stack" style="gap:4px">' + (p >= 100 ? sfTit('<b>En</b>', 'sincro ' + MV_RAYO) : sfTit('<b>Vamos ' + p + ' %</b>')) +
+          '<span class="mvsub">Meta a la mitad. El lunes arranca su primer cruce.</span></span>' +
+        '<div class="sfx">' + sfCol(p, nom, true, SF.flash) + sfCol(null, 'Otra banda', false) + '</div>' +
+        '<div class="sbint sfint">' + B.int.map(x => '<span class="sbper"><span class="av sm" style="background:' + grad(SF_GENTE[x.n]) + '">' + (x.id === 's1' ? 'M' : inicial(x.n)) + '</span><span class="small">' + x.n + '</span></span>').join('') + '</div>' +
+        (m ? '' : '<button class="btn ghost sm" data-sfsumar>Sumá a alguien</button>'));
+    }
+    let cab, cols, extra = '', sincro = false, ult;
+    if (sfLun1()) {
+      const r = sfRes(E, w - 1); ult = sfUlt8(E, w);
+      cab = '<span class="mvk">El cruce · la semana pasada</span><span class="stack" style="gap:4px">' + (r.gano ? sfTit('<b>Ganaron</b>', MV_RAYO) : sfTit('<b>Esta vez</b>', 'no')) +
+        '<span class="mvsub">' + (r.gano ? r.a + ' a ' + r.b + ' contra ' + r.riv + '. Hoy arranca otro cruce, contra ' + sfRivNom(E, w) + '.' : r.b + ' a ' + r.a + ' contra ' + r.riv + '. Hoy arranca la revancha.') + '</span></span>';
+      cols = sfCol(r.a, nom, true) + sfCol(r.b, r.riv, false); sincro = r.gano;
+      if (r.gano && !m) extra = '<button class="btn sm" data-sffoto>' + SB_CAM + 'La foto del cruce</button>';
+    } else {
+      const a = sfPct(E, w, SF.now), b = sfRivPct(w, SF.now), q = 6 - dia; ult = sfUlt8(E, w); sincro = a >= 100;
+      const cuando = dia === 6 ? (hora >= SE_ABRE[6][1] * 60 ? 'El resultado, mañana.' : 'Cierra hoy.') : q === 1 ? 'Queda 1 día.' : 'Quedan ' + q + ' días.';
+      const antes = dia === 0 && w > -8 ? '<span class="seres">La semana pasada: ' + (sfRes(E, w - 1).gano ? 'ganaron ' + MV_RAYO : 'esta vez no') + '</span>' : '';
+      cab = antes + '<span class="mvk">El cruce · esta semana</span><span class="stack" style="gap:4px">' + sfTit('<b>Vamos ' + a + ' %</b>', '· ellos ' + b + ' %') +
+        '<span class="mvsub">' + (sincro ? 'En sincro ' + MV_RAYO + ' ' : '') + cuando + '</span></span>';
+      cols = sfCol(a, nom, true, SF.flash) + sfCol(b, sfRivNom(E, w), false);
+    }
+    const mes = sfMes(E);
+    if (mes >= 3) extra += '<div class="mvfila sfcartelf"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">Mes cumplido ' + MV_RAYO + '</span><span class="small muted">El cartel de la banda</span></span><button class="btn sm" data-sfcartel>Verlo</button></div>';
+    return mvPos((sincro ? 'f' : 'c') + ' seeqbox sfcruce' + (SF.nuevoSincro ? ' seboom' : ''), cab + '<div class="sfx">' + cols + '</div>' +
+      '<span class="stack" style="gap:6px">' + sdCeldas(ult) + '<span class="scpie"><span>Últimos ' + ult.length + ' cruces</span><span>Ganados: ' + ult.filter(Boolean).length + '</span></span></span>' + extra);
+  }
+  function sfUltimo(ev){
+    const x = ev[0];
+    if (!x) return '<div class="card sefrs"><div class="sefr"><span class="sefk">Lo último</span><span class="sefx muted">Todavía nada esta semana.</span></div></div>';
+    const f = sfFirma(x), a = x.id === 's1' ? [f[0], f[1]] : [sfQuien(x), f[0].toLowerCase() + ' ' + f[1]];
+    return '<div class="card sefrs"><div class="sefr"><button class="sefrb" data-sfvibra aria-label="Lo último de tu banda: ver los últimos 7 días">' + sfAv(x) +
+      '<span class="sefx"><b>' + a[0] + '</b> ' + a[1] + (f[2] ? ' ' + MV_RAYO : '') + '</span></button>' + sfRayoBtn(x) + '</div></div>';
+  }
+  // ---- sin banda: el lugar que late (igual en las dos puertas) y la puerta
+  function sfLugar(){
+    let b = '';
+    for (let i = 0; i < 3; i++) b += '<span class="sebar' + (i === 1 ? ' aca' : '') + '"><svg viewBox="-6 -6 52 212" preserveAspectRatio="none" aria-hidden="true"><rect class="rl-slot" x="-4" y="-4" width="48" height="208" rx="6"/>' +
+      (i === 1 ? '<rect class="seaca" x="1" y="1" width="38" height="198" rx="5" fill="none" stroke="var(--lime)" stroke-width="2.5"/>' : '<rect x="2" y="2" width="36" height="196" rx="4" fill="none" stroke="var(--muted)" stroke-opacity=".35" stroke-dasharray="4 5"/>') +
+      '</svg><span class="senom">' + (i === 1 ? 'Vos' : '') + '</span></span>';
+    return '<div class="seeq off sfmini">' + b + '</div>';
+  }
+  const sfSal = (k, t) => '<button class="link lime sfsal" data-sfsal="' + k + '">' + t + '</button>';
+  function sfSin(){
+    const p = SF.alt ? (sfP() === 'trae' ? 'presenta' : 'trae') : sfP();
+    if (p === 'trae') return mvPos('m sfpuerta', sfLugar() + '<span class="stack" style="gap:6px">' + sfTit('<b>Entrená</b>', 'con alguien') + '<span class="mvsub">De a dos, venir es más fácil ' + MV_RAYO + '</span></span>' +
+      '<span class="stack" style="gap:10px"><button class="btn" data-sfinv>Invitá a un amigo</button><button class="btn ghost" data-sfcod>Ya entreno con alguien de Viva</button></span>' +
+      (SF.alt ? sfSal('volver', 'Volver al primer jueves') : sfSal('presenta', 'No tengo con quién')));
+    return mvPos('m sfpuerta', sfLugar() + '<span class="stack" style="gap:6px">' + sfTit('<b>Tu primer</b>', 'jueves') +
+        '<span class="sfprofe">' + sbProfe('Te recibe · ' + SB_G.hora + ' · ' + SB_G.sede) + '</span></span>' +
+      '<span class="stack" style="gap:10px"><button class="btn" data-sfprimer>Voy</button><span class="mvsub">Cada uno su rutina, a la misma hora. Tu profe arma las bandas.</span></span>' +
+      (scMenor() ? '' : SF.alt ? sfSal('volver', 'Volver') : sfSal('trae', 'Prefiero traer a alguien')));
+  }
+  function sfEspera(){
+    if (sfT() === 'trae') { const I = sfInv();
+      return mvPos('m sfpuerta', '<span class="mvk">En espera</span><span class="stack" style="gap:6px">' + sfTit('<b>Invitaste</b>', 'a alguien') +
+          '<span class="mvsub">Para el ' + SE_DIAS[sfDia(I.d * SE_DIA)] + ' ' + I.h + ' · ' + I.s + '. Si viene, arrancan en banda.</span></span>' +
+        '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-sfreenv>Reenviar</button><button class="btn ghost sm" data-sfinv>Cambiar el día</button></div>'); }
+    return mvPos('m sfpuerta', '<span class="mvk">Tu primer jueves · ' + SB_G.sede + '</span><span class="stack" style="gap:6px">' + sfTit('<b>Anotado</b>', MV_RAYO) +
+        '<span class="mvsub">El jueves te esperan a las ' + SB_G.hora + '. Prof. Lucas te recibe en la entrada de la sala.</span></span>' +
+      '<button class="btn ghost sm" data-sfnollego>No llego</button>');
+  }
+  // ---- Lo de Viva: lo de la E (publicaciones y videos ilustrados por código, o Instagram en vivo en el iPhone) y Social VIVA con Me anoto
+  function sfViva(){
+    const car = SF.ig === 'vivo' ? sdIgVivo() + '<div class="secarr">' + seCar(SE_PUB[3]) + '</div>' : '<div class="secarr" aria-label="Publicaciones de Viva">' + SE_PUB.map(seCar).join('') + '</div>';
+    return '<div class="stack" style="gap:14px"><span class="stack" style="gap:2px"><span class="lbl">Lo de Viva</span><span class="small muted">' + (SF.ig === 'vivo' ? 'La cuenta de Viva en Instagram' : 'Lo que publica Viva') + '</span></span>' + car + sdSocial() + '</div>';
+  }
+  // ---- la pantalla
+  function sfRender(){
+    const c = $('#sfArriba'); if (!c) return;
+    if (sfNueva() && SF.now < SF_NUEVA + 15) SF.now = SF_NUEVA + 15;
+    let h;
+    if (SF.est === 'sin' || SF.est === 'espera') h = sfCab(false) + (SF.est === 'sin' ? sfSin() : sfEspera());
+    else { const E = sfEntradas(); h = sfCab(true) + sfFecha() + sfCruce(E) + (SF.ult ? sfUltimo(sfEventos(E)) : ''); }
+    c.innerHTML = h; SF.flash = false; SF.nuevoSincro = false;
+    const v = $('#sfViva'), k = SF.ig + !!SD.anot.e2;
+    if (v.dataset.k !== k) { if (seVActivo) seVidPausa(seVActivo); v.dataset.k = k; v.innerHTML = sfViva(); seVidCargar('#sfViva'); }
+    if (SF.preg) { SF.preg = false; sfComp(true); }
+    if (SF.vivo && !sfVivoT) sfVivoProg();
+  }
+  function sfHoja(html){ $('#sfHojaIn').innerHTML = html; $('#sfHoja').hidden = false; }
+  const sfCerrarBtn = (t) => '<button class="btn ghost sm" data-sfx type="button">' + (t || 'Cerrar') + '</button>';
+  // La invitación (la de la B, con día, hora y sede): el mensaje a la vista; la app no pide ni guarda el nombre ni el teléfono del invitado.
+  const sfHoras = d => d === 5 ? ['09:00', '11:00', '16:00'] : d === 6 ? ['10:00', '12:00'] : ['07:00', '12:00', '18:00', '19:00', '20:00'];
+  function sfInv(){
+    const hoy = Math.floor(SF.now / SE_DIA);
+    if (!SF.inv || SF.inv.d < hoy) { let d = hoy + ((3 - sfDia(SF.now) + 7) % 7); if (d === hoy && SF.now % SE_DIA > 18 * 60) d += 7; SF.inv = { d:d, h:'19:00', s:SB_G.sede }; }
+    return SF.inv;
+  }
+  function sfInvTxt(I){
+    const hoy = Math.floor(SF.now / SE_DIA), dia = I.d === hoy ? 'Hoy' : I.d === hoy + 1 ? 'Mañana' : 'El ' + SE_DIAS[sfDia(I.d * SE_DIA)];
+    return dia + ' a las ' + (I.h.slice(3) === '00' ? +I.h.slice(0, 2) : I.h) + ' entreno en Viva ' + I.s + '. ¿Venís? Tenés un pase para acompañarme';
+  }
+  function sfInvHoja(){
+    const I = sfInv(), hoy = Math.floor(SF.now / SE_DIA), H = sfHoras(sfDia(I.d * SE_DIA));
+    if (!H.includes(I.h)) I.h = H[H.length > 3 ? 3 : 0];
+    const chip = (k, v, t, on) => '<button class="opt" type="button" data-' + k + '="' + v + '" aria-pressed="' + on + '">' + t + '</button>';
+    let dias = ''; for (let d = hoy; d < hoy + 7; d++) dias += chip('sfid', d, d === hoy ? 'Hoy' : d === hoy + 1 ? 'Mañana' : SE_DIAS[sfDia(d * SE_DIA)].slice(0, 3).replace(/^./, c => c.toUpperCase()), d === I.d);
+    const fila = (t, x) => '<span class="stack" style="gap:8px"><span class="lbl">' + t + '</span><div class="opts sfchips">' + x + '</div></span>';
+    sfHoja('<span class="mtitle sig"><b>Invitá</b> <i>a un amigo</i></span>' + fila('Día', dias) + fila('Hora', H.map(h => chip('sfih', h, h, h === I.h)).join('')) +
+      fila('Sede', SF_SEDES.map(s => chip('sfis', s, s, s === I.s)).join('')) +
+      '<div class="sfmsg"><span>' + sfInvTxt(I) + '</span><span class="sflink">Enlace del pase · en la demo, de ejemplo</span></div>' +
+      '<span class="small muted" style="line-height:1.4">Vivapp no pide ni guarda su nombre ni su teléfono. El pase lo valida recepción.</span>' +
+      '<button class="btn" data-sfwa="inv" type="button">' + SB_WA + 'Mandar por WhatsApp</button>' + sfCerrarBtn());
+  }
+  // Ya entreno con alguien de Viva: un código de cuatro cifras, en persona. Sin buscador de personas; los dos aceptan.
+  var sfCodT = 0;
+  const sfCodigo = () => String(1000 + (Math.floor(SF.now) * 7919 + 4127) % 9000);
+  function sfCodHoja(){
+    clearTimeout(sfCodT);
+    sfHoja('<span class="mtitle sig"><b>Ya entreno</b> <i>con alguien</i></span>' +
+      '<span class="stack" style="gap:6px"><span class="lbl">Mostrale este código</span><span class="sfcod" aria-label="Tu código: ' + sfCodigo().split('').join(' ') + '">' + sfCodigo() + '</span><span class="small muted" style="text-align:center">Vale por hoy. Cuando lo cargue, los dos aceptan.</span></span>' +
+      '<span class="stack" style="gap:8px"><span class="lbl">Tengo un código</span><div class="sfcodrow"><input class="sfcodin" id="sfCodIn" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="El código de cuatro cifras" placeholder="····">' +
+      '<button class="btn sm" data-sfcodok type="button">Sumarme</button></div></span>' + sfCerrarBtn());
+    sfCodT = setTimeout(() => { if (!$('#sfHoja').hidden && $('#sfCodIn')) sfAcepta('Cris cargó tu código'); }, 6000);   // en la demo, Cris lo carga a los 6 segundos
+  }
+  function sfAcepta(t){
+    clearTimeout(sfCodT);
+    sfHoja('<span class="mtitle sig"><b>' + t + '</b></span><span class="muted" style="line-height:1.45">¿Entrenan en banda? Quedan los dos, con el jueves a las 19 como su fecha. Lo cambian cuando quieran.</span>' +
+      '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-sfx type="button">Ahora no</button><button class="btn sm" data-sfbandaok type="button">Entrenar en banda</button></div>');
+  }
+  // La pregunta de permisos de la D, una vez, al entrar a la banda
+  function sfComp(primera){
+    sfHoja('<span class="mtitle sig"><b>' + (primera ? 'Entraste a' : 'Qué ve') + '</b> <i>' + (primera ? sfNom() : 'tu banda') + '</i></span>' +
+      (scMenor() ? '<span class="muted" style="line-height:1.45">Por ahora lo tuyo no sale a la banda. Lo que entrenás suma igual.</span>'
+        : '<span class="muted" style="line-height:1.45">' + (primera ? '¿Qué querés que vea tu banda? ' : '') + 'Solo cosas logradas, nunca la hora. Lo que entrenás suma igual.</span>' +
+          '<div>' + SD_COMP.map(x => '<label class="swrow" for="sfc_' + x[0] + '"><span style="flex:1">' + x[1] + '</span><input type="checkbox" class="sw" id="sfc_' + x[0] + '" data-sfsw="' + x[0] + '"' + (SF.comp[x[0]] ? ' checked' : '') + '></label>').join('') + '</div>' +
+          '<span class="small muted">Lo cambiás cuando quieras, desde tu banda.</span>') +
+      '<button class="btn" data-sfx type="button">Listo</button>');
+  }
+  function sfBandaHoja(){
+    const B = sfB();
+    sfHoja('<span class="mtitle sig"><b>' + B.nom[0] + '</b> <i>' + B.nom[1] + '</i></span>' + (B.conv ? sbProfe('La convoca · ' + SB_G.sede) : '<span class="small muted">El nombre lo eligen ustedes, cuando quieran.</span>') +
+      '<div class="sbint">' + B.int.map(x => '<span class="sbper"><span class="av sm" style="background:' + grad(SF_GENTE[x.n]) + '">' + (x.id === 's1' ? 'M' : inicial(x.n)) + '</span><span class="small">' + x.n + '</span></span>').join('') + '</div>' +
+      '<span class="small muted" style="line-height:1.4">Sin perfiles: solo el nombre. Del avance, la banda ve el total, nunca el de cada uno.</span>' +
+      (scMenor() ? '' : '<button class="btn ghost sm" data-sfsumar type="button">Sumá a alguien</button>') + '<button class="btn ghost sm" data-sfcomp type="button">Qué ve tu banda</button>' + sfCerrarBtn());
+  }
+  function sfSumarHoja(){
+    sfHoja('<span class="mtitle sig"><b>Sumá</b> <i>a alguien</i></span><span class="muted" style="line-height:1.45">A un amigo que todavía no viene, con una invitación; a alguien que ya entrena en Viva, con un código en persona.</span>' +
+      '<button class="btn" data-sfinv type="button">Invitá a un amigo</button><button class="btn ghost" data-sfcod type="button">Ya entrena en Viva</button>' + sfCerrarBtn());
+  }
+  function sfVibraHoja(){
+    const ev = sfEventos(sfEntradas());
+    sfHoja('<span class="mtitle sig"><b>Lo último</b> <i>de tu banda</i></span><span class="small muted">Los últimos 7 días. Solo lo logrado, nunca la hora.</span>' +
+      '<div class="mvfeed sevibra" style="gap:12px">' + ev.map(sfEv).join('') + '</div><span class="mvfin">Estás al día ⚡</span>' +
+      '<button class="btn ghost sm" data-sfcomp type="button">Qué ve tu banda</button>' + sfCerrarBtn());
+  }
+  function sfMsg(){
+    const fila = (k, t, s) => '<div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + t + '</span><span class="small muted">' + s + '</span></span><button class="btn sm" data-sfwa="' + k + '">Abrir</button></div>';
+    sfHoja('<span class="mtitle sig"><b>Mensajes</b> <i>por WhatsApp</i></span><div class="list">' + fila('banda', sfNom(), 'El grupo de WhatsApp de tu banda') + fila('profe', 'Prof. Lucas', 'Tu profe, a su número de trabajo') + '</div>' +
+      '<span class="small muted" style="line-height:1.4">En Vivapp no hay chat: la charla vive en WhatsApp. Nunca ves el número de otro socio. En la demo, los enlaces son de ejemplo.</span>' + sfCerrarBtn());
+  }
+  // La foto con marco (la de la A): el dato sale de las entradas; sale a historias y no se guarda en Vivapp
+  function sfDato(E){
+    const w = Math.floor(SF.now / SE_SEM);
+    if (sfLun1() && sfRes(E, w - 1).gano) return ['Ganamos', 'el cruce'];
+    let n = 0; for (let p = sfPct(E, w, SF.now) >= 100 ? w : w - 1; p >= (sfNueva() ? 0 : -8) && sfPct(E, p, Math.min(SF.now, sfFin(p))) >= 100; p--) n++;
+    if (n >= 2) return [n + ' semanas', 'en sincro'];
+    if (n === 1) return ['En', 'sincro'];
+    return ['Entrenamos', 'en banda'];
+  }
+  function sfFoto(){
+    const d = sfDato(sfEntradas());
+    sfHoja('<span class="mtitle sig"><b>La foto</b> <i>de la banda</i></span>' + mvFoto(['#07b0f2', '#f400a0'], d, sfNom() + ' · ' + SB_G.sede, true) +
+      '<span class="small muted" style="line-height:1.45">Sale con el marco de VIVA y el dato de la banda, y no se guarda en Vivapp. Antes de compartirla, que estén de acuerdo todos los que salen.</span>' +
+      '<div class="grid2" style="gap:10px">' + sfCerrarBtn() + '<button class="btn sm" data-sfig type="button">A historias</button></div>');
+  }
+  function sfCartel(){
+    sfHoja('<span class="mtitle sig"><b>Mes cumplido</b> <i>' + sfNom() + '</i></span><div class="sccartel sdcartel" role="img" aria-label="El cartel de ' + sfNom() + '">' + scCartelSvg(sfB().nom, 300, 170) + '</div>' +
+      '<span class="small muted" style="line-height:1.4">Tres semanas del mes en sincro. Queda en Tu mural de cada uno y sale a tus historias: solo el nombre de la banda, sin fotos ni números de nadie.</span>' +
+      '<div class="grid2" style="gap:10px">' + sfCerrarBtn() + '<button class="btn sm" data-sfig type="button">A historias</button></div>');
+  }
+  // ---- que pase algo (lo de la E): el próximo entrenamiento de hoy de la banda o, si no hay, alguien que hoy no vino. quien = 's1': entrás vos.
+  var sfTim = [], sfVivoT = 0;
+  const sfLimpiar = () => { sfTim.forEach(clearTimeout); sfTim = []; };
+  function sfRayos(key){
+    const otros = sfB().int.filter(m => m.id !== 's1'), n = Math.min(otros.length, 1 + (SF.rot % 2)); SF.rec[key] = [];
+    for (let i = 0; i < n; i++) { const q = otros[(SF.rot + i) % otros.length].n;
+      sfTim.push(setTimeout(() => { (SF.rec[key] = SF.rec[key] || []).push(q); toast(q + ' te mandó un ⚡'); sfRender(); }, 2200 + i * 2300)); }
+    SF.rot++;
+  }
+  function sfEntrena(quien){
+    if (SF.est === 'sin' || SF.est === 'espera') { toast('Sin banda no hay cruce: probalo con Banda recién formada o Con banda'); return false; }
+    const E = sfEntradas(), w = Math.floor(SF.now / SE_SEM), dia = Math.floor(SF.now / SE_DIA), B = sfB(), ids = B.int.map(m => m.id), ab = SE_ABRE[sfDia(SF.now)], hora = SF.now % SE_DIA;
+    const antes = sfTotal(E, w, SF.now), hoyYa = new Set(E.filter(e => Math.floor(e.m / SE_DIA) === dia && e.m <= SF.now).map(e => e.socio));
+    const prox = quien ? null : E.find(e => ids.includes(e.socio) && e.m > SF.now && Math.floor(e.m / SE_DIA) === dia);
+    let id;
+    if (prox) { SF.now = prox.m; id = prox.socio; }
+    else {
+      if (hora < ab[0] * 60 || hora >= ab[1] * 60 - 10) { toast('A esta hora la sala está cerrada'); return false; }
+      if (quien && hoyYa.has(quien)) { toast('Hoy ya entrenaste'); return false; }
+      const libres = B.int.filter(m => !hoyYa.has(m.id)), bajo = libres.filter(m => sfHechos(E, m.id, w, SF.now) < m.meta), L = bajo.length ? bajo : libres;
+      if (!quien && !L.length) { toast('Hoy ya entrenó toda la banda'); return false; }
+      id = quien || L[SF.rot % L.length].id; SF.now += 4; SF.extra.push({ socio:id, fecha:seFm(SF.now), extra:true });
+    }
+    const desp = sfTotal(sfEntradas(), w, SF.now), meta = sfMeta(w);
+    SF.flash = desp > antes; if (antes < meta && desp >= meta) { SF.nuevoSincro = true; toast(sfNom() + ': en sincro ⚡'); }
+    if (id === 's1') { if (SF.comp.hoy && !scMenor()) sfRayos(id + '@' + SF.now); if (!SF.nuevoSincro) toast(desp > antes ? 'Entraste a la sala: la banda sumó uno' : 'Entraste a la sala: ya cumpliste tu semana'); }
+    else if (!SF.nuevoSincro && desp > antes) toast('La banda sumó uno');
+    sfRender(); return true;
+  }
+  function sfVivoProg(){
+    clearTimeout(sfVivoT); sfVivoT = 0; if (!SF.vivo) return;
+    sfVivoT = setTimeout(() => { sfVivoT = 0;
+      const visible = SOC_V === 'F' && !$('#socialF').hidden && $('#demoSheet').hidden;
+      if (visible) { const E = sfEntradas(), dia = Math.floor(SF.now / SE_DIA), ids = sfB().int.map(m => m.id);
+        if (SF.prisa && !E.some(e => ids.includes(e.socio) && e.m > SF.now && Math.floor(e.m / SE_DIA) === dia)) { SF.prisa = false; sfVivoProg(); }
+        else if (!sfEntrena()) sfVivoProg(); }
+      else sfVivoProg();
+    }, SF.prisa ? 5000 + Math.random() * 3000 : 20000 + Math.random() * 20000);
+  }
+  // El estado y el momento (panel de demo): limpian lo que pasó mientras se miraba
+  function sfReset(){ sfLimpiar(); clearTimeout(sfCodT); SF.extra = []; SF.rec = {}; SF.flash = false; SF.nuevoSincro = false; SF.voy = 'voy'; }
+  function sfMomento(k){ sfReset(); SF.mom = k; SF.now = SF_MOM[k]; }
+  function sfEstado(est){ sfReset(); SF.est = est; SF.alt = false; SF.tipo = SF.puerta;
+    SF.now = est === 'con' ? SF_MOM[SF.mom] : est === 'nueva' ? SF_NUEVA + 15 : SF_SIN; if (est === 'nueva') SF.preg = true; }
+  sfEstado(SF.est);
+  $('#socialF').addEventListener('click', e => {
+    const q = s => e.target.closest(s), cerrar = () => { clearTimeout(sfCodT); $('#sfHoja').hidden = true; };
+    let b;
+    if ((b = q('[data-sevplay]')) || ((b = q('.sevid')) && !q('a'))) { seVidToggle(b.closest('.sevid')); return; }
+    if ((b = q('[data-sfrayo]'))) { const k = b.dataset.sfrayo, nom = b.getAttribute('aria-label').replace(/^(Sacarle|Mandarle) (el|un) rayo a /, '');
+      SF.rayo[k] = !SF.rayo[k]; $$('#socialF [data-sfrayo="' + k + '"]').forEach(x => { x.setAttribute('aria-pressed', !!SF.rayo[k]); x.setAttribute('aria-label', (SF.rayo[k] ? 'Sacarle el rayo a ' : 'Mandarle un rayo a ') + nom); });
+      if (SF.rayo[k]) toast('Le mandaste un ⚡ a ' + nom); return; }
+    if ((b = q('[data-sfvoy]'))) { SF.voy = b.dataset.sfvoy; sfRender(); toast(SF.voy === 'voy' ? '¡Vamos! Jueves a las 19, cada uno su rutina' : sfB().int.length >= 3 ? 'Listo. La banda ve un número, nunca quién' : 'Listo, esta vez no llegás'); return; }
+    if (q('[data-sfvibra]')) { sfVibraHoja(); return; }
+    if (q('[data-sfbanda]')) { sfBandaHoja(); return; }
+    if (q('[data-sfsumar]')) { sfSumarHoja(); return; }
+    if (q('[data-sfcomp]')) { sfComp(false); return; }
+    if (q('[data-sfmsg]')) { sfMsg(); return; }
+    if (q('[data-sffoto]')) { sfFoto(); return; }
+    if (q('[data-sfcartel]')) { sfCartel(); return; }
+    if (q('[data-sfig]')) { cerrar(); toast('Se abre Instagram para tu historia (en la demo, de ejemplo)'); return; }
+    if ((b = q('[data-sfsal]'))) { const k = b.dataset.sfsal;
+      if (k === 'volver') { SF.alt = false; sfRender(); return; }
+      if (k === 'trae' && sfP() === 'presenta') { sfInvHoja(); return; }   // "Prefiero traer a alguien" abre la invitación
+      SF.alt = true; sfRender(); $('#socialF .body').scrollTop = 0; return; }          // "No tengo con quién" lleva al primer jueves
+    if (q('[data-sfinv]')) { sfInvHoja(); return; }
+    if ((b = q('[data-sfid]'))) { sfInv().d = +b.dataset.sfid; sfInvHoja(); return; }
+    if ((b = q('[data-sfih]'))) { sfInv().h = b.dataset.sfih; sfInvHoja(); return; }
+    if ((b = q('[data-sfis]'))) { sfInv().s = b.dataset.sfis; sfInvHoja(); return; }
+    if ((b = q('[data-sfwa]'))) { const k = b.dataset.sfwa; cerrar();
+      if (k === 'inv') { if (SF.est === 'sin' || SF.est === 'espera') { SF.est = 'espera'; SF.tipo = 'trae'; SF.alt = false; sfRender(); }
+        toast('Se abre WhatsApp con el mensaje: elegís a quién (en la demo, de ejemplo)'); return; }
+      toast('Se abre WhatsApp: ' + (k === 'banda' ? 'el grupo de ' + sfNom() : 'Prof. Lucas') + ' (enlace de ejemplo)'); return; }
+    if (q('[data-sfreenv]')) { toast('Se abre WhatsApp con el mismo mensaje'); return; }
+    if (q('[data-sfcod]')) { sfCodHoja(); return; }
+    if (q('[data-sfcodok]')) { const v = ($('#sfCodIn').value || '').replace(/\D/g, '');
+      if (v.length !== 4) { toast('El código tiene cuatro cifras'); return; } sfAcepta('Es el código de Cris'); return; }
+    if (q('[data-sfbandaok]')) { cerrar(); sfReset(); SF.est = 'nueva'; SF.tipo = 'trae'; SF.alt = false; SF.now = SF_NUEVA + 15; SF.preg = true; sfRender(); $('#socialF .body').scrollTop = 0; toast('Cris también aceptó: ya son banda'); return; }
+    if (q('[data-sfprimer]')) { SF.est = 'espera'; SF.tipo = 'presenta'; SF.alt = false; sfRender(); toast('Te esperan el jueves a las 19 en Sarmiento'); return; }
+    if (q('[data-sfnollego]')) { SF.est = 'sin'; sfRender(); toast('Listo, tu profe ya sabe. Te esperamos otro jueves'); return; }
+    if (q('[data-sdanot]')) { SD.anot.e2 = !SD.anot.e2; sfRender(); toast(SD.anot.e2 ? 'Te anotaste a Social VIVA · sábado 08:30' : 'Te bajaste de Social VIVA'); return; }
+    if (e.target.id === 'sfHoja' || q('[data-sfx]')) cerrar();
+  });
+  $('#socialF').addEventListener('change', e => { const s = e.target.closest('[data-sfsw]'); if (!s) return;
+    SF.comp[s.dataset.sfsw] = s.checked; sfRender(); toast(s.checked ? 'Tu banda lo va a ver' : 'Tu banda ya no lo ve'); });
