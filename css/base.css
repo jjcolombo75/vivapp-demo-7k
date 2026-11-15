@@ -627,3 +627,65 @@ select.input{appearance:auto;-webkit-appearance:auto}
 .sdigv{gap:10px}
 .sdigf{width:100%;height:540px;border:0;border-radius:12px;background:#fff;display:block}
 .sdcomp{padding:0;flex-shrink:0}
+/* T24 · Social VIVA, versión E: el ecualizador de la banda */
+.mvpos.seeqbox{min-height:0;gap:14px;padding:18px 16px 16px}
+.setit{font-family:var(--display);text-transform:uppercase;font-size:31px;line-height:1;font-weight:900;white-space:nowrap}
+.setit b{font-weight:900}.setit i{font-style:normal;font-weight:900;font-size:.68em;color:var(--lime)}
+.mvpos.f .setit i,.seboom .setit i{color:var(--dat)}
+.setit .bolt-ico{color:var(--yel);filter:drop-shadow(0 0 6px rgba(255,233,74,.8));width:.5em;height:.82em;margin:0}
+.setit.secambio{animation:seCambio .9s ease-out 1}
+@keyframes seCambio{0%{opacity:.3;transform:translateY(4px)}100%{opacity:1;transform:none}}
+.seres{font-size:13px;font-weight:700;color:var(--muted)}
+.seres .bolt-ico{width:8px;height:12px;margin:0 0 0 2px;color:var(--yel)}
+.seeq{display:flex;gap:10px;align-items:stretch;justify-content:center;height:270px}
+.sebar{flex:1;min-width:0;max-width:64px;display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:0;padding:0;color:var(--muted);font:inherit;cursor:pointer}
+.sebar svg{width:100%;flex:1;min-height:0;transform-origin:50% 100%;overflow:visible}
+.sebar svg.late{animation:seLate var(--d,2s) ease-in-out var(--ph,0s) infinite}
+.seeq.sincro .sebar svg.late{animation-duration:1.15s;animation-delay:0s}
+@keyframes seLate{0%,100%{opacity:.8;transform:scaleY(.982)}50%{opacity:1;transform:scaleY(1)}}
+.senom{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;line-height:1.2}
+.sebar.yo .senom{color:var(--txt);border-bottom:2px solid var(--lime);padding-bottom:1px}
+.sebar.neu .senom{font-weight:500}
+.senuevo{animation:seNuevo 1.2s ease-out 1}
+@keyframes seNuevo{0%{opacity:0}25%{opacity:1;filter:brightness(2.4)}100%{opacity:1;filter:none}}
+.seeq.off .sebar{cursor:default}
+.seeq.off .seaca{animation:seAca 1.6s ease-in-out infinite}
+@keyframes seAca{0%,100%{stroke-opacity:.25}50%{stroke-opacity:1}}
+.setot{position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:2px}
+.app[data-mode="light"] .setot{background:rgba(18,22,29,.08)}
+.setot>i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--lime);transition:width .6s}
+.mvpos.f .setot>i{background:var(--zflow)}
+.setot>b{position:absolute;top:-5px;bottom:-5px;width:2px;margin-left:-1px;background:var(--txt);border-radius:1px}
+.setotl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:-6px}
+.seboom{animation:seBoom 1.4s ease-out 1}
+@keyframes seBoom{0%{transform:scale(.985)}30%{transform:scale(1.012)}100%{transform:none}}
+.sefrs{padding:0;gap:0;overflow:hidden}
+.sefr{display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 12px 6px 14px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--txt);font:inherit;text-align:left;width:100%}
+.sefr:last-child{border-bottom:0}
+.sefrb{display:flex;align-items:center;gap:10px;flex:1;min-width:0;background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;min-height:44px}
+.sefk{font-family:var(--display);text-transform:uppercase;font-weight:900;font-size:17px;color:var(--lime);flex-shrink:0;white-space:nowrap}
+.sefx{flex:1;min-width:0;line-height:1.3}
+.sefl{display:block}
+.sefx .bolt-ico{width:8px;height:12px;margin:0 0 0 2px;color:var(--yel)}
+.sechev{font-size:22px;color:var(--muted);flex-shrink:0}
+.sevoy{display:flex;gap:6px;flex-shrink:0}
+.sevoy .opt{min-height:40px;padding:0 10px;border-radius:12px;font-size:13px;width:auto}
+.sehojain{max-height:86%;overflow-y:auto}
+.sevibra .mvpos.sdev{min-height:0}
+.secarr{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-18px;padding:0 18px 4px;scroll-padding-inline:18px;scrollbar-width:none}
+.secarr::-webkit-scrollbar{display:none}
+.secar{flex:0 0 80%;scroll-snap-align:start;display:flex;flex-direction:column;gap:10px}
+.semedia{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#05070a}
+.semedia>img,.semedia>svg{width:100%;height:100%;display:block}
+.sevid{cursor:pointer}
+.setag{position:absolute;top:10px;left:10px;z-index:1;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.55);padding:4px 8px;border-radius:8px}
+.sevplay{position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.55);color:#fff;display:flex;align-items:center;justify-content:center;z-index:1;transition:opacity .2s}
+.sevid.on .sevplay{opacity:0}
+.sevid.on .sevpi{d:path("M7 5h4v14H7zM13 5h4v14h-4z")}
+.sevbar{position:absolute;left:10px;right:10px;bottom:10px;height:3px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}
+.sevbar i{display:block;height:100%;width:0;background:#fff}
+.sevdur,.sevmute{position:absolute;bottom:20px;font-size:12px;font-weight:700;color:#fff;background:rgba(0,0,0,.55);padding:3px 7px;border-radius:7px;display:flex;align-items:center}
+.sevdur{right:10px}.sevmute{left:10px}
+.seaviso{position:absolute;top:10px;left:12px;right:12px;z-index:16;background:rgba(18,22,30,.97);border:1px solid var(--line2);border-radius:16px;padding:12px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 12px 32px rgba(0,0,0,.5);animation:seAv .35s ease-out;cursor:pointer}
+.app[data-mode="light"] .seaviso{background:var(--panel)}
+@keyframes seAv{0%{opacity:0;transform:translateY(-14px)}100%{opacity:1;transform:none}}

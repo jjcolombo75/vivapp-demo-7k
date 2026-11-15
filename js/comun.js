@@ -5,7 +5,7 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
   let modo = 'socio';
-  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','socialB','socialC','socialD','plan'];
+  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','socialB','socialC','socialD','socialE','plan'];
   let curScr = 'login', prevScr = 'login';
 
 //#bloque 015
@@ -39,7 +39,7 @@
     if (id === 'entrenando') startClock();
     if (id === 'inicio' && typeof semMarcarVisto === 'function') semMarcarVisto();
     if (typeof renderAcc === 'function' && typeof MOM !== 'undefined') { renderAcc(); avisosLater(); }
-    $('.app').dataset.scr = id; if (typeof deudaFranja === 'function') deudaFranja(); if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy(); if (id === 'progreso') renderProg(); if (id === 'social' && typeof muralRender === 'function') muralRender(); if (id === 'socialB' && typeof sbRender === 'function') sbRender(); if (id === 'socialC' && typeof scRender === 'function') scRender(); if (id === 'socialD' && typeof sdRender === 'function') sdRender();
+    $('.app').dataset.scr = id; if (typeof deudaFranja === 'function') deudaFranja(); if (id === 'hoy' && typeof renderEntHoy === 'function') renderEntHoy(); if (id === 'progreso') renderProg(); if (id === 'social' && typeof muralRender === 'function') muralRender(); if (id === 'socialB' && typeof sbRender === 'function') sbRender(); if (id === 'socialC' && typeof scRender === 'function') scRender(); if (id === 'socialD' && typeof sdRender === 'function') sdRender(); if (id === 'socialE' && typeof seRender === 'function') seRender();
   }
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }

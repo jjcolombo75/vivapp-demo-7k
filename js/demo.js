@@ -331,7 +331,7 @@
   // Plegado recordado entre visitas (nivel 1 y 2 abiertos, nivel 3 cerrado la primera vez)
   $$('#demoSheet details.dmdet').forEach(d => { if (dmMem.pleg && d.dataset.k in dmMem.pleg) d.open = dmMem.pleg[d.dataset.k];
     d.addEventListener('toggle', () => { (dmMem.pleg = dmMem.pleg || {})[d.dataset.k] = d.open; dmSave(); }); });
-  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC, social:SOC_V, socialB:SOC_B, socialC:SC.e, socialD:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab } }); // para pruebas y T6
+  window.demoEstado = () => ({ exp:EXP, etapa:ETAPA, mom:MOM, aus:AUS_N, ant:antAct(), mural:MURK, dia:rutinas.profe.next, vence:venceCorto(), deuda:deuda, obj:OBJ[0] || 'forma', sala:SALA_LLENA, voz:VOZ, esc:DM_ESC, social:SOC_V, socialB:SOC_B, socialC:SC.e, socialD:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab }, socialE:{ soc:SE.soc, mom:SE.mom, tam:SE.tam, neu:SE.neu, ig:SE.ig, vid:SE.vid, vivo:SE.vivo } }); // para pruebas y T6
   dmSync();
   $('#dmVer').textContent = 'Versión ' + (window.VK_V || '');
 
@@ -342,8 +342,12 @@
     ['A', 'Mural VIVA', 'A · El mural para scrollear de T20 (v98), sin cambios: publicaciones, íconos de sección y la cámara flotante.'],
     ['B', 'Los grupos', 'B · Grupos chicos con alguien que los convoca (el profe), un encuentro por semana y nada que moderar. La charla vive en su WhatsApp.'],
     ['C', 'En sincro', 'C · Tu ritmo, cuando se acopla con el de otros: solo, en dupla o en grupo, con el pulso (una celda por semana en sincro). El idioma de Inicio: ecualizador, neón y Flow.'],
-    ['D', 'La vibra', 'D · Tres bloques: cuándo se ve tu banda, contra quién juega esta semana y lo último que logró, con la cuenta de Viva en Instagram. Pasa algo nuevo cada vez que entrás.']
+    ['D', 'La vibra', 'D · Tres bloques: cuándo se ve tu banda, contra quién juega esta semana y lo último que logró, con la cuenta de Viva en Instagram. Pasa algo nuevo cada vez que entrás.'],
+    ['E', 'El ecualizador', 'E · Una pantalla: el ecualizador de tu banda, una barra por integrante hacia su propia meta. Lo último, la fecha y el cruce son franjas de una línea; abajo, lo de Viva. Se mueve con cada entrenamiento.']
   ];
+  const SOC_EE = { sin:['Sin banda', 'El que llega solo (Mica, 19 años, semana 2): el ecualizador apagado con su lugar latiendo y una sola acción, Tu primer jueves.'],
+    nueva:['Banda nueva', 'El jueves, en la bienvenida, el profe la suma a una banda: nombres recién sumados, la meta de la banda a la mitad la primera semana y la pregunta de si la banda ve su barra.'],
+    con:['Con banda', 'Los del jueves: el ecualizador (una barra por integrante hacia su meta), Lo último, La fecha y El cruce. Debajo, lo de Viva.'] };
   const SOC_DE = { sin:['Sin banda', 'El que entrena solo: Traé a alguien (con uno ya son banda), Sumame a una banda (se lo decimos a su profe) y La vibra de Viva.'],
     con:['Con banda', 'Los del jueves: La fecha, El pulso (el cruce de la semana) y La vibra de la banda y de Viva. Mensajes abre WhatsApp.'] };
   const SOC_CE = { solo:['Solo', 'El socio nuevo (pone a la socia en la semana 1 de sus primeras 8): su Tu ritmo en chico, el primer jueves de la sede, Traé a alguien y Quiero sumarme a un grupo.'],
@@ -355,7 +359,8 @@
     con:['Con grupo', '12 encuentros: el próximo encuentro, el grupo, lo que logran juntos, el WhatsApp y la foto del encuentro.'] };
   if (dmMem.soc) { if (SOC_VERS.some(v => v[0] === dmMem.soc.v)) SOC_V = dmMem.soc.v; if (dmMem.soc.b in SOC_BE) SOC_B = dmMem.soc.b;
     const c = dmMem.soc.c; if (c) { if (c.e in SOC_CE) SC.e = c.e; SC.mes = !!c.mes; SC.anf = !!c.anf; if (SC_TABS.includes(c.tab)) SC.tab = c.tab; }
-    const d = dmMem.soc.d; if (d) { if (d.e in SOC_DE) SD.e = d.e; if (d.dia in SD_CRUCE) SD.dia = d.dia; if (d.ig === 'ej' || d.ig === 'vivo') SD.ig = d.ig; if (SD_TABS.includes(d.tab)) SD.tab = d.tab; } }
+    const d = dmMem.soc.d; if (d) { if (d.e in SOC_DE) SD.e = d.e; if (d.dia in SD_CRUCE) SD.dia = d.dia; if (d.ig === 'ej' || d.ig === 'vivo') SD.ig = d.ig; if (SD_TABS.includes(d.tab)) SD.tab = d.tab; }
+    const x = dmMem.soc.e; if (x) { if (x.soc in SOC_EE) SE.soc = x.soc; if (x.mom in SE_MOM) seMomento(x.mom); if (x.tam in SE_TAM) SE.tam = +x.tam; SE.neu = !!x.neu; if (x.ig === 'ej' || x.ig === 'vivo') SE.ig = x.ig; SE.vid = x.vid !== false; } }
   function socSync(){
     $('#socVPick').innerHTML = SOC_VERS.map(v => '<button class="opt" data-socv="' + v[0] + '" aria-pressed="' + (SOC_V === v[0]) + '">' + v[0] + '<small>' + v[1] + '</small></button>').join('') +
       (SOC_VERS.length < 3 ? '<button class="opt" disabled aria-pressed="false">' + String.fromCharCode(65 + SOC_VERS.length) + '<small>la próxima</small></button>' : '');
@@ -368,10 +373,11 @@
     $('#socDRow').hidden = SOC_V !== 'D'; $('#socDTxt').textContent = SOC_DE[SD.e][1];
     const pd = (s, v) => $$('#socDRow [' + s + ']').forEach(x => x.setAttribute('aria-pressed', x.getAttribute(s) === v));
     pd('data-socd', SD.e); pd('data-sddia', SD.dia); pd('data-sdig', SD.ig); pd('data-sdtab', SD.tab);
+    if (typeof seSync === 'function') seSync();
     $$('#demoSheet [data-socnota]').forEach(n => n.hidden = n.dataset.socnota !== SOC_V);
     socNav();
   }
-  const socSave = () => { dmMem.soc = { v:SOC_V, b:SOC_B, c:{ e:SC.e, mes:SC.mes, anf:SC.anf, tab:SC.tab }, d:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab } }; dmSave(); };
+  const socSave = () => { dmMem.soc = { v:SOC_V, b:SOC_B, c:{ e:SC.e, mes:SC.mes, anf:SC.anf, tab:SC.tab }, d:{ e:SD.e, dia:SD.dia, ig:SD.ig, tab:SD.tab }, e:{ soc:SE.soc, mom:SE.mom, tam:SE.tam, neu:SE.neu, ig:SE.ig, vid:SE.vid } }; dmSave(); };
   $('#demoSheet').addEventListener('click', e => { let b;
     if ((b = e.target.closest('[data-socv]'))) { SOC_V = b.dataset.socv; socSave(); socSync(); return dmFin('social', 'Social · versión ' + SOC_V + ': ' + SOC_VERS.find(v => v[0] === SOC_V)[1]); }
     if ((b = e.target.closest('[data-socb]'))) { SOC_V = 'B'; SOC_B = b.dataset.socb; socSave(); socSync(); return dmFin('social', 'Versión B · ' + SOC_BE[SOC_B][0]); }
@@ -395,6 +401,39 @@
     if ((b = e.target.closest('[data-sdig]'))) { SD.ig = b.dataset.sdig; return aD(SD.ig === 'vivo' ? 'Instagram de Viva: en vivo' : 'Instagram de Viva: ejemplo'); }
     if ((b = e.target.closest('[data-sdtab]'))) { SD.tab = b.dataset.sdtab; return aD('La pestaña dice "' + SD.tab + '"'); }
     if (e.target.closest('#socDPreg')) { SD.e = 'con'; SD.preg = true; return aD('Al entrar a una banda: qué compartís'); }
+  });
+  socSync();
+
+//#bloque 346
+  // ===== T24 · la E en el panel: socio, momento de la semana, que entrene alguien, en vivo, tamaño, quién no comparte, lo de Viva y los escenarios =====
+  const SE_MOMN = { lun:'Lunes: arranca la semana', mie:'Miércoles: en camino', jue:'Jueves 19:10: la fecha', sab:'Sábado: falta 1', sincro:'Sábado: en sincro', dom:'Domingo: no llegó', lun1:'Lunes siguiente', mar:'Martes, en la sala' };
+  function seSync(){
+    $('#socERow').hidden = SOC_V !== 'E'; $('#socETxt').textContent = SOC_EE[SE.soc][1];
+    const pe = (s, v) => $$('#socERow [' + s + ']').forEach(x => x.setAttribute('aria-pressed', x.getAttribute(s) === String(v)));
+    pe('data-sesoc', SE.soc); pe('data-semom', SE.mom); pe('data-sevivo', SE.vivo ? 1 : 0); pe('data-setam', SE.tam); pe('data-seneu', SE.neu ? 1 : 0); pe('data-seig', SE.ig); pe('data-sevid', SE.vid ? 1 : 0);
+    $('#seEsc1b').hidden = !(SE.soc === 'sin'); $('#seEsc5b').hidden = SE.mom !== 'dom';
+  }
+  const SE_ESC = {
+    1:() => { SE.soc = 'sin'; SE.primer = false; seMomento('mie'); return 'Escenario 1 · Mica, 19 años, semana 2, sin banda'; },
+    2:() => { SE.soc = 'con'; SE.tam = 5; SE.neu = false; SE.yoComp = true; seMomento('mar'); SE.voy = null; seTim.push(setTimeout(seEntrena, 1600)); return 'Escenario 2 · Martes: entrás a la sala'; },
+    3:() => { SE.soc = 'con'; SE.tam = 5; SE.neu = false; seMomento('jue'); SE.voy = 'voy'; SE.vivo = true; SE.prisa = true; seVivoProg(); seTim.push(setTimeout(() => seAviso('fecha'), 900)); return 'Escenario 3 · Jueves 19:10, la fecha, en vivo'; },
+    4:() => { SE.soc = 'con'; SE.tam = 5; SE.neu = false; seMomento('sab'); seTim.push(setTimeout(() => seAviso('falta1'), 700), setTimeout(seEntrena, 3200)); return 'Escenario 4 · Sábado: entrena el que faltaba'; },
+    5:() => { SE.soc = 'con'; SE.tam = 5; seMomento('dom'); return 'Escenario 5 · Semana floja: domingo'; }
+  };
+  $('#demoSheet').addEventListener('click', e => { let b;
+    const aE = msg => { SOC_V = 'E'; socSave(); socSync(); return dmFin('social', msg); };
+    if ((b = e.target.closest('[data-sesoc]'))) { const antes = SE.soc; SE.soc = b.dataset.sesoc; if (SE.soc === 'nueva' && antes !== 'nueva') { SE.preg = true; SE.yoComp = true; seMomento('jue'); } else if (SE.soc !== 'sin') seMomento(SE.mom); return aE('Versión E · ' + SOC_EE[SE.soc][0]); }
+    if ((b = e.target.closest('[data-semom]'))) { if (SE.soc === 'sin') SE.soc = 'con'; seMomento(b.dataset.semom); const r = aE('El momento · ' + SE_MOMN[SE.mom]);
+      if (SE.mom === 'jue') seTim.push(setTimeout(() => seAviso('fecha'), 900)); if (SE.mom === 'sab') seTim.push(setTimeout(() => seAviso('falta1'), 900)); return r; }
+    if (e.target.closest('#seEntrena')) { SOC_V = 'E'; socSave(); socSync(); dmFin('social'); setTimeout(seEntrena, 500); return; }
+    if ((b = e.target.closest('[data-sevivo]'))) { SE.vivo = b.dataset.sevivo === '1'; SE.prisa = false; seVivoProg(); return aE(SE.vivo ? 'En vivo: cada 20 a 40 segundos pasa algo' : 'En vivo: apagado'); }
+    if ((b = e.target.closest('[data-setam]'))) { SE.tam = +b.dataset.setam; if (SE.soc === 'sin') SE.soc = 'con'; seMomento(SE.mom); return aE('La banda: ' + SE.tam + ' integrantes'); }
+    if ((b = e.target.closest('[data-seneu]'))) { SE.neu = b.dataset.seneu === '1'; return aE(SE.neu ? 'Un integrante no comparte: su barra queda neutra' : 'Todos comparten su barra'); }
+    if ((b = e.target.closest('[data-seig]'))) { SE.ig = b.dataset.seig; return aE(SE.ig === 'vivo' ? 'Lo de Viva: Instagram en vivo' : 'Lo de Viva: ejemplo ilustrado'); }
+    if ((b = e.target.closest('[data-sevid]'))) { SE.vid = b.dataset.sevid === '1'; return aE(SE.vid ? 'Con el video del profe' : 'Sin el video del profe'); }
+    if ((b = e.target.closest('[data-seesc]'))) { SE.vivo = false; seVivoProg(); return aE(SE_ESC[b.dataset.seesc]()); }
+    if (e.target.closest('#seEsc1b')) { SE.soc = 'nueva'; SE.preg = true; SE.yoComp = true; seMomento('jue'); return aE('El jueves: el profe la suma a una banda'); }
+    if (e.target.closest('#seEsc5b')) { seMomento('lun1'); return aE('El lunes siguiente'); }
   });
   socSync();
 

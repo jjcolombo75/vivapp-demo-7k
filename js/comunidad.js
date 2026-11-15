@@ -421,7 +421,7 @@
     if ((b = q('[data-sbcomp]'))) { cerrar(); toast(b.dataset.sbcomp === 'ig' ? 'Lista para tu historia de Instagram' : 'Lista para mandar al WhatsApp del grupo'); return; }
     if (e.target.id === 'sbHoja' || q('[data-sbx]')) cerrar();
   });
-  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : SOC_V === 'D' ? SD.tab : 'Social'; }
+  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : SOC_V === 'D' ? SD.tab : SOC_V === 'E' ? 'Sincro' : 'Social'; }
 //#bloque 227
   // ===== T22 · Social VIVA, versión C: En sincro (v101) =====
   // Hilo conductor (Juanjo, 15/11): tu ritmo, cuando se acopla con el de otros. Versiones Social (panel, bloque 345 de demo.js) elige A, B o C.
@@ -770,3 +770,387 @@
   });
   $('#socialD').addEventListener('change', e => { const s = e.target.closest('[data-sdsw]'); if (!s) return;
     SD.comp[s.dataset.sdsw] = s.checked; sdRender(); toast(s.checked ? 'Tu banda lo va a ver' : 'Tu banda ya no lo ve'); });
+//#bloque 229
+  // ===== T24 · Social VIVA, versión E: El ecualizador (v104) =====
+  // Una pantalla, una pregunta: "¿cómo viene mi banda?". Unidad: el entrenamiento (la entrada a la sala); gesto: el ⚡; frase: tu banda entra
+  // en sincro cuando llega a su semana. Protagonista: el ecualizador (una barra por integrante hacia su propia meta); de ahí cuelgan tres franjas
+  // de una línea (Lo último · La fecha · El cruce) y, debajo del pliegue, Lo de Viva (contenido oficial, ilustrado por código: app/img/social).
+  // Simulación: un conjunto fijo de entradas {socio, fecha} (forma de EVO: v1/entries), seis semanas de historia, una semana en curso (buena o
+  // floja) y una banda rival. Todo lo que se ve (titular, barras, eventos, cruce) sale de las entradas; ningún número escrito a mano en el HTML.
+  // En real: entradas de EVO del mismo día (sin verificar: viva-datos) · metas de Tu Ritmo · banda, fecha, ⚡ y consentimientos, tablas de
+  // Vivapp · Lo de Viva, la cuenta oficial de Instagram · las bandas las arma el profe en su tablero.
+  // Piso: la barra de cada uno es presencia (consentimiento aparte al entrar; se apaga y queda neutra, sus entrenamientos suman igual); solo lo
+  // logrado (nunca quién falta ni días sin venir); sin horarios (hoy, ayer, el martes); el titular habla de la banda, nunca de una persona;
+  // la semana que no se llega se cuenta sin rojo ni reproche; menores: barra neutra, sin WhatsApp y sin salida a Instagram.
+  var SE = { soc:'con', mom:'jue', tam:5, neu:false, ig:/github\.io$/.test(location.hostname) ? 'vivo' : 'ej', vid:true, vivo:false, prisa:false,
+    voy:'voy', primer:false, yoComp:true, preg:false, now:0, extra:[], rayo:{}, rec:{}, flash:null, nuevoSincro:false, avW:{}, rot:0 };
+  const SE_GENTE = { Vos:MV_YO, Nico:['#3a8a7a','#0e2a24'], Sofi:['#c08a3a','#33230c'], Fede:['#5a7aa8','#141e2e'], Vale:['#a85a5a','#2e1212'],
+    Lu:['#9a4f8a','#2c1028'], Tomi:['#8a5a3a','#2a180c'], Cami:['#8a4f9a','#22102c'] };
+  // Integrantes de la demo (nombres inventados): meta semanal de cada uno (Tu Ritmo). La banda de 3, 5 u 8 sale de esta lista, en orden.
+  const SE_INT = [{ id:'s1', n:'Vos', meta:3 }, { id:'s2', n:'Nico', meta:3 }, { id:'s3', n:'Sofi', meta:4 }, { id:'s4', n:'Fede', meta:2 }, { id:'s5', n:'Vale', meta:3 },
+    { id:'s6', n:'Lu', meta:3 }, { id:'s7', n:'Tomi', meta:2 }, { id:'s8', n:'Cami', meta:3 }];
+  const SE_TAM = { 3:['s1','s2','s4'], 5:['s1','s2','s3','s4','s5'], 8:['s1','s2','s3','s4','s5','s6','s7','s8'] };
+  // Días y horas habituales de cada uno (L M X J V S D). La semana buena llega al sincro el sábado; la floja termina 7 de 12.
+  const SE_HAB = { s1:'M18:30 J19:12', s2:'L06:30 X06:40 J19:15', s3:'L19:40 X20:10 J19:20', s4:'M07:10 S10:00', s5:'L18:10 X18:05 S11:20',
+    s6:'M08:00 J13:00 S09:30', s7:'X21:00 V07:00', s8:'L12:30 J18:00 D10:00' };
+  const SE_FLOJA = { s1:'M18:30 J19:12', s2:'L06:30 X06:40', s3:'L19:40 J19:20', s4:'S10:00', s5:'', s6:'M08:00', s7:'V07:00', s8:'J18:00' };
+  // Historia: las seis semanas anteriores repiten los hábitos menos estas entradas (socio:orden). Con la banda de 5: 12 · 9 · 13 · 11 · 12 · 13.
+  const SE_SALTA = { '-6':['s5:2'], '-5':['s2:2','s3:1','s5:0','s4:1'], '-4':[], '-3':['s1:1','s3:2'], '-2':['s4:0'], '-1':[] };
+  // El cruce: la banda rival de esta semana (sus entradas, sin nombres) y el % de las rivales de las seis semanas anteriores.
+  const SE_RIV = { nom:['Las de', 'las 7'], metas:{ r1:3, r2:2, r3:3, r4:2, r5:2 }, hab:{ r1:'L07:00 X07:05 S08:30', r2:'M07:05 V07:00', r3:'L07:10 J07:00', r4:'M07:00', r5:'J07:15' } };
+  const SE_PAS = [['Los madrugadores', 92], ['Team sábado', 81], ['Las imparables', 95], ['Los del mediodía', 86], ['Las de las 7', 104], ['Los madrugadores', 88]];
+  const SE_PROX = 'Los madrugadores';
+  const SE_BASE = Date.UTC(2026, 10, 16);   // lunes de la semana de la demo
+  const SE_SEM = 10080, SE_DIA = 1440, SE_JUE = 3 * SE_DIA, SE_NUEVA = SE_JUE + 20 * 60 + 15;   // la banda nueva se arma el jueves, después de la bienvenida
+  const SE_MOM = { lun:360, mar:SE_DIA + 18 * 60 + 20, mie:2 * SE_DIA + 19 * 60, jue:SE_JUE + 19 * 60 + 10, sab:5 * SE_DIA + 9 * 60, sincro:5 * SE_DIA + 10 * 60 + 5,
+    dom:6 * SE_DIA + 20 * 60, lun1:SE_SEM + 360 };
+  const SE_DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+  const SE_ABRE = [[5, 23], [5, 23], [5, 23], [5, 23], [5, 23], [8, 18], [9, 15]];   // horario de Viva (cultura-viva.md § 1)
+  const seFm = m => new Date(SE_BASE + m * 60000).toISOString().slice(0, 16);
+  const seMin = f => (Date.parse(f + ':00Z') - SE_BASE) / 60000;
+  const seSlot = (w, t) => w * SE_SEM + 'LMXJVSD'.indexOf(t[0]) * SE_DIA + (+t.slice(1, 3)) * 60 + (+t.slice(4, 6));
+  const seFloja = () => SE.soc === 'con' && (SE.mom === 'dom' || SE.mom === 'lun1');
+  const seBanda = () => SE_INT.filter(m => SE_TAM[SE.tam].includes(m.id));
+  const seNeuId = () => { const b = SE_TAM[SE.tam]; return b.includes('s3') ? 's3' : b[1]; };
+  const seNeutra = id => id === 's1' ? (!SE.yoComp || scMenor()) : SE.neu && id === seNeuId();
+  // Las entradas, con la forma de EVO ({socio, fecha}). La semana 0 es la de la demo; las extra son las que pasan mientras se mira.
+  function seEntradas(){
+    const L = [], add = (id, w, spec) => (spec || '').split(' ').filter(Boolean).forEach(t => L.push({ socio:id, fecha:seFm(seSlot(w, t)) }));
+    for (let w = -6; w <= -1; w++) Object.keys(SE_HAB).forEach(id => { const salta = SE_SALTA[w].filter(x => x.split(':')[0] === id).map(x => +x.split(':')[1]);
+      add(id, w, SE_HAB[id].split(' ').filter((_, i) => !salta.includes(i)).join(' ')); });
+    const cur = seFloja() ? SE_FLOJA : SE_HAB; Object.keys(cur).forEach(id => add(id, 0, cur[id]));
+    return L.concat(SE.extra).map(e => Object.assign({ m:seMin(e.fecha) }, e)).sort((a, b) => a.m - b.m);
+  }
+  const seRivEnt = () => { const L = []; Object.keys(SE_RIV.hab).forEach(id => SE_RIV.hab[id].split(' ').forEach(t => L.push({ socio:id, m:seSlot(0, t) }))); return L; };
+  // La banda nueva cuenta desde el jueves en que se armó; su primera semana tiene la meta a la mitad (propuesta del ticket).
+  const seDesde = w => SE.soc === 'nueva' && w === 0 ? SE_JUE : w * SE_SEM;
+  function seMeta(w){ const s = seBanda().reduce((a, m) => a + m.meta, 0), m = Math.round(0.8 * s); return SE.soc === 'nueva' && w === 0 ? Math.round(m / 2) : m; }
+  const seHechos = (E, id, w, hasta) => E.filter(e => e.socio === id && e.m >= seDesde(w) && e.m < (w + 1) * SE_SEM && e.m <= hasta).length;
+  const seTotal = (E, w, hasta) => seBanda().reduce((a, m) => a + Math.min(m.meta, seHechos(E, m.id, w, hasta)), 0);
+  function seRivPct(w, hasta){
+    if (w < 0) return SE_PAS[w + 6][1];
+    const t = Object.keys(SE_RIV.metas).reduce((a, id) => a + Math.min(SE_RIV.metas[id], seRivEnt().filter(e => e.socio === id && e.m <= hasta).length), 0);
+    return Math.round(100 * t / Math.round(0.8 * Object.values(SE_RIV.metas).reduce((a, b) => a + b, 0)));
+  }
+  const sePct = (E, w, hasta) => Math.round(100 * seTotal(E, w, hasta) / seMeta(w));
+  const seCruceRes = (E, w) => { const fin = (w + 1) * SE_SEM - 1, a = sePct(E, w, fin), b = seRivPct(w, fin); return { a:a, b:b, gano:a > b, riv:w < 0 ? SE_PAS[w + 6][0] : SE_RIV.nom.join(' ') }; };
+  const seCuando = m => { const d = Math.floor(SE.now / SE_DIA) - Math.floor(m / SE_DIA); return d <= 0 ? 'hoy' : d === 1 ? 'ayer' : 'el ' + SE_DIAS[Math.floor(m / SE_DIA) % 7]; };
+  const seNom = id => SE_INT.find(m => m.id === id).n;
+  // Lo que pasó en la banda (7 días, del más nuevo al más viejo): entrenó · cumplió su semana · la banda entró en sincro · se sumó · ganó el cruce.
+  function seEventos(E){
+    const B = seBanda(), ids = B.map(m => m.id), desde = SE.now - 7 * SE_DIA, ev = [], cuenta = {}, tot = {};
+    E.filter(e => ids.includes(e.socio) && e.m <= SE.now && e.m >= seDesde(Math.floor(e.m / SE_SEM))).forEach(e => {
+      const w = Math.floor(e.m / SE_SEM), k = e.socio + w, meta = SE_INT.find(m => m.id === e.socio).meta;
+      cuenta[k] = (cuenta[k] || 0) + 1; const antes = tot[w] || 0; if (cuenta[k] <= meta) tot[w] = antes + 1;
+      if (e.m > desde && !(seNeutra(e.socio) && e.socio !== 's1')) ev.push({ k:cuenta[k] === meta ? 'sem' : 'ent', id:e.socio, m:e.m, key:e.socio + '@' + e.m });
+      if (e.m > desde && antes < seMeta(w) && tot[w] >= seMeta(w)) ev.push({ k:'sincro', m:e.m + .5, key:'sincro@' + w });
+    });
+    if (SE.soc === 'nueva') B.forEach((b, i) => { if (SE_NUEVA <= SE.now && SE_NUEVA > desde) ev.push({ k:'nuevo', id:b.id, m:SE_NUEVA + i * .01, key:'nuevo' + b.id }); });
+    else for (let w = Math.floor(desde / SE_SEM) + 1; w <= Math.floor(SE.now / SE_SEM); w++) { const r = seCruceRes(E, w - 1);
+      if (r.gano && w * SE_SEM > desde && w * SE_SEM <= SE.now) ev.push({ k:'gano', m:w * SE_SEM + 1, key:'gano@' + w, r:r }); }
+    return ev.sort((a, b) => b.m - a.m);
+  }
+  const SE_BANDA = () => SB_G.nom.join(' ');
+  function seFirma(x){   // [verbo, resto, con rayo]
+    const yo = x.id === 's1';
+    if (x.k === 'sincro') return ['Entraron', 'en sincro', 1];
+    if (x.k === 'gano') return ['Ganaron', 'el cruce', 1];
+    if (x.k === 'nuevo') return yo ? ['Te sumaste', 'a la banda'] : ['Se sumó', 'a la banda'];
+    if (x.k === 'sem') return yo ? ['Cumpliste', 'tu semana', 1] : ['Cumplió', 'su semana', 1];
+    return [yo ? 'Entrenaste' : 'Entrenó', seCuando(x.m)];
+  }
+  const seQuien = x => x.id ? (x.id === 's1' ? 'Vos' : seNom(x.id)) : SE_BANDA();
+  function seFrase(x){ const f = seFirma(x), r = f[2] ? ' ' + MV_RAYO : ''; return x.id === 's1' ? [f[0], f[1] + r] : [seQuien(x), f[0].toLowerCase() + ' ' + f[1] + r]; }
+  const seAv = x => !x.id ? '<span class="av sm sdbav" aria-hidden="true">' + MV_RAYO + '</span>'
+    : '<span class="av sm" style="background:' + grad(SE_GENTE[seNom(x.id)]) + '">' + (x.id === 's1' ? 'M' : inicial(seNom(x.id))) + '</span>';
+  const seRec = x => x.key in SE.rec ? SE.rec[x.key].length : 2 + Math.round(x.m) % 2;
+  function seRayoBtn(x){
+    if (x.id === 's1') { const n = seRec(x); return n ? '<span class="small muted sdtuyo">' + n + ' ' + MV_RAYO + '<br>lo ves vos</span>' : ''; }
+    const on = !!SE.rayo[x.key], q = x.id ? seNom(x.id) : SE_BANDA();
+    return '<button class="clap sdrayo" data-serayo="' + x.key + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Sacarle el rayo a ' : 'Mandarle un rayo a ') + q + '">' + MV_RAYO + '</button>';
+  }
+  // La vibra (la de la D, con los eventos de las entradas): una tarjeta por evento, con el día y nunca la hora.
+  function seEv(x){
+    const f = seFirma(x), cls = x.k === 'ent' || x.k === 'nuevo' ? 'c' : 'm', firma = '<b>' + f[0] + '</b> <i>' + f[1] + '</i>' + (f[2] ? ' ' + MV_RAYO : '');
+    return '<article class="mvpos sdev ' + cls + '"><div class="sdevrow">' + seAv(x) + '<span class="stack" style="gap:3px;flex:1;min-width:0"><span class="small muted"><b class="sdq">' + seQuien(x) + '</b>' +
+      (x.k === 'ent' ? '' : ' · ' + seCuando(x.m)) + '</span><span class="mvfirma sig">' + firma + '</span></span>' + seRayoBtn(x) + '</div></article>';
+  }
+  // ---- el ecualizador: una barra por integrante, con tantos segmentos como su meta. Misma altura llena para todos: se ve avance, no cantidad.
+  const SE_RIT = [1.7, 2.15, 1.9, 2.4, 1.6, 2.25, 1.8, 2.05];
+  function seBarra(m, i, E, w, sincro){
+    const neu = seNeutra(m.id), yo = m.id === 's1', nom = yo ? 'Vos' : m.n;
+    const head = '<button class="sebar' + (yo ? ' yo' : '') + (neu ? ' neu' : '') + '" data-sebar="' + m.id + '"';
+    if (neu) return head + ' aria-label="' + nom + ': barra sin mostrar"><svg viewBox="-6 -6 52 212" preserveAspectRatio="none" aria-hidden="true"><rect class="rl-slot" x="-4" y="-4" width="48" height="208" rx="6"/>' +
+      '<rect x="2" y="2" width="36" height="196" rx="4" fill="none" stroke="var(--muted)" stroke-opacity=".45" stroke-dasharray="4 5"/></svg><span class="senom">' + nom + '</span></button>';
+    const k = m.meta, hechos = seHechos(E, m.id, w, SE.now), lit = Math.min(k, hechos), ok = hechos >= k, id = 'seb' + (++scUid), GP = 6, sh = (200 - GP * (k - 1)) / k;
+    const F = sincro && lit ? 'url(#' + id + 'z)' : ok ? 'var(--dat)' : 'var(--lime)', L = eqLuz(Math.max(.4, lit / k));
+    let g = '<defs><filter id="' + id + '" filterUnits="userSpaceOnUse" x="-30" y="-30" width="100" height="270"><feGaussianBlur stdDeviation="' + (L.hb * .5).toFixed(1) + '"/></filter>' +
+      '<linearGradient id="' + id + 'z" gradientUnits="userSpaceOnUse" x1="0" y1="200" x2="0" y2="0"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient></defs>' +
+      '<rect class="rl-slot" x="-4" y="-4" width="48" height="208" rx="6"/>';
+    for (let j = 0; j < k; j++) { const c = eqCeldaCol(0, 200 - (j + 1) * sh - j * GP, 40, sh, j < lit, j < lit ? F : 'var(--lime)', L, id, ok);
+      g += SE.flash === m.id && j === lit - 1 ? '<g class="senuevo">' + c + '</g>' : c; }
+    return head + ' style="--d:' + SE_RIT[i % 8] + 's;--ph:-' + (i * .37).toFixed(2) + 's" aria-label="' + nom + ': ' + lit + ' de ' + k + '">' +
+      '<svg class="' + (lit ? 'late' : '') + '" viewBox="-6 -6 52 212" preserveAspectRatio="none" aria-hidden="true">' + g + '</svg><span class="senom">' + nom + '</span></button>';
+  }
+  function seEq(E, w){
+    const B = seBanda(), tot = seTotal(E, w, SE.now), meta = seMeta(w), sum = B.reduce((a, m) => a + m.meta, 0), sincro = tot >= meta;
+    return '<div class="seeq' + (sincro ? ' sincro' : '') + '">' + B.map((m, i) => seBarra(m, i, E, w, sincro)).join('') + '</div>' +
+      '<div class="setot" role="img" aria-label="La banda: ' + tot + ', meta ' + meta + '"><i style="width:' + Math.min(100, 100 * tot / sum).toFixed(1) + '%"></i><b style="left:' + (100 * meta / sum).toFixed(1) + '%"></b></div>' +
+      '<span class="setotl"><span>La banda: ' + tot + '</span><span>meta ' + meta + '</span></span>';
+  }
+  // ---- el titular: siempre de la banda, nunca de una persona
+  function seTitular(E, w){
+    const tot = seTotal(E, w, SE.now), meta = seMeta(w), f = meta - tot, hora = SE.now % SE_DIA, dia = Math.floor(SE.now / SE_DIA) % 7;
+    if (f <= 0) return ['<b>En</b> <i>sincro</i> ' + MV_RAYO, SE.soc === 'nueva' && w === 0 ? 'La primera semana de la banda, adentro.' : 'La banda llegó a su semana.'];
+    if (dia === 6 && hora >= SE_ABRE[6][1] * 60) return ['<b>' + tot + '</b> <i>de ' + meta + '</i>', 'Esta semana. El lunes arranca otra.'];
+    if (tot === 0) return ['<b>Arranca</b> <i>la semana</i>', 'Meta de la banda: ' + meta];
+    return [f === 1 ? '<b>Falta 1</b> <i>para el sincro</i>' : '<b>Faltan ' + f + '</b> <i>para el sincro</i>', SE.soc === 'nueva' && w === 0 ? 'Primera semana: meta de ' + meta + '.' : 'Cada entrenamiento suma.'];
+  }
+  // La semana pasada, en una línea (solo los lunes)
+  function seAntes(E, w){
+    if (Math.floor(SE.now / SE_DIA) % 7 !== 0) return '';
+    const p = w - 1, t = seTotal(E, p, w * SE_SEM - 1), m = seMeta(p);
+    return '<span class="seres">' + (t >= m ? 'La semana pasada: en sincro ' + MV_RAYO : t + ' de ' + m + '. Arranca otra.') + '</span>';
+  }
+  function seCab(){
+    const con = SE.soc !== 'sin';
+    return '<div class="sdhead"><div class="stack" style="gap:6px;flex:1;min-width:0"><h1 class="mtitle sig"><b>En</b> <i>sincro</i></h1>' +
+      (con ? '<span class="sdbanda">' + SE_BANDA() + '</span><span class="small muted">Tu banda · la convoca Prof. Lucas</span>' : '<span class="small muted">Tu ritmo, con el de otros.</span>') + '</div>' +
+      (con && !scMenor() ? '<button class="btn ghost sdmsg" data-semsg aria-label="Mensajes: abre WhatsApp">' + SB_WA + '<span>WhatsApp</span></button>' : '') + '</div>';
+  }
+  // ---- las tres franjas
+  function seUltimo(ev){
+    const x = ev[0];
+    if (!x) return '<div class="sefr"><span class="sefk">Lo último</span><span class="sefx muted">Todavía nada esta semana.</span></div>';
+    const f = seFrase(x);
+    return '<div class="sefr"><button class="sefrb" data-sevibra aria-label="Lo último de tu banda: ver los últimos 7 días">' + seAv(x) +
+      '<span class="sefx"><b>' + f[0] + '</b> ' + f[1] + '</span></button>' + seRayoBtn(x) + '</div>';
+  }
+  function seFechaFr(){
+    const w = Math.floor(SE.now / SE_SEM), esta = SE.now < w * SE_SEM + SE_JUE + 20 * 60, hoy = esta && Math.floor(SE.now / SE_DIA) % 7 === 3;
+    const otros = esta ? Math.max(0, seBanda().length - 2) : 1, van = otros + (SE.voy === 'voy' ? 1 : 0);
+    const op = (k, t) => '<button class="opt" data-sevoy="' + k + '" aria-pressed="' + (SE.voy === k) + '">' + t + '</button>';
+    return '<div class="sefr"><span class="sefk">' + (hoy ? 'Hoy' : 'Jue') + ' ' + SB_G.hora + '</span><span class="sefx small"><span class="sefl">' + SB_G.sede + '</span><span class="sefl muted">van ' + van + '</span></span>' +
+      '<span class="opts sevoy">' + op('voy', 'Voy') + op('no', 'No llego') + '</span></div>';
+  }
+  function seCruceFr(E, w){
+    if (SE.soc === 'nueva' && w === 0) return '<div class="sefr"><span class="sefk">Cruce</span><span class="sefx small muted">Arranca el lunes, contra otra banda de la sede.</span></div>';
+    const lunes = Math.floor(SE.now / SE_DIA) % 7 === 0 && SE.now % SE_DIA < 12 * 60, r = lunes ? seCruceRes(E, w - 1) : null;
+    const txt = r ? (r.gano ? 'Ganaron <b>' + r.a + ' %</b> a ' + r.b + ' % ' + MV_RAYO : 'Esta vez no · <b>' + r.a + ' %</b> a ' + r.b + ' %')
+      : 'Contra ' + (w > 0 ? SE_PROX : SE_RIV.nom.join(' ')) + ' · <b>' + sePct(E, w, SE.now) + ' %</b> a ' + (w > 0 ? 0 : seRivPct(w, SE.now)) + ' %';
+    return '<button class="sefr" data-secruce><span class="sefk">Cruce</span><span class="sefx small">' + txt + '</span><span class="sechev" aria-hidden="true">›</span></button>';
+  }
+  // ---- sin banda: el ecualizador apagado, con un lugar que late
+  function seSin(){
+    let b = '';
+    for (let i = 0; i < 5; i++) b += '<span class="sebar' + (i === 2 ? ' aca' : '') + '"><svg viewBox="-6 -6 52 212" preserveAspectRatio="none" aria-hidden="true"><rect class="rl-slot" x="-4" y="-4" width="48" height="208" rx="6"/>' +
+      (i === 2 ? '<rect class="seaca" x="1" y="1" width="38" height="198" rx="5" fill="none" stroke="var(--dat)" stroke-width="2.5"/>' : '') + '</svg><span class="senom">' + (i === 2 ? 'Vos' : '·') + '</span></span>';
+    const p = SE.primer;
+    return mvPos('c seeqbox', '<span class="stack" style="gap:4px"><span class="setit sig"><b>Acá va</b> <i>tu banda</i></span><span class="mvsub">La arma tu profe, en la sala.</span></span>' +
+      '<div class="seeq off">' + b + '</div>') +
+      mvPos('m', '<span class="mvk">Tu primer jueves · ' + SB_G.sede + '</span><span class="mvbig"><span class="mvfirma sig"><i>' + SB_G.dia + '</i></span><span class="mvnum">' + SB_G.hora + '</span></span>' +
+        '<span class="stack" style="gap:10px"><button class="btn' + (p ? ' ghost' : '') + '" data-seprimer>' + (p ? '✓ Te esperan' : 'Voy') + '</button>' +
+        '<span class="mvsub">' + (p ? 'Prof. Lucas te recibe en la entrada de la sala.' : 'Prof. Lucas recibe a los que arrancan: cada uno su rutina, a la misma hora.') + '</span></span>');
+  }
+  // ---- Lo de Viva: contenido oficial, ilustrado por código (app/img/social). Los socios no publican.
+  const SE_PUB = [
+    ['vid-01', 'v', 'hoy', 'Así arranca la semana en la sala. A veces con ganas, a veces no tanto ⚡'],
+    ['pub-05', 'p', 'ayer', 'Social VIVA: running y desayuno ⚡ ¿Te sumás el sábado?'],
+    ['pub-01', 'p', 'hace 2 días', 'La sala te espera con la energía de siempre ⚡ ¿Nos vemos?'],
+    ['vid-03', 'profe', 'hace 2 días', 'El ejercicio de la semana: remo con mancuerna. Espalda firme, el codo va hacia atrás. Si es tu primera vez, pedime que te mire en la sala.'],
+    ['pub-03', 'p', 'hace 3 días', 'A veces con ganas. A veces no tanto. Pero en VIVA, siempre terminás mejor ⚡'],
+    ['pub-07', 'p', 'hace 4 días', 'Tu InBody te dice cómo estás hoy, no cómo tenés que ser. Pedilo en recepción y miralo con tu nutricionista.'],
+    ['vid-02', 'v', 'hace 5 días', 'Así fue el último Social VIVA. Mucha energía compartida 🫶'],
+    ['pub-04', 'p', 'hace 6 días', 'Encontrá tu Fit House ⚡ Welcome to the club.'],
+    ['pub-06', 'p', 'hace 1 semana', 'Después de correr, el desayuno. Gracias a ustedes por venir ⚡'],
+    ['pub-02', 'p', 'hace 1 semana', 'Técnica primero, carga después. Tu profe está en la sala para eso ⚡'],
+    ['pub-08', 'p', 'hace 2 semanas', '¡Feliz aniversario, Sarmiento! Gracias a ustedes por tanta energía ⚡']
+  ];
+  const SE_ALT = { 'pub-01':'la sala, con una persona frente al espejo', 'pub-02':'una máquina de la sala con luz de neón', 'pub-03':'el rack de mancuernas',
+    'pub-04':'el frente de una sede de VIVA', 'pub-05':'Social VIVA, gente corriendo al amanecer', 'pub-06':'el desayuno de Social VIVA', 'pub-07':'el equipo de InBody', 'pub-08':'el aniversario de una sede',
+    'vid-01':'sentadillas con barra en la sala', 'vid-02':'Social VIVA, gente corriendo', 'vid-03':'remo con mancuerna apoyado en un banco' };
+  const SE_VDUR = 10, seV = () => '?v=' + (window.VK_V || '');
+  function seCar(P){
+    const profe = P[1] === 'profe', vid = P[0].charAt(0) === 'v';
+    const cab = profe ? sbProfe('Tu profe · ' + P[2]) : mvCab('VIVA', ['#3c4658','#12161d'], '@vivafithouse · ' + P[2]);
+    const media = vid ? '<div class="semedia sevid" data-sevid="' + P[0] + '" role="img" aria-label="Video de ejemplo: ' + SE_ALT[P[0]] + '"><span class="setag">' + (profe ? 'El ejercicio de la semana' : 'Video') + '</span>' +
+        '<button class="sevplay" data-sevplay aria-label="Reproducir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path class="sevpi" d="M8 5v14l11-7z" fill="currentColor"/></svg></button>' +
+        '<span class="sevmute" aria-label="Sin sonido"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg></span>' +
+        '<span class="sevdur">0:' + SE_VDUR + '</span><span class="sevbar"><i></i></span></div>'
+      : '<div class="semedia"><img src="img/social/' + P[0] + '.svg' + seV() + '" alt="Ilustración de ejemplo: ' + SE_ALT[P[0]] + '" loading="lazy" decoding="async"></div>';
+    return '<article class="secar">' + cab + media + '<span class="mvtxt">' + P[3] + '</span></article>';
+  }
+  function seViva(){
+    const L = SE_PUB.filter(P => P[1] !== 'profe' || SE.vid);
+    const car = SE.ig === 'vivo' ? sdIgVivo() + (SE.vid ? '<div class="secarr">' + seCar(SE_PUB[3]) + '</div>' : '') : '<div class="secarr" aria-label="Publicaciones de Viva">' + L.map(seCar).join('') + '</div>';
+    return '<div class="stack" style="gap:14px"><span class="stack" style="gap:2px"><span class="lbl">Lo de Viva</span><span class="small muted">' + (SE.ig === 'vivo' ? 'La cuenta de Viva en Instagram' : 'Lo que publica Viva') + '</span></span>' +
+      car + sdSocial() + '</div>';
+  }
+  // Los videos se insertan en la página (SMIL) para poder pausarlos; el bucle dura SE_VDUR segundos.
+  const SE_VSVG = {};
+  var seVActivo = null, seVRaf = 0;
+  function seVidCargar(){
+    $$('#seViva .sevid').forEach(el => { if (el.querySelector('svg.sevs')) return;
+      const k = el.dataset.sevid, poner = t => { if (el.querySelector('svg.sevs')) return; el.insertAdjacentHTML('afterbegin', t.replace('<svg ', '<svg class="sevs" '));
+        const s = el.querySelector('svg.sevs'); if (s && s.pauseAnimations) { s.pauseAnimations(); try { s.setCurrentTime(1.2); } catch (e) {} } };
+      if (SE_VSVG[k]) return poner(SE_VSVG[k]);
+      fetch('img/social/' + k + '.svg' + seV()).then(r => r.ok ? r.text() : '').then(t => { if (t) { SE_VSVG[k] = t; poner(t); } }).catch(() => {}); });
+  }
+  function seVidPausa(el){ const s = el && el.querySelector('svg.sevs'); if (s) s.pauseAnimations(); if (el) { el.classList.remove('on'); el.querySelector('[data-sevplay]').setAttribute('aria-label', 'Reproducir'); }
+    if (seVActivo === el) { seVActivo = null; cancelAnimationFrame(seVRaf); } }
+  function seVidToggle(el){
+    const s = el.querySelector('svg.sevs'); if (!s || !s.unpauseAnimations) { toast('El video todavía está cargando'); return; }
+    if (el.classList.contains('on')) return seVidPausa(el);
+    if (seVActivo) seVidPausa(seVActivo);
+    s.unpauseAnimations(); el.classList.add('on'); el.querySelector('[data-sevplay]').setAttribute('aria-label', 'Pausar'); seVActivo = el;
+    const bar = el.querySelector('.sevbar i'), dur = el.querySelector('.sevdur');
+    const paso = () => { if (seVActivo !== el || !el.isConnected) return; const t = s.getCurrentTime() % SE_VDUR;
+      bar.style.width = (100 * t / SE_VDUR).toFixed(1) + '%'; dur.textContent = '0:' + String(Math.floor(t)).padStart(2, '0'); seVRaf = requestAnimationFrame(paso); };
+    paso();
+  }
+  // ---- la pantalla
+  function seRender(){
+    const c = $('#seArriba'); if (!c) return;
+    if (SE.soc === 'nueva' && SE.now < SE_NUEVA + 15) SE.now = SE_NUEVA + 15;   // la banda nueva existe desde el jueves
+    let h = seCab();
+    if (SE.soc === 'sin') h += seSin();
+    else {
+      const E = seEntradas(), w = Math.floor(SE.now / SE_SEM), t = seTitular(E, w), sincro = seTotal(E, w, SE.now) >= seMeta(w), ev = seEventos(E);
+      h += mvPos((sincro ? 'f' : 'c') + ' seeqbox' + (SE.nuevoSincro ? ' seboom' : ''), seAntes(E, w) +
+          '<span class="stack" style="gap:4px"><span class="setit sig' + (SE.flash ? ' secambio' : '') + '">' + t[0] + '</span><span class="mvsub">' + t[1] + '</span></span>' + seEq(E, w) +
+          (sincro && !scMenor() ? '<div class="grid2" style="gap:10px"><button class="btn sm" data-secartel>A historias</button><button class="btn ghost sm" data-sewa="banda">Al WhatsApp</button></div>' : '')) +
+        '<div class="card sefrs">' + seUltimo(ev) + seFechaFr() + seCruceFr(E, w) + '</div>';
+    }
+    c.innerHTML = h; SE.flash = null; SE.nuevoSincro = false;
+    const v = $('#seViva'), k = SE.ig + SE.vid + !!SD.anot.e2 + scMenor();
+    if (v.dataset.k !== k) { if (seVActivo) seVidPausa(seVActivo); v.dataset.k = k; v.innerHTML = seViva(); seVidCargar(); }
+    if (SE.preg) { SE.preg = false; seConsent(); }
+    if (SE.vivo && !seVivoT) seVivoProg();
+  }
+  function seHoja(html){ $('#seHojaIn').innerHTML = html; $('#seHoja').hidden = false; }
+  function seConsent(){
+    if (scMenor()) { SE.yoComp = false; return seHoja('<span class="mtitle sig"><b>Entraste a</b> <i>' + SE_BANDA() + '</i></span><span class="muted" style="line-height:1.45">Por ahora tu barra no se muestra a la banda. Lo que entrenás suma igual.</span><button class="btn" data-sex type="button">Listo</button>'); }
+    seHoja('<span class="mtitle sig"><b>Entraste a</b> <i>' + SE_BANDA() + '</i></span><span class="muted" style="line-height:1.45">¿Tu banda ve tu barra? Muestra cuántas veces entrenaste esta semana, hacia tu meta. Nunca la hora.</span>' +
+      '<span class="small muted" style="line-height:1.4">Si no la mostrás, queda neutra y lo que entrenás suma igual. Lo cambiás cuando quieras tocando tu barra.</span>' +
+      '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-secomp="0" type="button">Ahora no</button><button class="btn sm" data-secomp="1" type="button">Que la vea</button></div>');
+  }
+  function seBarraHoja(id){
+    const E = seEntradas(), w = Math.floor(SE.now / SE_SEM), m = SE_INT.find(x => x.id === id), h = seHechos(E, id, w, SE.now), yo = id === 's1';
+    const hoy = E.some(e => e.socio === id && Math.floor(e.m / SE_DIA) === Math.floor(SE.now / SE_DIA) && e.m <= SE.now), ult = E.filter(e => e.socio === id && e.m <= SE.now).pop();
+    if (yo) return seHoja('<span class="mtitle sig"><b>Vos</b> <i>' + Math.min(h, m.meta) + ' de ' + m.meta + '</i></span>' +
+      (scMenor() ? '<span class="muted" style="line-height:1.45">Por ahora tu barra no se muestra a la banda. Lo que entrenás suma igual.</span>'
+        : '<span class="muted" style="line-height:1.45">' + (SE.yoComp ? 'Tu banda ve tu barra: cuántas veces entrenaste esta semana, nunca la hora.' : 'Tu banda no ve tu barra. Lo que entrenás suma igual.') + '</span>' +
+          '<button class="btn ghost sm" data-secomp="' + (SE.yoComp ? '0' : '1') + '" type="button">' + (SE.yoComp ? 'Que no la vea' : 'Mostrarla') + '</button>') +
+      '<button class="btn sm" data-sex type="button">Listo</button>');
+    if (seNeutra(id)) return seHoja('<span class="mtitle sig"><b>' + m.n + '</b> <i>en la banda</i></span><span class="muted" style="line-height:1.45">' + m.n + ' no muestra su barra. Lo que entrena suma igual a la banda.</span><button class="btn sm" data-sex type="button">Listo</button>');
+    const x = ult ? { k:'ent', id:id, m:ult.m, key:id + '@' + ult.m } : null;
+    seHoja('<span class="mtitle sig"><b>' + m.n + '</b> <i>' + Math.min(h, m.meta) + ' de ' + m.meta + '</i></span>' +
+      (hoy ? '<span class="muted">Entrenó hoy.</span>' : h >= m.meta ? '<span class="muted">Cumplió su semana.</span>' : '') +
+      (x && hoy ? '<div class="between"><span class="small muted">Mandale un rayo</span>' + seRayoBtn(x) + '</div>' : '') + '<button class="btn sm" data-sex type="button">Listo</button>');
+  }
+  function seVibraHoja(){
+    const ev = seEventos(seEntradas());
+    seHoja('<span class="mtitle sig"><b>Lo último</b> <i>de tu banda</i></span><span class="small muted">Los últimos 7 días. Solo lo logrado, nunca la hora.</span>' +
+      '<div class="mvfeed sevibra" style="gap:12px">' + ev.map(seEv).join('') + '</div><span class="mvfin">Estás al día ⚡</span><button class="btn ghost sm" data-sex type="button">Cerrar</button>');
+  }
+  // El cruce: el detalle de El pulso de la D, con los números de las entradas
+  function seCruceHoja(){
+    const E = seEntradas(), w = Math.floor(SE.now / SE_SEM), lunes = Math.floor(SE.now / SE_DIA) % 7 === 0, pasadas = [];
+    for (let p = SE.soc === 'nueva' ? 0 : -6; p < w; p++) pasadas.push(seCruceRes(E, p).gano ? 1 : 0);
+    const fila = (nom, p, yo) => '<span class="sdbarra"><span style="font-weight:700' + (yo ? '' : ';color:var(--muted)') + '">' + nom + ' · ' + p + ' %</span><span class="bar ' + (yo ? 'sdyo' : 'scotro') + '" data-n="10"><i style="width:' + Math.min(100, p) + '%"></i></span></span>';
+    let cuerpo;
+    if (lunes) { const r = seCruceRes(E, w - 1);
+      cuerpo = (r.gano ? '<span class="mvfirma sig"><b>Ganaron</b> <i>' + r.a + ' a ' + r.b + '</i> ' + MV_RAYO + '</span>' : scFirma('Esta vez no:', r.a + ' a ' + r.b)) +
+        '<span class="mvsub">La semana pasada, contra ' + r.riv + '. Hoy arranca otro cruce, contra ' + (w > 0 ? SE_PROX : SE_RIV.nom.join(' ')) + '.</span>' +
+        '<span class="stack" style="gap:12px">' + fila(SE_BANDA(), r.a, true) + fila(r.riv, r.b, false) + '</span>'; }
+    else { const a = sePct(E, w, SE.now), b = seRivPct(w, SE.now);
+      cuerpo = scFirma('Vamos ' + a + ' %', '· ellos ' + b + ' %') + '<span class="mvsub">Cada banda contra su propia meta. El resultado, el lunes.</span>' +
+        '<span class="stack" style="gap:12px">' + fila(SE_BANDA(), a, true) + fila(SE_RIV.nom.join(' '), b, false) + '</span>'; }
+    seHoja('<span class="mvk">El cruce</span>' + cuerpo + '<span class="stack" style="gap:6px">' + sdCeldas(pasadas) + '<span class="scpie"><span>Últimos ' + pasadas.length + ' cruces</span><span>Ganados: ' +
+      pasadas.filter(Boolean).length + '</span></span></span><button class="btn ghost sm" data-sex type="button">Cerrar</button>');
+  }
+  function seMsg(){
+    const fila = (k, t, s) => '<div class="mvfila"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + t + '</span><span class="small muted">' + s + '</span></span><button class="btn sm" data-sewa="' + k + '">Abrir</button></div>';
+    seHoja('<span class="mtitle sig"><b>Mensajes</b> <i>por WhatsApp</i></span><div class="list">' + fila('banda', SE_BANDA(), 'El grupo de WhatsApp de tu banda') + fila('profe', 'Prof. Lucas', 'Tu profe, a su número de trabajo') + '</div>' +
+      '<span class="small muted" style="line-height:1.4">En Vivapp no hay chat: la charla vive en WhatsApp. Nunca ves el número de otro socio. En la demo, los enlaces son de ejemplo.</span><button class="btn ghost sm" data-sex type="button">Cerrar</button>');
+  }
+  function seCartel(){
+    seHoja('<span class="mtitle sig"><b>En sincro</b> <i>' + SE_BANDA() + '</i></span><div class="sccartel sdcartel" role="img" aria-label="El cartel de ' + SE_BANDA() + '">' + scCartelSvg(SB_G.nom, 300, 170) + '</div>' +
+      '<span class="small muted" style="line-height:1.4">Sale a tus historias de Instagram. Solo el nombre de la banda: sin fotos ni números de nadie.</span>' +
+      '<div class="grid2" style="gap:10px"><button class="btn ghost sm" data-sex type="button">Cerrar</button><button class="btn sm" data-seig1 type="button">A historias</button></div>');
+  }
+  // ---- los avisos (dos por semana como máximo: la fecha del día y "falta 1"). En la demo, una tarjeta arriba; no es una notificación real.
+  var seAvT = 0;
+  function seAviso(tipo){
+    const w = Math.floor(SE.now / SE_SEM), ya = SE.avW[w] || [];
+    if (ya.includes(tipo) || ya.length >= 2 || SE.soc === 'sin') return;
+    SE.avW[w] = ya.concat([tipo]);
+    const txt = tipo === 'fecha' ? 'Hoy a las 19 es la fecha de ' + SE_BANDA() + ' ⚡' : 'Falta 1 para el sincro de ' + SE_BANDA() + ' ⚡';
+    const a = $('#seAviso'); a.innerHTML = '<span class="av sm sdbav" aria-hidden="true">' + MV_RAYO + '</span><span class="stack" style="gap:1px;flex:1;min-width:0"><span class="small muted">Vivapp · aviso de ejemplo</span><span style="font-weight:700;line-height:1.3">' + txt + '</span></span>';
+    a.hidden = false; clearTimeout(seAvT); seAvT = setTimeout(() => { a.hidden = true; }, 4500);
+  }
+  // ---- que pase algo: el próximo entrenamiento de hoy, si hay; si no, uno nuevo de alguien que no vino hoy
+  var seTim = [], seVivoT = 0;
+  const seLimpiar = () => { seTim.forEach(clearTimeout); seTim = []; };
+  function seRayos(key){   // los ⚡ que recibe el socio de la demo: dos o tres, de integrantes distintos
+    const otros = seBanda().filter(m => m.id !== 's1'), n = Math.min(otros.length, 2 + (SE.rot % 2)); SE.rec[key] = [];
+    for (let i = 0; i < n; i++) { const q = otros[(SE.rot + i * 2) % otros.length].n;
+      seTim.push(setTimeout(() => { (SE.rec[key] = SE.rec[key] || []).push(q); toast(q + ' te mandó un ⚡'); seRender(); }, 2200 + i * 2300)); }
+    SE.rot++;
+  }
+  function seEntrena(){
+    if (SE.soc === 'sin') { toast('Sin banda no hay barras: probalo con Banda nueva o Con banda'); return false; }
+    const E = seEntradas(), w = Math.floor(SE.now / SE_SEM), dia = Math.floor(SE.now / SE_DIA), ids = SE_TAM[SE.tam], ab = SE_ABRE[dia % 7], hora = SE.now % SE_DIA;
+    const antes = seTotal(E, w, SE.now), prox = E.find(e => ids.includes(e.socio) && e.m > SE.now && Math.floor(e.m / SE_DIA) === dia);
+    let id;
+    if (prox) { SE.now = prox.m; id = prox.socio; }
+    else {
+      if (hora < ab[0] * 60 || hora >= ab[1] * 60 - 10) { toast('A esta hora la sala está cerrada'); return false; }
+      const hoy = new Set(E.filter(e => Math.floor(e.m / SE_DIA) === dia && e.m <= SE.now).map(e => e.socio));
+      const libres = seBanda().filter(m => !hoy.has(m.id)), bajo = libres.filter(m => seHechos(E, m.id, w, SE.now) < m.meta), L = bajo.length ? bajo : libres;
+      if (!L.length) { toast('Hoy ya entrenó toda la banda'); return false; }
+      const m = L[SE.rot % L.length]; SE.now += 4; id = m.id; SE.extra.push({ socio:id, fecha:seFm(SE.now), extra:true });
+    }
+    const E2 = seEntradas(), desp = seTotal(E2, w, SE.now), meta = seMeta(w);
+    SE.flash = id; if (antes < meta && desp >= meta) { SE.nuevoSincro = true; toast(SE_BANDA() + ': en sincro ⚡'); }
+    if (id === 's1') { seRayos(id + '@' + SE.now); if (!SE.nuevoSincro) toast('Entraste a la sala: tu barra sumó uno'); }
+    seRender(); if (desp === meta - 1 && antes < desp) seAviso('falta1');
+    return true;
+  }
+  function seVivoProg(){
+    clearTimeout(seVivoT); seVivoT = 0; if (!SE.vivo) return;
+    seVivoT = setTimeout(() => { seVivoT = 0;
+      const visible = SOC_V === 'E' && !$('#socialE').hidden && $('#demoSheet').hidden;
+      if (visible) { const E = seEntradas(), dia = Math.floor(SE.now / SE_DIA);
+        if (SE.prisa && !E.some(e => SE_TAM[SE.tam].includes(e.socio) && e.m > SE.now && Math.floor(e.m / SE_DIA) === dia)) { SE.prisa = false; seVivoProg(); }
+        else if (!seEntrena()) seVivoProg(); }
+      else seVivoProg();
+    }, (SE.prisa ? 5000 + Math.random() * 3000 : 20000 + Math.random() * 20000));
+  }
+  // El momento de la semana (panel de demo): limpia lo que pasó mientras se miraba
+  function seMomento(k){
+    seLimpiar(); const av = $('#seAviso'); if (av) av.hidden = true; SE.mom = k; SE.now = SE_MOM[k]; SE.extra = []; SE.rec = {}; SE.flash = null; SE.avW = {}; SE.prisa = false;
+    if (SE.voy === null) SE.voy = 'voy';
+  }
+  seMomento(SE.mom);
+  $('#socialE').addEventListener('click', e => {
+    const q = s => e.target.closest(s), cerrar = () => { $('#seHoja').hidden = true; };
+    let b;
+    if (q('#seAviso')) { $('#seAviso').hidden = true; return; }
+    if ((b = q('[data-sevplay]')) || ((b = q('.sevid')) && !q('a'))) { seVidToggle(b.closest('.sevid')); return; }
+    if ((b = q('[data-serayo]'))) { const k = b.dataset.serayo, nom = b.getAttribute('aria-label').replace(/^(Sacarle|Mandarle) (el|un) rayo a /, '');
+      SE.rayo[k] = !SE.rayo[k]; $$('#socialE [data-serayo="' + k + '"]').forEach(x => { x.setAttribute('aria-pressed', !!SE.rayo[k]); x.setAttribute('aria-label', (SE.rayo[k] ? 'Sacarle el rayo a ' : 'Mandarle un rayo a ') + nom); });
+      if (SE.rayo[k]) toast('Le mandaste un ⚡ a ' + nom); return; }
+    if ((b = q('[data-sebar]'))) { seBarraHoja(b.dataset.sebar); return; }
+    if (q('[data-sevibra]')) { seVibraHoja(); return; }
+    if (q('[data-secruce]')) { seCruceHoja(); return; }
+    if ((b = q('[data-sevoy]'))) { SE.voy = b.dataset.sevoy; seRender(); toast(SE.voy === 'voy' ? '¡Vamos! Jueves a las 19, cada uno su rutina' : 'Listo. La banda ve un número, nunca quién'); return; }
+    if (q('[data-seprimer]')) { SE.primer = !SE.primer; seRender(); toast(SE.primer ? 'Te esperan el jueves a las 19 en Sarmiento' : 'Te bajaste del primer jueves'); return; }
+    if ((b = q('[data-secomp]'))) { SE.yoComp = b.dataset.secomp === '1'; cerrar(); seRender(); toast(SE.yoComp ? 'Tu banda ve tu barra' : 'Tu barra queda neutra; lo que entrenás suma igual'); return; }
+    if (q('[data-semsg]')) { seMsg(); return; }
+    if ((b = q('[data-sewa]'))) { cerrar(); toast('Se abre WhatsApp: ' + (b.dataset.sewa === 'banda' ? 'el grupo de ' + SE_BANDA() : 'Prof. Lucas') + ' (enlace de ejemplo)'); return; }
+    if (q('[data-secartel]')) { seCartel(); return; }
+    if (q('[data-seig1]')) { cerrar(); toast('Se abre Instagram con el cartel (en la demo, de ejemplo)'); return; }
+    if (q('[data-sdanot]')) { SD.anot.e2 = !SD.anot.e2; seRender(); toast(SD.anot.e2 ? 'Te anotaste a Social VIVA · sábado 08:30' : 'Te bajaste de Social VIVA'); return; }
+    if (e.target.id === 'seHoja' || q('[data-sex]')) cerrar();
+  });
