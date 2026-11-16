@@ -26,7 +26,7 @@
   new MutationObserver(sistemaEstampar).observe(document.querySelector('.app'), { childList:true, subtree:true });
 
   function go(id){
-    if (id === 'social' && typeof SOC_V !== 'undefined' && SOC_V !== 'A') id = 'social' + SOC_V;   // T21 · Versiones Social
+    if (id === 'social' && typeof SOC_V !== 'undefined' && SOC_V !== 'A') id = SOC_V === 'G' ? 'socialF' : 'social' + SOC_V;   // T21 · Versiones Social (T26: la G usa la pantalla de la F)
     if (id !== curScr) { prevScr = curScr; curScr = id; }
     $$('.scr').forEach(s => s.hidden = s.id !== id);
     $('#nav').hidden = !withNav.includes(id);

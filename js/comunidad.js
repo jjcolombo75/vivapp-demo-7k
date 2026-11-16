@@ -421,7 +421,7 @@
     if ((b = q('[data-sbcomp]'))) { cerrar(); toast(b.dataset.sbcomp === 'ig' ? 'Lista para tu historia de Instagram' : 'Lista para mandar al WhatsApp del grupo'); return; }
     if (e.target.id === 'sbHoja' || q('[data-sbx]')) cerrar();
   });
-  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : SOC_V === 'D' ? SD.tab : SOC_V === 'E' ? 'Sincro' : SOC_V === 'F' ? SF.tab : 'Social'; }
+  function socNav(){ const t = $('#nav [data-go="social"]').lastChild; if (t && t.nodeType === 3) t.nodeValue = SOC_V === 'A' ? 'Mural' : SOC_V === 'C' ? SC.tab : SOC_V === 'D' ? SD.tab : SOC_V === 'E' ? 'Sincro' : SOC_V === 'F' ? SF.tab : SOC_V === 'G' ? SG.voc : 'Social'; }
 //#bloque 227
   // ===== T22 · Social VIVA, versión C: En sincro (v101) =====
   // Hilo conductor (Juanjo, 15/11): tu ritmo, cuando se acopla con el de otros. Versiones Social (panel, bloque 345 de demo.js) elige A, B o C.
@@ -1197,7 +1197,7 @@
   const sfDia = m => ((Math.floor(m / SE_DIA) % 7) + 7) % 7;
   const sfP = () => scMenor() ? 'presenta' : SF.puerta;          // menores: solo la puerta 2
   const sfT = () => scMenor() ? 'presenta' : SF.tipo;            // la banda que nació (de la puerta o del camino que tomó el socio)
-  const sfB = () => SF_B[sfT()];
+  const sfB = () => SOC_V === 'G' ? sgB(sfT()) : SF_B[sfT()];   // T26: en la G, la banda puede tener el nombre aprobado
   const sfNom = () => sfB().nom.join(' ');
   const sfNueva = () => SF.est === 'nueva';
   const sfLun1 = () => (SF.mom === 'lun1g' || SF.mom === 'lun1p') && SF.est === 'con' && Math.floor(SF.now / SE_SEM) === 1 && sfDia(SF.now) === 0;
@@ -1325,18 +1325,19 @@
       cab = '<span class="mvk">El cruce · la semana pasada</span><span class="stack" style="gap:4px">' + (r.gano ? sfTit('<b>Ganaron</b>', MV_RAYO) : sfTit('<b>Esta vez</b>', 'no')) +
         '<span class="mvsub">' + (r.gano ? r.a + ' a ' + r.b + ' contra ' + r.riv + '. Hoy arranca otro cruce, contra ' + sfRivNom(E, w) + '.' : r.b + ' a ' + r.a + ' contra ' + r.riv + '. Hoy arranca la revancha.') + '</span></span>';
       cols = sfCol(r.a, nom, true) + sfCol(r.b, r.riv, false); sincro = r.gano;
+      if (SOC_V === 'G') { const g = sgLun1(E, w, r); cab = g.cab; cols = g.cols; }   // T26: el resultado se revela
       if (r.gano && !m) extra = '<button class="btn sm" data-sffoto>' + SB_CAM + 'La foto del cruce</button>';
     } else {
       const a = sfPct(E, w, SF.now), b = sfRivPct(w, SF.now), q = 6 - dia; ult = sfUlt8(E, w); sincro = a >= 100;
-      const cuando = dia === 6 ? (hora >= SE_ABRE[6][1] * 60 ? 'El resultado, mañana.' : 'Cierra hoy.') : q === 1 ? 'Queda 1 día.' : 'Quedan ' + q + ' días.';
+      const cuando = SOC_V === 'G' && dia === 6 ? 'Se define hoy.' : dia === 6 ? (hora >= SE_ABRE[6][1] * 60 ? 'El resultado, mañana.' : 'Cierra hoy.') : q === 1 ? 'Queda 1 día.' : 'Quedan ' + q + ' días.';
       const antes = dia === 0 && w > -8 ? '<span class="seres">La semana pasada: ' + (sfRes(E, w - 1).gano ? 'ganaron ' + MV_RAYO : 'esta vez no') + '</span>' : '';
       cab = antes + '<span class="mvk">El cruce · esta semana</span><span class="stack" style="gap:4px">' + sfTit('<b>Vamos ' + a + ' %</b>', '· ellos ' + b + ' %') +
         '<span class="mvsub">' + (sincro ? 'En sincro ' + MV_RAYO + ' ' : '') + cuando + '</span></span>';
-      cols = sfCol(a, nom, true, SF.flash) + sfCol(b, sfRivNom(E, w), false);
+      cols = sfCol(a, nom, true, SF.flash) + sfCol(b, sgRivLbl(sfRivNom(E, w)), false);
     }
     const mes = sfMes(E);
     if (mes >= 3) extra += '<div class="mvfila sfcartelf"><span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">Mes cumplido ' + MV_RAYO + '</span><span class="small muted">El cartel de la banda</span></span><button class="btn sm" data-sfcartel>Verlo</button></div>';
-    return mvPos((sincro ? 'f' : 'c') + ' seeqbox sfcruce' + (SF.nuevoSincro ? ' seboom' : ''), cab + '<div class="sfx">' + cols + '</div>' +
+    return mvPos((sincro ? 'f' : 'c') + ' seeqbox sfcruce' + (SF.nuevoSincro ? ' seboom' : '') + (SOC_V === 'G' && !sfLun1() && dia === 6 ? ' sgvivo' : ''), cab + '<div class="sfx">' + cols + '</div>' +
       '<span class="stack" style="gap:6px">' + sdCeldas(ult) + '<span class="scpie"><span>Últimos ' + ult.length + ' cruces</span><span>Ganados: ' + ult.filter(Boolean).length + '</span></span></span>' + extra);
   }
   function sfUltimo(ev){
@@ -1384,15 +1385,17 @@
     const c = $('#sfArriba'); if (!c) return;
     if (sfNueva() && SF.now < SF_NUEVA + 15) SF.now = SF_NUEVA + 15;
     let h;
-    if (SF.est === 'sin' || SF.est === 'espera') h = sfCab(false) + (SF.est === 'sin' ? sfSin() : sfEspera());
+    if (SOC_V === 'G') h = sgArriba();   // T26: la G, con la fila arriba
+    else if (SF.est === 'sin' || SF.est === 'espera') h = sfCab(false) + (SF.est === 'sin' ? sfSin() : sfEspera());
     else { const E = sfEntradas(); h = sfCab(true) + sfFecha() + sfCruce(E) + (SF.ult ? sfUltimo(sfEventos(E)) : ''); }
     c.innerHTML = h; SF.flash = false; SF.nuevoSincro = false;
-    const v = $('#sfViva'), k = SF.ig + !!SD.anot.e2;
-    if (v.dataset.k !== k) { if (seVActivo) seVidPausa(seVActivo); v.dataset.k = k; v.innerHTML = sfViva(); seVidCargar('#sfViva'); }
+    const v = $('#sfViva'), k = (SOC_V === 'G' ? 'G' + SG.voc : SF.ig) + !!SD.anot.e2;
+    if (v.dataset.k !== k) { if (seVActivo) seVidPausa(seVActivo); v.dataset.k = k; v.innerHTML = SOC_V === 'G' ? sgPie() : sfViva(); seVidCargar('#sfViva'); }
+    if (SOC_V === 'G') sgDespues(c);
     if (SF.preg) { SF.preg = false; sfComp(true); }
     if (SF.vivo && !sfVivoT) sfVivoProg();
   }
-  function sfHoja(html){ $('#sfHojaIn').innerHTML = html; $('#sfHoja').hidden = false; }
+  function sfHoja(html){ $('#sfHojaIn').innerHTML = html; $('#sfHoja').hidden = false; if (SOC_V === 'G') sgVocDom($('#sfHojaIn')); }
   const sfCerrarBtn = (t) => '<button class="btn ghost sm" data-sfx type="button">' + (t || 'Cerrar') + '</button>';
   // La invitación (la de la B, con día, hora y sede): el mensaje a la vista; la app no pide ni guarda el nombre ni el teléfono del invitado.
   const sfHoras = d => d === 5 ? ['09:00', '11:00', '16:00'] : d === 6 ? ['10:00', '12:00'] : ['07:00', '12:00', '18:00', '19:00', '20:00'];
@@ -1516,7 +1519,7 @@
   function sfVivoProg(){
     clearTimeout(sfVivoT); sfVivoT = 0; if (!SF.vivo) return;
     sfVivoT = setTimeout(() => { sfVivoT = 0;
-      const visible = SOC_V === 'F' && !$('#socialF').hidden && $('#demoSheet').hidden;
+      const visible = (SOC_V === 'F' || SOC_V === 'G') && !$('#socialF').hidden && $('#demoSheet').hidden;
       if (visible) { const E = sfEntradas(), dia = Math.floor(SF.now / SE_DIA), ids = sfB().int.map(m => m.id);
         if (SF.prisa && !E.some(e => ids.includes(e.socio) && e.m > SF.now && Math.floor(e.m / SE_DIA) === dia)) { SF.prisa = false; sfVivoProg(); }
         else if (!sfEntrena()) sfVivoProg(); }
@@ -1569,3 +1572,368 @@
   });
   $('#socialF').addEventListener('change', e => { const s = e.target.closest('[data-sfsw]'); if (!s) return;
     SF.comp[s.dataset.sfsw] = s.checked; sfRender(); toast(s.checked ? 'Tu banda lo va a ver' : 'Tu banda ya no lo ve'); });
+
+//#bloque 236
+  // ===== T26 · Social VIVA, versión G: Las insignias (v109) =====
+  // La F con otra cabecera: comparte pantalla (#socialF) y estado (SF). Lo nuevo: la fila de insignias arriba (todas las bandas que eligen
+  // verse, de las sedes con app), la historia automática que abre cada una, la insignia que crece con las semanas en sincro, el cruce con
+  // suspenso (domingo "se define hoy"; el lunes el resultado se revela) y el vocabulario Bandas · Tribus. Sale el carrusel de Lo de Viva.
+  // Piso: nada que moderar (todo lo de una banda lo genera el sistema desde las entradas); de otra banda, solo datos de banda (insignia,
+  // nombre, sede, semanas en sincro, eventos de banda); sin orden por rendimiento; una banda se ve solo si todos sus integrantes dijeron que sí
+  // y ninguno es menor (E11). En real: entradas de EVO (sede del socio y entrada del día, sin verificar) · banda, nombre y su aprobación,
+  // visible, ⚡ y "ya lo vi", tablas de Vivapp · cruce especial, lo carga Viva (sin definir quién).
+  var SG = { voc:'Bandas', vis:'si', nombre:'ok', semK:'auto', nov:'varias', rivSede:'tu', esp:false, mano:false,
+    visto:{}, novAt:'', rev:{}, rayo:{}, avW:{}, L:[], E:null, h:null, hT:0 };
+  var SG_BC = {};
+  SF_MOM.mar = SE_DIA + 20 * 60;   // martes a la noche (escenario 7)
+  // El nombre que propuso quien armó la banda (en la demo, ya aprobado por el profe, o esperando)
+  var SG_NOK = { trae:['Dúo', 'dinamita'], presenta:['Fuego del', 'jueves'] };
+  function sgB(t){ const k = t + SG.nombre; return SG_BC[k] || (SG_BC[k] = Object.assign({}, SF_B[t], { nom:SG.nombre === 'ok' ? SG_NOK[t] : SF_B[t].nom })); }
+  var SG_SEDE = 'Sarmiento', SG_OTRA = 'López y Planes';   // las dos sedes con app en la demo; Alberdi queda de control (sin app)
+  const sgHash = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const sgRnd = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const sgVoc = s => SG.voc === 'Tribus' ? String(s).replace(/(^|[^A-Za-zÁÉÍÓÚáéíóúñÑ])([Bb])anda(s?)(?![A-Za-zÁÉÍÓÚáéíóúñÑ])/g, (m, a, b, p) => a + (b === 'B' ? 'T' : 't') + 'ribu' + p) : s;
+  const sgW = () => Math.floor(SF.now / SE_SEM);
+  const sgCon = () => SF.est === 'con' || SF.est === 'nueva';
+
+  // ---- las bandas de los demás: quince, de las dos sedes con app. [nombre, sede, metas, constancia, semana de alta, extra]
+  // extra: suma = un integrante que se suma esta semana (orden, día, hora) · no = uno no dio el sí · menor = un integrante menor de 18.
+  // Nombres inventados; incluyen las rivales de semanas anteriores de la F (pas, prox), para que el cruce sea el mismo.
+  const SG_GEN = [
+    ['Los madrugadores', SG_SEDE, [3, 3, 2, 3], .7, -30], ['Team sábado', SG_OTRA, [2, 3, 2], .62, -22],
+    ['Las imparables', SG_SEDE, [4, 3, 3, 3, 2], .66, -28], ['Los del mediodía', SG_OTRA, [3, 2, 3, 2], .58, -14],
+    ['Dúo de la mañana', SG_SEDE, [3, 3], .74, -9], ['Los de las 21', SG_OTRA, [3, 3, 2, 2, 3], .6, -26],
+    ['Hierro y mate', SG_OTRA, [3, 2], .7, -5], ['Las del after', SG_SEDE, [2, 2, 3], .64, -3],
+    ['Doble turno', SG_OTRA, [4, 4], .78, -30], ['Los de siempre', SG_SEDE, [3, 3, 3, 2, 2], .63, -20, { suma:[0, 19, 30] }],
+    ['Team domingo', SG_OTRA, [2, 2, 2], .72, 0], ['Las cardio', SG_SEDE, [3, 2, 3], .6, -12, { suma:[2, 18, 0] }],
+    ['Los del fondo', SG_SEDE, [3, 3, 3], .8, -10, { no:true }], ['Piernas de acero', SG_OTRA, [3, 2], .8, -16, { no:true }],
+    ['Los pibes', SG_SEDE, [3, 3, 2], .8, -8, { menor:true }]
+  ];
+  const SG_HORA = [6, 7, 8, 12, 13, 18, 19, 20, 21];
+  // Entradas {socio, fecha} de 31 semanas: cada integrante tiene sus días y horas; viene con la constancia de la banda, y una semana de cada
+  // siete o así la banda entera afloja. De acá salen semanas en sincro, eventos y cruces: ningún número escrito a mano.
+  function sgArmar(){
+    return SG_GEN.map((g, i) => {
+      const R = sgRnd(sgHash(g[0])), x = g[5] || {}, b = { key:'g' + i, nom:g[0], sede:g[1], altaW:g[4], mem:[], E:[], vis:!x.no && !x.menor, gen:true };
+      const metas = g[2].concat(x.suma ? [3] : []);
+      metas.forEach((meta, j) => {
+        const nuevo = x.suma && j === metas.length - 1, alta = nuevo ? x.suma[0] * SE_DIA + x.suma[1] * 60 + x.suma[2] : g[4] * SE_SEM + Math.floor(R() * 2) * SE_DIA + 18 * 60;
+        const m = { id:b.key + 'm' + j, meta:meta, alta:alta, menor:!!x.menor && j === 1 };
+        const dias = [0, 1, 2, 3, 4, 5].sort(() => R() - .5).slice(0, meta + (R() < .5 ? 1 : 0)).sort();
+        m.hab = dias.map(d => { let h = SG_HORA[Math.floor(R() * SG_HORA.length)]; if (d === 5) h = Math.min(17, Math.max(8, h)); return d * SE_DIA + h * 60 + Math.floor(R() * 50); });
+        m.p = Math.min(.97, g[3] * (.88 + R() * .24)); b.mem.push(m);
+      });
+      for (let w = Math.max(-30, g[4]); w <= 1; w++) { const floja = R() < .14 ? .55 : 1;
+        b.mem.forEach(m => m.hab.forEach(t => { const at = w * SE_SEM + t; if (at >= m.alta && R() < m.p * floja) b.E.push({ socio:m.id, fecha:seFm(at) }); })); }
+      b.E = b.E.map(e => ({ socio:e.socio, m:seMin(e.fecha) })).sort((p, q) => p.m - q.m);
+      return b;
+    });
+  }
+  var SG_GENB = null;
+  const sgGenB = () => SG_GENB || (SG_GENB = sgArmar());
+  // La rival de la semana de tu banda: la de la F (mismas entradas). En la G suma a alguien el martes (para el escenario 7).
+  function sgRiv(){
+    const B = sfB(), R = B.riv, nom = R.nom.join(' ');
+    return { key:'riv', nom:nom, sede:SG.rivSede === 'otra' ? SG_OTRA : SG_SEDE, altaW:-8, half:false, vis:true, riv:true,
+      mem:Object.keys(R.metas).map(id => ({ id:id, meta:R.metas[id], alta:-8 * SE_SEM })), E:sfRivEnt(), altas:[SE_DIA + 13 * 60 + 30] };
+  }
+  // Total y meta de una banda en la semana w hasta h (cada uno suma hasta su meta; meta = 80 % de la suma; a la mitad la semana de alta)
+  function sgTM(b, w, h){
+    const fin = (w + 1) * SE_SEM - 1, hh = Math.min(h, fin), M = b.mem.filter(x => x.alta < w * SE_SEM || (w === b.altaW && x.alta <= fin));
+    if (!M.length || hh < w * SE_SEM) return [0, 1];
+    let meta = Math.round(.8 * M.reduce((a, x) => a + x.meta, 0)); if (w === b.altaW && b.half !== false) meta = Math.max(1, Math.round(meta / 2));
+    const t = M.reduce((a, x) => a + Math.min(x.meta, b.E.filter(e => e.socio === x.id && e.m >= w * SE_SEM && e.m <= hh).length), 0);
+    return [t, meta];
+  }
+  const sgPct = (b, w, h) => { const r = sgTM(b, w, h); return 100 * r[0] / r[1]; };
+  function sgSem(b, h){ let n = 0; for (let w = Math.max(-30, b.altaW); w <= Math.floor(h / SE_SEM); w++) if (sgPct(b, w, h) >= 100) n++; return n; }
+  // El cruce de las demás: cada lunes se arman de a dos (de cualquier sede con app); la que fue rival de tu banda, con el resultado de la F.
+  function sgGano(b, w, E){
+    const rn = w >= -8 ? sfRivNom(E, w) : null;
+    if (b.nom === rn) { const r = sfRes(E, w); return r.b > r.a; }
+    if (b.riv) return false;
+    const L = sgGenB().filter(x => x.altaW <= w && x.nom !== rn).sort((p, q) => sgHash(p.nom + w) - sgHash(q.nom + w)), i = L.indexOf(b), o = L[i ^ 1];
+    return !!o && sgPct(b, w, (w + 1) * SE_SEM) > sgPct(o, w, (w + 1) * SE_SEM);
+  }
+  // Los eventos de banda de esta semana (duran hasta el lunes): entró en sincro · la insignia dio el salto (4, 12, 24) · ganó el cruce ·
+  // sumaron a alguien · se armó. Nunca quién, ni la hora, ni quién falta.
+  function sgEv(b, E){
+    const w = sgW(), ev = [];
+    if (sgPct(b, w, SF.now) >= 100) {
+      const t = b.E.filter(e => e.m >= w * SE_SEM && e.m <= SF.now).find(e => sgPct(b, w, e.m) >= 100);
+      if (t) { ev.push({ k:'sincro', m:t.m }); const n = sgSem(b, SF.now); if ([4, 12, 24].includes(n)) ev.push({ k:'salto', n:n, m:t.m + .3 }); }
+    }
+    if (w - 1 >= b.altaW && sgGano(b, w - 1, E)) ev.push({ k:'gano', m:w * SE_SEM + 1 });
+    if (b.altaW === w) ev.push({ k:'nace', m:Math.min.apply(null, b.mem.map(x => x.alta)) });
+    else b.mem.forEach(x => { if (x.alta >= w * SE_SEM && x.alta <= SF.now && x.alta > (b.altaW + 1) * SE_SEM) ev.push({ k:'alta', m:x.alta }); });
+    (b.altas || []).forEach(m => { if (m >= w * SE_SEM && m <= SF.now) ev.push({ k:'alta', m:m }); });
+    return ev.filter(x => x.m <= SF.now).sort((p, q) => p.m - q.m);
+  }
+  // Tu banda: semanas en sincro (de las entradas, o el atajo del panel) y lo de esta semana (Lo último, con los permisos de la D)
+  function sgSemTu(E){
+    if (SG.semK !== 'auto') return +SG.semK;
+    let n = 0; const w = sgW(); for (let p = sfNueva() ? 0 : -8; p <= w; p++) if (sfPct(E, p, Math.min(SF.now, sfFin(p))) >= 100) n++;
+    return n;
+  }
+  const sgVisible = () => SG.vis === 'si' && !scMenor();
+  // ⚡ que le mandaron a tu banda esta semana (en la demo: dos bandas que tuvieron algo esta semana; solo si tu banda se ve)
+  function sgRec(E, L){
+    if (!sgVisible() || SF.est !== 'con') return [];
+    return L.filter(b => b.gen && b.ev.length).slice(0, 2).map(b => ({ b:b, m:b.ev[0].m + 45 })).filter(x => x.m <= SF.now);
+  }
+  // La lista de la fila: "+" o tu banda · la rival · las que tienen algo nuevo, por lo reciente · el resto, alternando sedes.
+  // Nunca por semanas en sincro ni por cruces ganados.
+  function sgLista(E){
+    const w = sgW(), out = [], con = sgCon();
+    const rn = con && !(sfNueva() && w === 0) ? sfRivNom(E, w) : null;
+    let otras = sgGenB().filter(b => b.vis && Math.min.apply(null, b.mem.map(x => x.alta)) <= SF.now);
+    const riv = sgRiv(); if (rn === riv.nom) otras.push(riv);
+    otras = otras.map(b => Object.assign(b, { sem:sgSem(b, SF.now), ev:sgEv(b, E), rival:b.nom === rn }));
+    if (con) { const ev = sfEventos(E).filter(x => x.m >= w * SE_SEM); out.push({ key:'yo', yo:true, nom:sfNom(), sede:SG_SEDE, sem:sgSemTu(E), ev:ev }); }
+    const on = b => b.ev.length && b.ev[b.ev.length - 1].m > (b.key in SG.visto ? SG.visto[b.key] : -1e9);
+    const r = otras.find(b => b.rival); if (r) out.push(r);
+    const resto = otras.filter(b => !b.rival), nuevas = resto.filter(on).sort((p, q) => q.ev[q.ev.length - 1].m - p.ev[p.ev.length - 1].m);
+    const viejas = resto.filter(b => !on(b)).sort((p, q) => sgHash(p.nom) - sgHash(q.nom)), A = viejas.filter(b => b.sede === SG_SEDE), Bq = viejas.filter(b => b.sede !== SG_SEDE);
+    const alt = []; while (A.length || Bq.length) { if (A.length) alt.push(A.shift()); if (Bq.length) alt.push(Bq.shift()); }
+    out.push.apply(out, nuevas.concat(alt));
+    if (con) { const yo = out[0]; yo.rec = sgRec(E, out); yo.ev = yo.ev.concat(yo.rec.length ? [{ k:'rayos', m:Math.max.apply(null, yo.rec.map(x => x.m)) }] : []).sort((p, q) => p.m - q.m); }
+    out.forEach(b => b.on = !!on(b));
+    return out;
+  }
+  // Cuántas bandas (todas las de las sedes con app, se vean o no) están en sincro esta semana; el lunes temprano, la semana pasada.
+  function sgCuantas(E){
+    const w = sgW(), c = (ww, h) => sgGenB().filter(b => b.altaW <= ww && sgPct(b, ww, h) >= 100).length + (sgPct(sgRiv(), ww, h) >= 100 ? 1 : 0) + (sgCon() && sfPct(E, ww, h) >= 100 ? 1 : 0);
+    const n = c(w, SF.now); return n ? 'Esta semana, ' + n + ' bandas en sincro' : 'La semana pasada, ' + c(w - 1, w * SE_SEM - 1) + ' bandas en sincro';
+  }
+
+  // ---- la insignia: la genera la app desde el nombre (siempre igual para el mismo nombre). Diez formas, dos colores del neón de Viva,
+  // las iniciales. Crece con las semanas en sincro acumuladas (nunca vuelve atrás): un rayo por semana hasta 12; a las 4, un segundo trazo;
+  // a las 12, el anillo de puntos que se enciende uno por semana; a las 24, el espectro. Nace con su forma completa.
+  const SG_PAR = [['#07b0f2', '#f400a0'], ['#f400a0', '#07b0f2'], ['#ffe94a', '#07b0f2'], ['#07b0f2', '#ffe94a'], ['#f400a0', '#ffe94a'], ['#ffe94a', '#f400a0']];
+  const SG_STOP = ['los', 'las', 'la', 'el', 'del', 'de', 'y', 'en'];
+  const sgIni = nom => nom.split(' ').filter(p => !SG_STOP.includes(p.toLowerCase())).slice(0, 2).map(p => /^\d+$/.test(p) ? p.slice(0, 2) : p[0].toUpperCase()).join('').slice(0, 2);
+  function sgForma(k, r){
+    const pol = (n, rot, rr) => { const p = []; for (let i = 0; i < n; i++) { const a = (rot + i * 360 / n) * Math.PI / 180; p.push((rr * Math.cos(a)).toFixed(1) + ',' + (rr * Math.sin(a)).toFixed(1)); } return '<polygon stroke-linejoin="round" points="' + p.join(' ') + '"'; };
+    const s = r / 30;
+    switch (k) {
+      case 0: return '<circle r="' + (r * .95).toFixed(1) + '"';
+      case 1: return pol(3, -90, r * 1.2);
+      case 2: return pol(4, -90, r * 1.1);
+      case 3: return '<rect x="' + (-r * .82).toFixed(1) + '" y="' + (-r * .82).toFixed(1) + '" width="' + (r * 1.64).toFixed(1) + '" height="' + (r * 1.64).toFixed(1) + '" rx="' + (r * .3).toFixed(1) + '"';
+      case 4: return pol(5, -90, r * 1.04);
+      case 5: return pol(5, 90, r * 1.04);
+      case 6: return pol(6, -90, r);
+      case 7: return pol(6, 0, r);
+      case 8: return pol(8, 22.5, r);
+      default: return '<path stroke-linejoin="round" d="M0 ' + (-31 * s).toFixed(1) + 'L' + (27 * s).toFixed(1) + ' ' + (-20 * s).toFixed(1) + 'L' + (27 * s).toFixed(1) + ' ' + (3 * s).toFixed(1) + 'Q' + (25 * s).toFixed(1) + ' ' + (22 * s).toFixed(1) + ' 0 ' + (32 * s).toFixed(1) + 'Q' + (-25 * s).toFixed(1) + ' ' + (22 * s).toFixed(1) + ' ' + (-27 * s).toFixed(1) + ' ' + (3 * s).toFixed(1) + 'L' + (-27 * s).toFixed(1) + ' ' + (-20 * s).toFixed(1) + 'Z"';
+    }
+  }
+  function sgIns(nom, n, cls, nueva){
+    const h = sgHash(nom), k = h % 10, P = SG_PAR[(h >>> 5) % 6], A = P[0], B = P[1], id = 'sgi' + (++scUid), ini = sgIni(nom), R = 29;
+    let g = n >= 24 ? '<defs><linearGradient id="' + id + '" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient></defs>' : '';
+    for (let i = 0; i < Math.min(n, 12); i++) { const a = (-90 + i * 30) * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+      g += '<line class="' + (nueva && i === Math.min(n, 12) - 1 ? 'sgpz' : '') + '" x1="' + (37 * c).toFixed(1) + '" y1="' + (37 * s).toFixed(1) + '" x2="' + (44 * c).toFixed(1) + '" y2="' + (44 * s).toFixed(1) + '" stroke="' + A + '" stroke-width="3.4" stroke-linecap="round"/>'; }
+    if (n >= 12) for (let i = 0; i < 12; i++) { const a = (-75 + i * 30) * Math.PI / 180, on = i < Math.min(12, n - 11);
+      g += '<circle cx="' + (45.5 * Math.cos(a)).toFixed(1) + '" cy="' + (45.5 * Math.sin(a)).toFixed(1) + '" r="2.5" fill="' + (on ? B : 'none') + '" stroke="' + B + '" stroke-opacity="' + (on ? 1 : .45) + '" stroke-width="1"/>'; }
+    g += sgForma(k, R) + ' fill="' + A + '" fill-opacity=".16" stroke="' + (n >= 24 ? 'url(#' + id + ')' : A) + '" stroke-width="' + (n >= 24 ? 4 : 3.2) + '"/>';
+    if (n >= 4) g += sgForma(k, R * .74) + ' fill="none" stroke="' + B + '" stroke-width="2"/>';
+    if (ini) g += '<text x="0" y="' + (k === 1 ? 6 : k === 9 ? 3 : 1) + '" text-anchor="middle" dominant-baseline="central" style="font-family:var(--display);font-weight:800;letter-spacing:-.5px" font-size="' + (ini.length > 1 ? (k === 1 ? 15 : 21) : (k === 1 ? 22 : 27)) + '" fill="currentColor">' + ini + '</text>';
+    return '<svg class="sgins ' + (cls || '') + '" viewBox="-50 -50 100 100" style="--ia:' + A + '" aria-hidden="true">' + g + '</svg>';
+  }
+  // Lo que le falta para la próxima pieza, dicho en positivo
+  function sgProx(n){
+    if (n >= 24) return 'Tiene todas sus piezas. Cada semana en sincro la mantiene encendida.';
+    const p = n === 3 ? 'el segundo trazo' : n === 11 ? 'el anillo' : n === 23 ? 'el espectro' : n < 12 ? 'un rayo' : 'un punto del anillo';
+    return 'Una semana más en sincro y suma ' + p + '.';
+  }
+
+  // ---- la cabecera y la fila
+  function sgCab(con){
+    const m = scMenor();
+    return '<div class="sdhead"><div class="stack" style="gap:6px;flex:1;min-width:0"><h1 class="mtitle sig"><b>Las</b> <i>bandas</i></h1></div>' +
+      (con && !m ? '<span class="sfcabb"><button class="btn ghost sdmsg" data-sffoto aria-label="La foto con el marco de Viva">' + SB_CAM + '<span>Foto</span></button>' +
+        '<button class="btn ghost sdmsg" data-sfmsg aria-label="Mensajes: abre WhatsApp">' + SB_WA + '<span>WhatsApp</span></button></span>' : '') + '</div>';
+  }
+  function sgFila(E){
+    const L = SG.L, it = b => '<button class="sgc" data-sgver="' + b.key + '" aria-label="' + (b.yo ? 'Tu banda, ' : '') + b.nom + (b.sede !== SG_SEDE ? ', ' + b.sede : '') + (b.on ? ': hay algo nuevo' : '') + '">' +
+      '<span class="sgaro' + (b.on ? ' on' : '') + (b.yo && !sgVisible() ? ' priv' : '') + '">' + sgIns(b.nom, b.sem) + '</span><span class="sgn">' + b.nom + '</span>' + (b.sede !== SG_SEDE ? '<span class="sgs">' + b.sede + '</span>' : '') + '</button>';
+    const mas = sgCon() ? '' : '<button class="sgc" data-sgmas aria-label="Armá tu banda"><span class="sgaro plus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="sgn">Tu banda</span></button>';
+    return '<div class="sgfila" role="list" aria-label="Las bandas">' + mas + L.map(it).join('') + '<span class="sgtot">' + sgCuantas(E) + '</span></div>';
+  }
+  function sgBandaLinea(){
+    const B = sfB(), nom = sfNom(), sub = [B.conv ? 'la convoca ' + B.conv : '', sgVisible() ? '' : 'solo ustedes la ven'].filter(Boolean).join(' · ');
+    return '<button class="sfbanda sgbl" data-sfbanda aria-label="Tu banda: ' + nom + '">' + sgIns(nom, SG.L[0] ? SG.L[0].sem : 0, 'sgmini') +
+      '<span class="stack" style="gap:2px;min-width:0"><span class="sdbanda">' + nom + '</span>' + (sub ? '<span class="small muted">' + sub + '</span>' : '') + '</span></button>';
+  }
+  // El cruce especial del mes (lo propone Viva): sede contra sede, cada una en % de la suma de las metas de sus bandas
+  function sgEspPct(E){
+    const w = sgW(), S = {}; S[SG_SEDE] = [0, 0]; S[SG_OTRA] = [0, 0];
+    const add = (sede, r) => { S[sede][0] += r[0]; S[sede][1] += r[1]; };
+    sgGenB().filter(b => b.altaW <= w).forEach(b => add(b.sede, sgTM(b, w, SF.now))); const rv = sgRiv(); add(rv.sede, sgTM(rv, w, SF.now));
+    if (sgCon()) add(SG_SEDE, [sfTotal(E, w, SF.now), sfMeta(w)]);
+    return [[SG_SEDE, Math.round(100 * S[SG_SEDE][0] / S[SG_SEDE][1])], [SG_OTRA, Math.round(100 * S[SG_OTRA][0] / S[SG_OTRA][1])]];
+  }
+  const sgEspFr = E => '<div class="card sefrs sgesp"><div class="sefr"><span class="sefk">Cruce especial</span><span class="sefx small">' + sgEspPct(E).map(x => x[0] + ' ' + x[1] + ' %').join(' · ') + '</span></div></div>';
+  const sgMano = () => '<button class="link lime sfsal sgmano" data-sgmano' + (SG.mano ? ' aria-pressed="true"' : '') + '>' + (SG.mano ? 'Tu profe ya sabe ' + MV_RAYO : 'Que mi profe me sume a una') + '</button>';
+  // La pantalla de la G (la llama sfRender): cabecera, fila, y abajo lo de la F
+  function sgArriba(){
+    const E = sfEntradas(), con = sgCon(), k = SF.est + SF.puerta + SF.mom + SG.semK + SG.vis + SG.nombre + SG.rivSede;
+    SG.E = E;
+    if (SG.novAt !== k) { SG.novAt = k; SG.rev = {}; sgNovAplicar(E); }
+    SG.L = sgLista(E);
+    let h = sgCab(con) + sgFila(E);
+    if (!con) h += SF.est === 'sin' ? sfSin() : sfEspera();
+    else h += sgBandaLinea() + (SG.esp && SF.est === 'con' ? sgEspFr(E) : '') + sfFecha() + sfCruce(E) + (SF.ult ? sfUltimo(sfEventos(E)) : '');
+    return h;
+  }
+  // Novedades (panel): qué anillos arrancan encendidos. "Ya lo vi" = el momento en que se abrió la historia.
+  function sgNovAplicar(E){
+    SG.visto = {}; if (SG.nov === 'varias') return;
+    sgLista(E).forEach(b => { const deja = (SG.nov === 'tu' || SG.nov === 'dos') && b.key === 'yo' || (SG.nov === 'rival' || SG.nov === 'dos') && b.rival; if (!deja) SG.visto[b.key] = SF.now; });
+  }
+  function sgPie(){ return '<div class="stack sgpie0" style="gap:10px">' + sdSocial() + '</div>'; }
+  // Después de dibujar: el vocabulario, el resultado del lunes que queda fijo y, una vez por semana, el aviso de los ⚡ recibidos
+  function sgDespues(c){
+    sgVocDom(c); sgVocDom($('#sfViva'));
+    const w = sgW();
+    if (sfLun1() && !SG.rev[w]) setTimeout(() => { SG.rev[w] = true; }, 2600);
+    const yo = SG.L[0]; if (yo && yo.yo && yo.rec && yo.rec.length && !SG.avW[w] && $('#demoSheet').hidden) { SG.avW[w] = true; setTimeout(() => toast('Les mandaron ⚡ a tu banda'), 900); }
+  }
+  function sgVocDom(el){
+    if (!el || SG.voc !== 'Tribus') return;
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n; while ((n = tw.nextNode())) { const v = sgVoc(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; }
+    el.querySelectorAll('[aria-label]').forEach(x => x.setAttribute('aria-label', sgVoc(x.getAttribute('aria-label'))));
+  }
+  toast = (f => m => f(SOC_V === 'G' ? sgVoc(m) : m))(toast);
+  // En la G, la columna rival dice el nombre y la sede (la rival puede ser de cualquier sede con app)
+  function sgRivLbl(n){ if (SOC_V !== 'G') return n; const r = sgRiv(), b = n === r.nom ? r : sgGenB().find(x => x.nom === n); return b && b.sede !== SG_SEDE ? n + ' · ' + b.sede : n; }
+
+  // ---- el cruce con suspenso: el lunes, el resultado no está a la vista; las columnas terminan de llenarse y después queda fijo
+  function sgColRev(p0, p, nom, yo){
+    const N = 10, l0 = Math.min(N, Math.floor(Math.min(100, p0) / 10)), lit = Math.min(N, Math.floor(Math.min(100, p) / 10)), sin = yo && p >= 100, id = 'sfc' + (++scUid), GP = 5, sh = (200 - GP * (N - 1)) / N;
+    const C = yo ? 'var(--lime)' : 'var(--muted)', F = sin ? 'url(#' + id + 'z)' : C, L = eqLuz(Math.max(.4, lit / N));
+    let g = '<defs><filter id="' + id + '" filterUnits="userSpaceOnUse" x="-30" y="-30" width="100" height="270"><feGaussianBlur stdDeviation="' + (L.hb * .5).toFixed(1) + '"/></filter>' +
+      '<linearGradient id="' + id + 'z" gradientUnits="userSpaceOnUse" x1="0" y1="200" x2="0" y2="0"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient></defs>' +
+      '<rect class="rl-slot" x="-4" y="-4" width="48" height="208" rx="6"/>';
+    for (let j = 0; j < N; j++) { const y = 200 - (j + 1) * sh - j * GP;
+      g += eqCeldaCol(0, y, 40, sh, false, C, L, id, false);
+      if (j < lit) g += '<g' + (j >= l0 ? ' class="sgllena" style="animation-delay:' + (.35 + (j - l0) * .16).toFixed(2) + 's"' : '') + '>' + eqCeldaCol(0, y, 40, sh, true, F, L, id, sin) + '</g>'; }
+    return '<div class="sfcol' + (yo ? ' yo' : '') + (sin ? ' sin' : '') + '" role="img" aria-label="' + nom + ': ' + p + ' % de su meta">' +
+      '<span class="sfp sgtras">' + p + ' %' + (sin ? MV_RAYO : '') + '</span><svg viewBox="-6 -6 52 212" preserveAspectRatio="none" aria-hidden="true">' + g + '</svg><span class="senom">' + nom + '</span></div>';
+  }
+  function sgLun1(E, w, r){
+    const nom = sfNom(), rl = sgRivLbl(r.riv), rev = SG.rev[w], sab = (w - 1) * SE_SEM + 3 * SE_DIA;   // las columnas arrancan como estaban el jueves y terminan de llenarse
+    const sumo = SG.semK === 'auto' && r.a >= 100;
+    const txt = (r.gano ? sfTit('<b>Ganaron</b>', MV_RAYO) : sfTit('<b>Esta vez</b>', 'no')) +
+      '<span class="mvsub">' + (r.gano ? r.a + ' a ' + r.b + ' contra ' + r.riv + '. Hoy arranca otro cruce, contra ' + sfRivNom(E, w) + '.' : r.b + ' a ' + r.a + ' contra ' + r.riv + '. Hoy arranca la revancha.') + '</span>' +
+      (sumo ? '<span class="sgsumo">' + sgIns(nom, sgSemTu(E), 'sgmini', true) + '<span class="small">Su insignia sumó una pieza</span></span>' : '');
+    return { cab:'<span class="mvk">El cruce · la semana pasada</span><span class="stack' + (rev ? '' : ' sgtras') + '" style="gap:4px">' + txt + '</span>',
+      cols:rev ? sfCol(r.a, nom, true) + sfCol(r.b, rl, false) : sgColRev(sfPct(E, w - 1, sab), r.a, nom, true) + sgColRev(sfRivPct(w - 1, sab), r.b, rl, false) };
+  }
+
+  // ---- la historia: dos a cuatro tarjetas a pantalla completa; un toque pasa (a la izquierda, vuelve), deslizar cierra; cada una dura 5 s y
+  // al final se cierra sola (ver una historia y volver: un toque). Duran hasta el lunes.
+  $('#socialF').insertAdjacentHTML('beforeend', '<div class="sghist" id="sgHist" hidden role="dialog" aria-label="Historia de la banda"></div>');
+  const sgFirmaB = x => x.k === 'sincro' ? ['Entraron', 'en sincro', 1] : x.k === 'gano' ? ['Ganaron', 'el cruce', 1] : x.k === 'alta' ? ['Sumaron', 'a alguien'] :
+    x.k === 'nace' ? ['Se armó', 'la banda', 1] : x.k === 'salto' ? ['Su insignia', 'dio el salto', 1] : ['', ''];
+  const sgBig = (b, i, s) => '<span class="sgbig sig"><b>' + b + '</b> <i>' + i + '</i>' + (s ? ' ' + MV_RAYO : '') + '</span>';
+  const sgSemTxt = n => n ? (n === 1 ? '1 semana en sincro' : n + ' semanas en sincro') : 'Banda nueva';
+  function sgCruceCard(E, b){
+    const w = sgW(), nom = sfNom(), lun = sfLun1();
+    if (sfNueva() && w === 0) return '<span class="sgkick">El cruce</span>' + sgBig('El lunes', 'arranca') + '<span class="sgsub">Su primer cruce. Esta semana, la meta a la mitad.</span>';
+    const r = lun ? sfRes(E, w - 1) : null, a = lun ? r.a : sfPct(E, w, SF.now), c = lun ? r.b : sfRivPct(w, SF.now), rn = lun ? r.riv : sfRivNom(E, w), dia = sfDia(SF.now);
+    const tit = lun ? (r.gano ? sgBig('Ganaron', '', 1) : sgBig('Esta vez', 'no')) : a >= 100 ? sgBig('En', 'sincro', 1) : sgBig('Vamos', a + ' %');
+    const sub = lun ? (r.gano ? 'La semana pasada, contra ' + rn + '.' : 'El lunes hay revancha.') : dia === 6 ? 'Se define hoy.' : 'El lunes, el resultado.';
+    return '<span class="sgkick">' + (b && !b.yo ? 'Contra ustedes' : 'El cruce') + '</span>' + tit + '<div class="sfx sgx">' + sfCol(a, nom, true) + sfCol(c, sgRivLbl(rn), false) + '</div><span class="sgsub">' + sub + '</span>' +
+      (SG.esp && !lun ? '<span class="sgsub">Cruce especial: ' + sgEspPct(E).map(x => x[0] + ' ' + x[1] + ' %').join(' · ') + '</span>' : '');
+  }
+  function sgCards(b){
+    const E = SG.E || sfEntradas(), C = [], m = scMenor();
+    if (b.yo) {
+      const ev = b.ev.filter(x => x.k !== 'rayos').slice(-3).reverse();
+      C.push('<span class="sgkick">Esta semana</span>' + (ev.length ? '<span class="sglist">' + ev.map(x => { const f = sfFirma(x), q = x.id ? (x.id === 's1' ? '' : sfQuien(x) + ' ') : '';
+        return '<span class="sgl">' + (x.id ? sfAv(x) : '') + '<span><b>' + q + (q ? f[0].toLowerCase() : f[0]) + '</b> ' + f[1] + (f[2] ? ' ' + MV_RAYO : '') + '</span></span>'; }).join('') + '</span>'
+        : sgBig('Todavía', 'nada') + '<span class="sgsub">El lunes arrancó la semana.</span>') +
+        (sgVisible() ? '' : '<span class="sgsub">' + (SG.vis === 'falta' ? 'Solo ustedes la ven: falta el sí de alguien.' : 'Solo ustedes la ven.') + '</span>'));
+      C.push(sgCruceCard(E, b));
+      C.push('<span class="sgkick">La insignia</span>' + sgIns(b.nom, b.sem, 'sgxl') + sgBig(sgSemTxt(b.sem), '') + '<span class="sgsub">' + sgProx(b.sem) + '</span>' +
+        (SG.nombre === 'espera' ? '<span class="sgsub">Propusieron «' + SG_NOK[sfT()].join(' ') + '»: lo aprueba tu profe.</span>' : '') +
+        (m ? '' : '<button class="btn sm" data-sgfoto type="button">' + SB_CAM + 'Foto con la insignia</button>'));
+      if (b.rec && b.rec.length) C.push('<span class="sgkick">De otras bandas</span><span class="sgrec">' + b.rec.map(x => sgIns(x.b.nom, x.b.sem, 'sgmed')).join('') + '</span>' + sgBig('Les mandaron', '', 1));
+      return C;
+    }
+    C.push(sgIns(b.nom, b.sem, 'sgxl') + sgBig(b.nom.split(' ').slice(0, -1).join(' ') || b.nom, b.nom.split(' ').length > 1 ? b.nom.split(' ').slice(-1)[0] : '') +
+      '<span class="sgsub">' + b.sede + ' · ' + sgSemTxt(b.sem) + '</span>');
+    if (b.rival && sgCon()) C.push(sgCruceCard(E, b));
+    b.ev.slice(-(4 - C.length)).forEach(x => { const f = sgFirmaB(x);
+      C.push((x.k === 'salto' ? sgIns(b.nom, x.n, 'sgxl', true) : '') + sgBig(f[0], f[1], f[2]) + '<span class="sgsub">' + (x.k === 'salto' ? sgSemTxt(x.n) + ' · ' : '') + sfCuando(x.m) + '</span>'); });
+    if (C.length === 1) C.push(sgBig('Esta semana,', 'todavía nada nuevo') + '<span class="sgsub">Vuelve a pasar algo cuando entrenen.</span>');
+    return C;
+  }
+  function sgAbrir(key){
+    const b = SG.L.find(x => x.key === key); if (!b) return;
+    SG.h = { b:b, C:sgCards(b), i:0 }; SG.visto[key] = SF.now;
+    $('#sgHist').hidden = false; sgPaso(0);
+  }
+  function sgPaso(i){
+    clearTimeout(SG.hT); const H = SG.h; if (!H) return;
+    if (i < 0) i = 0; if (i >= H.C.length) { sgCerrar(); return; }
+    H.i = i; const b = H.b, m = scMenor();
+    const sub = b.yo ? (sgVisible() ? 'Tu banda' : 'Tu banda · solo ustedes la ven') : b.sede;
+    $('#sgHist').innerHTML = '<div class="sgbars">' + H.C.map((_, j) => '<i class="' + (j < i ? 'ya' : j === i ? 'ahora' : '') + '"></i>').join('') + '</div>' +
+      '<div class="sghcab">' + sgIns(b.nom, b.sem, 'sgmed') + '<span class="stack" style="gap:2px;flex:1;min-width:0"><b class="sghn">' + b.nom + '</b><span class="small sghs">' + sub + '</span></span>' +
+        '<button class="iconbtn sgx" data-sgx type="button" aria-label="Cerrar">✕</button></div>' +
+      '<div class="sgcard" aria-live="polite">' + H.C[i] + '</div>' +
+      '<div class="sgfoot">' + (!b.yo && !m && sgCon() ? '<button class="sgrayo" data-sgrayo type="button" aria-pressed="' + !!SG.rayo[b.key] + '" aria-label="' + (SG.rayo[b.key] ? 'Sacarles el ⚡' : 'Mandarles un ⚡') + '">' + MV_RAYO + '</button>' : '') + '</div>';
+    sgVocDom($('#sgHist'));
+    SG.hT = setTimeout(() => sgPaso(i + 1), 5000);
+  }
+  function sgCerrar(){ clearTimeout(SG.hT); SG.h = null; $('#sgHist').hidden = true; sfRender(); }
+  (function () {
+    const H = $('#sgHist'); let y0 = null;
+    H.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive:true });
+    H.addEventListener('touchend', e => { if (y0 != null && e.changedTouches[0].clientY - y0 > 70) { y0 = null; sgCerrar(); H.dataset.sw = '1'; setTimeout(() => delete H.dataset.sw, 400); } y0 = null; });
+    H.addEventListener('click', e => {
+      if (H.dataset.sw || !SG.h) return;
+      const q = s => e.target.closest(s);
+      if (q('[data-sgx]')) { sgCerrar(); return; }
+      if (q('[data-sgrayo]')) { const k = SG.h.b.key; SG.rayo[k] = !SG.rayo[k]; const b = q('[data-sgrayo]'); b.setAttribute('aria-pressed', !!SG.rayo[k]); b.setAttribute('aria-label', SG.rayo[k] ? 'Sacarles el ⚡' : 'Mandarles un ⚡');
+        if (SG.rayo[k]) toast('Les mandaste ⚡ a ' + SG.h.b.nom); return; }
+      if (q('[data-sgfoto]')) { sgCerrar(); sgFoto(); return; }
+      const r = H.getBoundingClientRect(); sgPaso(SG.h.i + (e.clientX - r.left < r.width / 3 ? -1 : 1));
+    });
+  })();
+  // La foto con marco de la F, con la insignia de la banda
+  function sgFoto(){ sfFoto(); const f = $('#sfHojaIn .mvfoto'); if (f) f.insertAdjacentHTML('beforeend', '<span class="sgfotoins">' + sgIns(sfNom(), sgSemTu(SG.E || sfEntradas())) + '</span>'); }
+  function sgBandaHoja(){
+    const B = sfB(), m = scMenor(), nom = sfNom();
+    sfHoja('<div class="sgbh">' + sgIns(nom, sgSemTu(SG.E || sfEntradas()), 'sgmed') + '<span class="mtitle sig"><b>' + B.nom[0] + '</b> <i>' + B.nom[1] + '</i></span></div>' +
+      (SG.nombre === 'espera' ? '<span class="small muted" style="line-height:1.4">Propusieron «' + SG_NOK[sfT()].join(' ') + '». Lo aprueba tu profe; mientras, la banda se llama así y la insignia sale de este nombre.</span>' : '') +
+      (B.conv ? sbProfe('La convoca · ' + SB_G.sede) : '') +
+      '<div class="sbint">' + B.int.map(x => '<span class="sbper"><span class="av sm" style="background:' + grad(SF_GENTE[x.n]) + '">' + (x.id === 's1' ? 'M' : inicial(x.n)) + '</span><span class="small">' + x.n + '</span></span>').join('') + '</div>' +
+      (m ? '<span class="small muted" style="line-height:1.4">Por ahora tu banda no aparece en la fila de las demás.</span>'
+        : '<label class="swrow" for="sgVisSw"><span style="flex:1">Que las otras bandas nos vean</span><input type="checkbox" class="sw" id="sgVisSw" data-sgvis' + (SG.vis !== 'no' ? ' checked' : '') + '></label>' +
+          '<span class="small muted" style="line-height:1.4">' + (SG.vis === 'falta' ? 'Falta el sí de alguien: hasta entonces, solo ustedes la ven.' : 'Aparece si todos dicen que sí, cada uno por su lado. Cualquiera la saca cuando quiere.') + ' Las otras ven la insignia, el nombre y lo que logra la banda; nunca quién.</span>') +
+      (m ? '' : '<button class="btn ghost sm" data-sfsumar type="button">Sumá a alguien</button>') + '<button class="btn ghost sm" data-sfcomp type="button">Qué ve tu banda</button>' + sfCerrarBtn());
+  }
+  function sgMasHoja(){
+    const m = scMenor(), pr = sfP() === 'presenta' || m;
+    const jue = '<button class="btn' + (pr ? '' : ' ghost') + '" data-sfprimer type="button">Tu primer jueves · ' + SB_G.hora + '</button>';
+    sfHoja('<span class="mtitle sig"><b>Armá</b> <i>tu banda</i></span><span class="muted" style="line-height:1.45">Que nadie entrene solo. Elegí cómo:</span>' +
+      (pr ? jue : '') + (m ? '' : '<button class="btn' + (pr ? ' ghost' : '') + '" data-sfinv type="button">Invitá a un amigo</button><button class="btn ghost" data-sfcod type="button">Ya entreno con alguien de Viva</button>') + (pr ? '' : jue) +
+      sgMano() + sfCerrarBtn());
+  }
+  // Los toques de la G van antes que los de la F (captura): solo con la G
+  $('#socialF').addEventListener('click', e => {
+    if (SOC_V !== 'G') return;
+    const q = s => e.target.closest(s), para = () => { e.stopPropagation(); e.preventDefault(); };
+    let b;
+    if ((b = q('[data-sgver]'))) { para(); sgAbrir(b.dataset.sgver); return; }
+    if (q('[data-sgmas]')) { para(); sgMasHoja(); return; }
+    if (q('[data-sgmano]')) { para(); $('#sfHoja').hidden = true; SG.mano = true; sfRender(); toast('Listo: tu profe ya sabe. Él te suma a una banda'); return; }
+    if (q('[data-sfbanda]')) { para(); sgBandaHoja(); return; }
+    if (q('[data-sffoto]')) { para(); sgFoto(); return; }
+    if (q('#sfHoja [data-sfprimer]')) $('#sfHoja').hidden = true;   // sigue la F: queda anotado al primer jueves
+  }, true);
+  $('#socialF').addEventListener('change', e => { const s = e.target.closest('[data-sgvis]'); if (!s || SOC_V !== 'G') return;
+    SG.vis = s.checked ? 'si' : 'no'; sfRender(); sgBandaHoja(); toast(s.checked ? 'Tu banda aparece en la fila de las demás' : 'Tu banda ya no aparece en la fila de las demás'); });
