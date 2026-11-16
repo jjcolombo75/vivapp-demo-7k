@@ -117,7 +117,7 @@
     if (MURK === 'nueva') { toast('La socia nueva todavía no tiene un mes entero: elegí 3 meses o 1 año'); return; }
     $('#demoSheet').hidden = true;
     const now = HOY_D, id = 'm' + now.getFullYear() + '-' + now.getMonth();
-    const v = serie().slice(-1)[0].f; let ti = 0; zonas().forEach((q, k) => { if (v >= q[0]) ti = k; });
+    const v = tv(serie().slice(-1)[0].f); let ti = 0; zonas().forEach((q, k) => { if (v >= q[0]) ti = k; });
     const prevM = MUR.meses.find(m => m.m === now.getMonth() && m.y === now.getFullYear()); if (prevM) prevM.c = CIERRE_C;
     if (!prevM) { MUR.meses.push({ m:now.getMonth(), y:now.getFullYear(), t:ti, c:CIERRE_C }); MUR.sem += Math.max(0, 3 - MUR.prevMes - (semCumplida() ? 1 : 0)); }
     MUR.cerrado = true; MUR.cerradoC = CIERRE_C; muralNuevo = id;

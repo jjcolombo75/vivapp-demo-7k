@@ -121,9 +121,16 @@
     const vs = ritmoCorre(Ls, frs);
     return ds.map((d, i) => ({ d:d, ctl:vs[i], L:Ls[i], fr:frs[i], f:Math.min(100, Math.round(vs[i] * 100)) }));
   }
-  const zona = v => { let r = zonas()[0]; zonas().forEach(q => { if (v >= q[0]) r = q; }); return [r[1], r[2]]; };
+  // T-R v107 · VIVA Flow exige 4 semanas seguidas (28 días) con el número en 85 o más (registro 13/11): el número puede pasar 85 antes y el tramo sigue en Firme.
+  // tv(v) es el número que decide el tramo; el que se muestra sigue siendo v. En las otras variantes (pilas, ritmo) no rige: el tope es el número.
+  const FLOW_DIAS = 28;
+  const enFlow = s => { s = s || serie(); const u = V().z[V().z.length - 1][0]; return V().flow ? s.length >= FLOW_DIAS && s.slice(-FLOW_DIAS).every(x => x.f >= u) : s[s.length - 1].f >= u; };
+  const tv = (v, s) => { const u = V().z[V().z.length - 1][0]; return v >= u && !enFlow(s) ? u - 1 : v; };
+  const zona = (v, s) => { v = tv(v, s); let r = zonas()[0]; zonas().forEach(q => { if (v >= q[0]) r = q; }); return [r[1], r[2]]; };
   // Semanas para llegar a un valor viniendo a la meta, desde el estado actual
-  const semA = u => { const s = serie(), L = s.map(x => x.L).concat(patMeta(400)), vs = ritmoCorre(L, s.map(x => x.fr).concat(patMeta(400).map(() => false))).slice(s.length), k = vs.findIndex(v => v * 100 >= u); return Math.max(1, Math.ceil((k < 0 ? 400 : k + 1) / 7)); };
+  const semA = u => { const s = serie(), L = s.map(x => x.L).concat(patMeta(400)), vs = ritmoCorre(L, s.map(x => x.fr).concat(patMeta(400).map(() => false))), fl = V().flow && u >= V().z[V().z.length - 1][0];
+    let k = -1; for (let i = s.length; i < vs.length; i++) { if (fl ? i >= FLOW_DIAS - 1 && vs.slice(i - FLOW_DIAS + 1, i + 1).every(x => x * 100 >= u) : vs[i] * 100 >= u) { k = i - s.length; break; } }
+    return Math.max(1, Math.ceil((k < 0 ? 400 : k + 1) / 7)); };
   // InBody simulado (solo variante B): siempre contra la primera medición del socio
   const IB = [{ f:'12/08', m:24.1, g:31.0 }, { f:'18/09', m:24.6, g:29.8 }, { f:'20/10', m:25.0, g:28.9 }];
   let fitPromoNo = false, fitPedido = false;
@@ -156,11 +163,11 @@
   // Firma del manual: la primera palabra en Archivo Black, el resto en Archivo Expanded Light
   function firma(t){ const i = t.indexOf(' '); return i < 0 ? '<b>' + t + '</b>' : '<b>' + t.slice(0, i) + '</b> <i>' + t.slice(i + 1) + '</i>'; }
   function renderForma(){
-    const s = serie(), v = s[s.length - 1].f, dv = v - s[s.length - 8].f, z = zona(v), g = metaSemana(v), zs = zonas(), nom = V().nom;
+    const s = serie(), v = s[s.length - 1].f, dv = v - s[s.length - 8].f, z = zona(v, s), vt = tv(v, s), g = metaSemana(v), zs = zonas(), nom = V().nom;
     $$('[data-mname]').forEach(e => e.innerHTML = firma(nom)); $$('#estPick [data-est]').forEach((b, i) => b.textContent = zonas()[i][1]); $$('[data-mtu]').forEach(e => e.textContent = V().tu); $$('[data-msub]').forEach(e => e.textContent = V().sub); $$('[data-msubaja]').forEach(e => e.textContent = Cap(V().tu.replace('tu', 'su')) + ' ' + V().baja); $('#altaLbl').textContent = nom + vb(' arranca hoy', ' arrancan hoy'); $('#altaZ').textContent = zonas()[0][1]; $('#onbPaso2').textContent = V().paso2;
     const delta = '<span class="fdelta" style="color:' + (dv >= 0 ? 'var(--dat)' : 'var(--orange)') + '">' + (dv > 0 ? '▲ +' + dv + ' contra la semana pasada' : dv < 0 ? '▼ ' + dv + ' contra la semana pasada' : '= igual que la semana pasada') + '</span>';
     const aria = nom + ': ' + z[0] + ', ' + v + ' de 100. ' + (dv >= 0 ? 'Subió ' : 'Bajó ') + Math.abs(dv) + ' contra la semana pasada. ' + V().sub + '.';
-    const top = v >= zs[zs.length - 1][0], tr = dv > 1 ? 'tup' : dv < -1 ? 'tdown' : 'tflat', hc = 'fhito ' + tr + (top ? ' flow' : '');
+    const top = vt >= zs[zs.length - 1][0], tr = dv > 1 ? 'tup' : dv < -1 ? 'tdown' : 'tflat', hc = 'fhito ' + tr + (top ? ' flow' : '');
     const num = '<span class="fnumsm">' + v + '<small> de 100</small></span>';
     const big = () => '<div class="between" style="align-items:flex-end"><span class="' + hc + '" style="color:' + z[1] + '" role="img" aria-label="' + aria + '">' + z[0] + '</span><span class="stack" style="gap:4px;align-items:flex-end;flex-shrink:0">' + num + delta + '</span></div>';
     let h = '';
@@ -176,7 +183,7 @@
     } else if (fFmt === 'aguja') {
       const P = (a, r) => [120 + r * Math.cos(Math.PI * (1 - a / 100)), 122 - r * Math.sin(Math.PI * (1 - a / 100))];
       const arcD = (a0, a1) => { const p0 = P(a0, 96), p1 = P(a1, 96); return 'M' + p0[0].toFixed(1) + ' ' + p0[1].toFixed(1) + ' A96 96 0 0 1 ' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1); };
-      let ci = 0; zs.forEach((q, k) => { if (v >= q[0]) ci = k; });
+      let ci = 0; zs.forEach((q, k) => { if (vt >= q[0]) ci = k; });
       const last = zs.length - 1, Z = 100 / zs.length, gt = P(posV(g.meta), 113), gi = P(posV(g.meta), 104), pf0 = P(last * Z + 2.6, 96), pf1 = P(99.6, 96);
       let defs = '<defs><filter id="nfB1" filterUnits="userSpaceOnUse" x="-40" y="-40" width="320" height="220"><feGaussianBlur stdDeviation="7"/></filter><filter id="nfB2" filterUnits="userSpaceOnUse" x="-40" y="-40" width="320" height="220"><feGaussianBlur stdDeviation="2.2"/></filter>' +
         '<linearGradient id="nfFlow" gradientUnits="userSpaceOnUse" x1="' + pf0[0].toFixed(1) + '" y1="' + pf0[1].toFixed(1) + '" x2="' + pf1[0].toFixed(1) + '" y2="' + pf1[1].toFixed(1) + '"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient>';
@@ -194,12 +201,12 @@
       });
       h = '<svg class="gauge ' + tr + '" viewBox="0 -10 240 142" role="img" aria-label="' + aria + '">' + defs + arcs + labs +
         '<line x1="' + gi[0].toFixed(1) + '" y1="' + gi[1].toFixed(1) + '" x2="' + gt[0].toFixed(1) + '" y2="' + gt[1].toFixed(1) + '" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round"/>' +
-        '<g class="boltn" transform="translate(120 122) rotate(' + (posV(v) * 1.8 - 90).toFixed(1) + ')"><g class="boltglow ' + tr + '" style="color:' + (ci === last ? 'var(--z3)' : z[1]) + '"><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG3)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG2)" opacity=".8"/></g><path filter="url(#nfBolt)" d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="var(--txt)" stroke="var(--panel)" stroke-width="3" stroke-linejoin="round" paint-order="stroke"/></g></svg>' +
+        '<g class="boltn" transform="translate(120 122) rotate(' + (posV(vt) * 1.8 - 90).toFixed(1) + ')"><g class="boltglow ' + tr + '" style="color:' + (ci === last ? 'var(--z3)' : z[1]) + '"><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG3)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG2)" opacity=".8"/></g><path filter="url(#nfBolt)" d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="var(--txt)" stroke="var(--panel)" stroke-width="3" stroke-linejoin="round" paint-order="stroke"/></g></svg>' +
         '<div class="stack" style="align-items:center;gap:6px;margin-top:-2px;text-align:center"><span class="' + hc + '" style="color:' + z[1] + '">' + z[0] + '</span><span class="small muted"><strong style="color:var(--txt)">' + v + '</strong> de 100 · ' + delta + '</span></div>';
     } else if (fFmt === 'vumetro') {
       // Vúmetro: 20 segmentos de 5 puntos, agrupados por tramo; el rayo al final es la meta
       const N = 20, SW = 8.6, GP = 4.4, GG = 7, BX = 26, H0 = 14, HS = 40, last = zs.length - 1;
-      const SPG = N / zs.length, grp = k => Math.floor(k / SPG), pv = posV(v);
+      const SPG = N / zs.length, grp = k => Math.floor(k / SPG), pv = posV(vt);
       const lit = k => pv >= k * 5 + 2.5, nLit = Array.from({ length: N }, (_, k) => k).filter(lit).length;
       let x = 4, segs = '', gx0 = null, gx1 = 0, xs = [];
       for (let k = 0; k < N; k++) { if (k && grp(k) !== grp(k - 1)) x += GG; xs.push(x); if (grp(k) === last) { if (gx0 === null) gx0 = x; gx1 = x + SW; } x += SW + GP; }
@@ -214,10 +221,10 @@
           : '<path class="halo" d="' + d + '" stroke="' + c + '" filter="url(#nvB1)"/><path class="halo2" d="' + d + '" stroke="' + c + '" filter="url(#nvB2)"/><path class="body" d="' + d + '" stroke="' + c + '"/><path class="core" d="' + d + '"/>') + '</g>';
       }
       const mk = Math.min(N - 1, Math.max(0, Math.ceil((posV(g.meta) - 2.5) / 5))), mx = xs[mk] + SW / 2;
-      const topOn = v >= zs[last][0], bx = x - GP + 8;
+      const topOn = vt >= zs[last][0], bx = x - GP + 8;
       defs = defs.replace('</defs>', '<filter id="nvBolt" x="-80%" y="-40%" width="260%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation="7" result="gb1"/><feFlood class="nfGlowFlood" style="flood-color:var(--z3)" result="gc"/><feComposite in="gc" in2="gb1" operator="in" result="glow1"/><feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="gb2"/><feComposite in="gc" in2="gb2" operator="in" result="glow2"/><feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="sb"/><feOffset in="sb" dy="2" result="so"/><feFlood flood-color="#000" flood-opacity=".5"/><feComposite in2="so" operator="in" result="shadow"/><feMerge><feMergeNode in="glow1"/><feMergeNode in="glow2"/><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>');
       const bolt = '<g transform="translate(' + bx.toFixed(1) + ' ' + (H0 + 2) + ') scale(1.5)" class="' + (topOn ? 'vbolt on' : 'vbolt') + '"' + (topOn ? ' filter="url(#nvBolt)"' : '') + '><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="' + (topOn ? 'var(--z1)' : 'none') + '" stroke="' + (topOn ? 'none' : 'var(--muted)') + '" stroke-width="1.2" stroke-linejoin="round"/></g>';
-      let vci = 0; zs.forEach((q, i) => { if (v >= q[0]) vci = i; });
+      let vci = 0; zs.forEach((q, i) => { if (vt >= q[0]) vci = i; });
       let vl = ''; zs.forEach((q, i) => { const ks = xs.filter((_, k) => grp(k) === i); const cx = (ks[0] + ks[ks.length - 1] + SW) / 2;
         vl += '<text class="zl' + (i === vci ? ' cur' : i < vci ? ' on' : '') + '" x="' + cx.toFixed(1) + '" y="' + (H0 + HS + 26) + '" text-anchor="middle" aria-hidden="true">' + q[1] + '</text>'; });
       h = '<svg class="vumeter ' + tr + '" viewBox="0 0 ' + W.toFixed(0) + ' 84" role="img" aria-label="' + aria + '">' + defs + segs + bolt + vl +
@@ -226,9 +233,9 @@
     } else if (fFmt === 'camino') {
       // Paradas equidistantes; el punto avanza dentro de cada tramo según el número
       const n = zs.length, pos = val => { let i = 0; zs.forEach((q, k) => { if (val >= q[0]) i = k; }); if (i === n - 1) return 100; const lo = zs[i][0], hi = zs[i + 1][0]; return (i + (val - lo) / (hi - lo)) * 100 / (n - 1); };
-      const nx = zs.find(q => q[0] > v);
-      let stops = ''; zs.forEach((q, i) => { stops += '<span class="cstop' + (v >= q[0] ? ' on' : '') + (i === n - 1 ? ' flow' : '') + (i % 2 ? ' up' : '') + (i === 0 ? ' first' : '') + (i === n - 1 ? ' last' : '') + '" style="left:' + (i * 100 / (n - 1)) + '%;--c:' + q[2] + '"><i></i><em>' + q[1] + '</em></span>'; });
-      h = big() + '<div class="camino" aria-hidden="true"><div class="ctrack"><i style="width:' + pos(v).toFixed(1) + '%"></i></div>' + stops + '<span class="cme" style="left:' + pos(v).toFixed(1) + '%"></span></div>' +
+      const nx = zs.find(q => q[0] > vt);
+      let stops = ''; zs.forEach((q, i) => { stops += '<span class="cstop' + (vt >= q[0] ? ' on' : '') + (i === n - 1 ? ' flow' : '') + (i % 2 ? ' up' : '') + (i === 0 ? ' first' : '') + (i === n - 1 ? ' last' : '') + '" style="left:' + (i * 100 / (n - 1)) + '%;--c:' + q[2] + '"><i></i><em>' + q[1] + '</em></span>'; });
+      h = big() + '<div class="camino" aria-hidden="true"><div class="ctrack"><i style="width:' + pos(vt).toFixed(1) + '%"></i></div>' + stops + '<span class="cme" style="left:' + pos(vt).toFixed(1) + '%"></span></div>' +
         '<span class="small" style="line-height:1.45">' + (nx ? 'Próxima parada: <strong>' + nx[1] + '</strong>. Viniendo a tu meta, ' + (semA(nx[0]) === 1 ? '<strong>esta semana</strong>' : 'en unas <strong>' + semA(nx[0]) + ' semanas</strong>') + '.' : 'Llegaste a la última parada: ahora se trata de sostenerla.') + '</span>';
     } else if (fFmt === 'curva') {
       const pts = s.slice(-57), W = 320, H = 130, L = 26, R = 10, T = 10, B = 22, X = i => L + i * (W - L - R) / (pts.length - 1), Y = val => T + (1 - val / 100) * (H - T - B);
@@ -316,7 +323,7 @@
 
   // ===== Tu semana (v30): ecualizador Visitas · Activación · Fuerza · Cardio =====
   // Metas por objetivo principal: valores de demo; los define el profe (configuración por gimnasio). 'v' = igual a la meta de visitas.
-  const OBJS = [['bien', 'Sentirme bien', 'Cuidarme, moverme sin dolores, despejarme', 2, 90], ['forma', 'Estar en forma', 'Sentirme bien y tonificar', 'v', 90], ['ver', 'Verme mejor', 'Bajar de peso', 2, 150], ['musc', 'Ganar músculo', 'Ponerme fuerte', 'v', 60], ['rend', 'Mejorar mi rendimiento', 'En mi deporte (fútbol, pádel, running…)', 'v', 90]];
+  const OBJS = [['bien', 'Sentirme bien', 'Cuidarme, moverme sin dolores, despejarme', 2, 90], ['forma', 'Estar en forma', 'Sentirme bien y tonificar', 'v', 90], ['ver', 'Verme mejor', 'Bajar grasa, alivianarme', 2, 150], ['musc', 'Ganar músculo', 'Ponerme fuerte', 'v', 60], ['rend', 'Mejorar mi rendimiento', 'En mi deporte (fútbol, pádel, running…)', 'v', 90]];
   let OBJ = []; // sin onboarding: se usa "Estar en forma"
   const objP = () => OBJS.find(o => o[0] === (OBJ[0] || 'forma'));
   const CARD_SEG = 15;

@@ -134,9 +134,9 @@
   // ===== Métrica principal · detalle =====
   // Semanas desde 0 hasta cada zona viniendo a la meta (no depende de la meta: la escala es relativa a ella)
   const lunesProx = () => { const d = new Date(+ahora() + (((8 - todayWd) % 7) || 7) * 864e5); return d.getDate() + '/' + (d.getMonth() + 1); };
-  const semHasta = u => { const L = patMeta(400), vs = ritmoCorre(L, L.map(() => false)), k = vs.findIndex(v => v * 100 >= u); return Math.max(1, Math.ceil((k + 1) / 7)); };
+  const semHasta = u => { const L = patMeta(400), vs = ritmoCorre(L, L.map(() => false)), k = vs.findIndex(v => v * 100 >= u); return Math.max(1, Math.ceil((k + 1 + (V().flow && u >= V().z[V().z.length - 1][0] ? FLOW_DIAS - 1 : 0)) / 7)); }; // T-R v107: VIVA Flow suma los 28 días seguidos
   function renderFormaDet(){
-    const s = serie(), v = s[s.length - 1].f, dv = v - s[s.length - 8].f, z = zona(v), zs = zonas(), nom = V().nom;
+    const s = serie(), v = s[s.length - 1].f, dv = v - s[s.length - 8].f, z = zona(v, s), vt = tv(v, s), zs = zonas(), nom = V().nom;
     const pts = s.slice(-85), W = 320, H = 150, L = 26, R = 8, T = 8, B = 22, X = i => L + i * (W - L - R) / (pts.length - 1), Y = val => T + (1 - val / 100) * (H - T - B);
     let svg = '<svg class="fcurve" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + nom + ' en las últimas 12 semanas: hoy ' + v + ', ' + z[0] + '.">';
     zs.forEach((q, i) => { const top = i < zs.length - 1 ? zs[i + 1][0] : 100; svg += '<rect x="' + L + '" width="' + (W - L - R) + '" y="' + Y(top).toFixed(1) + '" height="' + (Y(q[0]) - Y(top)).toFixed(1) + '" fill="' + q[2] + '" opacity=".08"/>'; });
@@ -152,13 +152,13 @@
     $$('#fdMeta .opt').forEach(b => { const m = +b.dataset.m; b.setAttribute('aria-pressed', m === (META_PROX || META_SEM)); b.disabled = PLAN_TOPE !== null && m > PLAN_TOPE; });
     $('#fdPlan').textContent = PLAN_TOPE ? 'Tu plan: ' + PLAN_TOPE + ' veces por semana' : 'Plan Mensual libre';
     $('#fdMetaTxt').textContent = Cap(V().tu) + vb(' se mide', ' se miden') + ' contra esta meta: 100 es venir ' + META_SEM + ' veces en 7 días. ' + (META_PROX ? 'Desde el lunes ' + lunesProx() + ', tu meta es ' + META_PROX + ': esta semana cierra con ' + META_SEM + '.' : 'Si la cambiás, rige desde el lunes: esta semana cierra con la meta con la que empezó.');
-    $('#fdZonas').innerHTML = zs.map((q, i) => { const top = i < zs.length - 1 ? zs[i + 1][0] - 1 : 100, cur = v >= q[0] && v <= top, sem = q[0] ? semHasta(q[0]) : 0;
+    $('#fdZonas').innerHTML = zs.map((q, i) => { const top = i < zs.length - 1 ? zs[i + 1][0] - 1 : 100, cur = vt >= q[0] && vt <= top, sem = q[0] ? semHasta(q[0]) : 0;
       return '<div class="zrow' + (cur ? ' cur' : '') + '"><i' + (i === zs.length - 1 ? ' class="flow"' : '') + ' style="background:' + q[2] + '"></i><span><b>' + q[1] + (cur ? ' · estás acá' : '') + '</b><small>' + (sem === 1 ? 'Con tu primera semana completa' : sem ? 'Viniendo a tu meta, desde cero: unas ' + sem + ' semanas' : 'Las primeras semanas') + '</small></span><span class="small muted">' + q[0] + '–' + top + '</span></div>'; }).join('');
     const row = (sym, col, t, d) => '<div class="howrow"><span style="color:' + col + ';font-weight:700;width:30px;flex-shrink:0;text-align:center">' + sym + '</span><span><b>' + t + '</b>' + d + '</span></div>';
     $('#fdHow').innerHTML = row('+', 'var(--dat)', V().subeT, 'Entrás por el molinete, en cualquier sede, y suma. Cuenta igual si entrenás liviano o pesado. Dos veces el mismo día cuentan como una.') +
       row('−', 'var(--orange)', V().bajaT, V().bajaD) +
       row('=', 'var(--blue)', 'No cuenta cuando no depende de vos', 'Con tu plan pausado, en los feriados y los días que tu sede está cerrada no ' + vb('baja', 'bajan') + '.') +
-      row('100', 'var(--txt)', 'Es cumplir tu meta en los últimos 7 días', 'Tu primera semana completa ya es "' + zs[2][1] + '"' + (V().flow ? '; a las 2 semanas, "VIVA Flow". Faltar una semana no te saca de ahí.' : '.')) +
+      row('100', 'var(--txt)', 'Es cumplir tu meta en los últimos 7 días', 'Tu primera semana completa ya es "' + zs[2][1] + '"' + (V().flow ? '; con 4 semanas seguidas en ' + zs[zs.length - 1][0] + ' o más, "VIVA Flow". Faltar una semana no te saca de ahí.' : '.')) +
       row('?', 'var(--muted)', 'Lo que no mide', V().noMide + ' <button class="inlink" data-fitgo>Ver Índice FIT</button>');
     $('#fdPausa').hidden = !pausa;
     if (pausa) $('#fdPausa').textContent = 'Tu plan está pausado del ' + ddmm(pausa.desde) + ' al ' + ddmm(pausa.hasta) + ': mientras tanto ' + V().tu + vb(' no baja', ' no bajan') + ' (' + v + ').';
@@ -251,9 +251,8 @@
     PROG_MIN = sum.min;
     $('#sesSumGrid').innerHTML = '<span><b>' + sum.min + ' min</b>Duración</span><span><b>' + sum.series + ' de ' + sum.total + '</b>Series</span>' + (expProg() === 'arranco' ? '' : '<span><b>' + kgTxt + '</b>Levantados</span>');
     $('#sesKcal').textContent = !sum.series ? 'No registraste series hoy. Tocá el tilde de cada serie y acá ves lo que hiciste.' : '';
-    const prev = hoyEntreno; hoyEntreno = false; const f0 = serie().slice(-1)[0].f; hoyEntreno = true; const f1 = serie().slice(-1)[0].f; hoyEntreno = prev;
-    const zt = zonas()[zonas().length - 1][0];
-    $('#sesForma').hidden = false; $('#sesForma').innerHTML = '<span><strong>' + (V().flow && f1 >= zt && f0 < zt ? '¡Estás en VIVA Flow! ⚡' : V().up(f0, f1)) + '</strong> Cuenta porque viniste, entrenes liviano o pesado.</span>';
+    const prev = hoyEntreno; hoyEntreno = false; const f0 = serie().slice(-1)[0].f, e0 = enFlow(); hoyEntreno = true; const f1 = serie().slice(-1)[0].f, e1 = enFlow(); hoyEntreno = prev;
+    $('#sesForma').hidden = false; $('#sesForma').innerHTML = '<span><strong>' + (V().flow && e1 && !e0 ? '¡Estás en VIVA Flow! ⚡' : V().up(f0, f1)) + '</strong> Cuenta porque viniste, entrenes liviano o pesado.</span>';
     $('#sesSum').hidden = false;
   }
 
