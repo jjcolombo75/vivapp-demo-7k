@@ -40,7 +40,7 @@
 <section class="scr" id="sala" hidden aria-label="Tu sesión">
   <div class="salatop"><button class="salamenu" id="salaMenu" aria-label="Menú de la sesión"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button><div class="salaprog" id="salaProg" aria-hidden="true"></div><span class="salapos" id="salaPos"></span><div class="salactl"><button id="salaPausa" aria-label="Pausar la sesión" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button><button id="salaVoz" aria-label="Voz: solo en pantalla" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg></button></div></div>
   <div class="salabody" id="salaBody"></div>
-  <div class="salafoot"><button class="salamic" id="salaMic" aria-label="Decímelo: mantené apretado para hablar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Decímelo</span></button><button class="salalisto" id="salaListo">Listo</button></div>
+  <div class="salafoot"><button class="salamic" id="salaProfe" aria-label="Llamar a mi profe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profe</span></button><button class="salalisto" id="salaListo">Listo</button></div>
 </section>
 
 <!-- ONBOARDING DE ENTRENAR (versión 44): invitación, 4 preguntas salteables y cierre con la sesión de hoy -->
@@ -323,6 +323,7 @@
 <!--#h19-->
 <div class="caja" id="caja" hidden><div class="cajain" id="cajaIn" role="dialog" aria-modal="true" aria-label="Tu sesión"></div></div>
 <button class="cajapill" id="cajaPill" hidden aria-label="Volver a tu sesión"></button>
+<button class="profefab" id="profeFab" hidden aria-label="Llamar a mi profe"></button>
 <div class="sheet" id="salaSheet" hidden role="dialog" aria-label="Opciones de la sesión"><div class="sheetin" id="salaSheetIn" style="max-height:88%;overflow-y:auto"></div></div>
 <div class="sheet" id="cardioSheet" hidden role="dialog" aria-labelledby="cdTitle">
   <div class="sheetin">

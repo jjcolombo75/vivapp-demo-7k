@@ -155,9 +155,11 @@
       <div class="dmrow"><span class="dmk">Voz y auriculares</span>
         <div class="opts g2"><button class="opt" data-ac="voz0" aria-pressed="true">Solo en pantalla</button><button class="opt" data-ac="voz1" aria-pressed="false">Voz con auriculares</button><button class="opt" data-ac="au1" aria-pressed="true">Auriculares: sí</button><button class="opt" data-ac="au0" aria-pressed="false">Auriculares: no</button></div>
         <span class="dmayu">La voz habla solo en momentos fijos (arranque, antes de cada ejercicio, fin del descanso, cierre) y solo con auriculares; nunca dolor ni datos sensibles. En la app nativa, la síntesis del teléfono.</span></div>
-      <div class="dmrow"><span class="dmk">Decímelo: qué frase simula</span>
-        <div class="opts g2" id="dcPick"><button class="opt" data-dc2="reps" aria-pressed="true">"Hice 10, 10 y 8 con 42 y medio"</button><button class="opt" data-dc2="ocupada" aria-pressed="false">"Está ocupada"</button><button class="opt" data-dc2="falta" aria-pressed="false">"¿Cuánto me falta?"</button><button class="opt" data-dc2="duele" aria-pressed="false">"Me duele el hombro"</button></div>
-        <span class="dmayu">"Me duele" siempre va a Cambiar · Me molesta. Sin Decímelo sin señal ni en menores.</span></div>
+      <div class="dmrow"><span class="dmk">Llamar a mi profe (simulado)</span>
+        <div class="opts g2" id="pfTurno"><button class="opt" data-pft="1" aria-pressed="true">Lucas en el turno</button><button class="opt" data-pft="0" aria-pressed="false">Lucas no está</button></div>
+        <div class="opts g3" id="pfResp"><button class="opt" data-pfr="su" aria-pressed="true">Contesta</button><button class="opt" data-pfr="otro" aria-pressed="false">Contesta otro</button><button class="opt" data-pfr="nadie" aria-pressed="false">Nadie</button></div>
+        <button class="btn ghost sm" id="pfVer">Probarlo con la sesión abierta</button>
+        <span class="dmayu">Simula el tablero del profe (E6): su profe; a los 60 s, los profes de sala; a los 3 min, "Nadie pudo venir ahora" y recepción. La emergencia va a todos a la vez. Con el reloj rápido, 3 min son 18 s. En la app real contesta un profe con "Voy"; quién está de turno sale de Viva Gestión.</span></div>
       <div class="dmrow"><span class="dmk">Días seguidos</span>
         <div class="opts g2" id="dsPick"><button class="opt" data-ds="2" aria-pressed="true">2 días</button><button class="opt" data-ds="5" aria-pressed="false">5 días</button></div>
         <span class="dmayu">Con 5 y la semana cumplida, Hoy propone descanso; sin la semana cumplida, nunca. Parámetro a validar por los profes.</span></div>

@@ -47,8 +47,16 @@
   });
   $('#qrClose').addEventListener('click', () => $('#qrOverlay').hidden = true);
 
-  let tt;
-  function toast(msg){ const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(tt); tt = setTimeout(() => el.hidden = true, 2200); }
+  // T18 · Avisos (archivo/entrenar-estado § 7.6, decidido 12/11): copiar el comportamiento del teléfono, no su aspecto.
+  // Uno por vez, nunca apilados: el que llega reemplaza al que ya tuvo 1,5 s a la vista; si no, espera (solo el último).
+  // Duran lo que tarda en leerse (1 s + 18 caracteres por segundo, entre 2,5 y 6 s); un toque lo descarta.
+  let tt, tq = [], tVer = 0;
+  function toast(msg){ const el = $('#toast'); if (!el) return; if (!el.hidden && el.textContent === msg) return;
+    if (!el.hidden && Date.now() - tVer < 1500) { tq = [msg]; clearTimeout(tt); tt = setTimeout(toastFin, 1500 - (Date.now() - tVer)); return; } toastVer(msg); }
+  function toastVer(msg){ const el = $('#toast'); tVer = Date.now(); el.textContent = msg; el.hidden = false; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
+    clearTimeout(tt); tt = setTimeout(toastFin, Math.round(Math.max(2500, Math.min(6000, 1000 + msg.length * 1000 / 18)))); }
+  function toastFin(){ const el = $('#toast'); clearTimeout(tt); el.hidden = true; const n = tq.shift(); if (n) tt = setTimeout(() => toastVer(n), 200); }
+  $('#toast').addEventListener('click', toastFin);
 
   // ===== Calendario de la demo: la FECHA se fija acá y todo lo demás se deriva (la hora es la real del teléfono) =====
   // Miércoles 18/11/2026: tercera semana del mes, dos semanas cumplidas cerradas (Tu mes 2 de 3) y Mes cumplido todavía alcanzable.

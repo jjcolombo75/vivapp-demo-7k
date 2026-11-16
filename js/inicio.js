@@ -296,6 +296,7 @@
     na.querySelector('.nai').innerHTML = MOM === 'sala' ? ICO_PLAY : MOM === 'sesion' ? ICO_SES : ICO_ENT;
     na.querySelector('.nal').textContent = MOM === 'sala' ? 'Empezar' : MOM === 'sesion' ? 'Tu sesión' : 'Entrenar';
     $('.app').dataset.accbar = !$('#accBar').hidden && curScr === 'inicio' ? '1' : '0';
+    if (typeof pfFab === 'function') pfFab();   // T18: el botón del profe sigue al momento y a la pantalla
     if (['hoy', 'rutinas', 'progreso', 'ia', 'entrenando', 'sala', 'cierre'].includes(curScr)) na.setAttribute('aria-current', 'page'); else na.removeAttribute('aria-current');
   }
   function accGo(){ if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else go('hoy'); }
