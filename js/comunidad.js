@@ -1689,7 +1689,7 @@
     let otras = sgGenB().filter(b => b.vis && Math.min.apply(null, b.mem.map(x => x.alta)) <= SF.now);
     const riv = sgRiv(); if (rn === riv.nom) otras.push(riv);
     otras = otras.map(b => Object.assign(b, { sem:sgSem(b, SF.now), ev:sgEv(b, E), rival:b.nom === rn }));
-    if (con) { const ev = sfEventos(E).filter(x => x.m >= w * SE_SEM); out.push({ key:'yo', yo:true, nom:sfNom(), sede:SG_SEDE, sem:sgSemTu(E), ev:ev }); }
+    if (con) { const ev = sfEventos(E).filter(x => x.m >= w * SE_SEM).concat(sg2ResOn() ? [{ k:'resumen', m:w * SE_SEM }] : []); out.push({ key:'yo', yo:true, nom:sfNom(), sede:SG_SEDE, sem:sgSemTu(E), ev:ev }); }
     const on = b => b.ev.length && b.ev[b.ev.length - 1].m > (b.key in SG.visto ? SG.visto[b.key] : -1e9);
     const r = otras.find(b => b.rival); if (r) out.push(r);
     const resto = otras.filter(b => !b.rival), nuevas = resto.filter(on).sort((p, q) => q.ev[q.ev.length - 1].m - p.ev[p.ev.length - 1].m);
@@ -1756,7 +1756,7 @@
   }
   function sgFila(E){
     const L = SG.L, it = b => '<button class="sgc" data-sgver="' + b.key + '" aria-label="' + (b.yo ? 'Tu banda, ' : '') + b.nom + (b.sede !== SG_SEDE ? ', ' + b.sede : '') + (b.on ? ': hay algo nuevo' : '') + '">' +
-      '<span class="sgaro' + (b.on ? ' on' : '') + (b.yo && !sgVisible() ? ' priv' : '') + '">' + sgIns(b.nom, b.sem) + '</span><span class="sgn">' + b.nom + '</span>' + (b.sede !== SG_SEDE ? '<span class="sgs">' + b.sede + '</span>' : '') + '</button>';
+      '<span class="sgaro' + (b.on ? ' on' : '') + (b.yo && sg2ResOn() ? ' res' : '') + (b.yo && !sgVisible() ? ' priv' : '') + '">' + sgIns(b.nom, b.sem) + '</span><span class="sgn">' + b.nom + '</span>' + (b.sede !== SG_SEDE ? '<span class="sgs">' + b.sede + '</span>' : '') + '</button>';
     const mas = sgCon() ? '' : '<button class="sgc" data-sgmas aria-label="Armá tu banda"><span class="sgaro plus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="sgn">Tu banda</span></button>';
     return '<div class="sgfila" role="list" aria-label="Las bandas">' + mas + L.map(it).join('') + '<span class="sgtot">' + sgCuantas(E) + '</span></div>';
   }
@@ -1781,9 +1781,9 @@
     SG.E = E;
     if (SG.novAt !== k) { SG.novAt = k; SG.rev = {}; sgNovAplicar(E); }
     SG.L = sgLista(E);
-    let h = sgCab(con) + sgFila(E);
+    let h = sgCab(false) + sgFila(E);   // T27: Foto y WhatsApp pasan a la fila de acciones de Tu banda
     if (!con) h += SF.est === 'sin' ? sfSin() : sfEspera();
-    else h += sgBandaLinea() + (SG.esp && SF.est === 'con' ? sgEspFr(E) : '') + sfFecha() + sfCruce(E) + (SF.ult ? sfUltimo(sfEventos(E)) : '');
+    else h += sg2Banda() + (SG.esp && SF.est === 'con' ? sgEspFr(E) : '') + sfCruce(E) + (SF.ult ? sfUltimo(sfEventos(E)) : '');   // T27: la fecha vive en Voy
     return h;
   }
   // Novedades (panel): qué anillos arrancan encendidos. "Ya lo vi" = el momento en que se abrió la historia.
@@ -1847,7 +1847,7 @@
     return '<span class="sgkick">' + (b && !b.yo ? 'Contra ustedes' : 'El cruce') + '</span>' + tit + '<div class="sfx sgx">' + sfCol(a, nom, true) + sfCol(c, sgRivLbl(rn), false) + '</div><span class="sgsub">' + sub + '</span>' +
       (SG.esp && !lun ? '<span class="sgsub">Cruce especial: ' + sgEspPct(E).map(x => x[0] + ' ' + x[1] + ' %').join(' · ') + '</span>' : '');
   }
-  function sgCards(b){
+  function sgCardsT26(b){   // T27: reemplazada por sgCards (bloque 237)
     const E = SG.E || sfEntradas(), C = [], m = scMenor();
     if (b.yo) {
       const ev = b.ev.filter(x => x.k !== 'rayos').slice(-3).reverse();
@@ -1878,15 +1878,15 @@
   function sgPaso(i){
     clearTimeout(SG.hT); const H = SG.h; if (!H) return;
     if (i < 0) i = 0; if (i >= H.C.length) { sgCerrar(); return; }
-    H.i = i; const b = H.b, m = scMenor();
+    H.i = i; const b = H.b, m = scMenor(); $('#sgHist').style.setProperty('--hc', sg2Par(b.nom)[0]);
     const sub = b.yo ? (sgVisible() ? 'Tu banda' : 'Tu banda · solo ustedes la ven') : b.sede;
     $('#sgHist').innerHTML = '<div class="sgbars">' + H.C.map((_, j) => '<i class="' + (j < i ? 'ya' : j === i ? 'ahora' : '') + '"></i>').join('') + '</div>' +
       '<div class="sghcab">' + sgIns(b.nom, b.sem, 'sgmed') + '<span class="stack" style="gap:2px;flex:1;min-width:0"><b class="sghn">' + b.nom + '</b><span class="small sghs">' + sub + '</span></span>' +
         '<button class="iconbtn sgx" data-sgx type="button" aria-label="Cerrar">✕</button></div>' +
       '<div class="sgcard" aria-live="polite">' + H.C[i] + '</div>' +
-      '<div class="sgfoot">' + (!b.yo && !m && sgCon() ? '<button class="sgrayo" data-sgrayo type="button" aria-pressed="' + !!SG.rayo[b.key] + '" aria-label="' + (SG.rayo[b.key] ? 'Sacarles el ⚡' : 'Mandarles un ⚡') + '">' + MV_RAYO + '</button>' : '') + '</div>';
+      '<div class="sgfoot">' + (!b.yo && !m && sgCon() ? '<span class="sgrayow"><button class="sgrayo" data-sgrayo type="button" aria-pressed="' + !!SG.rayo[b.key] + '" aria-label="' + (SG.rayo[b.key] ? 'Sacarles el ⚡' : 'Mandarles un ⚡') + '">' + MV_RAYO + '</button><span class="sgrw"><span class="a">Mandar</span><span class="b">Mandado</span></span></span>' : '') + '</div>';
     sgVocDom($('#sgHist'));
-    SG.hT = setTimeout(() => sgPaso(i + 1), 5000);
+    if (!/data-sg2share/.test(H.C[i])) SG.hT = setTimeout(() => sgPaso(i + 1), SG2_DUR);   // T27: la de compartir espera
   }
   function sgCerrar(){ clearTimeout(SG.hT); SG.h = null; $('#sgHist').hidden = true; sfRender(); }
   (function () {
@@ -1937,3 +1937,185 @@
   }, true);
   $('#socialF').addEventListener('change', e => { const s = e.target.closest('[data-sgvis]'); if (!s || SOC_V !== 'G') return;
     SG.vis = s.checked ? 'si' : 'no'; sfRender(); sgBandaHoja(); toast(s.checked ? 'Tu banda aparece en la fila de las demás' : 'Tu banda ya no aparece en la fila de las demás'); });
+
+//#bloque 237
+  // ===== T27 · Social VIVA, la G ordenada y con vida (v112): reemplaza a la G de T26 y sigue llamándose G =====
+  // Con banda, cuatro niveles: la fila · Tu banda (la insignia, el nombre y cuatro acciones con ícono de neón y palabra: Voy · Foto · Chat ·
+  // Sumar) · el cruce · Lo último. Sale la franja de la fecha (vive en Voy) y las pastillas Foto y WhatsApp de la cabecera.
+  // La historia pasa a ser gráfica: las siete celdas de la semana, las columnas del cruce que se llenan, la insignia que suma su pieza, el
+  // resultado y los ⚡. De lunes a miércoles (si el panel dice "Resumen del lunes: sí"), el anillo de tu banda trae el resumen de la semana
+  // que cerró: la semana, el cruce, la insignia y una imagen para historias. Todo sale de las entradas y metas de T26.
+  // Quieta se entiende: cada animación arranca de un estado "from"; el estilo de base es el final (movimiento reducido, capturas).
+  // Piso: de otra banda, solo datos de banda (sus celdas dicen qué días entrenó alguien, nunca quién ni a qué hora); lo de cada integrante,
+  // solo dentro de su banda y con los permisos de la D; lo que sale a Instagram lleva nombre, insignia y un dato de banda; menores: solo Voy,
+  // sin compartir hacia afuera. En real: lo de T26, y la imagen se arma en el teléfono y no se guarda.
+  SG.res = true; SG.voy = null;
+  sfReset = (f => function () { f(); SG.voy = null; })(sfReset);
+  const SG2_DUR = 6000;
+  const sg2Par = nom => { const h = sgHash(nom); return SG_PAR[(h >>> 5) % 6]; };
+  // El resumen: de lunes a miércoles, con banda y semana anterior
+  const sg2ResOn = () => SOC_V === 'G' && SG.res && SF.est === 'con' && sfDia(SF.now) <= 2 && sgW() > -8;
+
+  // ---- Tu banda: insignia, nombre y la fila de acciones
+  const SG2_IC = {
+    voy:'<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/>',
+    foto:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+    chat:'<path d="M4 20l1.4-4.2A8 8 0 1 1 8.6 19z"/>',
+    sumar:'<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M19 8v6M16 11h6"/>' };
+  const sg2Ic = k => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + SG2_IC[k] + '</svg>';
+  function sg2Fecha(){   // [día y hora de la fecha de la banda, "van N" (solo con tres o más) o '']
+    const w = sgW(), esta = SF.now < w * SE_SEM + SE_JUE + 20 * 60, hoy = esta && sfDia(SF.now) === 3, n = sfB().int.length;
+    const van = Math.max(1, Math.round((n - 1) * (esta ? .75 : .25))) + (SG.voy === 'voy' ? 1 : 0);
+    return [(hoy ? 'Hoy ' : 'Jue ') + SB_G.hora, n >= 3 ? 'van ' + van : ''];
+  }
+  const sg2Acc = (k, word, sub, cls, at) => '<button class="sgacc' + (cls || '') + '" type="button" ' + at + '><span class="sgtubo">' + sg2Ic(k) + '</span><span class="sgaw">' + word + '</span>' +
+    (sub ? '<span class="sgas">' + sub + '</span>' : '') + '</button>';
+  function sg2Acciones(){
+    const f = sg2Fecha(), m = scMenor(), v = SG.voy;
+    const voy = sg2Acc('voy', v === 'no' ? 'No llego' : 'Voy', f[0] + (f[1] ? '<br>' + f[1] : ''), v === 'voy' ? ' on' : v === 'no' ? ' no' : '',
+      'data-sgvoy aria-pressed="' + (v === 'voy') + '" aria-label="' + (v === 'voy' ? 'Vas el ' : v === 'no' ? 'No llegás el ' : 'Voy: ') + f[0] + ', ' + SB_G.sede + '"');
+    return '<div class="sgaccs' + (m ? ' solo' : '') + '" role="group" aria-label="Lo que se hace con tu banda">' + voy +
+      (m ? '' : sg2Acc('foto', 'Foto', '', '', 'data-sffoto aria-label="Foto con el marco de Viva"') + sg2Acc('chat', 'Chat', '', '', 'data-sfmsg aria-label="Chat: abre el WhatsApp de la banda"') +
+        sg2Acc('sumar', 'Sumar', '', '', 'data-sfsumar aria-label="Sumar a alguien a la banda"')) + '</div>';
+  }
+  function sg2Banda(){
+    const B = sfB(), nom = sfNom(), yo = SG.L[0] && SG.L[0].yo ? SG.L[0] : null, res = sg2ResOn();
+    const sub = [B.conv ? 'la convoca ' + B.conv : '', sgVisible() ? '' : 'solo ustedes la ven'].filter(Boolean).join(' · ');
+    return '<div class="sgtu"><div class="sgtuc"><button class="sgtuins" data-sgver="yo" type="button" aria-label="' + (res ? 'El resumen de la semana de tu banda' : 'La historia de tu banda') + '">' +
+        '<span class="sgaro grande' + (yo && yo.on ? ' on' : '') + (res ? ' res' : '') + (sgVisible() ? '' : ' priv') + '">' + sgIns(nom, yo ? yo.sem : 0) + '</span>' +
+        (res ? '<span class="sgrespill">Resumen</span>' : '') + '</button>' +
+      '<button class="sfbanda sgtun" data-sfbanda type="button" aria-label="Tu banda: ' + nom + '"><span class="sdbanda">' + nom + '</span>' + (sub ? '<span class="small muted">' + sub + '</span>' : '') + '</button></div>' +
+      sg2Acciones() + '</div>';
+  }
+  function sg2VoyHoja(){
+    const f = sg2Fecha(), op = (k, t) => '<button class="opt" data-sgvoyop="' + k + '" type="button" aria-pressed="' + (SG.voy === k) + '">' + t + '</button>';
+    sfHoja('<span class="mtitle sig"><b>' + f[0] + '</b> <i>' + SB_G.sede + '</i></span><span class="muted" style="line-height:1.45">' + SB_G.que + '.' + (f[1] ? ' Esta semana ' + f[1] + '.' : '') + '</span>' +
+      '<div class="opts g2">' + op('voy', 'Voy') + op('no', 'No llego') + '</div>' + sfCerrarBtn());
+  }
+  function sg2Voy(k){
+    SG.voy = k; $('#sfHoja').hidden = true; sfRender();
+    toast(k === 'voy' ? '¡Vamos! ' + sg2Fecha()[0] + ', cada uno su rutina' : sfB().int.length >= 3 ? 'Listo. La banda ve un número, nunca quién' : 'Listo, esta vez no llegás');
+  }
+
+  // ---- piezas gráficas de la historia
+  const sg2Big = (b, i, s) => '<span class="sgbig sig"><b>' + b + '</b>' + (i ? ' <i>' + i + '</i>' : '') + (s ? ' ' + MV_RAYO : '') + '</span>';
+  const SG2_DL = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  // Qué días de la semana w entrenó alguien de la banda (hasta h). quien: dentro de tu banda, las iniciales de quien lo comparte.
+  function sg2Dias(lista, w, h, quien){
+    const d = [0, 0, 0, 0, 0, 0, 0].map(() => ({ on:false, q:[] }));
+    lista.forEach(e => { if (e.m >= w * SE_SEM && e.m < (w + 1) * SE_SEM && e.m <= h) { const x = d[sfDia(e.m)]; x.on = true;
+      if (quien && quien(e.socio) && !x.q.includes(e.socio)) x.q.push(e.socio); } });
+    return d;
+  }
+  function sg2Celdas(d, hoy, avs){
+    const id = 'sgd' + (++scUid), L = eqLuz(1);
+    let i = 0;
+    return '<div class="sgdias" role="img" aria-label="' + d.filter(x => x.on).length + ' de 7 días con entrenamiento">' +
+      '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="' + id + '" filterUnits="userSpaceOnUse" x="-20" y="-20" width="80" height="160"><feGaussianBlur stdDeviation="3"/></filter>' +
+      '<linearGradient id="' + id + 'z" gradientUnits="userSpaceOnUse" x1="0" y1="110" x2="0" y2="0"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient></defs></svg>' +
+      d.map((x, j) => { const fut = hoy >= 0 && j > hoy, on = x.on && !fut, F = on ? 'var(--lime-f)' : '#8f99ab';
+        const cel = fut ? '<rect x="1" y="1" width="34" height="108" rx="3" fill="none" stroke="#8f99ab" stroke-opacity=".4" stroke-dasharray="4 5"/>' : eqCeldaCol(0, 0, 36, 110, on, F, L, id, false);
+        return '<span class="sgdia' + (on ? ' on' : '') + (j === hoy ? ' hoy' : '') + '"' + (on ? ' style="animation-delay:' + (.25 + (i++) * .14).toFixed(2) + 's"' : '') + '>' +
+          '<svg viewBox="-4 -4 44 118" aria-hidden="true">' + (j === hoy ? '<rect x="-3" y="-3" width="42" height="116" rx="5" fill="none" stroke="var(--lime-f)" stroke-width="1.6"/>' : '') + cel + '</svg>' +
+          '<span class="sgdl">' + SG2_DL[j] + '</span>' + (avs && on ? '<span class="sgdav">' + x.q.slice(0, 3).map(avs).join('') + '</span>' : '') + '</span>'; }).join('') + '</div>';
+  }
+  const sg2Av = id => '<span class="av sgavx" style="background:' + grad(SF_GENTE[sfNomDe(id)]) + '" aria-hidden="true">' + (id === 's1' ? 'M' : inicial(sfNomDe(id))) + '</span>';
+  const sg2Comparte = id => id === 's1' ? SF.comp.hoy && !scMenor() : sfB().hoy.includes(id);
+  function sg2SemanaCard(lista, w, h, propia, b){
+    const hoy = Math.floor(h / SE_SEM) === w ? sfDia(h) : -1, d = sg2Dias(lista, w, h, propia ? sg2Comparte : null), n = d.filter(x => x.on).length;
+    return '<span class="sgkick">' + (hoy < 0 ? 'La semana' : 'Esta semana') + '</span>' + sg2Celdas(d, hoy, propia ? sg2Av : null) +
+      (n ? sg2Big(String(n), n === 1 ? 'día' : 'días') + '<span class="sgsub">con alguien de la banda</span>' : sg2Big('Todavía', 'nada') + '<span class="sgsub">La semana arrancó el lunes.</span>') +
+      (propia && !sgVisible() ? '<span class="sgsub">' + (SG.vis === 'falta' ? 'Solo ustedes la ven: falta el sí de alguien.' : 'Solo ustedes la ven.') + '</span>' : '');
+  }
+  // El cruce: las dos columnas se llenan desde cero hasta donde van (o hasta el final, el lunes)
+  function sg2CruceCard(E, b){
+    const w = sgW(), nom = sfNom();
+    if (sfNueva() && w === 0) return '<span class="sgkick">El cruce</span>' + sg2Big('El lunes', 'arranca') + '<span class="sgsub">Su primer cruce. Esta semana, la meta a la mitad.</span>';
+    const a = sfPct(E, w, SF.now), c = sfRivPct(w, SF.now), rn = sfRivNom(E, w), dia = sfDia(SF.now);
+    return '<span class="sgkick">' + (b && !b.yo ? 'Contra ustedes' : 'El cruce') + '</span>' + (a >= 100 ? sg2Big('En', 'sincro', 1) : sg2Big('Vamos', a + ' %')) +
+      '<div class="sfx sgx">' + sgColRev(0, a, nom, true) + sgColRev(0, c, sgRivLbl(rn), false) + '</div>' +
+      '<span class="sgsub">' + (dia === 6 ? 'Se define hoy.' : 'El lunes, el resultado.') + (SG.esp ? ' Cruce especial: ' + sgEspPct(E).map(x => x[0] + ' ' + x[1] + ' %').join(' · ') + '.' : '') + '</span>';
+  }
+  // El resultado de la semana que cerró (lunes): ganaron o esta vez no, con las columnas llenas y la insignia
+  function sg2ResultadoCard(E, foto){
+    const w = sgW() - 1, r = sfRes(E, w), nom = sfNom(), m = scMenor();
+    return '<span class="sgkick">El cruce</span>' + (r.gano ? sg2Big('Ganaron', '', 1) : sg2Big('Esta vez', 'no')) +
+      '<div class="sfx sgx">' + sgColRev(0, r.a, nom, true) + sgColRev(0, r.b, sgRivLbl(r.riv), false) + '</div>' +
+      '<span class="sgsub">' + (r.gano ? 'Hoy arranca otro cruce.' : 'Hoy arranca la revancha.') + '</span>' +
+      (foto && r.gano && !m ? '<button class="btn sm" data-sgfoto type="button">' + SB_CAM + 'Foto</button>' : '');
+  }
+  function sg2InsCard(nom, n, nueva, extra){
+    return '<span class="sgkick">La insignia</span><span class="sginsw">' + sgIns(nom, n, 'sgxl', nueva) + '</span>' +
+      (nueva ? sg2Big('Sumó', 'una pieza', 1) : sg2Big(sgSemTxt(n), '')) + '<span class="sgsub">' + (nueva ? sgSemTxt(n) + '. ' : '') + sgProx(n) + '</span>' + (extra || '');
+  }
+  // Los eventos de otra banda, como piezas
+  function sg2EvCard(b, x){
+    const cu = '<span class="sgsub">' + (x.k === 'salto' ? sgSemTxt(x.n) + ' · ' : '') + sfCuando(x.m) + '</span>';
+    if (x.k === 'sincro') return '<div class="sfx sgx sguno">' + sgColRev(0, 100, b.nom, true) + '</div>' + sg2Big('Entraron', 'en sincro', 1) + cu;
+    if (x.k === 'gano') return '<span class="sgrafaga">' + sgIns(b.nom, b.sem, 'sgxl') + '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>' + sg2Big('Ganaron', 'el cruce', 1) + cu;
+    if (x.k === 'alta') { const n = b.mem.filter(z => z.alta <= x.m).length;
+      return '<span class="sgpuntos" role="img" aria-label="Ahora son ' + n + '">' + Array.from({ length:n }, (_, j) => '<i' + (j === n - 1 ? ' class="nuevo"' : '') + '></i>').join('') + '</span>' + sg2Big('Sumaron', 'a alguien') + '<span class="sgsub">Ahora son ' + n + ' · ' + sfCuando(x.m) + '</span>'; }
+    if (x.k === 'nace') return '<span class="sginsw nace">' + sgIns(b.nom, 0, 'sgxl') + '</span>' + sg2Big('Se armó', 'la banda', 1) + cu;
+    if (x.k === 'salto') return '<span class="sginsw">' + sgIns(b.nom, x.n, 'sgxl', true) + '</span>' + sg2Big('Su insignia', 'dio el salto', 1) + cu;
+    return '';
+  }
+
+  // ---- el resumen del lunes: la semana que cerró, en cuatro tarjetas (la cuarta, la imagen para historias; menores, sin ella)
+  function sg2Res(E){
+    const w = sgW() - 1, r = sfRes(E, w), ids = sfB().int.map(m => m.id);
+    const ent = E.filter(e => ids.includes(e.socio) && e.m >= sfDesde(w) && e.m <= sfFin(w)).length, sem = sgSemTu(E), llego = r.a >= 100;
+    const dato = r.gano ? ['Ganamos', 'el cruce'] : llego ? (sem >= 2 ? [sem + ' semanas', 'en sincro'] : ['En', 'sincro']) : [ent + ' entrenamientos', 'en banda'];
+    return { w:w, r:r, ent:ent, sem:sem, llego:llego, dato:dato };
+  }
+  function sg2Share(R){
+    const nom = sfNom(), d = new Date(SE_BASE + R.w * SE_SEM * 60000), P = sg2Par(nom);
+    return '<div class="sgshare" style="--a:' + P[0] + ';--b:' + P[1] + '" role="img" aria-label="Imagen para historias: ' + nom + ', ' + R.dato.join(' ') + '">' +
+      '<svg class="sgshlogo" width="58" height="28" aria-hidden="true"><use href="#vLogo" width="58" height="28"/></svg>' + sgIns(nom, R.sem, 'sgshins') +
+      '<span class="sgshn">' + nom + '</span><span class="mvdato sig sgshd"><b>' + R.dato[0] + '</b> <i>' + R.dato[1] + '</i>' + MV_RAYO + '</span>' +
+      '<span class="sgshs">' + SG_SEDE + ' · semana del ' + d.getUTCDate() + '/' + (d.getUTCMonth() + 1) + '</span></div>';
+  }
+  function sg2ResCards(E){
+    const R = sg2Res(E), C = [], pct = R.r.a, nom = sfNom();
+    C.push('<span class="sgkick">Su semana</span>' + sg2Celdas(sg2Dias(E.filter(e => sfB().int.some(m => m.id === e.socio)), R.w, sfFin(R.w)), -1, null) +
+      sg2Big(String(R.ent), 'entrenamientos') + '<span class="sgsub">' + (R.llego ? pct + ' % de la meta de la banda.' : pct + ' % de la meta. Todo lo entrenado suma.') + '</span>');
+    C.push(sg2ResultadoCard(E, false));
+    C.push(sg2InsCard(nom, R.sem, R.llego && SG.semK === 'auto', R.llego ? '' : '<span class="sgsub">Nunca pierde nada.</span>'));
+    if (!scMenor()) C.push('<span class="sgkick">Para compartir</span>' + sg2Share(R) + '<button class="btn sgcomp" data-sg2share type="button">Compartir en historias</button>');
+    return C;
+  }
+
+  // ---- las tarjetas de cada historia (reemplaza a las de T26)
+  function sgCards(b){
+    const E = SG.E || sfEntradas(), C = [], m = scMenor(), w = sgW();
+    if (b.yo) {
+      if (sg2ResOn()) return sg2ResCards(E);
+      C.push(sg2SemanaCard(E.filter(e => sfB().int.some(x => x.id === e.socio)), w, SF.now, true, b));
+      C.push(sfLun1() ? sg2ResultadoCard(E, true) : sg2CruceCard(E, b));
+      const nueva = SG.semK === 'auto' && !sfLun1() && sfPct(E, w, SF.now) >= 100;
+      C.push(sg2InsCard(b.nom, b.sem, nueva, (SG.nombre === 'espera' ? '<span class="sgsub">Propusieron «' + SG_NOK[sfT()].join(' ') + '»: lo aprueba tu profe.</span>' : '') +
+        (m ? '' : '<button class="btn sm" data-sgfoto type="button">' + SB_CAM + 'Foto con la insignia</button>')));
+      if (b.rec && b.rec.length) C.push('<span class="sgkick">De otras bandas</span><span class="sgrec">' + b.rec.map(x => sgIns(x.b.nom, x.b.sem, 'sgmed')).join('') + '</span>' + sg2Big('Les mandaron', '', 1) +
+        '<span class="sgsub">' + b.rec.map(x => x.b.nom).join(' y ') + '</span>');
+      return C;
+    }
+    const nm = b.nom.split(' ');
+    C.push('<span class="sginsw">' + sgIns(b.nom, b.sem, 'sgxl') + '</span>' + sg2Big(nm.length > 1 ? nm.slice(0, -1).join(' ') : b.nom, nm.length > 1 ? nm[nm.length - 1] : '') +
+      '<span class="sgsub">' + b.sede + ' · ' + sgSemTxt(b.sem) + '</span>');
+    if (b.rival && sgCon()) C.push(sg2CruceCard(E, b));
+    C.push(sg2SemanaCard(b.E, w, SF.now, false, b));
+    b.ev.slice(-(4 - C.length)).forEach(x => { const h = sg2EvCard(b, x); if (h) C.push(h); });
+    return C;
+  }
+
+  // ---- toques de la G nueva (antes que los de la F, como los de T26)
+  $('#socialF').addEventListener('click', e => {
+    if (SOC_V !== 'G') return;
+    const q = s => e.target.closest(s), para = () => { e.stopPropagation(); e.preventDefault(); };
+    let b;
+    if (q('[data-sgvoy]')) { para(); if (SG.voy === 'voy') sg2VoyHoja(); else sg2Voy('voy'); return; }
+    if ((b = q('[data-sgvoyop]'))) { para(); sg2Voy(b.dataset.sgvoyop); return; }
+  }, true);
+  $('#sgHist').addEventListener('click', e => {
+    if (!e.target.closest('[data-sg2share]')) return;
+    e.stopPropagation(); sgCerrar(); toast('Se abre Instagram para tu historia (en la demo, de ejemplo)');
+  }, true);

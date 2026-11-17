@@ -338,13 +338,8 @@
   // ===== T21 · Versiones Social: la sección social en versiones completas e intercambiables =====
   // Agregar una versión = una fila en SOC_VERS, su pantalla (#social + la letra; la A es #social) y su nota (data-socnota) en html/demo.html.
   const SOC_VERS = [
-    ['A', 'Mural VIVA', 'A · El mural para scrollear de T20 (v98), sin cambios: publicaciones, íconos de sección y la cámara flotante.'],
-    ['B', 'Los grupos', 'B · Grupos chicos con alguien que los convoca (el profe), un encuentro por semana y nada que moderar. La charla vive en su WhatsApp.'],
-    ['C', 'En sincro', 'C · Tu ritmo, cuando se acopla con el de otros: solo, en dupla o en grupo, con el pulso (una celda por semana en sincro). El idioma de Inicio: ecualizador, neón y Flow.'],
-    ['D', 'La vibra', 'D · Tres bloques: cuándo se ve tu banda, contra quién juega esta semana y lo último que logró, con la cuenta de Viva en Instagram. Pasa algo nuevo cada vez que entrás.'],
-    ['E', 'El ecualizador', 'E · Una pantalla: el ecualizador de tu banda, una barra por integrante hacia su propia meta. Lo último, la fecha y el cruce son franjas de una línea; abajo, lo de Viva. Se mueve con cada entrenamiento.'],
-    ['F', 'Las puertas', 'F · Una pantalla, dos puertas para que nadie entrene solo: Traé a tu gente o Viva te presenta (abajo, Puerta). Con banda es idéntica: la fecha, el cruce de la semana como protagonista (solo la barra de la banda) y lo de Viva. Es la que va a marketing el 20/11.'],
-    ['G', 'Las insignias', 'G · La F con otra cabecera: arriba, la fila de insignias de las bandas que eligen verse (de las sedes con app). Tocás una y ves su semana, que arma la app sola. El cruce se define el domingo y se revela el lunes. Sin fotos ni nada que moderar.']
+    ['F', 'Las puertas', 'F · Una pantalla, dos puertas para que nadie entrene solo: Traé a tu gente o Viva te presenta (abajo, Puerta). Con banda: la fecha, el cruce de la semana como protagonista y lo de Viva. Queda para comparar con la G.'],
+    ['G', 'Las insignias', 'G · Cuatro niveles: arriba, la fila de insignias de las bandas; tu banda con cuatro acciones (Voy · Foto · Chat · Sumar); el cruce; lo último. Tocás una insignia y ves su semana en piezas gráficas; el lunes, el resumen para compartir. Sin fotos ni nada que moderar.']
   ];
   const SOC_EE = { sin:['Sin banda', 'El que llega solo (Mica, 19 años, semana 2): el ecualizador apagado con su lugar latiendo y una sola acción, Tu primer jueves.'],
     nueva:['Banda nueva', 'El jueves, en la bienvenida, el profe la suma a una banda: nombres recién sumados, la meta de la banda a la mitad la primera semana y la pregunta de si la banda ve su barra.'],
@@ -364,7 +359,7 @@
     const x = dmMem.soc.e; if (x) { if (x.soc in SOC_EE) SE.soc = x.soc; if (x.mom in SE_MOM) seMomento(x.mom); if (x.tam in SE_TAM) SE.tam = +x.tam; SE.neu = !!x.neu; if (x.ig === 'ej' || x.ig === 'vivo') SE.ig = x.ig; SE.vid = x.vid !== false; } }
   function socSync(){
     $('#socVPick').innerHTML = SOC_VERS.map(v => '<button class="opt" data-socv="' + v[0] + '" aria-pressed="' + (SOC_V === v[0]) + '">' + v[0] + '<small>' + v[1] + '</small></button>').join('') +
-      (SOC_VERS.length < 3 ? '<button class="opt" disabled aria-pressed="false">' + String.fromCharCode(65 + SOC_VERS.length) + '<small>la próxima</small></button>' : '');
+      '';   // T27: solo F y G
     $('#socVTxt').textContent = SOC_VERS.find(v => v[0] === SOC_V)[2];
     $('#socBRow').hidden = SOC_V !== 'B'; $('#socBTxt').textContent = SOC_BE[SOC_B][1];
     $$('#socBPick [data-socb]').forEach(x => x.setAttribute('aria-pressed', x.dataset.socb === SOC_B));
@@ -493,21 +488,25 @@
   // ===== T26 · la G en el panel: escenarios 7 a 10, palabra, visible, nombre, semanas en sincro, novedades, rival y momentos.
   // Debajo se muestra también la fila de la F (puerta, estado, momento, que entrene alguien, en vivo, lo último): la G comparte su estado.
   var SG_OPC = { voc:['Bandas', 'Tribus'], vis:['si', 'no', 'falta'], nombre:['ok', 'espera'], semK:['auto', '0', '1', '3', '4', '12', '24'], nov:['ninguna', 'tu', 'rival', 'varias', 'dos'], rivSede:['tu', 'otra'] };
-  if (dmMem.socG) { const x = dmMem.socG; Object.keys(SG_OPC).forEach(k => { if (SG_OPC[k].includes(x[k])) SG[k] = x[k]; }); SG.esp = !!x.esp; }
+  if (dmMem.socG) { const x = dmMem.socG; Object.keys(SG_OPC).forEach(k => { if (SG_OPC[k].includes(x[k])) SG[k] = x[k]; }); SG.esp = !!x.esp; if ('res' in x) SG.res = !!x.res; }
   function sgSync(){
     const r = $('#socGRow'); if (!r) return;
     r.hidden = SOC_V !== 'G';
     const pg = (s, v) => $$('#socGRow [' + s + ']').forEach(x => x.setAttribute('aria-pressed', x.getAttribute(s) === String(v)));
-    pg('data-sgvoc', SG.voc); pg('data-sgvisp', SG.vis); pg('data-sgnom', SG.nombre); pg('data-sgsem', SG.semK); pg('data-sgnov', SG.nov); pg('data-sgriv', SG.rivSede); pg('data-sgesp', SG.esp ? 1 : 0);
+    pg('data-sgres', SG.res ? 1 : 0); pg('data-sgvoc', SG.voc); pg('data-sgvisp', SG.vis); pg('data-sgnom', SG.nombre); pg('data-sgsem', SG.semK); pg('data-sgnov', SG.nov); pg('data-sgriv', SG.rivSede); pg('data-sgesp', SG.esp ? 1 : 0);
   }
-  const sgSave = () => { dmMem.socG = { voc:SG.voc, vis:SG.vis, nombre:SG.nombre, semK:SG.semK, nov:SG.nov, rivSede:SG.rivSede, esp:SG.esp }; dmSave(); };
+  const sgSave = () => { dmMem.socG = { voc:SG.voc, vis:SG.vis, nombre:SG.nombre, semK:SG.semK, nov:SG.nov, rivSede:SG.rivSede, esp:SG.esp, res:SG.res }; dmSave(); };
   const SG_ESC = {
     7:() => { SF.puerta = 'trae'; SF.mom = 'mar'; sfEstado('con'); Object.assign(SG, { vis:'si', nombre:'ok', semK:'auto', nov:'dos', rivSede:'tu', novAt:'' });
       return 'Escenario 7 · Martes: dos anillos encendidos'; },
     8:() => { SF.mom = 'lun1g'; sfEstado('con'); Object.assign(SG, { semK:'auto', nov:'varias', novAt:'' }); return 'Escenario 8 · Lunes: el resultado se revela'; },
     9:() => { SF.puerta = 'presenta'; sfEstado('sin'); Object.assign(SG, { nov:'varias', novAt:'' }); return 'Escenario 9 · Mica, 19 años, sin banda, ve la fila'; },
     10:() => { SG.vis = 'falta'; SG.novAt = ''; if (SF.est !== 'con') { SF.mom = 'jue'; sfEstado('con'); } setTimeout(() => { if (SOC_V === 'G') sgAbrir('yo'); }, 1500);
-      return 'Escenario 10 · Tu banda todavía no aparece para las demás'; }
+      return 'Escenario 10 · Tu banda todavía no aparece para las demás'; },
+    11:() => { SF.mom = 'lun1g'; sfEstado('con'); Object.assign(SG, { res:true, semK:'auto', vis:'si', nov:'varias', novAt:'' }); setTimeout(() => { if (SOC_V === 'G') sgAbrir('yo'); }, 1500);
+      return 'Escenario 11 · Lunes: el resumen (ganaron)'; },
+    12:() => { SF.mom = 'lun1p'; sfEstado('con'); Object.assign(SG, { res:true, semK:'auto', vis:'si', nov:'varias', novAt:'' }); setTimeout(() => { if (SOC_V === 'G') sgAbrir('yo'); }, 1500);
+      return 'Escenario 12 · Lunes: semana floja, el resumen dice lo hecho'; }
   };
   const SG_MSG = { vis:{ si:'Visible: todos dijeron que sí', no:'Visible: no (lo eligieron)', falta:'Falta el sí de uno: ustedes la ven, las demás no' },
     nombre:{ ok:'El nombre: aprobado por el profe', espera:'El nombre: esperando a tu profe' },
@@ -523,6 +522,8 @@
     if ((b = e.target.closest('[data-sgnov]'))) { SG.nov = b.dataset.sgnov; SG.novAt = ''; return aG(SG_MSG.nov[SG.nov]); }
     if ((b = e.target.closest('[data-sgriv]'))) { SG.rivSede = b.dataset.sgriv; if (SF.est !== 'con') sfEstado('con'); return aG(SG.rivSede === 'otra' ? 'La rival es de López y Planes' : 'La rival es de tu sede'); }
     if (e.target.closest('[data-sgdom]')) { SF.mom = 'dom'; sfEstado('con'); return aG('Domingo a la noche: se define hoy'); }
+    if ((b = e.target.closest('[data-sgres]'))) { SG.res = b.dataset.sgres === '1'; SG.novAt = ''; return aG(SG.res ? 'Resumen del lunes: sí (de lunes a miércoles)' : 'Resumen del lunes: no'); }
+    if (e.target.closest('[data-sglunres]')) { SF.mom = 'lun1g'; sfEstado('con'); SG.res = true; SG.novAt = ''; return aG('Lunes, con resumen: el anillo de tu banda lo trae'); }
     if ((b = e.target.closest('[data-sgesp]'))) { SG.esp = b.dataset.sgesp === '1'; if (SG.esp && SF.est !== 'con') sfEstado('con'); return aG(SG.esp ? 'Semana del cruce especial: sede contra sede' : 'Sin cruce especial'); }
   });
   socSync();
