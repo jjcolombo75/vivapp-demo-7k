@@ -276,7 +276,7 @@
     // Retomo en un socio nuevo: sin historia en Viva no hay "80 % de la vez pasada" ni "Volviste" (veracidad); la regla del primer mes ya frena la carga sugerida
     if (IA.exp === 'retomo') { ETAPA = 'normal'; $('.app').dataset.etapa = ETAPA; $$('#etPick [data-et]').forEach(y => y.setAttribute('aria-pressed', y.dataset.et === 'normal')); }
     META_SEM = dias; META_PROX = null; OB.res.meta = dias;
-    OB.hecho = true; OB.salt = ['cui'].concat(IA.obj.length ? [] : ['obj']).concat(IA.exp ? [] : ['exp']);   // lo que no preguntó la captación queda para "Contame de vos"
+    OB.hecho = true; OB.salt = ['cui'].concat(IA.obj.length ? [] : ['obj']).concat(IA.exp ? [] : ['exp']);   // lo que no preguntó la captación queda para "Contanos de vos"
     try { nvRefresh(); } catch (e) {}
     $('#inicio .title').textContent = 'Hola, ' + n; go('inicio'); toast('Así arranca tu inicio de socio nuevo');
   });

@@ -314,6 +314,7 @@
   $('#flowShare').addEventListener('click', () => { const tn = zonas()[zonas().length - 1][1], w = tn.split(' ');
     openStory({ type:'ach', a:{ id:'top', t:tn, s:'', big:(w[0] === 'VIVA' ? 'VIVA' : tn).toUpperCase(), unit:(w[0] === 'VIVA' ? w.slice(1).join(' ').toUpperCase() + ' ' : '') + '⚡', cap:'vengo a mi meta todas las semanas', feedT:tn } }); });
   let fitFrom = 'inicio';
+  var FIT_OBJ = 0, FIT_OBJ_ABIERTO = false;   // medición en la que ya contestó el objetivo · la hoja se abrió desde el Índice FIT
   $('#fitBadge').addEventListener('click', () => { fitFrom = 'inicio'; renderFit(); go('fit'); });
   $('#fitBox').addEventListener('click', () => { FIT_NOV = null; fitFrom = 'inicio'; renderFit(); go('fit'); });
   $('#fitBack').addEventListener('click', () => go(fitFrom));
@@ -326,8 +327,16 @@
     const ok = inbodyOk(), dm = u.m - a.m, dg = u.g - a.g;
     el.innerHTML = '<div class="between"><span class="lbl">Tus mediciones</span><span class="src">Ejemplo</span></div>' +
       '<div class="ibgrid"><span></span><b>Músculo</b><b>Grasa</b>' + L.map((x, i) => '<span>' + (i === 0 ? 'Punto de partida · ' : i === L.length - 1 ? 'Última · ' : '') + x.f + '</span><span>' + f(x.m) + ' kg</span><span>' + f(x.g) + ' %</span>').join('') + '</div>' +
-      '<div class="note' + (ok ? ' lime' : '') + '"><span>' + (ok ? '<strong>Cómo cambiaste desde tu punto de partida:</strong> ' + (dm >= 0 ? '+' : '') + f(dm) + ' kg de músculo y ' + (dg >= 0 ? '+' : '') + f(dg) + ' puntos de grasa.' : '<strong>Todavía no se ve un cambio claro.</strong> El cuerpo tarda más que el hábito: seguí con tu ritmo y medite de nuevo en unas semanas.') + '</span></div>';
+      '<div class="note' + (ok ? ' lime' : '') + '"><span>' + (ok ? '<strong>Cómo cambiaste desde tu punto de partida:</strong> ' + (dm >= 0 ? '+' : '') + f(dm) + ' kg de músculo y ' + (dg >= 0 ? '+' : '') + f(dg) + ' puntos de grasa.' : '<strong>Todavía no se ve un cambio claro.</strong> El cuerpo tarda más que el hábito: seguí con tu ritmo y medite de nuevo en unas semanas.') + '</span></div>' + fitObjHtml();
   }
+  // T2 D3 (17/11): con cada medición nueva (cada 12 semanas) se vuelve a preguntar el objetivo, con las mismas cinco opciones (OBJS) y la misma hoja.
+  // El objetivo de la semana 1 envejece: la app no personaliza con un dato viejo. Una vez por medición; si no contesta, se queda el que tenía.
+  function fitObjHtml(){ const o = (OBJ.length ? OBJ : ['forma']).map(k => OBJS.find(x => x[0] === k)[1]).join(' · ');
+    return '<div class="stack" style="gap:8px;border-top:1px solid var(--line);padding-top:12px;margin-top:2px"><span class="lbl">Tu objetivo</span>' + (FIT_OBJ === nIB
+      ? '<span style="line-height:1.5"><b>' + o + '.</b> Te lo volvemos a preguntar en tu próxima medición.</span>'
+      : '<span style="line-height:1.5"><b>¿Sigue siendo esto lo que venís a buscar?</b> Hoy: ' + o + '.</span><div style="display:flex;gap:8px"><button class="btn sm" data-fobj="si" style="flex:1">Sí, sigue</button><button class="btn sm ghost" data-fobj="cambiar" style="flex:1">Cambiarlo</button></div>') + '</div>'; }
+  $('#fitBody').addEventListener('click', e => { const b = e.target.closest('[data-fobj]'); if (!b) return;
+    if (b.dataset.fobj === 'si') { FIT_OBJ = nIB; renderFit(); toast('Listo. Seguimos con ' + objP()[1].toLowerCase()); } else { FIT_OBJ_ABIERTO = true; renderObj(); $('#objSheet').hidden = false; } });
 
   // ===== Tu semana (v30): ecualizador Visitas · Activación · Fuerza · Cardio =====
   // Metas por objetivo principal: valores de demo; los define el profe (configuración por gimnasio). 'v' = igual a la meta de visitas.
@@ -552,12 +561,12 @@
       return '<button class="objopt" data-obj="' + o[0] + '" aria-pressed="' + (i >= 0) + '"><span style="font-weight:700;font-size:16px">' + o[1] + '</span><small>' + o[2] + '</small>' + (i === 0 ? '<em>Principal</em>' : i === 1 ? '<em>Segundo</em>' : '') + '</button>'; }).join('');
   }
   $('#swObj').addEventListener('click', () => { renderObj(); $('#objSheet').hidden = false; });
-  $('#obX').addEventListener('click', () => { $('#objSheet').hidden = true; });
-  $('#objSheet').addEventListener('click', e => { if (e.target.id === 'objSheet') { $('#objSheet').hidden = true; return; }
+  $('#obX').addEventListener('click', () => { $('#objSheet').hidden = true; FIT_OBJ_ABIERTO = false; });
+  $('#objSheet').addEventListener('click', e => { if (e.target.id === 'objSheet') { $('#objSheet').hidden = true; FIT_OBJ_ABIERTO = false; return; }
     const b = e.target.closest('[data-obj]'); if (!b) return; const k = b.dataset.obj, i = OBJ.indexOf(k);
     if (i >= 0) OBJ.splice(i, 1); else { if (OBJ.length >= 2) OBJ.pop(); OBJ.push(k); }
     renderObj(); });
-  $('#obGo').addEventListener('click', () => { $('#objSheet').hidden = true; renderForma(); renderSemanaDet(); toast('Objetivo: ' + objP()[1] + '. Tu semana se ajustó ⚡'); });
+  $('#obGo').addEventListener('click', () => { $('#objSheet').hidden = true; if (FIT_OBJ_ABIERTO) { FIT_OBJ_ABIERTO = false; FIT_OBJ = nIB; renderFit(); } renderForma(); renderSemanaDet(); toast('Objetivo: ' + objP()[1] + '. Tu semana se ajustó ⚡'); });
   $('#semPick').addEventListener('click', e => {
     const b = e.target.closest('[data-sem]'); if (!b) return; semKey = b.dataset.sem; lunesVisto = false; WK = semPreset(semKey);
     if (semKey === 'lunes') semMarcarVistoCero();

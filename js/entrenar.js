@@ -948,10 +948,10 @@
     else if (k === 'later') { OB.later++; OB.reofrecer = OB.later === 1; toast(OB.reofrecer ? 'Dale. Te lo volvemos a ofrecer una sola vez' : 'Listo, no te lo preguntamos más'); go('hoy'); }
     else if (k === 'ver') go('hoy');
   });
-  // "Contame de vos · 30 s" (T2): con el onboarding hecho y algo salteado, una tarjeta discreta y fija en Hoy que pregunta solo lo salteado
+  // "Contanos de vos · 30 s" (T2): con el onboarding hecho y algo salteado, una tarjeta discreta y fija en Hoy que pregunta solo lo salteado
   function obHoy(){ const el = $('#hOnb'); if (!el) return; const contame = OB.hecho && OB.salt.length > 0;
     el.hidden = MOM === 'sesion' || !(contame || (OB.reofrecer && !OB.hecho));
-    $('span', el).innerHTML = contame ? '<b>Contame de vos</b> · 30 s. ' + (OB.salt.length === 1 ? 'Una pregunta' : OB.salt.length + ' preguntas') + ' que salteaste.' : '<b>¿Armamos tu entrenamiento?</b> Son 4 preguntas.';
+    $('span', el).innerHTML = contame ? '<b>Contanos de vos</b> · 30 s. ' + (OB.salt.length === 1 ? 'Una pregunta' : OB.salt.length + ' preguntas') + ' que salteaste.' : '<b>¿Armamos tu entrenamiento?</b> Son 4 preguntas.';
     $('#hOnbNo').hidden = contame; }
   $('#hOnbSi').addEventListener('click', () => { if (OB.hecho && OB.salt.length) { obAbrir(true); return; } OB.reofrecer = false; obAbrir(); OB.step = 'obj'; obRender(); });
   $('#hOnbNo').addEventListener('click', () => { OB.reofrecer = false; OB.later = 2; obHoy(); toast('Listo. Tu objetivo lo podés elegir en Tu semana'); });
