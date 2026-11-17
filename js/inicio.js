@@ -391,7 +391,7 @@
     const dp = nvDisp(); c.hidden = NUEVO == null || dp === 'silencio'; if (c.hidden) return;
     const s = NUEVO, P = 'tu profe <b>' + NV_PROFE + '</b>', rev = s === 4 || s === 8;
     const arriba = !!dp || rev || s === 3, ref = arriba ? $('#formaCard') : $('#mesCard'); if (c.nextElementSibling !== ref) ref.insertAdjacentElement('beforebegin', c);   // con algo que hacer o leer hoy, arriba de Tu ritmo
-    const t = dp === 'alta' ? '<b>Bienvenida a Viva ⚡</b> En tu primera visita, ' + P + ' te recibe, te muestra la sala y te deja la rutina lista. Tu meta: <b>' + META_SEM + ' por semana</b>. Tu profe sabe cuando llegás, para recibirte.'
+    const t = dp === 'alta' ? '<b>Te damos la bienvenida a Viva ⚡</b> En tu primera visita, ' + P + ' te recibe, te muestra la sala y te deja la rutina lista. Tu meta: <b>' + META_SEM + ' por semana</b>. Tu profe sabe cuando llegás, para recibirte.'
       : dp === 'sin7' || dp === 'sin14' ? 'Tu rutina está lista y ' + P + ' te espera para tu primera visita, el día que te quede bien.'
       : dp === 'falta' ? 'Cuando quieras volver, tu rutina está lista y ' + P + ' también.'
       : dp === 'volvio' ? '<b>Volviste ⚡</b> Tu rutina sigue lista y ' + P + ' sabe que llegaste.'

@@ -11,7 +11,7 @@
 
   // IA
   $$('.opts').forEach(g => g.addEventListener('click', e => {
-    const b = e.target.closest('.opt'); if (!b) return;
+    const b = e.target.closest('.opt'); if (!b || !g.dataset.group) return;
     $$('.opt', g).forEach(x => x.setAttribute('aria-pressed', x === b));
   }));
   const val = g => $('.opts[data-group="'+g+'"] .opt[aria-pressed="true"]').textContent;
@@ -23,13 +23,12 @@
     '6': [['Día A · Empuje', 6], ['Día B · Tracción', 6], ['Día C · Piernas', 6], ['Día D · Empuje', 6], ['Día E · Tracción', 6], ['Día F · Piernas', 6]]
   };
   $('#genBtn').addEventListener('click', () => {
-    const obj = val('obj'), nivel = val('nivel'), dias = val('dias'), tiempo = val('tiempo');
-    const lesion = { 'Rodilla':'molestia en la rodilla', 'Espalda baja':'molestia en la espalda baja', 'Hombro':'molestia en el hombro' }[val('lesion')] || '';
+    if (!IA.obj.length) { toast('Elegí qué buscás'); return; }
+    if (!IA.exp) { toast('Contanos cuánto venís entrenando'); return; }
+    const dias = val('dias'), tiempo = val('tiempo'), obj = OBJS.find(o => o[0] === IA.obj[0])[1], ex = OB_EXP.find(x => x[0] === IA.exp)[1];
     $('#resTitle').textContent = obj + ' · ' + dias + ' días';
-    $('#resSub').textContent = 'Nivel ' + nivel.toLowerCase() + ' · ' + tiempo + ' por sesión · 8 semanas';
+    $('#resSub').textContent = (IA.obj[1] ? 'También: ' + OBJS.find(o => o[0] === IA.obj[1])[1].toLowerCase() + ' · ' : '') + ex + ' · ' + tiempo + ' por sesión';
     $('#resDays').innerHTML = planes[dias].map(([n, c]) => '<div><span style="flex:1;font-weight:700">' + n + '</span><span class="small muted">' + c + ' ejercicios</span></div>').join('');
-    $('#resLesion').hidden = !lesion;
-    $('#resLesionTxt').textContent = 'Adaptamos los ejercicios por: ' + lesion + '. Consultá a tu profe si sentís dolor.';
     $('#iaForm').hidden = true; $('#iaLoading').hidden = false;
     setTimeout(() => { $('#iaLoading').hidden = true; $('#iaResult').hidden = false; prepLead(); }, 1400);
   });
@@ -38,7 +37,7 @@
   // Activar rutina generada con IA: queda activa y en curso
   function crearRutinaIA(){
     const dias = val('dias'), keys = Object.keys(lib);
-    return { tipo:'ia', nombre:$('#resTitle').textContent, by:'Generada con IA', sub:'Creada hoy · ' + val('tiempo') + ' por sesión', next:0,
+    return { tipo:'ia', nombre:$('#resTitle').textContent, by:iaDeProfes() ? 'De los profes de Viva' : 'Generada con IA', sub:'Creada hoy · ' + val('tiempo') + ' por sesión', next:0,
       dias: planes[dias].map(([n], i) => ({ k:String.fromCharCode(65 + i), n:n.split(' · ')[1], ex:[keys[i % 7], keys[(i + 2) % 7], keys[(i + 4) % 7]], lbl:['Lun','Mar','Mié','Jue','Vie','Sáb'][i] })) };
   }
   $('#activarBtn').addEventListener('click', () => {
@@ -834,20 +833,30 @@
   // ===== v44 · Onboarding de Entrenar (instrucción, sección 9; propuesta 4 bis) =====
   // Se propone completo la primera vez y decide el socio. Cada pregunta se puede saltear. "Después vemos" lo reofrece una sola vez (en Hoy).
   // Sin peso ni altura: el cuerpo entra por el Índice FIT. Edad y género vienen de EVO. Nunca en medio de una sesión.
-  var OB = { step:'inv', obj:[], zonaAbierta:false, zona:null, meta:3, later:0, reofrecer:false, hecho:false, res:{} };
+  var OB = { step:'inv', obj:[], zonaAbierta:false, zona:null, meta:3, later:0, reofrecer:false, hecho:false, res:{}, salt:[], only:null };
   var OB_STEPS = ['obj', 'exp', 'cui', 'meta'];
-  var OB_EXP = [['arranco', 'Recién arranco', 'Nunca entrené o hace mucho que no'], ['habitual', 'Entreno hace un tiempo', 'Ya conozco las máquinas'], ['avanzado', 'Entreno hace años', 'Sé armar mi rutina']];
+  // T2 (12/11): "Retomo" es la cuarta opción; activa lo que ya existe para el que vuelve (etapa "vuelvo": 80 %, sin carga sugerida)
+  var OB_EXP = [['arranco', 'Recién arranco', 'Nunca entrené'], ['retomo', 'Retomo', 'Entrené antes, dejé y vuelvo a arrancar'], ['habitual', 'Entreno hace un tiempo', 'Ya conozco las máquinas'], ['avanzado', 'Entreno hace años', 'Sé armar mi rutina']];
+  var OB_DEP = ['Fútbol', 'Pádel', 'Running', 'Tenis', 'Básquet', 'Hockey', 'Otro'];
+  const obSteps = () => OB.only || OB_STEPS;
+  function obExp(k){   // Retomo = experiencia Habitual + etapa "vuelvo"
+    EXP = k === 'retomo' ? 'habitual' : k; OB.res.exp = k;
+    if (k === 'retomo') { ETAPA = 'vuelvo'; $('.app').dataset.etapa = ETAPA; $$('#etPick [data-et]').forEach(y => y.setAttribute('aria-pressed', y.dataset.et === 'vuelvo')); }
+    try { renderProg(); } catch (e) {} $$('#expPick [data-exp]').forEach(y => y.setAttribute('aria-pressed', y.dataset.exp === EXP));
+  }
   var OB_ZONAS = ['Hombro', 'Codo', 'Muñeca', 'Espalda', 'Cadera', 'Rodilla', 'Tobillo', 'Otra'];
   var OB_BOLT = '<svg class="vbolt" viewBox="0 0 16 24" aria-hidden="true"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="currentColor"/></svg>';
-  function obAbrir(){
+  function obAbrir(solo){
     if (MOM === 'sesion') { toast('Nunca en medio de una sesión: primero cerrala'); return; }
+    if (solo) { OB.only = OB_STEPS.filter(s => OB.salt.includes(s)); OB.step = OB.only[0]; OB.zonaAbierta = false; OB.zona = null; obRender(); go('onbE'); return; }
+    OB.only = null; OB.salt = []; OB.e60 = ETAPA === '60';   // la edad viene de EVO; en la demo, de la etapa "60 o más" al abrir
     OB.step = 'inv'; OB.obj = []; OB.zonaAbierta = false; OB.zona = null; OB.meta = 3; OB.res = {};
     obRender(); go('onbE');
   }
   function obTop(){
-    const i = OB_STEPS.indexOf(OB.step);
+    const S = obSteps(), i = S.indexOf(OB.step);
     return '<div class="obtop"><button class="iconbtn" data-ob="back" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>' +
-      '<span class="obdots" aria-label="Pregunta ' + (i + 1) + ' de 4">' + OB_STEPS.map((s, k) => '<i class="' + (k <= i ? 'on' : '') + '"></i>').join('') + '</span>' +
+      '<span class="obdots" aria-label="Pregunta ' + (i + 1) + ' de ' + S.length + '">' + S.map((s, k) => '<i class="' + (k <= i ? 'on' : '') + '"></i>').join('') + '</span>' +
       '<button class="link" data-ob="skip" style="padding:0 4px">Saltear</button></div>';
   }
   function obRender(){
@@ -861,7 +870,8 @@
       const L = OBJS.filter(o => !(esMenor() && o[0] === 'ver'));
       h = obTop() + '<span class="h2 obq">¿Qué buscás?</span><p class="obsub">Elegí hasta dos. La primera es la principal.</p>' +
         '<div class="oblist">' + L.map(o => { const i = OB.obj.indexOf(o[0]);
-          return '<button class="objopt" data-obo="' + o[0] + '" aria-pressed="' + (i >= 0) + '"><span style="font-weight:700;font-size:16px">' + o[1] + '</span><small>' + o[2] + '</small>' + (i === 0 ? '<em>Principal</em>' : i === 1 ? '<em>Segundo</em>' : '') + '</button>'; }).join('') + '</div>';
+          return '<button class="objopt" data-obo="' + o[0] + '" aria-pressed="' + (i >= 0) + '"><span style="font-weight:700;font-size:16px">' + o[1] + '</span><small>' + o[2] + '</small>' + (i === 0 ? '<em>Principal</em>' : i === 1 ? '<em>Segundo</em>' : '') + '</button>'; }).join('') + '</div>' +
+        (OB.obj.includes('rend') ? '<span class="small muted" style="font-weight:700;margin-top:6px">¿En qué deporte? <span style="font-weight:400">· opcional</span></span><div class="opts">' + OB_DEP.map(d => '<button class="opt" data-obd="' + d + '" aria-pressed="' + (OB.res.dep === d) + '">' + d + '</button>').join('') + '</div>' : '');
       ft = '<button class="accbtn' + (OB.obj.length ? ' on' : '') + '" data-ob="next"' + (OB.obj.length ? '' : ' disabled') + '><span>Seguir</span></button>';
     } else if (OB.step === 'exp') {
       h = obTop() + '<span class="h2 obq">¿Cuánto venís entrenando?</span><p class="obsub">Así sabemos cuánto explicarte y cuándo subir la carga.</p>' +
@@ -871,13 +881,14 @@
         h = obTop() + '<span class="h2 obq">¿Hay algo que tengamos que cuidar?</span><p class="obsub">Una lesión, un dolor o algo que te molesta. Si hay algo, contáselo a tu profe: Lucas te arma la sesión.</p>' +
           '<div class="oblist"><button class="objopt" data-obc="no"><span style="font-weight:700;font-size:16px">No, nada</span></button><button class="objopt" data-obc="profe"><span style="font-weight:700;font-size:16px">Sí, quiero contarle a mi profe</span><small>No guardamos nada en la app</small></button></div>';
       } else if (OB.zona) {
-        h = obTop() + '<span class="h2 obq">' + (OB.zona === 'Otra' ? 'Lo cuidamos' : 'Cuidamos ' + zonaTxt(OB.zona)) + '</span><div class="obcons"><span class="h2">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina; lo ve tu profe solo si vos querés, y se borra cuando lo das por resuelto.</span>' +
-          '<div class="grid2" style="gap:8px"><button class="btn sm" data-obg="1">Guardar</button><button class="btn ghost sm" data-obg="0">No guardar</button></div></div>';
+        h = obTop() + '<span class="h2 obq">' + (OB.zona === 'Otra' ? 'Lo cuidamos' : 'Cuidamos ' + zonaTxt(OB.zona)) + '</span><div class="obcons"><span class="h2">Un dato de salud</span><span class="muted" style="line-height:1.5">Esto es un dato de salud. Lo guardamos solo para cuidarte en la rutina y se borra cuando lo das por resuelto. Vos elegís si lo ve Lucas.</span>' +
+          '<div class="stack" style="gap:8px"><button class="btn sm" data-obg="1p">Guardar y que lo vea Lucas</button><button class="btn ghost sm" data-obg="1">Guardar solo para mí</button><button class="btn ghost sm" data-obg="0">No guardar</button></div></div>';
       } else {
         h = obTop() + '<span class="h2 obq">¿Hay algo que tengamos que cuidar?</span><p class="obsub">Una lesión, un dolor o una zona que te molesta.</p>' +
           (OB.zonaAbierta
             ? '<div class="opts g2" id="obZ">' + OB_ZONAS.map(z => '<button class="opt" data-obz="' + z + '" style="min-height:52px">' + z + '</button>').join('') + '</div><button class="link lime" data-obc="profe" style="min-height:44px">Prefiero hablarlo con mi profe</button>'
-            : '<div class="oblist"><button class="objopt" data-obc="no"><span style="font-weight:700;font-size:16px">No, nada</span></button><button class="objopt" data-obc="si"><span style="font-weight:700;font-size:16px">Sí, hay algo</span><small>Elegís la zona; la rutina la evita</small></button></div>');
+            : '<div class="oblist"><button class="objopt" data-obc="no"><span style="font-weight:700;font-size:16px">No, nada</span></button><button class="objopt" data-obc="si"><span style="font-weight:700;font-size:16px">Sí, hay algo</span><small>Elegís la zona; la rutina la evita</small></button>' +
+              (OB.e60 ? '<button class="objopt" data-obc="edad"><span style="font-weight:700;font-size:16px">Adaptala a mi edad</span><small>Lucas la ajusta con tu edad en mente</small></button>' : '') + '</div>');
       }
     } else if (OB.step === 'meta') {
       const n = OB.meta;
@@ -887,41 +898,45 @@
         '<p class="obsub" style="margin:0">La cambiás cuando quieras.</p>';
       ft = '<button class="accbtn on" data-ob="next"><span>Dale</span></button>';
     } else if (OB.step === 'fin') {
-      const r = OB.res, o = r.obj && r.obj.length ? r.obj.map(k => OBJS.find(x => x[0] === k)[1]).join(' · ') : 'Lo vemos con tu profe';
+      const r = OB.res, o = r.obj && r.obj.length ? r.obj.map(k => OBJS.find(x => x[0] === k)[1] + (k === 'rend' && r.dep ? ' (' + r.dep.toLowerCase() + ')' : '')).join(' · ') : 'Lo vemos con tu profe';
       const ex = r.exp ? OB_EXP.find(x => x[0] === r.exp)[1] : 'Lo vemos con tu profe';
-      const cu = r.cui === 'no' ? 'Nada' : r.cui === 'profe' ? 'Lo hablás con Lucas' : r.cui === 'guardado' ? zonaTxt(r.zona).replace(/^tu /, '').replace(/^./, c => c.toUpperCase()) : r.cui === 'hoy' ? 'Solo hoy' : 'Sin responder';
+      const cu = r.cui === 'no' ? 'Nada' : r.cui === 'profe' ? 'Lo hablás con Lucas' : r.cui === 'edad' ? 'Tu edad' : r.cui === 'guardado' ? zonaTxt(r.zona).replace(/^tu /, '').replace(/^./, c => c.toUpperCase()) + (MOLESTIA && MOLESTIA.profe ? ' · lo ve Lucas' : ' · solo vos') : r.cui === 'hoy' ? 'Solo hoy' : 'Sin responder';
+      const nada = OB_STEPS.every(s => OB.salt.includes(s));
       const d = rutinas[actual].dias[rutinas[actual].next];
       h = '<div style="height:24px"></div><span class="wktit"><span class="sig">' + firma('Tu rutina está lista') + '</span></span>' +
-        '<p class="sv big">' + OB_BOLT + '<span>Hoy toca el Día ' + d.k + ', ' + d.n.toLowerCase() + '. Ya tiene en cuenta lo que nos contaste.</span></p>' +
+        '<p class="sv big">' + OB_BOLT + '<span>Hoy toca el Día ' + d.k + ', ' + d.n.toLowerCase() + '.</span></p>' +
         '<div class="obres"><div><span>Buscás</span><b>' + o + '</b></div><div><span>Experiencia</span><b>' + ex + '</b></div><div><span>Cuidamos</span><b>' + cu + '</b></div><div><span>Tu meta</span><b>' + (r.meta ? r.meta + ' por semana' : META_SEM + ' por semana') + '</b></div></div>' +
-        '<p class="obsub" style="margin:0">Lucas la revisa con vos en la sala.</p>';
+        '<p class="obsub" style="margin:0">' + (nada ? 'Es la rutina que te armó Lucas, tal cual. Cuando quieras, contanos de vos desde Hoy.' : 'Lucas la ajusta con lo que nos contaste; la revisa con vos en la sala.') + '</p>';
       ft = '<button class="accbtn on" data-ob="ver"><span>Ver tu rutina</span></button>';
     }
     b.innerHTML = h; f.innerHTML = ft; f.hidden = !ft; b.scrollTop = 0;
   }
   function obNext(){
-    const i = OB_STEPS.indexOf(OB.step);
+    const S = obSteps(), i = S.indexOf(OB.step);
+    OB.salt = OB.salt.filter(s => s !== OB.step);
     if (OB.step === 'obj' && OB.obj.length) { OBJ = OB.obj.slice(); OB.res.obj = OBJ.slice(); }
     if (OB.step === 'meta') { const antes = META_SEM; META_SEM = OB.meta; META_PROX = null; OB.res.meta = OB.meta; if (antes !== META_SEM) renderForma(); }
-    OB.step = i < OB_STEPS.length - 1 ? OB_STEPS[i + 1] : 'fin';
+    OB.step = i < S.length - 1 ? S[i + 1] : 'fin';
     if (OB.step === 'fin') obFin(); obRender();
   }
   function obFin(){
-    OB.hecho = true; OB.reofrecer = false;
+    OB.hecho = true; OB.reofrecer = false; OB.only = null;
     try { renderForma(); renderSemanaDet(); renderAcc(); renderHoy(); renderToday(); } catch (e) {}
   }
   $('#obBody').addEventListener('click', e => {
     const a = e.target.closest('[data-ob]');
-    if (a && a.dataset.ob === 'back') { const i = OB_STEPS.indexOf(OB.step); if (OB.step === 'cui' && (OB.zona || OB.zonaAbierta)) { OB.zona = null; OB.zonaAbierta = false; } else OB.step = i <= 0 ? 'inv' : OB_STEPS[i - 1]; obRender(); return; }
-    if (a && a.dataset.ob === 'skip') { if (OB.step === 'obj') OB.obj = []; if (OB.step === 'cui') { OB.zona = null; OB.zonaAbierta = false; } if (OB.step === 'meta') OB.meta = META_SEM; OB_STEPS.indexOf(OB.step) === 3 ? (OB.step = 'fin', obFin()) : (OB.step = OB_STEPS[OB_STEPS.indexOf(OB.step) + 1]); obRender(); return; }
+    const S = obSteps();
+    if (a && a.dataset.ob === 'back') { const i = S.indexOf(OB.step); if (OB.step === 'cui' && (OB.zona || OB.zonaAbierta)) { OB.zona = null; OB.zonaAbierta = false; } else if (i <= 0 && OB.only) { OB.only = null; go('hoy'); return; } else OB.step = i <= 0 ? 'inv' : S[i - 1]; obRender(); return; }
+    if (a && a.dataset.ob === 'skip') { if (!OB.salt.includes(OB.step)) OB.salt.push(OB.step); if (OB.step === 'obj') OB.obj = []; if (OB.step === 'cui') { OB.zona = null; OB.zonaAbierta = false; } if (OB.step === 'meta') OB.meta = META_SEM; S.indexOf(OB.step) === S.length - 1 ? (OB.step = 'fin', obFin()) : (OB.step = S[S.indexOf(OB.step) + 1]); obRender(); return; }
+    const dp = e.target.closest('[data-obd]'); if (dp) { OB.res.dep = OB.res.dep === dp.dataset.obd ? null : dp.dataset.obd; obRender(); return; }
     const o = e.target.closest('[data-obo]'); if (o) { const k = o.dataset.obo, i = OB.obj.indexOf(k); if (i >= 0) OB.obj.splice(i, 1); else { if (OB.obj.length >= 2) OB.obj.pop(); OB.obj.push(k); } obRender(); return; }
-    const x = e.target.closest('[data-obx]'); if (x) { EXP = x.dataset.obx; OB.res.exp = EXP; renderProg(); $$('#expPick [data-exp]').forEach(y => y.setAttribute('aria-pressed', y.dataset.exp === EXP)); x.setAttribute('aria-pressed', 'true'); setTimeout(obNext, 220); return; }
+    const x = e.target.closest('[data-obx]'); if (x) { obExp(x.dataset.obx); x.setAttribute('aria-pressed', 'true'); setTimeout(obNext, 220); return; }
     const c = e.target.closest('[data-obc]'); if (c) { const k = c.dataset.obc;
       if (k === 'si') { OB.zonaAbierta = true; obRender(); return; }
-      OB.res.cui = k; if (k === 'profe') toast('Listo. Lucas lo charla con vos en la sala ⚡'); obNext(); return; }
+      OB.res.cui = k; if (k === 'profe') toast('Listo. Lucas lo charla con vos en la sala ⚡'); if (k === 'edad') toast('Listo. Lucas la ajusta con tu edad en mente'); obNext(); return; }
     const z = e.target.closest('[data-obz]'); if (z) { OB.zona = z.dataset.obz; obRender(); return; }
     const g = e.target.closest('[data-obg]'); if (g) {
-      if (g.dataset.obg === '1') { MOLESTIA = { zona:OB.zona, bien:0 }; OB.res.cui = 'guardado'; OB.res.zona = OB.zona; ETAPA = 'molestia'; $('.app').dataset.etapa = ETAPA; $$('#etPick [data-et]').forEach(y => y.setAttribute('aria-pressed', y.dataset.et === 'molestia')); try { chkReset(); } catch (e2) {} toast('Guardado. Te vamos a preguntar cómo está ' + zonaTxt(OB.zona)); }
+      if (g.dataset.obg !== '0') { MOLESTIA = { zona:OB.zona, bien:0, profe:g.dataset.obg === '1p' }; OB.res.cui = 'guardado'; OB.res.zona = OB.zona; ETAPA = 'molestia'; $('.app').dataset.etapa = ETAPA; $$('#etPick [data-et]').forEach(y => y.setAttribute('aria-pressed', y.dataset.et === 'molestia')); try { chkReset(); } catch (e2) {} toast('Guardado. Te vamos a preguntar cómo está ' + zonaTxt(OB.zona)); }
       else { OB.res.cui = 'hoy'; CUIDA = OB.zona; toast('No lo guardamos. Hoy lo cuidamos igual'); }
       OB.zona = null; OB.zonaAbierta = false; obNext(); return; }
     const m = e.target.closest('[data-obm]'); if (m) { OB.meta = Math.max(2, Math.min(5, OB.meta + +m.dataset.obm)); obRender(); return; }
@@ -933,10 +948,32 @@
     else if (k === 'later') { OB.later++; OB.reofrecer = OB.later === 1; toast(OB.reofrecer ? 'Dale. Te lo volvemos a ofrecer una sola vez' : 'Listo, no te lo preguntamos más'); go('hoy'); }
     else if (k === 'ver') go('hoy');
   });
-  function obHoy(){ const el = $('#hOnb'); if (el) el.hidden = !(OB.reofrecer && !OB.hecho && MOM !== 'sesion'); }
-  $('#hOnbSi').addEventListener('click', () => { OB.reofrecer = false; obAbrir(); OB.step = 'obj'; obRender(); });
+  // "Contame de vos · 30 s" (T2): con el onboarding hecho y algo salteado, una tarjeta discreta y fija en Hoy que pregunta solo lo salteado
+  function obHoy(){ const el = $('#hOnb'); if (!el) return; const contame = OB.hecho && OB.salt.length > 0;
+    el.hidden = MOM === 'sesion' || !(contame || (OB.reofrecer && !OB.hecho));
+    $('span', el).innerHTML = contame ? '<b>Contame de vos</b> · 30 s. ' + (OB.salt.length === 1 ? 'Una pregunta' : OB.salt.length + ' preguntas') + ' que salteaste.' : '<b>¿Armamos tu entrenamiento?</b> Son 4 preguntas.';
+    $('#hOnbNo').hidden = contame; }
+  $('#hOnbSi').addEventListener('click', () => { if (OB.hecho && OB.salt.length) { obAbrir(true); return; } OB.reofrecer = false; obAbrir(); OB.step = 'obj'; obRender(); });
   $('#hOnbNo').addEventListener('click', () => { OB.reofrecer = false; OB.later = 2; obHoy(); toast('Listo. Tu objetivo lo podés elegir en Tu semana'); });
   $('#verPrim').addEventListener('click', () => { $('#demoSheet').hidden = true; OB.hecho = false; OB.later = 0; OB.reofrecer = false; obAbrir(); });
+  // ---- T2 · Formulario de la rutina (captación, pago por uso y socio): objetivo y experiencia desde OBJS y OB_EXP ----
+  var IA = { obj:[], exp:null };
+  function iaDeProfes(){ return leadMode || modo === 'ppu'; }   // al que no es socio, la rutina se elige entre las plantillas de los profes (piso, dueno.md 35)
+  function iaForm(){
+    const prof = iaDeProfes();
+    $('#iaPillT').textContent = prof ? 'RUTINAS DE LOS PROFES' : 'RUTINA CON IA';
+    $('#iaLoadT').textContent = prof ? 'Buscando entre las rutinas de los profes…' : 'Armando tu rutina…';
+    $('#resProfe').hidden = !prof;
+    $('#resProfeTxt').textContent = leadMode ? 'Elegida entre las rutinas que armaron los profes de Viva. Un profe la revisa con vos en tu primera visita.' : 'Elegida entre las rutinas que armaron los profes de Viva. Un profe la revisa con vos en la sala.';
+    $('#iaObj').innerHTML = OBJS.map(o => { const i = IA.obj.indexOf(o[0]); return '<button class="objopt" data-iao="' + o[0] + '" aria-pressed="' + (i >= 0) + '"><span style="font-weight:700">' + o[1] + '</span><small>' + o[2] + '</small>' + (i === 0 ? '<em>Principal</em>' : i === 1 ? '<em>Segundo</em>' : '') + '</button>'; }).join('');
+    $('#iaExp').innerHTML = OB_EXP.map(x => '<button class="objopt" data-iax="' + x[0] + '" aria-pressed="' + (IA.exp === x[0]) + '"><span style="font-weight:700">' + x[1] + '</span><small>' + x[2] + '</small></button>').join('');
+  }
+  $('#iaForm').addEventListener('click', e => {
+    const o = e.target.closest('[data-iao]'); if (o) { const k = o.dataset.iao, i = IA.obj.indexOf(k); if (i >= 0) IA.obj.splice(i, 1); else { if (IA.obj.length >= 2) IA.obj.pop(); IA.obj.push(k); } iaForm(); return; }
+    const x = e.target.closest('[data-iax]'); if (x) { IA.exp = x.dataset.iax; iaForm(); }
+  });
+  document.addEventListener('click', e => { if (e.target.closest('[data-go="ia"],#leadStart,#nLead')) setTimeout(iaForm, 0); });
+  iaForm();
 //#bloque 306
   // ===== v46 · T7 El acompañante (docs/tickets/T7-el-acompanante.md) =====
   // Quien lleva la sesión es este motor determinista: rutina, tiempos, registro "como estaba indicado" y plantillas.

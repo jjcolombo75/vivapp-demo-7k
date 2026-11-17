@@ -24,8 +24,6 @@
   function renderLanding(){
     const col = { low:'var(--ok)', mid:'var(--orange)', high:'var(--pink)', full:'var(--pink)' };
     $('#lOcc').innerHTML = sedesPPU.map(x => { const [lv, c] = nivel(x.occ); return '<div class="lsede"><span class="hdot oc-' + c + '" style="background:' + col[c] + '"></span><span style="flex:1;font-weight:500">' + x.n + '</span><span class="small muted">' + (c === 'low' ? 'Poca gente' : c === 'mid' ? 'Gente moderada' : 'Mucha gente') + '</span></div>'; }).join('');
-    const pr = sedesPPU.map(x => precio(x.occ)).filter(x => x !== null);
-    $('#lDesde').textContent = 'Desde ' + money(Math.min.apply(null, pr)) + ' ahora';
     $('#hsTrial').textContent = mitad() ? 'Probala a mitad de precio con un profe' : 'Probala gratis con un profe';
   }
   document.addEventListener('click', e => { if (e.target.closest('[data-group="gancho"]')) setTimeout(renderLanding, 0); });
@@ -45,47 +43,37 @@
   $('#logout').addEventListener('click', () => { step(0); go('login'); });
 
 //#bloque 110
-  // ===== Pago por uso (valores de ejemplo, configurables desde Viva Gestión) =====
-  const cfg = { ventana:30, tope:90, base:5000, tramos:[[40,1],[70,1.3],[101,1.6]] };
+  // ===== Pase del día a precio fijo (T2; alcance 4, dueno.md 20). Precio: [PRECIO] hasta que Viva lo mande. Cierre de las sedes: ejemplo =====
+  const PRECIO = '[PRECIO]', cfg = { tope:90, cierre:'22:00' };
   const sedesPPU = [
     { id:'sar', n:'Sarmiento', occ:34 }, { id:'lyp', n:'López y Planes', occ:57 },
     { id:'cor', n:'Corrientes', occ:74 }, { id:'alb', n:'Alberdi', occ:92 }, { id:'sta', n:'Santa Ana', occ:22 }, { id:'pos', n:'Posadas', occ:41 }
   ];
-  const money = n => '$' + Math.round(n).toLocaleString('es-AR');
-  const precio = o => { if (o >= cfg.tope) return null; const t = cfg.tramos.find(x => o < x[0]); return Math.round(cfg.base * t[1] / 100) * 100; };
-  const nivel = o => o >= cfg.tope ? ['Completa','full'] : o >= 70 ? ['Alta','high'] : o >= 40 ? ['Media','mid'] : ['Baja','low'];
-  $$('.vent').forEach(el => el.textContent = cfg.ventana);
-  let selSede = null, ago = 0, pase = null, saldo = 0;
+  const nivel = o => o >= cfg.tope ? ['Llena ahora','full'] : o >= 70 ? ['Mucha gente','high'] : o >= 40 ? ['Gente moderada','mid'] : ['Poca gente','low'];
+  let selSede = null, ago = 0, pase = null;
 
   function renderPPU(){
     $('#ppuList').innerHTML = sedesPPU.map(s => {
-      const pr = precio(s.occ), [lv, cls] = nivel(s.occ);
-      return '<button class="sede ' + cls + '" data-sede="' + s.id + '"' + (pr === null ? ' aria-disabled="true"' : '') + '>' +
+      const [lv, cls] = nivel(s.occ);
+      return '<button class="sede ' + cls + '" data-sede="' + s.id + '">' +
         '<span class="stack" style="gap:6px;flex:1;min-width:0"><span style="font-weight:700;font-size:16px">' + s.n + '</span>' +
         '<span class="occ sm"><i style="width:' + s.occ + '%"></i></span>' +
         '<span class="small"><span class="lv">' + lv + '</span> · ' + s.occ + '% de ocupación</span></span>' +
-        (pr === null ? '<span class="pill bad">COMPLETA</span>' : '<span class="num" style="font-size:26px">' + money(pr) + '</span>') +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>' +
         '</button>';
     }).join('');
-    const ok = sedesPPU.map(s => precio(s.occ)).filter(x => x !== null);
-    $('#nDesde').textContent = ok.length ? 'Desde ' + money(Math.min.apply(null, ok)) + ' ahora' : 'Todas las sedes completas ahora';
   }
   function renderCotiza(){
     if (!selSede) return;
-    const s = sedesPPU.find(x => x.id === selSede), pr = precio(s.occ), [lv, cls] = nivel(s.occ);
+    const s = sedesPPU.find(x => x.id === selSede), [lv, cls] = nivel(s.occ);
     $('#cSede').textContent = s.n;
     $('#cOcc').textContent = s.occ + '%'; $('#cLvl').textContent = lv;
     $('#cBar').style.width = s.occ + '%'; $('#cBar').className = cls;
-    $('#cPrice').textContent = pr === null ? 'Completa' : money(pr);
-    const b = $('#payBtn'); b.disabled = pr === null; b.style.opacity = pr === null ? .4 : 1;
-    const usa = pr === null ? 0 : Math.min(saldo, pr), apagar = pr === null ? 0 : pr - usa;
-    $('#cSaldo').hidden = !saldo; $('#cSaldo').textContent = 'Tenés ' + money(saldo) + ' de saldo a favor (vence en 60 días): lo descontamos solo.';
-    $('#payTxt').textContent = pr === null ? 'Sede completa en este momento' : apagar === 0 ? 'Entrar con mi saldo a favor' : 'Pagar ' + money(apagar) + ' con Mercado Pago';
+    $('#cLleno').hidden = s.occ < cfg.tope;
   }
   $('#ppuList').addEventListener('click', e => {
     const b = e.target.closest('[data-sede]'); if (!b) return;
     const s = sedesPPU.find(x => x.id === b.dataset.sede);
-    if (precio(s.occ) === null) { toast(s.n + ' está completa ahora. Probá otra sede.'); return; }
     selSede = s.id; renderCotiza(); go('cotiza');
   });
 
@@ -98,66 +86,48 @@
     });
     ago = 0; renderPPU(); renderCotiza(); renderOcc();
   }, 4000);
-  setInterval(() => { ago++; $('#ppuAgo').textContent = ago; tickPase(); }, 1000);
+  setInterval(() => { ago++; $('#ppuAgo').textContent = ago; }, 1000);
 
   // Pago (simulado) y pase
   const hhmm = d => String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
   $('#payBtn').addEventListener('click', () => requireFicha(() => {
-    const s = sedesPPU.find(x => x.id === selSede), pr = precio(s.occ); if (pr === null) return;
-    const usa = Math.min(saldo, pr), apagar = pr - usa;
+    const s = sedesPPU.find(x => x.id === selSede);
     const activar = () => {
-      saldo -= usa; const now = ahora();
-      pase = { sede:s.n, paid:pr, at:now, until:new Date(now.getTime() + cfg.ventana * 60000), estado:'activo' };
-      consumos.unshift({ d:now, sede:s.n, monto:apagar }); paintPase(); go('pase');
+      const now = ahora();
+      pase = { sede:s.n, at:now, estado:'activo' };
+      consumos.unshift({ d:now, sede:s.n }); paintPase(); go('pase');
     };
-    if (!apagar) { activar(); toast('Usaste tu saldo a favor'); return; }
     $('#mpSheet').hidden = false; $('#mpWait').hidden = false; $('#mpOk').hidden = true;
     setTimeout(() => {
-      $('#mpWait').hidden = true; $('#mpOk').hidden = false; $('#mpOkTxt').textContent = 'Acreditado en Viva Fit House · ' + money(apagar);
+      $('#mpWait').hidden = true; $('#mpOk').hidden = false; $('#mpOkTxt').textContent = 'Acreditado en Viva Fit House · Pase del día ' + PRECIO;
       setTimeout(() => { $('#mpSheet').hidden = true; activar(); }, 1300);
     }, 1600);
   }));
-  function vencer(){
-    if (!pase || pase.estado !== 'activo') return;
-    pase.estado = 'vencido'; saldo += pase.paid;
-    $('#pVencTxt').textContent = 'Pasaron los ' + cfg.ventana + ' minutos. Los ' + money(pase.paid) + ' quedaron como saldo a favor para tu próximo ingreso. Vence en 60 días.';
-    paintPase(); renderCotiza(); toast('Quedó como saldo a favor');
-  }
   function paintPase(){
     if (!pase) return;
-    $('#pSede').textContent = pase.sede; $('#pPaid').textContent = money(pase.paid);
-    $('#pAt').textContent = hhmm(pase.at); $('#pUntil').textContent = hhmm(pase.until);
-    $('#pActivo').hidden = pase.estado !== 'activo'; $('#pDentro').hidden = pase.estado !== 'dentro'; $('#pVencido').hidden = pase.estado !== 'vencido';
+    $('#pSede').textContent = pase.sede; $('#pPaid').textContent = PRECIO;
+    $('#pAt').textContent = hhmm(pase.at); $('#pUntil').textContent = cfg.cierre;
+    $('#pActivo').hidden = pase.estado !== 'activo'; $('#pDentro').hidden = pase.estado !== 'dentro';
     $('#pDemo').hidden = pase.estado !== 'activo';
     $('#nPase').hidden = pase.estado !== 'activo';
+    $('#nPaseTxt').textContent = pase.sede + ' · vale hoy hasta las ' + cfg.cierre;
     renderPpuHome();
-    tickPase();
-  }
-  function tickPase(){
-    if (!pase || pase.estado !== 'activo') return;
-    const left = Math.max(0, Math.round((pase.until - +ahora()) / 1000));
-    const t = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
-    $('#pCount').textContent = t;
-    $('#pBar').style.width = (left / (cfg.ventana * 60) * 100).toFixed(1) + '%';
-    $('#nPaseTxt').textContent = pase.sede + ' · quedan ' + t + ' para entrar';
-    if (left === 0) vencer();
   }
   $('#simIngreso').addEventListener('click', () => {
     pase.estado = 'dentro'; pase.inAt = ahora(); $('#pDentroTxt').textContent = pase.sede + ' · ' + hhmm(ahora()) + '. ¡Buen entrenamiento!';
     paintPase(); toast('Molinete habilitado');
   });
-  $('#simVence').addEventListener('click', () => { pase.until = ahora(); vencer(); });
   renderPPU();
 
   // ===== Inicio y entrenamientos de pago por uso =====
   const diasAtras = (n, h, m) => { const d = ahora(); d.setDate(d.getDate() - n); d.setHours(h, m, 0, 0); return d; };
   const consumos = [
-    { d:diasAtras(3, 18, 40), sede:'López y Planes', monto:6500 },
-    { d:diasAtras(7, 10, 5), sede:'Sarmiento', monto:5000 },
-    { d:diasAtras(14, 19, 30), sede:'López y Planes', monto:8000 }
+    { d:diasAtras(3, 18, 40), sede:'López y Planes' },
+    { d:diasAtras(7, 10, 5), sede:'Sarmiento' },
+    { d:diasAtras(14, 19, 30), sede:'López y Planes' }
   ];
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  const franjas = [['7',6500],['9',5000],['11',5000],['13',5000],['15',5000],['17',6500],['19',8000],['21',6500]];
+  const franjas = [['7',48],['9',24],['11',20],['13',28],['15',22],['17',62],['19',86],['21',54]];   // ocupación promedio (%), simulada desde las entradas
   rutinas.ppu = null;
 
   function renderPpuHome(){
@@ -165,38 +135,35 @@
     try { const s = ahora().toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' }); $('#phHoy').textContent = s.charAt(0).toUpperCase() + s.slice(1); } catch(_){}
     // Estado del pase de hoy
     let h = '';
-    if (!pase) h = '<span class="lbl">Sin pase hoy</span><button class="btn sm" data-go="ppu">Pagar un ingreso</button>';
-    else if (pase.estado === 'activo') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill">ACTIVO</span></div><span class="h2">Entrá antes de las ' + hhmm(pase.until) + '</span><button class="btn sm" data-go="pase">Ver mi pase</button>';
+    if (!pase) h = '<span class="lbl">Sin pase hoy</span><button class="btn sm" data-go="ppu">Sacar el pase del día</button>';
+    else if (pase.estado === 'activo') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill">ACTIVO</span></div><span class="h2">Vale hasta las ' + cfg.cierre + '</span><button class="btn sm" data-go="pase">Ver tu pase</button>';
     else if (pase.estado === 'dentro') h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill gris">USADO</span></div><span class="h2">Ingresaste a las ' + hhmm(pase.inAt || ahora()) + '</span><span class="small muted">¡Buen entrenamiento! Tu rutina está en la pestaña Entrenamientos.</span>';
-    else h = '<div class="between"><span class="lbl">Pase de hoy · ' + pase.sede + '</span><span class="pill gris">SIN USAR</span></div><span class="h2">Tenés ' + money(saldo) + ' de saldo a favor</span><span class="small muted">No llegaste a entrar a tiempo: no perdiste nada.</span><button class="btn sm" data-go="ppu">Usar mi saldo</button>';
     $('#phPase').innerHTML = h;
     // Estadísticas del mes
     const now = ahora(), mes = consumos.filter(c => c.d.getMonth() === now.getMonth() && c.d.getFullYear() === now.getFullYear());
     $('#phCount').textContent = mes.length;
-    $('#phSum').textContent = money(mes.reduce((a, c) => a + c.monto, 0));
     $('#phMes').textContent = meses[now.getMonth()];
-    // Empujón a plan: lo pagado por uso se descuenta del primer mes
-    const gast = mes.reduce((a, c) => a + c.monto, 0);
-    const pagos = mes.filter(c => c.monto > 0).length;
+    // Con 2 pases o más en el mes, te conviene un plan; lo pagado en pases se descuenta del primer mes
+    const pagos = mes.length;
     $('#phNudge').hidden = pagos < 2;
-    $('#phNudge').innerHTML = '<span class="lbl">¿Venís seguido?</span><span style="font-weight:700;font-size:18px;line-height:1.3">Este mes ya pagaste ' + pagos + ' ingresos: ' + money(gast) + '.</span><span class="small muted" style="line-height:1.45">Si te pasás al plan mensual, te descontamos esos ' + money(gast) + ' del primer mes (hasta la mitad de la cuota).</span><button class="btn sm" data-go="planes">Ver planes</button>';
-    $('#plNudge').hidden = !gast; $('#plNudge').textContent = 'Te descontamos los ' + money(gast) + ' que pagaste por uso este mes, hasta la mitad del primer mes.';
+    $('#phNudge').innerHTML = '<span class="lbl">¿Venís seguido?</span><span style="font-weight:700;font-size:18px;line-height:1.3">Este mes ya viniste ' + pagos + ' veces con el pase del día.</span><span class="small muted" style="line-height:1.45">Con 2 o más pases en el mes, te conviene un plan. Lo que pagaste en pases este mes se descuenta del primer mes, hasta la mitad de la cuota.</span><button class="btn sm" data-go="planes">Ver planes</button>';
+    $('#plNudge').hidden = !pagos; $('#plNudge').textContent = 'Te descontamos lo que pagaste en pases este mes, hasta la mitad del primer mes.';
     // Mejores horarios
     const sede = pase ? pase.sede : 'López y Planes';
     $('#phSede').textContent = sede;
     const max = Math.max.apply(null, franjas.map(f => f[1])), min = Math.min.apply(null, franjas.map(f => f[1]));
-    $('#phChart').innerHTML = franjas.map(f => '<span class="hb' + (f[1] === min ? ' best' : '') + '" style="height:' + Math.round(f[1] / max * 100) + '%" title="' + f[0] + ' h · ' + money(f[1]) + '"><em>' + (f[1] / 1000).toLocaleString('es-AR') + 'k</em></span>').join('');
+    $('#phChart').innerHTML = franjas.map(f => '<span class="hb' + (f[1] === min ? ' best' : '') + '" style="height:' + Math.round(f[1] / max * 100) + '%" title="' + f[0] + ' h · ' + f[1] + ' %"><em>' + f[1] + '%</em></span>').join('');
     $('#phLabels').innerHTML = franjas.map(f => '<span>' + f[0] + ' h</span>').join('');
-    $('#phTip').textContent = 'Lo más barato en ' + sede + ': de 9 a 16 h, ' + money(min) + ' promedio.';
+    $('#phTip').textContent = 'Con menos gente en ' + sede + ': de 9 a 16 h.';
     // Consumos
     $('#phList').innerHTML = consumos.map(c => '<div><span class="stack" style="gap:2px;flex:1"><span style="font-weight:700">' + c.sede + '</span><span class="small muted">' +
-      c.d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit' }) + ' · ' + hhmm(c.d) + '</span></span><span style="font-weight:700">' + (c.monto ? money(c.monto) : 'Saldo a favor') + '</span></div>').join('');
+      c.d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit' }) + ' · ' + hhmm(c.d) + '</span></span><span class="small muted">Pase del día</span></div>').join('');
   }
 
   function renderPpuTrain(){
     const r = rutinas.ppu;
-    if (!r) { $('#ptList').innerHTML = '<div class="card" style="align-items:center;text-align:center"><span class="h2">Todavía no tenés rutina</span><span class="small muted">Contanos tu objetivo y la IA te arma una rutina con las máquinas de la sede.</span></div>'; return; }
-    $('#ptList').innerHTML = '<div class="card rut cur"><div class="between"><span class="pill ia">GENERADA CON IA</span><span class="pill">EN CURSO</span></div>' +
+    if (!r) { $('#ptList').innerHTML = '<div class="card" style="align-items:center;text-align:center"><span class="h2">Todavía no tenés rutina</span><span class="small muted">Contanos qué buscás y te mostramos la rutina de los profes de Viva que va con vos, con las máquinas de tu sede.</span></div>'; return; }
+    $('#ptList').innerHTML = '<div class="card rut cur"><div class="between"><span class="pill ia">DE LOS PROFES DE VIVA</span><span class="pill">EN CURSO</span></div>' +
       '<div class="stack" style="gap:4px"><span class="h2">' + r.nombre + '</span><span class="small muted">' + r.sub + '</span></div>' +
       '<div class="days" style="grid-template-columns:repeat(' + r.dias.length + ',minmax(0,1fr))">' +
       r.dias.map((d, i) => '<button class="day ' + (i < r.next ? 'done' : i === r.next ? 'today' : '') + '" data-pstart="' + i + '"><b>' + d.k + '</b><span>' + (i < r.next ? 'Hecho' : i === r.next ? 'Hoy' : d.lbl) + '</span></button>').join('') +
@@ -269,7 +236,7 @@
     $('#plNudge').hidden = !planOffer && $('#plNudge').hidden; if (planOffer) { $('#plNudge').hidden = false; $('#plNudge').innerHTML = '<span><strong>20% en tu primer mes</strong> por haber venido a tu primera visita. Válido hasta el ' + vence48() + '.</span>'; }
     const r = $('#nRut'), tiene = !!(rutinas.lead && leadSaved);
     r.hidden = !tiene;
-    if (tiene) r.innerHTML = '<div class="between"><span class="pill ia">GENERADA CON IA</span><span class="small muted">Se revisa después de tu visita</span></div><span class="h2">' + rutinas.lead.nombre + '</span><div class="note"><span class="avatar" style="width:30px;height:30px;font-size:11px">LP</span><span>Después de tu primera visita, un profe la ajusta a vos y te avisa por WhatsApp.</span></div><button class="btn ghost sm" id="nRutVer">Ver mi rutina</button>';
+    if (tiene) r.innerHTML = '<div class="between"><span class="pill ia">DE LOS PROFES DE VIVA</span><span class="small muted">Se revisa en tu visita</span></div><span class="h2">' + rutinas.lead.nombre + '</span><div class="note"><span class="avatar" style="width:30px;height:30px;font-size:11px">LP</span><span>La elegimos entre las rutinas de los profes. En tu primera visita, un profe la ajusta a vos.</span></div><button class="btn ghost sm" id="nRutVer">Ver mi rutina</button>';
     $('#nLead').hidden = tiene;
   }
   $('#nuevo').addEventListener('click', e => {
@@ -291,15 +258,28 @@
       }, 1600);
     });
   });
+  const semTxt = n => n === 1 ? 'una semana' : 'unas ' + n + ' semanas';
   function altaSocio(plan){
     $('#altaPlan').textContent = plan + (plan.includes('3 veces') ? ' · tu sede' : ' · todas las sedes') + (planOffer ? ' · 20% en el primer mes' : '');
     // Forma de alguien que arranca: solo su primera visita (TAU 42 días, meta 4 por semana)
-    const m = 3, f0 = Math.max(1, Math.round((1 / 42) / (m / 7) * 100)), zs = zonas();
+    const m = Math.max(2, Math.min(5, +val('dias') || 3)), f0 = Math.max(1, Math.round((1 / 42) / (m / 7) * 100)), zs = zonas();
     $('#altaF').textContent = f0;
-    $('#altaTxt').textContent = 'Tu meta: ' + m + ' veces por semana' + (plan.includes('3 veces') ? ', la de tu plan' : ' (la cambiás cuando quieras)') + '. Si la cumplís, en unas ' + semHasta(zs[1][0]) + ' semanas pasás a ' + zs[1][1] + ' y en unas ' + semHasta(zs[2][0]) + ', a ' + zs[2][1] + '.';
+    $('#altaTxt').textContent = 'Tu meta: ' + m + ' veces por semana' + (plan.includes('3 veces') ? ', la de tu plan' : ' (la cambiás cuando quieras)') + '. Si la cumplís, en ' + semTxt(semHasta(zs[1][0])) + ' pasás a ' + zs[1][1] + ' y en ' + semTxt(semHasta(zs[2][0])) + ', a ' + zs[2][1] + '.';
     go('alta');
   }
-  $('#altaGo').addEventListener('click', () => { const n = $('#nName').textContent; $('#inicio .title').textContent = 'Hola, ' + n; go('inicio'); toast('Bienvenido, ' + n + ' · la demo sigue con datos de una socia con historia'); });
+  $('#altaGo').addEventListener('click', () => {
+    const n = $('#nName').textContent, dias = Math.max(2, Math.min(5, +val('dias') || 3));
+    const nv = $('#demoSheet [data-nv="0"]'); if (nv) nv.click();   // socio nuevo, recién dado de alta (T11)
+    $('#demoSheet').hidden = true;
+    if (IA.obj.length) { OBJ = IA.obj.slice(); OB.res.obj = OBJ.slice(); }
+    if (IA.exp) obExp(IA.exp);
+    // Retomo en un socio nuevo: sin historia en Viva no hay "80 % de la vez pasada" ni "Volviste" (veracidad); la regla del primer mes ya frena la carga sugerida
+    if (IA.exp === 'retomo') { ETAPA = 'normal'; $('.app').dataset.etapa = ETAPA; $$('#etPick [data-et]').forEach(y => y.setAttribute('aria-pressed', y.dataset.et === 'normal')); }
+    META_SEM = dias; META_PROX = null; OB.res.meta = dias;
+    OB.hecho = true; OB.salt = ['cui'].concat(IA.obj.length ? [] : ['obj']).concat(IA.exp ? [] : ['exp']);   // lo que no preguntó la captación queda para "Contame de vos"
+    try { nvRefresh(); } catch (e) {}
+    $('#inicio .title').textContent = 'Hola, ' + n; go('inicio'); toast('Así arranca tu inicio de socio nuevo');
+  });
 
   // DNI y deslinde: recién antes del primer ingreso
   let fichaCb = null;
