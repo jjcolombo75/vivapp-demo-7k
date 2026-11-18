@@ -2429,9 +2429,20 @@
   function shBarra(){
     const ppl = SH.people && !shMen();
     return '<header class="shbar"><button class="shmas" type="button" data-shmas aria-label="Crear una placa">' + shTr('mas', '#fff', 24, 2.4) + '</button>' +
-      '<h1 class="shtit">SOCIAL</h1>' +
-      '<button class="shent" type="button" data-shdes>' + shTr('duelo', '#eef2f8', 22) + '<span>Desafíos</span></button>' +
+      '<h1 class="shtit">SOCIAL</h1>' + shMiIns() +
       (ppl ? '<button class="shent" type="button" data-shppl>' + shTr('chispa', '#eef2f8', 22) + '<span>People</span></button>' : '') + '</header>';
+  }
+  // Tu insignia, fija en la barra: con banda o dúo abre su hoja; sola, la tuya (o elegirla, el día 1)
+  function shMiIns(){
+    const banda = SH.perfil === 'banda', duo = SH.perfil === 'duo' && !shMen(), elegir = !banda && !duo && SH.dia === 1 && !SH.ins;
+    const ins = banda ? shEmb('Dúo dinamita', 46, shSincro(shBan('dd'), shHoy())) : duo ? shDuo(46) : elegir ? shHueco(46) : shPer('Sofi', 46);
+    const w = banda ? 'Tu banda' : duo ? 'Tu dúo' : elegir ? 'Elegila' : 'Vos';
+    return '<button class="shmiins" type="button" data-shmiins aria-label="' + (banda ? 'Dúo dinamita, tu banda' : duo ? 'Sofi y Cami, tu dúo' : elegir ? 'Elegí tu insignia' : 'Tu insignia') + '">' + ins + '<span>' + w + '</span></button>';
+  }
+  function shYoHoja(){
+    shHoja('<div class="shbh">' + shPer('Sofi', 56) + '<span class="stack" style="gap:3px"><span class="mtitle sig">Sofi</span><span class="small muted">Sarmiento · meta ' + shMeta('sofi') + ' por semana</span></span></div>' +
+      '<span class="muted" style="line-height:1.45">Tu insignia la ves vos y quienes vos elegís. Con alguien que ya conocés, arman dúo: cada semana que cumplen las dos, se enciende un tubo.</span>' +
+      (shMen() ? '' : shOpc('data-shinv', shTr('wa', SH_C.c, 24), 'Armar dúo', 'Le llega por WhatsApp con tu día y tu sede.')));
   }
   function shRender(){
     const c = $('#shIn'); if (!c) return;
@@ -2591,6 +2602,7 @@
     if ((b = q('[data-shig]'))) { toast('Se abre Instagram con la placa (en la demo, de ejemplo)'); return; }
     if (q('[data-shinv]')) { shInvitar('duo'); return; }
     if (q('[data-shbanda]')) { shBandaHoja(); return; }
+    if (q('[data-shmiins]')) { if (SH.perfil === 'banda' || SH.perfil === 'duo' && !shMen()) shBandaHoja(); else if (SH.dia === 1 && !SH.ins) shElegir(); else shYoHoja(); return; }
     if (q('[data-shbvoy]')) { SH.voy = !SH.voy; toast(SH.voy ? (SH.perfil === 'duo' ? 'Le avisamos a Cami: vas mañana' : 'Le avisamos a tu banda: vas mañana') : 'Listo, lo sacamos'); shRender(); shBandaHoja(); return; }
     if (q('[data-shbwa]')) { $('#shHoja').hidden = true; toast('Se abre el grupo de WhatsApp (en la demo, de ejemplo)'); return; }
     if (q('[data-shsumar]')) { shInvitar('banda'); return; }

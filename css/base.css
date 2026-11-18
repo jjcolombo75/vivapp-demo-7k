@@ -954,3 +954,14 @@ select.input{appearance:auto;-webkit-appearance:auto}
 .shmems{display:flex;flex-wrap:wrap;gap:12px 6px}
 .shmem{width:64px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;text-align:center}
 .shmem i{display:block;font-style:normal;font-weight:400;color:var(--muted);font-size:11px}
+/* T28 tanda 3 · la barra fija con tu insignia, y Desafíos flotante con el espectro que gira (el halo del botón Empezar) */
+.shbody{padding-top:0;padding-bottom:16px}
+.shbar{position:sticky;top:0;z-index:6;height:64px;background:rgba(10,13,18,.78);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.shmiins{min-width:56px;height:60px;padding:0 4px;border:0;background:none;color:#eef2f8;font:inherit;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+.shmiins .shemb{width:42px;height:42px}
+.shdesfab{position:sticky;bottom:14px;align-self:center;flex:none;z-index:4;width:76px;height:76px;margin-top:8px;padding:0;border-radius:50%;border:2.5px solid transparent;cursor:pointer;
+  background:linear-gradient(#0b1119,#0b1119) padding-box,conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a) border-box;animation:accSpin 4s linear infinite;isolation:isolate}
+.shdesfab::after{content:"";position:absolute;inset:-5px;border-radius:50%;z-index:-1;filter:blur(12px);opacity:.85;pointer-events:none;background:conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a);animation:accSpin 3s linear infinite}
+.shdesin{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;height:100%;border-radius:50%;color:#fff;font-size:11px;font-weight:800;letter-spacing:.02em}
+@media (prefers-reduced-motion:reduce){.shdesfab,.shdesfab::after{animation:none}}
+#socialH:has(#shHist:not([hidden])) .shdesfab{display:none}
