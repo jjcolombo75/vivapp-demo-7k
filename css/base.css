@@ -946,3 +946,11 @@ select.input{appearance:auto;-webkit-appearance:auto}
 .shopc svg{flex:none}
 .shelige{display:flex;justify-content:center;gap:14px}
 .shelige button{width:88px;height:88px;border-radius:50%;border:1.5px solid #2c3544;background:rgba(13,17,25,.82);display:grid;place-items:center;cursor:pointer}
+/* T28 tanda 2 · la hoja de tu banda */
+.shqb{display:flex;align-items:center;gap:10px;flex:1;min-width:0;min-height:44px;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.shpq b{display:flex;align-items:center;gap:4px}
+.shbh{display:flex;align-items:center;gap:14px}
+.shbh .shemb{flex:none}
+.shmems{display:flex;flex-wrap:wrap;gap:12px 6px}
+.shmem{width:64px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;text-align:center}
+.shmem i{display:block;font-style:normal;font-weight:400;color:var(--muted);font-size:11px}

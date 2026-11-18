@@ -2285,7 +2285,8 @@
   const shIgBtn = k => shMen() ? '' : shBtn('data-shig="' + k + '"', shTr('camara', '#eef2f8', 16), 'A Instagram');
   function shPlaca(p){
     return '<article class="shp' + (p.fija ? ' fija' : '') + '" data-shp="' + p.key + '">' +
-      '<header class="shpcab">' + p.ins + '<span class="shpq"><b>' + p.nom + '</b><span>' + p.sub + '</span></span>' +
+      '<header class="shpcab">' + (p.hoja ? '<button class="shqb" type="button" data-shbanda aria-label="Abrir ' + p.nom + '">' : '') + p.ins +
+        '<span class="shpq"><b>' + p.nom + (p.hoja ? shTr('der', SH_GR, 14) : '') + '</b><span>' + p.sub + '</span></span>' + (p.hoja ? '</button>' : '') +
         (p.fija ? '<span class="shfija">' + shTr('fijada', SH_GR, 16) + 'FIJADA</span>' : '<span class="shcu">' + shCuando(p.m) + '</span>') + '</header>' +
       '<div class="shlz' + (p.foto ? ' foto' : '') + '" role="img" aria-label="' + p.alt + '">' +
         (p.foto ? '<img src="img/social/' + p.foto + '.svg' + seV() + '" alt="" decoding="async"><i class="shvelo"></i>' : '') +
@@ -2303,7 +2304,7 @@
     const kick = lun ? 'EL CRUCE · LA SEMANA PASADA' : 'EL CRUCE · ESTA SEMANA';
     const big = lun ? (gano ? 'GANARON ' + MV_RAYO : 'ESTA VEZ NO') : q === 0 ? 'SE DEFINE HOY' : 'QUEDAN ' + (q + 1) + ' DÍAS';
     const sub = lun ? 'Esta semana, contra ' + shBan(SH_RIV0).nom + '.' : q === 0 ? 'Cada banda contra su propia meta. El resultado, mañana.' : 'Cada banda contra su propia meta.';
-    return { key:'cruce', fija:true, ins:shEmb(dd.nom, 36, shSincro(dd, h)), nom:dd.nom, sub:'tu banda', m:h, alt:'El cruce de la semana: ' + dd.nom + ' ' + a + ' % de su meta; ' + rv.nom + ' ' + c + ' %',
+    return { key:'cruce', fija:true, hoja:true, ins:shEmb(dd.nom, 36, shSincro(dd, h)), nom:dd.nom, sub:'tu banda', m:h, alt:'El cruce de la semana: ' + dd.nom + ' ' + a + ' % de su meta; ' + rv.nom + ' ' + c + ' %',
       inner:'<span class="shkick">' + kick + '</span><div class="shvs">' + lado(dd, a, true) + '<span class="shvsx">VS</span>' + lado(rv, c, false) + '</div>' +
         shBl(80, shG(big, 10.6) + shL(sub, true)), sello:lun ? 'PUERTA · semana cerrada' : 'PUERTA · hasta ayer',
       pie:shRayoBtn('cruce', 'A tu banda') + '<span class="shsp"></span>' + shBtn('data-shver="dd"', shTr('der', '#eef2f8', 16), 'Ver el cruce') };
@@ -2356,7 +2357,7 @@
     const ult = sem >= 1 && both(shWk(h) - 1);
     const big = sem < 1 ? 'ARRANCAN<br>JUNTAS' : ult ? (on >= 3 ? 'TRES SEMANAS,<br>LAS DOS' : 'CUMPLIERON<br>LAS DOS') : 'SEMANA ' + (sem + 1) + '<br>DEL DÚO';
     const sub = sem < 1 ? 'Cada semana que cumplen las dos, se enciende un tubo.' : 'Semana ' + (sem + 1) + ' del dúo: en marcha.';
-    return { key:'duo', fija:true, ins:shDuo(36), nom:'Sofi y Cami', sub:'tu dúo · lo ven ustedes dos', m:h, alt:'Tu dúo con Cami: ' + on + ' semanas cumplidas las dos',
+    return { key:'duo', fija:true, hoja:true, ins:shDuo(36), nom:'Sofi y Cami', sub:'tu dúo · lo ven ustedes dos', m:h, alt:'Tu dúo con Cami: ' + on + ' semanas cumplidas las dos',
       inner:shPar(shPer('Cami', 92)) + shBl(54.7, shTubos(4, Math.min(4, on)) + shG(big, 11.2) + shL(sub, true)), sello:on > 1 ? 'PUERTA · ' + on + ' semanas' : on ? 'PUERTA · semana 1' : sem >= 1 ? 'PUERTA · hasta ayer' : null,
       pie:shRayoBtn('duo', 'A Cami') + '<span class="shsp"></span>' + (shMen() ? '' : shBtn('data-shvoy', shTr('check', SH.voy ? SH_C.c : '#eef2f8', 16), SH.voy ? 'Vas mañana' : 'Voy mañana', SH.voy)) };
   }
@@ -2493,7 +2494,9 @@
     $('#shHist').style.setProperty('--hc', x.b ? SH_C[SH_EMB[x.b.nom][0][0]] : x.key === 'sede' ? SH_C.c : x.key === 'viva' ? '#10202c' : SH_C.m);
     const des = otra && banda && x.b.key !== SH_RIV0;
     $('#shHist').innerHTML = '<div class="sgbars">' + H.C.map((_, j) => '<i class="' + (j < i ? 'ya' : j === i ? 'ahora' : '') + '"></i>').join('') + '</div>' +
-      '<div class="sghcab">' + x.ins.replace('width="44" height="44"', 'width="40" height="40"') + '<span class="stack" style="gap:2px;flex:1;min-width:0"><b class="sghn">' + x.nom + '</b><span class="small sghs">' + x.rol + '</span></span>' +
+      '<div class="sghcab">' + x.ins.replace('width="44" height="44"', 'width="40" height="40"') + ((x.key === 'dd' || x.key === 'duo') ?
+        '<button class="shqb" type="button" data-shbanda aria-label="Abrir ' + x.nom + '"><span class="stack" style="gap:2px;flex:1;min-width:0"><b class="sghn">' + x.nom + ' ›</b><span class="small sghs">' + x.rol + '</span></span></button>' :
+        '<span class="stack" style="gap:2px;flex:1;min-width:0"><b class="sghn">' + x.nom + '</b><span class="small sghs">' + x.rol + '</span></span>') +
         '<button class="iconbtn sgx" data-shx type="button" aria-label="Cerrar">✕</button></div>' +
       '<div class="sgcard" aria-live="polite">' + H.C[i] + '</div>' +
       '<div class="shhfoot">' + (des ? (SH.desaf[x.b.key] ? '<span class="shdesok">Desafío enviado. Si aceptan, el cruce arranca el lunes.</span>'
@@ -2551,9 +2554,27 @@
       '<div class="shelige">' + P.map((p, i) => '<button type="button" data-shins="' + i + '" aria-label="Insignia ' + (i + 1) + '">' + shMono(p[0], p[1], p[2], 72) + '</button>').join('') + '</div>');
     SH.insOp = P;
   }
-  function shInvitar(){
-    shHoja('<span class="mtitle sig"><b>Armen</b> <i>dúo</i></span><span class="muted" style="line-height:1.45">Le llega por WhatsApp con tu día y tu sede. Si se suma, arrancan su dúo: cada uno contra su meta, juntos.</span>' +
-      '<div class="card" style="gap:6px"><span class="lbl">El mensaje</span><span style="line-height:1.45">«Empecé en Viva Sarmiento. ¿Venís conmigo? Si te sumás, armamos dúo en la app.»</span></div>' +
+  // La hoja de tu banda o de tu dúo (D1 de T28, 18/11; sin cajón fijo): quiénes son, Voy, WhatsApp y Sumar. Lo de adentro lo ve solo la banda.
+  // "van N": los de la banda que marcaron Voy para mañana (en la demo, los que tienen entrada mañana); solo con tres o más y nunca en un dúo.
+  function shBandaHoja(){
+    const duo = SH.perfil === 'duo', m = shMen(), h = shHoy(), b = shBan('dd'), man = h + SE_DIA, ids = duo ? ['sofi', 'cami'] : b.ids;
+    const nom = duo ? 'Sofi y Cami' : b.nom, ins = duo ? shDuo(56) : shEmb(b.nom, 56, shSincro(b, h));
+    const sub = duo ? 'Tu dúo · Sarmiento' : 'Tu banda · Sarmiento · ' + sgSemTxt(shSincro(b, h)).toLowerCase();
+    const mem = (duo ? ['Sofi', 'Cami'] : b.mem.map(x => x[0])).map((n, j) => '<span class="shmem">' + (SH_PER[n] ? shPer(n, 44) : shMono(n[0], ['c', 'y', 'm'][j % 3], 'm', 44)) +
+      '<span>' + n + (j === 0 ? ' <i>vos</i>' : '') + '</span></span>').join('');
+    const van = ids.slice(1).filter(id => (shSim().M[id] || []).some(x => x >= man && x < man + SE_DIA)).length + (SH.voy ? 1 : 0);
+    const voy = sg2Acc('voy', SH.voy ? 'Vas' : 'Voy', 'mañana' + (!duo && van >= 3 ? '<br>van ' + van : ''), SH.voy ? ' on' : '', 'data-shbvoy');
+    shHoja('<div class="shbh">' + ins + '<span class="stack" style="gap:3px;min-width:0"><span class="mtitle sig">' + nom + '</span><span class="small muted">' + sub + '</span></span></div>' +
+      '<div class="shmems">' + mem + '</div>' +
+      (m ? '' : '<div class="sgaccs shaccs" style="grid-template-columns:repeat(' + (duo ? 2 : 3) + ',minmax(0,1fr))">' + voy + sg2Acc('chat', 'WhatsApp', duo ? 'de las dos' : 'de la banda', '', 'data-shbwa') +
+        (duo ? '' : sg2Acc('sumar', 'Sumar', 'a alguien', '', 'data-shsumar')) + '</div>') +
+      '<span class="small muted" style="line-height:1.45">' + (duo ? 'Lo ven ustedes dos.' : 'Otras bandas ven el nombre, la insignia y lo que logra la banda; nunca quiénes son ni quién vino.') + '</span>');
+  }
+  function shInvitar(k){
+    const banda = k === 'banda';
+    shHoja('<span class="mtitle sig"><b>' + (banda ? 'Sumá' : 'Armen') + '</b> <i>' + (banda ? 'a alguien' : 'dúo') + '</i></span><span class="muted" style="line-height:1.45">' +
+      (banda ? 'Le llega por WhatsApp con el nombre de la banda y tu sede. Si se suma, entra a la banda el lunes, con su propia meta.' : 'Le llega por WhatsApp con tu día y tu sede. Si se suma, arrancan su dúo: cada uno contra su meta, juntos.') + '</span>' +
+      '<div class="card" style="gap:6px"><span class="lbl">El mensaje</span><span style="line-height:1.45">' + (banda ? '«Estoy en ' + shBan('dd').nom + ', en Viva Sarmiento. ¿Te sumás? Cada uno contra su meta, juntos.»' : '«Empecé en Viva Sarmiento. ¿Venís conmigo? Si te sumás, armamos dúo en la app.»') + '</span></div>' +
       '<span class="small muted">Vivapp no guarda el nombre ni el teléfono de a quién se lo mandás.</span><button class="btn sm" data-shwa type="button">' + SB_WA + 'Abrir WhatsApp</button>');
   }
 
@@ -2568,7 +2589,11 @@
     if ((b = q('[data-shchispa]'))) { const k = b.dataset.shchispa; SH.chispa[k] = !SH.chispa[k]; toast(SH.chispa[k] ? 'Guardado. Si es mutuo, les avisamos' : 'Listo, lo sacamos'); shRender(); return; }
     if (q('[data-shvoy]')) { SH.voy = !SH.voy; toast(SH.voy ? 'Le avisamos a Cami: vas mañana' : 'Listo, lo sacamos'); shRender(); return; }
     if ((b = q('[data-shig]'))) { toast('Se abre Instagram con la placa (en la demo, de ejemplo)'); return; }
-    if (q('[data-shinv]')) { shInvitar(); return; }
+    if (q('[data-shinv]')) { shInvitar('duo'); return; }
+    if (q('[data-shbanda]')) { shBandaHoja(); return; }
+    if (q('[data-shbvoy]')) { SH.voy = !SH.voy; toast(SH.voy ? (SH.perfil === 'duo' ? 'Le avisamos a Cami: vas mañana' : 'Le avisamos a tu banda: vas mañana') : 'Listo, lo sacamos'); shRender(); shBandaHoja(); return; }
+    if (q('[data-shbwa]')) { $('#shHoja').hidden = true; toast('Se abre el grupo de WhatsApp (en la demo, de ejemplo)'); return; }
+    if (q('[data-shsumar]')) { shInvitar('banda'); return; }
     if (q('[data-shwa]')) { $('#shHoja').hidden = true; toast('Se abre WhatsApp con el mensaje (en la demo, de ejemplo)'); return; }
     if (q('[data-shno]')) { SH.puertaNo = true; toast('Listo. Vuelve a aparecer el lunes'); shRender(); return; }
     if (q('[data-shmas]')) { shMas(); return; }
@@ -2592,6 +2617,7 @@
       if (H.dataset.sw || !SH.h) return;
       const q = s => e.target.closest(s), x = SH.h.x;
       if (q('[data-shx]')) { shCerrar(); return; }
+      if (q('[data-shbanda]')) { shCerrar(); shBandaHoja(); return; }
       if (q('[data-shdesaf]')) { SH.desaf[x.b.key] = true; toast('Desafío enviado a ' + x.nom); shPaso(SH.h.i); return; }
       if (q('[data-shhrayo]')) { const k = 'h' + x.key; SH.rayo[k] = !SH.rayo[k]; const b = q('[data-shhrayo]'); b.setAttribute('aria-pressed', !!SH.rayo[k]); if (SH.rayo[k]) toast('Les mandaste ⚡ a ' + x.nom); return; }
       if (q('.shhfoot')) return;
