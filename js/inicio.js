@@ -86,13 +86,13 @@
     let L = (MUR.prevW || []).slice(0, MUR.prevMes);
     while (L.length < MUR.prevMes) L.push(false);
     if (semCumplida()) L.push(semCompleta());
-    if (MUR.cerrado) { if (MUR.cerradoC) L = L.map(() => true); while (L.length < 3) L.push(!!MUR.cerradoC); }
+    if (MUR.cerrado) { while (L.length < 3) L.push(false); }
     return L.slice(0, 4);
   }
   function renderMuralHome(){
     const c = $('#mesCard'); if (!c) return;
     c.hidden = !MUR || !nvVer('mes'); if (c.hidden) return;   // T11 · Mes cumplido aparece en la semana 4
-    const L = mesSemanas(), n = L.length, comp = n >= 3 && L.filter(x => x).length >= 3, mes = meses[HOY_D.getMonth()];
+    const L = mesSemanas(), n = L.length, mes = meses[HOY_D.getMonth()];
     const col = eqFlow ? 'var(--z2)' : eqCol;
     $('#mesNm').textContent = MES_ABR[HOY_D.getMonth()];
     const BAR = EQ_EST === 'barras', W = 340, H = BAR ? 16 : 18, GP = BAR ? 10 : 6, sw = (W - 3 * GP) / 4, F = eqFlow ? 'url(#msFlow)' : eqCol;
@@ -117,7 +117,6 @@
     const nc = L.filter(x => x).length;
     bar.setAttribute('aria-label', 'Tu mes, ' + mes + ': ' + (n >= 3 ? 'Mes cumplido, ' + n + ' semanas cumplidas' : n + ' de 3 semanas cumplidas') + (nc ? ', ' + nc + (nc === 1 ? ' completa' : ' completas') : '') + '. Ver tu mural.');
     $('#mesTxt').innerHTML = pausa ? 'Plan en pausa: tu mes no pierde nada.'
-      : comp ? '<strong>Mes cumplido ⚡</strong> Tu cartel de ' + mes + ' brilla con todo.'
       : n >= 3 ? '<strong>¡Mes cumplido!</strong> Tu cartel de ' + mes + ' ya es tuyo.'
       : n === 0 ? 'Tu neón de ' + mes + ' arranca con tu primera semana cumplida ⚡'
       : 'Llevás <strong>' + n + ' de 3</strong> semanas cumplidas en ' + mes + ' ⚡';

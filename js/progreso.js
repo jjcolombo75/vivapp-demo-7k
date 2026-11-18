@@ -172,8 +172,52 @@
     pulso:'<path d="M3 12h4l2-5 4 10 2-5h6"/>',
     disco:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>'
   };
-  // Un ícono por mes, fijo en el calendario
-  const MES_ICO = ['botella','manzana','whey','pesa','rock','reloj','basquet','silbato','play','brazo','zapatilla','estallido'];
+  // ----- T19 · El cartel del mes: doce formas fijas, una por mes (enero siempre la misma). Sin íconos ni rayo. -----
+  // Cada generador recibe el ancho del nombre (tw) y su cuerpo (fs) y devuelve la forma centrada en 0,0:
+  // { w, h, d (trazo del tubo), ty (ajuste vertical del nombre), dots (bombitas, solo la marquesina) }
+  const FORMAS = [
+    (tw, fs) => { const r = tw / 2 + 11; return { w:2 * r, h:2 * r, d:'M' + (-r) + ' 0A' + r + ' ' + r + ' 0 1 1 ' + r + ' 0A' + r + ' ' + r + ' 0 1 1 ' + (-r) + ' 0Z', ty:0 }; },                       // enero · círculo
+    (tw, fs) => { const w = tw + 40, h = fs + 34; return { w:w, h:h, d:'M' + (-w / 2) + ' ' + (-h / 2) + 'H' + w / 2 + 'V' + h / 2 + 'H' + (-w / 2) + 'Z', ty:0 }; },                                          // febrero · rectángulo
+    (tw, fs) => {                                                                                                                                                                                          // marzo · nube
+      const w = tw + 64, h = fs + 54, a = w / 2, b = h / 2, C = [[0, 0, a * .74, b * .6], [-a * .55, -b * .06, b * .6, b * .6], [a * .56, -b * .04, b * .56, b * .56], [-a * .2, -b * .44, b * .52, b * .52], [a * .24, -b * .38, b * .46, b * .46]], yb = b * .66, P = [];
+      const dentro = (x, y) => C.some(c => ((x - c[0]) / c[2]) ** 2 + ((y - c[1]) / c[3]) ** 2 <= 1);
+      for (let i = 0; i < 160; i++) { const t = i / 160 * Math.PI * 2, cx = Math.cos(t), cy = Math.sin(t); let r = Math.max(a, b) * 1.2; while (r > 0 && !(dentro(cx * r, cy * r) && cy * r <= yb)) r -= .6; if (cy * r > yb || r <= 0) { r = yb / Math.max(.2, cy); } P.push([cx * r, Math.min(yb, cy * r)]); }
+      return { w:a * 2 * .96, h:b * 2 * .9, d:'M' + P.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L') + 'Z', ty:-b * .06 };
+    },
+    (tw, fs) => { const w = tw + 58, h = fs + 34, a = w / 2, b = h / 2, p = [[-a, 0], [-a + b, -b], [a - b, -b], [a, 0], [a - b, b], [-a + b, b]]; return { w:w, h:h, d:'M' + p.map(q => q.join(' ')).join('L') + 'Z', ty:0 }; }, // abril · hexágono
+    (tw, fs) => { const w = tw + 58, h = fs + 30, r = h / 2; return { w:w, h:h, d:'M' + (-w / 2 + r) + ' ' + (-h / 2) + 'H' + (w / 2 - r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (w / 2 - r) + ' ' + h / 2 + 'H' + (-w / 2 + r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (-w / 2 + r) + ' ' + (-h / 2) + 'Z', ty:0 }; }, // mayo · cápsula
+    (tw, fs) => { const w = tw / .56 + 6, h = fs * 2.6; return { w:w, h:h, d:'M0 ' + (-h / 2) + 'L' + w / 2 + ' 0L0 ' + h / 2 + 'L' + (-w / 2) + ' 0Z', ty:0 }; },                                              // junio · rombo
+    (tw, fs) => { const w = tw + 46, h = fs + 62, a = w / 2, b = h / 2; return { w:w, h:h, d:'M' + (-a) + ' ' + (-b) + 'H' + a + 'V' + b * .14 + 'C' + a + ' ' + b * .6 + ' ' + a * .36 + ' ' + b * .86 + ' 0 ' + b + 'C' + (-a * .36) + ' ' + b * .86 + ' ' + (-a) + ' ' + b * .6 + ' ' + (-a) + ' ' + b * .14 + 'Z', ty:-b * .14 }; }, // julio · escudo
+    (tw, fs) => { const w = tw + 62, h = fs + 42, a = w / 2, b = h / 2, dots = [], n = Math.round(w / 15), m = Math.round(h / 15);                                                                            // agosto · marquesina con bombitas
+      for (let i = 0; i <= n; i++) { const x = -a + w * i / n; dots.push([x, -b], [x, b]); } for (let j = 1; j < m; j++) { const y = -b + h * j / m; dots.push([-a, y], [a, y]); }
+      return { w:w, h:h, d:'M' + (-a) + ' ' + (-b) + 'H' + a + 'V' + b + 'H' + (-a) + 'Z', ty:0, dots:dots, fino:true }; },
+    (tw, fs) => { const w = tw + 62, h = fs + 38, a = w / 2, b = h / 2, n = 9; return { w:w, h:h, d:'M' + (-a) + ' ' + (-b) + 'H' + a + 'V' + (-n) + 'A' + n + ' ' + n + ' 0 0 0 ' + a + ' ' + n + 'V' + b + 'H' + (-a) + 'V' + n + 'A' + n + ' ' + n + ' 0 0 0 ' + (-a) + ' ' + (-n) + 'Z', ty:0 }; }, // septiembre · ticket
+    (tw, fs) => { const w = tw + 76, h = fs + 38, a = w / 2, b = h / 2; return { w:w, h:h, d:'M' + (-a) + ' ' + (-b) + 'H' + a + 'L' + (a - h * .34) + ' 0L' + a + ' ' + b + 'H' + (-a) + 'Z', ty:0, tx:-h * .08 }; },    // octubre · banderín
+    (tw, fs) => { const w = tw + 58, h = fs + 62, a = w / 2, b = h / 2, ry = h * .46; return { w:w, h:h, d:'M' + (-a) + ' ' + b + 'V' + (-b + ry) + 'A' + a + ' ' + ry + ' 0 0 1 ' + a + ' ' + (-b + ry) + 'V' + b + 'Z', ty:b * .12 }; },    // noviembre · arco de bar
+    (tw, fs) => { const w = tw + 54, h = fs + 42, a = w / 2, b = h / 2, c = h * .32, p = [[-a + c, -b], [a - c, -b], [a, -b + c], [a, b - c], [a - c, b], [-a + c, b], [-a, b - c], [-a, -b + c]]; return { w:w, h:h, d:'M' + p.map(q => q.join(' ')).join('L') + 'Z', ty:0 }; } // diciembre · octágono
+  ];
+  // Tubo de neón sobre un trazo: halo ancho, halo cercano, tubo de color y núcleo claro (las mismas capas que las letras)
+  function neonPath(d, col, s, fino){
+    const f = fino ? .6 : 1, a = 'd="' + d + '" fill="none" stroke-linejoin="round" stroke-linecap="round"';
+    return '<g><path ' + a + ' stroke="' + col + '" stroke-width="' + (9 * s * f).toFixed(1) + '" opacity=".5" filter="url(#mgB3)"/>' +
+      '<path ' + a + ' stroke="' + col + '" stroke-width="' + (6 * s * f).toFixed(1) + '" opacity=".85" filter="url(#mgB2)"/>' +
+      '<path ' + a + ' stroke="' + col + '" stroke-width="' + (3.4 * s * f).toFixed(1) + '" filter="url(#mgB1)"/>' +
+      '<path ' + a + ' stroke="' + col + '" stroke-width="' + (2.2 * s * f).toFixed(1) + '"/>' +
+      '<path ' + a + ' stroke="#fff" stroke-width="' + (.8 * s * f).toFixed(2) + '" opacity=".95"/></g>';
+  }
+  // El cartel del mes: forma fija + nombre horizontal. Devuelve su dibujo (centrado en 0,0) y su caja.
+  function cartelMes(m, col, k){
+    const nm = MES_ABR[m], fs = 26, tw = nm.length * fs * .56, f = FORMAS[m](tw, fs);
+    let g = neonPath(f.d, col, 1, f.fino);
+    (f.dots || []).forEach(p => { g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="4.4" fill="' + (String(col).indexOf('url') === 0 ? NEON.mag : col) + '" opacity=".8" filter="url(#mgB2)"/><circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="2" fill="#fff"/>'; });
+    g += '<g transform="translate(' + (f.tx || 0) + ' ' + f.ty.toFixed(1) + ')">' + neonTxt(nm, col, fs, { tl:tw }) + '</g>';
+    return { w:(f.w + 16) * k, h:(f.h + 16) * k, g:'<g transform="scale(' + k + ')">' + g + '</g>' };
+  }
+  // Ícono chico de la forma (lista del mural y accesibilidad visual): el mismo contorno, sin neón
+  function formaIco(m, col, px){
+    const f = FORMAS[m](46, 16), s = Math.max(f.w, f.h) + 6;
+    return '<svg width="' + px + '" height="' + px + '" viewBox="' + (-s / 2) + ' ' + (-s / 2) + ' ' + s + ' ' + s + '" aria-hidden="true"><path d="' + f.d + '" fill="none" stroke="' + col + '" stroke-width="' + (s / 11).toFixed(1) + '" stroke-linejoin="round"/></svg>';
+  }
   // Escalera de fichas: semanas cumplidas acumuladas (nunca consecutivas, nunca vuelve a cero)
   const FICHAS = [
     { n:0, k:'welcome', nom:'la bienvenida', art:'la bienvenida' },
@@ -190,8 +234,8 @@
   const mesAtras = k => { const d = new Date(HOY_D.getFullYear(), HOY_D.getMonth() - k, 1); return { m:d.getMonth(), y:d.getFullYear() }; };
   const MURALES = {
     nueva: () => ({ sem:0, alta:new Date(HOY_D.getTime() - 3 * 864e5), meses:[], sorp:[], prevMes:0 }),
-    '3m': () => ({ sem:10, alta:semAtras(13), meses:[Object.assign(mesAtras(2), { t:1 }), Object.assign(mesAtras(1), { t:2, c:true })], sorp:[['semcomp', semAtras(9)], ['afuera', semAtras(4)]], prevMes:2, prevW:[false, true] }),
-    '1a': () => ({ sem:49, alta:semAtras(54), meses:[[11,0],[10,1],[8,1],[7,2],[6,2],[4,2],[3,3],[2,3],[1,3]].map(([k, t]) => Object.assign(mesAtras(k), { t:t, c:[7, 3, 1].includes(k) })), sorp:[['semcomp', semAtras(50)], ['afuera', semAtras(44)], ['inbody', semAtras(41)], ['record', semAtras(30)], ['sede', semAtras(12)]], prevMes:2, prevW:[true, false] })
+    '3m': () => ({ sem:10, alta:semAtras(13), meses:[Object.assign(mesAtras(2), { t:1 }), Object.assign(mesAtras(1), { t:2 })], sorp:[['semcomp', semAtras(9)], ['afuera', semAtras(4)]], prevMes:2, prevW:[false, true] }),
+    '1a': () => ({ sem:49, alta:semAtras(54), meses:[[11,0],[10,1],[8,1],[7,2],[6,2],[4,2],[3,3],[2,3],[1,3]].map(([k, t]) => Object.assign(mesAtras(k), { t:t })), sorp:[['semcomp', semAtras(50)], ['afuera', semAtras(44)], ['inbody', semAtras(41)], ['record', semAtras(30)], ['sede', semAtras(12)]], prevMes:2, prevW:[true, false] })
   };
   var MURK = '3m', MUR = Object.assign(MURALES['3m'](), { cerrado:false }), muralLista = false, muralNuevo = null;
   // Semanas cumplidas acumuladas: las cerradas + la de esta semana si ya está cumplida
@@ -239,7 +283,7 @@
   function neonTxt(txt, col, fs, opt){
     opt = opt || {};
     if (MUR_TXT === 'cartel') {
-      const c = 'x="0" y="0" text-anchor="middle" dominant-baseline="central" font-family="Archivo, Arial Narrow, sans-serif" font-stretch="75%" font-weight="800" font-size="' + fs + '" letter-spacing="' + (fs * .05).toFixed(1) + '" fill="none" stroke-linejoin="round"';
+      const c = 'x="0" y="0" text-anchor="middle" dominant-baseline="central" font-family="Archivo, Arial Narrow, sans-serif" font-stretch="75%" font-weight="800" font-size="' + fs + '" letter-spacing="' + (fs * .05).toFixed(1) + '" fill="none" stroke-linejoin="round"' + (opt.tl ? ' textLength="' + opt.tl.toFixed(1) + '" lengthAdjust="spacingAndGlyphs"' : '');
       const tube = opt.white ? '#fff' : col;
       return '<g><text ' + c + ' stroke="' + col + '" stroke-width="' + (fs * .34).toFixed(1) + '" opacity=".5" filter="url(#mgB3)">' + txt + '</text>' +
         '<text ' + c + ' stroke="' + col + '" stroke-width="' + (fs * .22).toFixed(1) + '" opacity=".85" filter="url(#mgB2)">' + txt + '</text>' +
@@ -256,11 +300,7 @@
   // Cada pieza: su dibujo (centrado en 0,0), su caja aproximada y su texto
   function pieza(e, big){
     const k = big ? 1.28 : 1;
-    if (e.tipo === 'mes') {
-      const col = NEON[TRAMO_NEON[e.t]], nm = MES_ABR[e.m], fs = 30 * k, tw = nm.length * fs * (MUR_TXT === 'cartel' ? 0.6 : 0.52), w = tw + 40 * k;
-      const rw = e.c ? 24 * k : 0, W2 = w + rw;
-      return { w:W2, h:46 * k, g:'<g transform="translate(' + (-W2 / 2 + 15 * k) + ' 0)">' + neonSym(MES_ICO[e.m], col, 32 * k) + '</g><g transform="translate(' + (-W2 / 2 + 40 * k + tw / 2) + ' 0)">' + neonTxt(nm, col, fs) + '</g>' + (e.c ? '<g transform="translate(' + (W2 / 2 - 12 * k) + ' -2)">' + neonSym('rayo', NEON.z1, 30 * k) + '</g>' : '') };
-    }
+    if (e.tipo === 'mes') return cartelMes(e.m, NEON[TRAMO_NEON[e.t]], k);
     if (e.tipo === 'ficha') {
       const f = e.f;
       if (f.k === 'welcome') return { w:178 * k, h:62 * k, g:'<g transform="translate(0 -14)">' + neonTxt('WELCOME', NEON.cian, 30 * k, { white:true, ls:3 }) + '</g><g transform="translate(0 ' + (17 * k) + ')">' + neonTxt('TO THE CLUB', NEON.mag, 18 * k, { white:true, ls:2 }) + '</g>' };
@@ -283,13 +323,13 @@
   function muralEventos(){
     const ev = [];
     FICHAS.forEach(f => { if (f.n <= MUR.sem) ev.push({ tipo:'ficha', f:f, d:f.n === 0 ? MUR.alta : new Date(MUR.alta.getTime() + Math.round(f.n * 7 * 1.08) * 864e5), id:'f' + f.n }); });
-    MUR.meses.forEach(m => ev.push({ tipo:'mes', m:m.m, y:m.y, t:m.t, c:!!m.c, d:new Date(m.y, m.m + 1, 0), id:'m' + m.y + '-' + m.m }));
+    MUR.meses.forEach(m => ev.push({ tipo:'mes', m:m.m, y:m.y, t:m.t, d:new Date(m.y, m.m + 1, 0), id:'m' + m.y + '-' + m.m }));
     MUR.sorp.forEach(([k, d]) => ev.push({ tipo:'sorp', s:k, d:d, id:'s' + k }));
     ev.sort((a, b) => b.d - a.d);
     const h = ev.findIndex(e => e.tipo !== 'sorp'); if (h > 0) ev.unshift(ev.splice(h, 1)[0]);
     return ev;
   }
-  const evNombre = e => e.tipo === 'mes' ? Cap(meses[e.m]) + (e.c ? ' · Mes cumplido ⚡' : ' · Mes cumplido') : e.tipo === 'ficha' ? (e.f.n === 0 ? 'Bienvenida · Welcome to the club' : e.f.n + (e.f.n === 1 ? ' semana cumplida' : ' semanas cumplidas') + ' · ' + e.f.nom) : SORP[e.s][1];
+  const evNombre = e => e.tipo === 'mes' ? Cap(meses[e.m]) + ' · Mes cumplido' : e.tipo === 'ficha' ? (e.f.n === 0 ? 'Bienvenida · Welcome to the club' : e.f.n + (e.f.n === 1 ? ' semana cumplida' : ' semanas cumplidas') + ' · ' + e.f.nom) : SORP[e.s][1];
   const evFecha = e => meses[e.d.getMonth()].slice(0, 3) + ' ' + e.d.getFullYear();
   function muralSvg(evs, W, seed){
     // Collage: filas con piezas levemente giradas; la más nueva, más grande y más brillante
@@ -320,13 +360,13 @@
     $('#semAcum').textContent = semAcum();
     $('#muralNext').innerHTML = '<svg width="16" height="22" viewBox="0 0 16 24" aria-hidden="true" style="flex-shrink:0"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z" fill="var(--yel)"/></svg><span>' +
       (semAcum() === 0 ? 'Tu primera ficha es <b>el smile</b>: se enciende con tu primera semana cumplida.' : 'Tu próxima ficha: <b>' + fx.f.nom + '</b>. Llevás ' + (fx.f.n - fx.falta) + ' de ' + fx.f.n + ' semanas cumplidas.') + '</span>';
-    $('#muralList').innerHTML = evs.map(e => '<div><span class="mli">' + (e.tipo === 'mes' ? icoSm(MES_ICO[e.m], e.t === 3 ? '#07b0f2' : NEON[TRAMO_NEON[e.t]], 28) : e.tipo === 'ficha' ? icoSm({ welcome:'regalo', smile:'smile', yeah:'yeah', rayo:'rayo', corazon:'corazon', reloj:'reloj', mancuerna:'mancuerna', viva:'rayo' }[e.f.k], '#07b0f2', 28) : icoSm(SORP[e.s][0], '#f400a0', 24)) + '</span>' +
+    $('#muralList').innerHTML = evs.map(e => '<div><span class="mli">' + (e.tipo === 'mes' ? formaIco(e.m, e.t === 3 ? '#07b0f2' : NEON[TRAMO_NEON[e.t]], 28) : e.tipo === 'ficha' ? icoSm({ welcome:'regalo', smile:'smile', yeah:'yeah', rayo:'rayo', corazon:'corazon', reloj:'reloj', mancuerna:'mancuerna', viva:'rayo' }[e.f.k], '#07b0f2', 28) : icoSm(SORP[e.s][0], '#f400a0', 24)) + '</span>' +
       '<span class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:700">' + evNombre(e) + '</span><span class="small muted">' + Cap(evFecha(e)) + (e.tipo === 'mes' ? ' · terminaste en ' + zonas()[e.t][1] : '') + '</span></span><button data-mshare="' + e.id + '">Compartir</button></div>').join('');
     $('#muralList').hidden = !muralLista; $('#mural').hidden = muralLista;
     $('#muralLista').textContent = muralLista ? 'Ver el mural' : 'Ver como lista';
   }
   function shareEv(e){
-    const a = e.tipo === 'mes' ? (e.c ? { big:MES_ABR[e.m], unit:'MES CUMPLIDO ⚡', cap:'3 semanas completas en el mes', feedT:'Mes cumplido ⚡' } : { big:MES_ABR[e.m], unit:'MES CUMPLIDO', cap:'3 semanas cumplidas en el mes', feedT:'Mes cumplido' })
+    const a = e.tipo === 'mes' ? { big:MES_ABR[e.m], unit:'MES CUMPLIDO', cap:'3 semanas cumplidas en el mes', feedT:'Mes cumplido' }
       : e.tipo === 'ficha' ? (e.f.n === 0 ? { big:'VIVA', unit:'ARRANQUÉ ⚡', cap:'empecé mi mural VIVA', feedT:'Bienvenida' } : { big:String(e.f.n), unit:(e.f.n === 1 ? 'SEMANA CUMPLIDA' : 'SEMANAS CUMPLIDAS') + ' ⚡', cap:'mi ficha VIVA: ' + e.f.nom.toLowerCase(), feedT:e.f.n + ' semanas cumplidas' })
       : { big:'⚡', unit:SORP[e.s][1].toUpperCase(), cap:'en mi mural VIVA', feedT:SORP[e.s][1] };
     openStory({ type:'ach', a:a, noSede:true });
@@ -342,9 +382,9 @@
   function abrirCartel(e){
     const pc = pieza(e, true), W = 340, H = 190;
     $('#cartelWall').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true"><defs><filter id="mgB1" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feGaussianBlur stdDeviation="1.6"/></filter><filter id="mgB2" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feGaussianBlur stdDeviation="5"/></filter><filter id="mgB3" filterUnits="userSpaceOnUse" x="-400" y="-240" width="800" height="480"><feGaussianBlur stdDeviation="11"/></filter><filter id="mgH" filterUnits="userSpaceOnUse" x="-300" y="-160" width="600" height="320"><feMorphology operator="dilate" radius="1.6"/><feGaussianBlur stdDeviation="3.5"/></filter><linearGradient id="mgFlow" x1="0" x2="1"><stop offset="0" stop-color="#ffe94a"/><stop offset=".5" stop-color="#07b0f2"/><stop offset="1" stop-color="#f400a0"/></linearGradient></defs>' +
-      tapiz(W, H, 29) + '<g class="cpiece" transform="translate(' + W / 2 + ' ' + H / 2 + ') scale(1.35)">' + pc.g + '</g></svg>';
-    $('#cartelTag').innerHTML = '<span>' + (e.c ? '¡Mes cumplido! ⚡' : '¡Mes cumplido!') + '</span>';
-    $('#cartelTxt').textContent = Cap(meses[e.m]) + (e.c ? ': 3 semanas completas. Terminaste el mes en ' + zonas()[e.t][1] + ' y tu cartel suma el rayo y brilla con todo.' : ': 3 semanas cumplidas. Terminaste el mes en ' + zonas()[e.t][1] + ' y tu cartel ya está encendido en tu mural.');
+      tapiz(W, H, 29) + '<g class="cpiece" transform="translate(' + W / 2 + ' ' + H / 2 + ')">' + pc.g + '</g></svg>';
+    $('#cartelTag').innerHTML = '<span>¡Mes cumplido!</span>';
+    $('#cartelTxt').textContent = Cap(meses[e.m]) + ': 3 semanas cumplidas. Terminaste el mes en ' + zonas()[e.t][1] + ' y tu cartel ya está encendido en tu mural.';
     $('#cartelBen').hidden = true;
     $('#cartelOv').hidden = false; $('#cartelOv').dataset.ev = e.id;
   }

@@ -95,7 +95,7 @@
       <div class="dmrow"><span class="dmk">Punto de la semana</span>
         <div class="opts g2" id="semPick"><button class="opt" data-sem="lunes" aria-pressed="false">Lunes</button><button class="opt" data-sem="mitad" aria-pressed="true">A mitad</button><button class="opt" data-sem="cumplida" aria-pressed="false">Cumplida</button><button class="opt" data-sem="completa" aria-pressed="false">Completa</button><button class="opt" data-sem="sinreg" aria-pressed="false" style="grid-column:1 / -1">Sin registros en Entrenar</button></div></div>
       <div class="dmrow"><span class="dmk">Cierre del mes</span>
-        <div class="grid2" style="gap:8px"><button class="btn ghost sm" id="cerrarMes">Mes cumplido</button><button class="btn ghost sm" id="cerrarMesC">Mes cumplido ⚡</button></div>
+        <button class="btn ghost sm" id="cerrarMes">Mes cumplido</button>
         <span class="dmayu">Enciende el cartel del mes en Tu mural con el color del tramo. Premios reales: propuesta para el dueño.</span></div>
       <div class="dmrow"><span class="dmk">Índice FIT (InBody)</span>
         <div class="opts g3" id="fitPick"><button class="opt" data-fit="0" aria-pressed="false">Sin medir</button><button class="opt" data-fit="1" aria-pressed="false">1 medición</button><button class="opt" data-fit="3" aria-pressed="true">3 mediciones</button></div>
@@ -240,6 +240,26 @@
         <div class="dmrow"><span class="dmk">El ejercicio de la semana (video del profe)</span>
           <div class="opts g2"><button class="opt" data-sevid="1" aria-pressed="true">Sí</button><button class="opt" data-sevid="0" aria-pressed="false">No</button></div></div>
       </div>
+      <div class="stack" id="socHRow" style="gap:14px" hidden>
+        <div class="dmrow"><span class="dmk">Perfil</span>
+          <div class="opts g3"><button class="opt" data-shpf="banda" aria-pressed="true">Con banda<small>Martina</small></button><button class="opt" data-shpf="sola" aria-pressed="false">Nueva, sola<small>Sofi</small></button><button class="opt" data-shpf="duo" aria-pressed="false">Nueva, en dúo<small>Sofi y Cami</small></button></div>
+          <span class="dmayu" id="socHTxt"></span></div>
+        <div class="dmrow" id="shRowMom"><span class="dmk">Momento de la semana</span>
+          <div class="opts g3"><button class="opt" data-shmo="lun" aria-pressed="false">Lunes<small>resultado</small></button><button class="opt" data-shmo="mie" aria-pressed="true">Miércoles<small>cómo vamos</small></button><button class="opt" data-shmo="dom" aria-pressed="false">Domingo<small>se define</small></button></div>
+          <span class="dmayu">La fijada cambia con la semana. Los números cuentan hasta ayer.</span></div>
+        <div class="dmrow" id="shRowDia" hidden><span class="dmk">Día de la socia nueva</span>
+          <div class="opts g3"><button class="opt" data-shdia="1" aria-pressed="false">Día 1<small>lunes 2/11</small></button><button class="opt" data-shdia="8" aria-pressed="true">Día 8<small>lunes 9/11</small></button><button class="opt" data-shdia="22" aria-pressed="false">Día 22<small>lunes 23/11</small></button></div></div>
+        <div class="dmrow" id="shRowVino" hidden><span class="dmk">Su primera semana</span>
+          <div class="opts g2"><button class="opt" data-shvino="3" aria-pressed="true">Vino 3 de 3</button><button class="opt" data-shvino="1" aria-pressed="false">Vino una vez<small>el caso que más importa</small></button></div></div>
+        <div class="dmrow"><span class="dmk">Comparación con la camada</span>
+          <div class="opts g2"><button class="opt" data-shcomp="1" aria-pressed="true">Sí</button><button class="opt" data-shcomp="0" aria-pressed="false">No</button></div>
+          <span class="dmayu">Un número, sin nombres ni puestos; con 8 o más y solo mientras la mayoría viene. Para mostrarle las dos al dueño.</span></div>
+        <div class="dmrow"><span class="dmk">People</span>
+          <div class="opts g2"><button class="opt" data-shpeo="1" aria-pressed="false">Activada</button><button class="opt" data-shpeo="0" aria-pressed="true">No</button></div>
+          <span class="dmayu">Activada: la entrada aparece en la barra y "Me interesa" en la foto de Lu. Menores, nunca.</span></div>
+        <div class="dmrow"><span class="dmk">Muro</span>
+          <div class="opts g2"><button class="opt" data-shmuro="lleno" aria-pressed="true">Lleno</button><button class="opt" data-shmuro="poco" aria-pressed="false">Casi vacío</button></div></div>
+      </div>
       <div class="stack" id="socGRow" style="gap:14px" hidden>
         <div class="dmrow"><span class="dmk">Escenarios de la G (un toque deja todo armado)</span>
           <div class="opts g2"><button class="opt" data-sgesc="7" aria-pressed="false">7 · Martes<small>dos anillos</small></button><button class="opt" data-sgesc="8" aria-pressed="false">8 · Lunes<small>se revela</small></button><button class="opt" data-sgesc="9" aria-pressed="false">9 · Mica, 19<small>sin banda ve la fila</small></button><button class="opt" data-sgesc="10" aria-pressed="false">10 · No visible<small>falta el sí de uno</small></button><button class="opt" data-sgesc="11" aria-pressed="false">11 · Lunes, el resumen<small>ganaron; lo comparten</small></button><button class="opt" data-sgesc="12" aria-pressed="false">12 · Lunes, semana floja<small>dice lo hecho</small></button></div></div>
@@ -320,6 +340,11 @@
       <p class="small muted" style="margin:0;line-height:1.5"><b>Cambia respecto de la D:</b> en la D nunca se veía cuánto aportó cada uno; en la E se ve el avance de cada uno hacia su propia meta. Es el riesgo de la E (comparación y presión). Si en las bandas que no llegan se va más el que quedó más abajo, se saca la barra individual y queda solo la de la banda.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Preguntas abiertas:</b> (1) con el dueño, las horas del profe para grabar el video semanal · (2) qué hace una banda junta en una sala sin clases, además de coincidir (profe de Sarmiento) · (3) con el dueño: mostrar el avance de cada uno (con permiso), quién arma las bandas y con cuántas horas · menores: opinión del abogado.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Detrás (no se construye acá):</b> la pantalla necesita la entrada del día en el día (sin verificar con Viva Gestión); con la de la noche se mueve con un día de atraso. El profe arma las bandas en su tablero y ve las semanas flojas como señal para mirar a la banda.</p></div>
+      <div class="stack" data-socnota="H" style="gap:8px" hidden><span class="dmk">La placa: qué es ejemplo y qué falta definir</span>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Una sola pieza (DIS, 18/11):</b> todo lo que aparece es una placa 4:5 con el mismo marco (sello de Viva, @vivafithouse y, solo si hay un dato de la puerta, el sello amarillo) o una historia detrás de una insignia. Regla de juego: cada uno contra su propia meta, a cuatro tamaños (vos, tu dúo, tu banda, tu sede).</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Piso:</b> lo de una persona lo ve ella y quien eligió; lo de un dúo, ellos dos; una banda se muestra a otras desde cuatro integrantes (Team domingo, de tres, no aparece); de la sede, números sin nombres. Nada dice la hora ni qué faltó. Menores: sin dúo, sin foto hacia afuera, sin People ni Voy.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Para el dueño:</b> (1) la comparación con la camada (los que arrancaron la misma semana): ¿se muestra? Es una prueba. (2) People: plan o chat y quién atiende denuncias. (3) La foto que vuelve desde Instagram: falta verificar con Meta.</p>
+      <p class="small muted" style="margin:0;line-height:1.5"><b>Es ejemplo:</b> los nombres, las seis bandas y una sede simulada con la forma de EVO (entradas, metas y altas de doce semanas); de ahí sale cada número. Las fotos son ilustraciones; la de Lu "desde Instagram" y la publicación de VIVA, simuladas.</p></div>
       <div class="stack" data-socnota="G" style="gap:8px" hidden><span class="dmk">Las insignias: qué es ejemplo y qué falta definir</span>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Cuatro niveles (T27):</b> la fila de insignias · tu banda, con su insignia y cuatro acciones (Voy, con el día y la hora; Foto; Chat, que abre WhatsApp; Sumar) · el cruce · lo último y Social VIVA. Tocás una insignia y ves su semana en piezas gráficas (las celdas de la semana, las columnas del cruce, la insignia que suma su pieza, el resultado, los ⚡). De lunes a miércoles, el anillo de tu banda trae el resumen de la semana que cerró, con una imagen para historias.</p>
       <p class="small muted" style="margin:0;line-height:1.5"><b>Piso:</b> nadie escribe ni sube nada; de otra banda se ve solo la insignia, el nombre, la sede, las semanas en sincro y lo que logró la banda (nunca quién, ni la hora, ni quién falta). La fila no se ordena por rendimiento y no hay tabla. Una banda aparece solo si todos sus integrantes dijeron que sí, cada uno por su lado, y ninguno es menor (hasta el abogado).</p>
@@ -343,7 +368,7 @@
         <button class="btn ghost sm" id="coachNew">Simular que tiene algo nuevo</button>
         <span class="dmayu">Pendiente de E3. El botón se puede arrastrar.</span></div>
     </details>
-    <div class="grid2" style="gap:8px"><button class="btn ghost sm" data-go="gestion">Ver lo que ve Viva</button><button class="btn ghost sm" id="dmReset">Reiniciar la demo</button></div>
+    <div class="grid2" style="gap:8px"><!--sin-gestion--><button class="btn ghost sm" id="dmReset">Reiniciar la demo</button></div>
 
     <!-- Motor: controles viejos que la app todavía usa por dentro; el panel los maneja desde Antigüedad, Días sin venir y Plan -->
     <div id="dmMotor" hidden>

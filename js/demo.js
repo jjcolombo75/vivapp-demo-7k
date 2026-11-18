@@ -110,17 +110,15 @@
     $$('#muralPick [data-mur]').forEach(x => x.setAttribute('aria-pressed', x === b));
     $('#demoSheet').hidden = true; renderMural(); renderPremios(); renderForma(); renderDesafios(); go('muralScr');
   });
-  var CIERRE_C = false;
-  $('#cerrarMesC').addEventListener('click', () => { CIERRE_C = true; cerrarMesDemo(); });
-  $('#cerrarMes').addEventListener('click', () => { CIERRE_C = false; cerrarMesDemo(); });
+  $('#cerrarMes').addEventListener('click', cerrarMesDemo);
   function cerrarMesDemo(){
     if (MURK === 'nueva') { toast('La socia nueva todavía no tiene un mes entero: elegí 3 meses o 1 año'); return; }
     $('#demoSheet').hidden = true;
     const now = HOY_D, id = 'm' + now.getFullYear() + '-' + now.getMonth();
     const v = tv(serie().slice(-1)[0].f); let ti = 0; zonas().forEach((q, k) => { if (v >= q[0]) ti = k; });
-    const prevM = MUR.meses.find(m => m.m === now.getMonth() && m.y === now.getFullYear()); if (prevM) prevM.c = CIERRE_C;
-    if (!prevM) { MUR.meses.push({ m:now.getMonth(), y:now.getFullYear(), t:ti, c:CIERRE_C }); MUR.sem += Math.max(0, 3 - MUR.prevMes - (semCumplida() ? 1 : 0)); }
-    MUR.cerrado = true; MUR.cerradoC = CIERRE_C; muralNuevo = id;
+    const prevM = MUR.meses.find(m => m.m === now.getMonth() && m.y === now.getFullYear());
+    if (!prevM) { MUR.meses.push({ m:now.getMonth(), y:now.getFullYear(), t:ti }); MUR.sem += Math.max(0, 3 - MUR.prevMes - (semCumplida() ? 1 : 0)); }
+    MUR.cerrado = true; muralNuevo = id;
     renderMural(); renderPremios(); renderForma(); renderDesafios(); go('inicio');
     abrirCartel(muralEventos().find(x => x.id === id));
   }
@@ -339,6 +337,7 @@
   // Agregar una versión = una fila en SOC_VERS, su pantalla (#social + la letra; la A es #social) y su nota (data-socnota) en html/demo.html.
   const SOC_VERS = [
     ['F', 'Las puertas', 'F · Una pantalla, dos puertas para que nadie entrene solo: Traé a tu gente o Viva te presenta (abajo, Puerta). Con banda: la fecha, el cruce de la semana como protagonista y lo de Viva. Queda para comparar con la G.'],
+    ['H', 'La placa', 'H · Tres zonas: la barra ("+", Desafíos y People), la tira de insignias y el muro de placas, todas con el mismo marco. Tres socios: con banda, nueva y sola, nueva en dúo (abajo, Perfil). Abre por defecto.'],
     ['G', 'Las insignias', 'G · Cuatro niveles: arriba, la fila de insignias de las bandas; tu banda con cuatro acciones (Voy · Foto · Chat · Sumar); el cruce; lo último. Tocás una insignia y ves su semana en piezas gráficas; el lunes, el resumen para compartir. Sin fotos ni nada que moderar.']
   ];
   const SOC_EE = { sin:['Sin banda', 'El que llega solo (Mica, 19 años, semana 2): el ecualizador apagado con su lugar latiendo y una sola acción, Tu primer jueves.'],
@@ -372,6 +371,7 @@
     if (typeof seSync === 'function') seSync();
     if (typeof sfSync === 'function') sfSync();
     if (typeof sgSync === 'function') sgSync();
+    if (typeof shSync === 'function') shSync();
     $$('#demoSheet [data-socnota]').forEach(n => n.hidden = n.dataset.socnota !== SOC_V);
     socNav();
   }
@@ -527,6 +527,37 @@
     if ((b = e.target.closest('[data-sgesp]'))) { SG.esp = b.dataset.sgesp === '1'; if (SG.esp && SF.est !== 'con') sfEstado('con'); return aG(SG.esp ? 'Semana del cruce especial: sede contra sede' : 'Sin cruce especial'); }
   });
   socSync();
+
+//#bloque 349
+  // ===== T28 · la H en el panel: perfil, momento de la semana, día de la socia nueva, su primera semana, comparación, People y muro =====
+  var SH_OPC = { perfil:['banda', 'sola', 'duo'], mom:['lun', 'mie', 'dom'], dia:[1, 8, 22], vino:[3, 1] };
+  var SH_PTXT = { banda:'Martina, Sarmiento, de Dúo dinamita (cinco). La fijada es el cruce de la semana con Las del mediodía; después, la foto de Lu, el momento de Cris, la sede y VIVA.',
+    sola:'Sofi, alta el lunes 2/11 en Sarmiento, meta 3, no conoce a nadie. Día 1, 8 o 22 (abajo). La puerta, su camada como número y los rayos de su sede.',
+    duo:'Sofi y Cami, que vinieron juntas el lunes 2/11. La fijada es el dúo: cada semana que cumplen las dos, se enciende un tubo; "Voy mañana".' };
+  if (dmMem.socH) { const x = dmMem.socH; Object.keys(SH_OPC).forEach(k => { if (SH_OPC[k].includes(x[k])) SH[k] = x[k]; }); SH.comp = x.comp !== false; SH.people = !!x.people; SH.muro = x.muro === 'poco' ? 'poco' : 'lleno'; }
+  else SOC_V = 'H';   // T28: la H abre por defecto, también para quien tenía guardada otra versión
+  function shSave(){ dmMem.socH = { perfil:SH.perfil, mom:SH.mom, dia:SH.dia, vino:SH.vino, comp:SH.comp, people:SH.people, muro:SH.muro }; dmSave(); }
+  function shSync(){
+    const r = $('#socHRow'); if (!r || typeof SH_OPC === 'undefined') return;   // socSync (bloque 345) llama antes de que exista
+    r.hidden = SOC_V !== 'H';
+    const ph = (s, v) => $$('#socHRow [' + s + ']').forEach(x => x.setAttribute('aria-pressed', x.getAttribute(s) === String(v)));
+    ph('data-shpf', SH.perfil); ph('data-shmo', SH.mom); ph('data-shdia', SH.dia); ph('data-shvino', SH.vino); ph('data-shcomp', SH.comp ? 1 : 0); ph('data-shpeo', SH.people ? 1 : 0); ph('data-shmuro', SH.muro);
+    $('#shRowMom').hidden = SH.perfil !== 'banda'; $('#shRowDia').hidden = SH.perfil === 'banda'; $('#shRowVino').hidden = !(SH.perfil === 'sola' && SH.dia === 8);
+    $('#socHTxt').textContent = SH_PTXT[SH.perfil];
+    if (SOC_V === 'H') { if (SH.h) shCerrar(); $('#shHoja').hidden = true; shRender(); }
+  }
+  shSave(); socSync();
+  var SH_PN = { banda:'Con banda (Martina)', sola:'Nueva, sola (Sofi)', duo:'Nueva, en dúo (Sofi y Cami)' }, SH_MN = { lun:'Lunes: el resultado y rival nuevo', mie:'Miércoles: cómo vamos', dom:'Domingo: se define hoy' };
+  $('#demoSheet').addEventListener('click', e => { let b;
+    const aH = msg => { SH.visto = {}; SH.puertaNo = false; SH.prop = []; SH.voy = false; SOC_V = 'H'; shSave(); socSave(); socSync(); return dmFin('social', msg); };
+    if ((b = e.target.closest('[data-shpf]'))) { SH.perfil = b.dataset.shpf; return aH('Social H · ' + SH_PN[SH.perfil]); }
+    if ((b = e.target.closest('[data-shmo]'))) { SH.perfil = 'banda'; SH.mom = b.dataset.shmo; return aH(SH_MN[SH.mom]); }
+    if ((b = e.target.closest('[data-shdia]'))) { if (SH.perfil === 'banda') SH.perfil = 'sola'; SH.dia = +b.dataset.shdia; if (SH.dia === 1) SH.ins = null; return aH(SH_PN[SH.perfil] + ' · día ' + SH.dia); }
+    if ((b = e.target.closest('[data-shvino]'))) { SH.perfil = 'sola'; SH.dia = 8; SH.vino = +b.dataset.shvino; return aH(SH.vino === 3 ? 'Su primera semana: vino 3 de 3' : 'Su primera semana: vino una vez'); }
+    if ((b = e.target.closest('[data-shcomp]'))) { SH.comp = b.dataset.shcomp === '1'; return aH(SH.comp ? 'Comparación con la camada: sí' : 'Comparación con la camada: no'); }
+    if ((b = e.target.closest('[data-shpeo]'))) { SH.people = b.dataset.shpeo === '1'; return aH(SH.people ? 'People activada: la entrada aparece en la barra' : 'People: no'); }
+    if ((b = e.target.closest('[data-shmuro]'))) { SH.muro = b.dataset.shmuro; return aH(SH.muro === 'poco' ? 'Muro casi vacío' : 'Muro lleno'); }
+  });
 
 //#bloque 985
   // T16 · gancho de prueba para tools/barrido.py: abre pantallas que necesitan estado. Ninguna pantalla lo usa.

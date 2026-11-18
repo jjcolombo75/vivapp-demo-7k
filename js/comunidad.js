@@ -331,7 +331,7 @@
   // encuentros cumplidos y desafío del mes, entradas de EVO de noche (solo totales del grupo) · eventos, los que carga marketing · referidos, lo que Viva ya registra.
   // Piso: ninguna pantalla muestra presencia, horario ni kilos de otro socio; "van N" es un número, sin quién; la app no cuenta ausencias;
   // nada de lo que un socio escribe o fotografía queda guardado para que otro lo vea (la charla vive en su WhatsApp; la foto sale y no se guarda).
-  var SOC_V = 'F', SOC_B = 'con';   // la F abre por defecto (Juanjo, 15/11, T25); antes la B
+  var SOC_V = 'H', SOC_B = 'con';   // la H abre por defecto (T28, 18/11); antes la F (15/11) y la B
   var SB = { voy:{ primer:null, con:'voy' }, quiero:false, anot:{} };
   const SB_G = { nom:['Los del', 'jueves'], dia:'JUE', diaL:'jueves', hora:'19:00', sede:'Sarmiento', que:'Cada uno su rutina, a la misma hora', van:{ primer:4, con:3 }, enc:12, des:[38, 60],
     gente:[['Vos', MV_YO], ['Sofi', ['#c08a3a','#33230c']], ['Ramiro', ['#5a7aa8','#141e2e']], ['Cami', ['#8a4f9a','#22102c']], ['Nico', ['#3a8a7a','#0e2a24']], ['Juli', ['#a0603a','#301a0c']]] };
@@ -2119,3 +2119,482 @@
     if (!e.target.closest('[data-sg2share]')) return;
     e.stopPropagation(); sgCerrar(); toast('Se abre Instagram para tu historia (en la demo, de ejemplo)');
   }, true);
+
+//#bloque 238
+  // ===== T28 · Social, versión H: la tira y las placas (v114) =====
+  // Tres zonas: la barra ("+", el nombre, Desafíos y People, que ve solo quien la activó) · la tira (insignias en círculo; aro blanco = algo
+  // nuevo; tocar una abre su historia) · el muro (placas 4:5, la primera fijada, después por fecha; termina en "Estás al día"). Una sola pieza,
+  // la placa: imagen con un marco fijo (sello de Viva, @vivafithouse y, solo con un dato de la puerta, el sello amarillo "PUERTA · …").
+  // Simulación propia (no toca el estado de la F ni de la G): una sede con la forma de EVO ({socio, fecha}), metas de 2 a 5, altas por
+  // semana y bandas con insignias de la biblioteca. Todo número sale de ahí, con un día de atraso ("hasta ayer").
+  // Piso (reglas 4, 5, 8 y 14 de T28): lo de una persona lo ve ella y quien ella eligió; lo de un dúo, ellos dos; una banda se muestra a
+  // otros desde cuatro integrantes y si eligió verse, y de ella solo datos de banda; de la sede, agregados sin nombres; nada dice la hora,
+  // qué faltó ni cuántos días pasaron; la camada es un número, con 8 o más y solo mientras la mayoría viene; menores: sin dúo, sin foto hacia
+  // afuera, sin People y sin Voy. En real: entradas, altas (fecha y sede, sin verificar) y edad, de EVO; dúos, bandas, cruces, ⚡ y chispas,
+  // tablas de Vivapp; la foto "desde Instagram", la API de Meta (sin verificar).
+  var SH = { perfil:'banda', mom:'mie', dia:8, vino:3, comp:true, people:false, muro:'lleno',
+    visto:{}, rayo:{}, chispa:{}, voy:false, ins:null, prop:[], desaf:{}, puertaNo:false, h:null, hT:0, now:0 };
+  const SH_C = { c:'#07b0f2', m:'#f400a0', y:'#ffe94a' }, SH_GR = '#c3cad6';
+  const shMen = () => scMenor();
+
+  // ---- trazos (los del tablero del DIS: gen-tablero-social-cero.py)
+  const SH_TR = {
+    rayo:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>', duelo:'<path d="M5 19 19 5M15 5h4v4M19 19 5 5M5 9V5h4"/>', mas:'<path d="M12 5v14M5 12h14"/>',
+    check:'<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16 9.5"/>', camara:'<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7h.01"/>',
+    fijada:'<path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/>', der:'<path d="M9 5l7 7-7 7"/>',
+    chispa:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+    wa:'<path d="M4 20l1.4-4.2A8 8 0 1 1 8.6 19z"/>', momento:'<path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/>' };
+  const shTr = (k, c, s, sw, lleno) => '<svg aria-hidden="true" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="' + (lleno ? c : 'none') + '" stroke="' + c + '" stroke-width="' + (sw || 2) + '" stroke-linecap="round" stroke-linejoin="round">' + SH_TR[k] + '</svg>';
+
+  // ---- insignias: las seis de neón (pantalla Base), la de la sede, el monograma de cada persona y la del dúo. Crecen: nacen con un tubo
+  // encendido y suman los otros con las semanas en sincro (4 y 12); nunca pierden nada.
+  const SH_EMB = {
+    'Dúo dinamita':[['m', '<rect x="17" y="26" width="12" height="28" rx="3"/><rect x="35" y="26" width="12" height="28" rx="3"/><path d="M17 34h12M17 46h12M35 34h12M35 46h12"/>'],
+      ['c', '<path d="M23 26c0-8 9-6 9-12M41 26c0-8-9-6-9-12"/>'], ['y', '<path d="M32 3v5M25 6l3.5 3.5M39 6l-3.5 3.5M21 14h5M38 14h5"/>']],
+    'Las del mediodía':[['y', '<circle cx="32" cy="22" r="9"/><path d="M32 4v5M17 7l3.5 3.5M47 7l-3.5 3.5M12 22h5M47 22h5"/>'], ['m', '<path d="M16 54a16 16 0 0 1 32 0M32 54V42"/>'], ['c', '<path d="M8 54h48"/>']],
+    'Team domingo':[['c', '<path d="M14 6v52M14 10h38l-10 12 10 12H14"/>'], ['m', '<path d="M28 15l1.8 3.7 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z"/>'], ['y', '<path d="M8 58h14"/>']],
+    'Hierro y mate':[['m', '<path d="M21 24h22v5c0 10-4.5 17-11 17s-11-7-11-17z"/>'], ['y', '<path d="M35 24l7-18h7"/>'], ['c', '<path d="M14 56h36M10 51v10M16 52v8M54 51v10M48 52v8"/>']],
+    'Los de siempre':[['m', '<path d="M32 34c-5-8-9-11-14-11a11 11 0 0 0 0 22c5 0 9-3 14-11zm0 0c5 8 9 11 14 11a11 11 0 0 0 0-22c-5 0-9 3-14 11z"/>'], ['y', '<path d="M35 3l-7 9h6l-2 7 7-10h-6z"/>'], ['c', '<path d="M18 56h28"/>']],
+    'Los madrugadores':[['y', '<path d="M16 40a16 16 0 0 1 32 0M32 12v6M15 19l4 4M49 19l-4 4"/>'], ['c', '<path d="M4 42h56"/>'], ['m', '<path d="M14 50h36M22 58h20"/>']],
+    Sarmiento:[['c', '<path d="M32 58S14 41 14 27a18 18 0 0 1 36 0c0 14-18 31-18 31z"/>'], ['m', '<circle cx="32" cy="27" r="7"/>'], ['y', '<path d="M22 60h20"/>']]
+  };
+  const shSvg = (s, sombra, g, lbl) => '<svg class="shemb" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 ' + (s > 60 ? 10 : 6) + 'px ' + sombra + ')"' + (lbl ? ' role="img" aria-label="' + lbl + '"' : ' aria-hidden="true"') + '>' + g + '</svg>';
+  const shTubo = (c, d, on) => on ? '<g stroke="' + c + '" stroke-width="8" opacity=".22">' + d + '</g><g stroke="' + c + '" stroke-width="3.2">' + d + '</g><g stroke="#fff" stroke-width="1" opacity=".8">' + d + '</g>' : '<g stroke="#3a4352" stroke-width="3">' + d + '</g>';
+  function shEmb(nom, s, sem, lbl){
+    const L = SH_EMB[nom], lit = sem == null ? 3 : 1 + (sem >= 4) + (sem >= 12);
+    return shSvg(s, SH_C[L[0][0]], L.map((x, i) => shTubo(SH_C[x[0]], x[1], i < lit)).join(''), lbl);
+  }
+  const SH_HEX = '<path d="M32 5 55 18v28L32 59 9 46V18z"/>';
+  const shMono = (l, c1, c2, s) => shSvg(s, SH_C[c1], shTubo(SH_C[c1], SH_HEX, true) +
+    '<text x="32" y="42" text-anchor="middle" style="font-family:var(--display);font-weight:800" font-size="27" fill="#fff" stroke="' + SH_C[c2] + '" stroke-width=".8">' + l + '</text>');
+  const shDuo = s => shSvg(s, SH_C.m, shTubo(SH_C.m, '<path d="M24 12 41 22v20L24 52 7 42V22z"/>', true) + shTubo(SH_C.c, '<path d="M40 12 57 22v20L40 52 23 42V22z"/>', true));
+  const shHueco = s => '<svg class="shemb" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke="' + SH_GR + '" stroke-width="2.4" stroke-dasharray="5 6">' + SH_HEX + '</g>' +
+    '<text x="32" y="42" text-anchor="middle" style="font-family:var(--display);font-weight:800" font-size="27" fill="' + SH_GR + '">?</text></svg>';
+  const shLogo = w => { const h = Math.round(w * 167.9 / 344.8); return '<svg class="shlogo" width="' + w + '" height="' + h + '" aria-hidden="true"><use href="#vLogo" width="' + w + '" height="' + h + '"/></svg>'; };
+  const shViva = s => '<span class="shvivai" style="width:' + s + 'px;height:' + s + 'px">' + shLogo(Math.round(s * .7)) + '</span>';
+  // La insignia de cada uno: Martina, Sofi y Cami con su monograma (Sofi la elige el día 1); las de otros, solo dentro de su banda o su dúo
+  const SH_PER = { Martina:['M', 'm', 'c'], Sofi:['S', 'm', 'c'], Cami:['C', 'c', 'm'], Cris:['C', 'c', 'm'], Lu:['L', 'm', 'y'] };
+  const shPer = (n, s) => { const x = n === 'Sofi' && SH.ins ? SH.ins : SH_PER[n]; return shMono(x[0], x[1], x[2], s); };
+
+  // ---- la sede simulada (Sarmiento; las bandas pueden ser de López y Planes). Nombres inventados.
+  const SH_BANDAS = [
+    { key:'dd', nom:'Dúo dinamita', sede:'Sarmiento', mem:[['Martina', 3, .86], ['Cris', 3, 1], ['Vero', 2, .8], ['Pau', 4, .74], ['Juli', 3, .72]] },
+    { key:'lm', nom:'Las del mediodía', sede:'Sarmiento', mem:[['Lu', 3, .93], ['Ani', 2, .8], ['Caro', 3, .76], ['Meli', 3, .72]] },
+    { key:'hm', nom:'Hierro y mate', sede:'López y Planes', mem:[[null, 3, .85], [null, 2, .82], [null, 3, .8], [null, 4, .72]] },
+    { key:'ls', nom:'Los de siempre', sede:'Sarmiento', mem:[[null, 3, .78], [null, 3, .74], [null, 2, .8], [null, 4, .66], [null, 3, .7]] },
+    { key:'md', nom:'Los madrugadores', sede:'Sarmiento', mem:[[null, 3, .7], [null, 3, .66], [null, 2, .72], [null, 3, .62]] },
+    { key:'td', nom:'Team domingo', sede:'López y Planes', mem:[[null, 2, .8], [null, 2, .78], [null, 3, .7]] }   // de tres: no se muestra a otros (regla 4)
+  ];
+  SH_BANDAS.forEach(b => { b.ids = b.mem.map((_, j) => b.key + j); b.vis = b.mem.length >= 4; });
+  const shBan = k => SH_BANDAS.find(b => b.key === k);
+  // Sofi y Cami: alta el lunes 2/11 (semana -2) a la mañana; sus entradas las fija el panel (semana 1: 3 de 3 o una vez)
+  const SH_FIJ = { sofi:[['L10:30', 'X19:00', 'V18:30'], ['L18:30', 'X19:00', 'V18:30'], ['L18:30', 'X19:00', 'V18:30']], cami:[['L10:35', 'J19:00'], ['M19:00', 'J19:05'], ['L19:00', 'X19:00']] };
+  var SH_SIM = null;
+  function shArmar(){
+    const R = sgRnd(sgHash('T28 · Sarmiento')), P = {}, ent = [];
+    const alta = (id, o) => P[id] = Object.assign({ id:id, sede:'Sarmiento', meta:3, p:.7, alta:-40 * SE_SEM }, o);
+    for (let i = 0; i < 150; i++) alta('v' + i, { meta:[2, 3, 3, 3, 4, 4, 5][Math.floor(R() * 7)], p:.3 + R() * .65 });
+    SH_BANDAS.forEach(b => b.mem.forEach((x, j) => alta(b.key + j, { n:x[0], sede:b.sede, meta:x[1], p:x[2], banda:b.key })));
+    for (let w = -9; w <= 1; w++) { const N = w === -2 ? 17 : 15 + Math.floor(R() * 9);
+      for (let i = 0; i < N; i++) alta('a' + w + '_' + i, { meta:[2, 3, 3, 3, 4][Math.floor(R() * 5)], p:.62 + R() * .33, drop:.15,
+        alta:w * SE_SEM + Math.floor(Math.pow(R(), 2.6) * 6) * SE_DIA + (8 + Math.floor(R() * 12)) * 60 }); }   // más altas al principio de la semana
+    alta('sofi', { n:'Sofi', meta:3, alta:-2 * SE_SEM + 10 * 60, fija:true }); alta('cami', { n:'Cami', meta:2, alta:-2 * SE_SEM + 10 * 60 + 5, fija:true });
+    Object.values(P).forEach(s => { if (s.fija) return;
+      // los días de cada uno: barajados con el generador (un sort con comparador al azar no da lo mismo en cada carga)
+      const d6 = [0, 1, 2, 3, 4, 5]; for (let i = 5; i > 0; i--) { const j = Math.floor(R() * (i + 1)), t = d6[i]; d6[i] = d6[j]; d6[j] = t; }
+      s.hab = d6.slice(0, s.meta + 1).sort((x, y) => x - y);
+      const w0 = Math.max(-12, Math.floor(s.alta / SE_SEM)); let fuera = false;
+      for (let w = w0; w <= 1; w++) {
+        if (s.drop && w > w0 && R() < s.drop) fuera = true;
+        const p = fuera ? .03 : s.p >= 1 ? 1 : s.p * (R() < .12 ? .5 : 1);
+        // la primera semana el que arranca viene más: cualquier día desde el alta
+        if (s.drop && w === w0) { for (let d = sfDia(s.alta); d < 6; d++) { const m = w * SE_SEM + d * SE_DIA + (7 + Math.floor(R() * 14)) * 60; if (m >= s.alta && R() < s.p * .8) ent.push({ socio:s.id, fecha:seFm(m) }); } continue; }
+        s.hab.forEach(d => { const m = w * SE_SEM + d * SE_DIA + (7 + Math.floor(R() * 14)) * 60 + Math.floor(R() * 50);
+          if (m >= s.alta && R() < p) ent.push({ socio:s.id, fecha:seFm(m) }); }); } });
+    // los ⚡ que mandaron socios de la sede a la placa "arrancaron" de la camada de Sofi (cada veterano, uno de cada cinco)
+    let rayos = 0; for (let i = 0; i < 150; i++) if (R() < .2) rayos++;
+    return { P:P, ent:ent, rayos:rayos };
+  }
+  function shSim(){
+    if (!SH_SIM) { const A = shArmar(), M = {};
+      A.ent.forEach(e => (M[e.socio] = M[e.socio] || []).push(seMin(e.fecha)));
+      Object.keys(M).forEach(k => M[k].sort((a, b) => a - b)); SH_SIM = { P:A.P, M:M, rayos:A.rayos }; }
+    ['sofi', 'cami'].forEach(id => { const L = [];
+      SH_FIJ[id].forEach((sem, k) => (id === 'sofi' && k === 0 && SH.perfil === 'sola' && SH.dia === 8 && SH.vino === 1 ? ['L10:30'] : sem).forEach(t => L.push(seMin(seFm(seSlot(k - 2, t))))));
+      SH_SIM.M[id] = L; });
+    return SH_SIM;
+  }
+
+  // ---- lecturas: todo cuenta hasta ayer (la puerta se confirma de noche)
+  const shHoy = () => Math.floor(SH.now / SE_DIA) * SE_DIA;
+  const shWk = m => Math.floor(m / SE_SEM);
+  const shCuenta = (id, w, h) => (shSim().M[id] || []).filter(m => m >= w * SE_SEM && m < (w + 1) * SE_SEM && m < h).length;
+  const shMeta = id => shSim().P[id].meta;
+  function shPct(b, w, h){ const t = b.ids.reduce((a, id) => a + Math.min(shMeta(id), shCuenta(id, w, h)), 0), M = Math.round(.8 * b.ids.reduce((a, id) => a + shMeta(id), 0)); return Math.round(100 * t / M); }
+  function shSincro(b, h){ let n = 0; for (let w = -12; w < shWk(h); w++) if (shPct(b, w, (w + 1) * SE_SEM) >= 100) n++; return n; }
+  function shSeguidas(id, h){ let n = 0; for (let w = shWk(h) - 1; w >= -12 && shCuenta(id, w, h) >= shMeta(id); w--) n++; return n; }
+  // El cruce: esta semana, Dúo dinamita contra Las del mediodía; la semana pasada, la primera que ganaron (si no, la revancha sería otra)
+  const SH_RIV0 = 'lm';
+  function shRiv(w){ if (w >= 0) return SH_RIV0; const fin = (w + 1) * SE_SEM, a = shPct(shBan('dd'), w, fin);
+    return ['md', 'ls', 'hm'].find(k => a > shPct(shBan(k), w, fin)) || 'md'; }
+  // El resto se cruza entre sí cada lunes (de a dos, por orden fijo); de ahí sale quién ganó su cruce
+  function shGano(k, w){ const fin = (w + 1) * SE_SEM, dd = shBan('dd');
+    if (k === shRiv(w)) return shPct(shBan(k), w, fin) > shPct(dd, w, fin);
+    const L = SH_BANDAS.filter(b => b.key !== 'dd' && b.key !== shRiv(w)).map(b => b.key), i = L.indexOf(k), o = L[i ^ 1];
+    return !!o && shPct(shBan(k), w, fin) > shPct(shBan(o), w, fin); }
+  // Eventos de banda de esta semana (solo de banda; nunca quién): entró en sincro (el día) · ganó su cruce (el lunes)
+  function shEv(b){
+    const h = shHoy(), w = shWk(h), ev = [];
+    if (w - 1 >= -12 && shGano(b.key, w - 1)) ev.push({ k:'gano', m:w * SE_SEM + 6 * 60 });
+    const E = b.ids.reduce((a, id) => a.concat((shSim().M[id] || []).filter(m => m >= w * SE_SEM && m < h)), []).sort((a, c) => a - c);
+    const t = E.find(m => shPct(b, w, m + 1) >= 100); if (t != null) ev.push({ k:'sincro', m:Math.floor(t / SE_DIA) * SE_DIA + SE_DIA + 6 * 60 });
+    return ev.filter(x => x.m <= SH.now).sort((p, q) => p.m - q.m);
+  }
+  // La sede: de los que vinieron al menos una vez en el último mes, cuántos de cada 10 llegaron a su meta esa semana
+  function shSedeMeta(w){
+    const S = shSim(), act = Object.values(S.P).filter(s => s.sede === 'Sarmiento' && !s.fija && s.alta < w * SE_SEM && (S.M[s.id] || []).some(m => m >= (w - 3) * SE_SEM && m < (w + 1) * SE_SEM));
+    const ok = act.filter(s => shCuenta(s.id, w, Infinity) >= s.meta).length;
+    return { n:act.length, ok:ok, r:ok / act.length, de10:Math.round(10 * ok / act.length) };
+  }
+  const shAltas = (w, h) => Object.values(shSim().P).filter(s => s.sede === 'Sarmiento' && s.alta >= w * SE_SEM && s.alta < (w + 1) * SE_SEM && s.alta < h);
+  // La camada de Sofi: los que se dieron de alta la semana del lunes 2/11 en Sarmiento (ella y Cami incluidas)
+  function shCamada(){
+    const h = shHoy(), C = shAltas(-2, Infinity), sem = shWk(h) - (-2);   // semanas cerradas desde el alta
+    if (C.length < 8 || sem < 1) return null;
+    const dos = s => (shSim().M[s.id] || []).filter(m => m >= s.alta && m < s.alta + 7 * SE_DIA && m < h).length >= 2, todas = s => [-2, -1, 0].every(w => shCuenta(s.id, w, h) >= 1);
+    const f = sem >= 3 ? todas : dos, n = C.filter(f).length;
+    return { N:C.length, n:n, tres:sem >= 3, mayoria:n / C.length > .5, sofi:f(shSim().P.sofi), cami:f(shSim().P.cami) };
+  }
+
+  // ---- el momento de la demo
+  const SH_MOMV = { lun:8 * 60, mie:2 * SE_DIA + 12 * 60, dom:6 * SE_DIA + 12 * 60 };
+  const shNow = () => SH.perfil === 'banda' ? SH_MOMV[SH.mom] : -2 * SE_SEM + (SH.dia - 1) * SE_DIA + 13 * 60;
+  function shCuando(m){ const d = Math.floor(SH.now / SE_DIA) - Math.floor(m / SE_DIA);
+    if (d <= 0) return 'hoy'; if (d === 1) return 'ayer'; if (d < 7) return SE_DIAS[sfDia(m)];
+    const f = new Date(SE_BASE + m * 60000); return f.getUTCDate() + '/' + (f.getUTCMonth() + 1); }
+
+  // ---- la placa
+  const shSello = t => '<span class="shsello">' + shTr('check', '#14110a', 16, 2.2) + '<span>' + t + '</span></span>';
+  const shBl = (top, html) => '<div class="shbl" style="top:' + top + 'cqw">' + html + '</div>';
+  const shG = (t, cqw, cls) => '<span class="shg' + (cls ? ' ' + cls : '') + '" style="font-size:' + cqw + 'cqw">' + t + '</span>';
+  const shL = (t, sub) => '<span class="shl' + (sub ? ' sub' : '') + '">' + t + '</span>';
+  const shCartel = (t, c, cqw) => '<span class="shcartel ' + (c || 'cy') + '" style="font-size:' + (cqw || 6.2) + 'cqw">' + t + '</span>';
+  const shChipIg = () => '<span class="shchip">' + shTr('camara', '#eef2f8', 14) + 'desde Instagram</span>';
+  const shBtn = (data, ic, t, on) => '<button class="shbtn" type="button" ' + data + (on != null ? ' aria-pressed="' + !!on + '"' : '') + '>' + ic + '<span>' + t + '</span></button>';
+  const shRayoBtn = (k, t) => shBtn('data-shrayo="' + k + '"', shTr('rayo', SH_C.y, 18, 1.6, !!SH.rayo[k]), SH.rayo[k] ? 'Mandado' : (t || 'Mandar'), SH.rayo[k]);
+  const shIgBtn = k => shMen() ? '' : shBtn('data-shig="' + k + '"', shTr('camara', '#eef2f8', 16), 'A Instagram');
+  function shPlaca(p){
+    return '<article class="shp' + (p.fija ? ' fija' : '') + '" data-shp="' + p.key + '">' +
+      '<header class="shpcab">' + p.ins + '<span class="shpq"><b>' + p.nom + '</b><span>' + p.sub + '</span></span>' +
+        (p.fija ? '<span class="shfija">' + shTr('fijada', SH_GR, 16) + 'FIJADA</span>' : '<span class="shcu">' + shCuando(p.m) + '</span>') + '</header>' +
+      '<div class="shlz' + (p.foto ? ' foto' : '') + '" role="img" aria-label="' + p.alt + '">' +
+        (p.foto ? '<img src="img/social/' + p.foto + '.svg' + seV() + '" alt="" decoding="async"><i class="shvelo"></i>' : '') +
+        '<svg class="shsv" viewBox="0 0 257.6 289.3" aria-hidden="true"><use href="#vSello"/></svg>' + (p.cuenta === false ? '' : '<span class="shcta">@vivafithouse</span>') +
+        p.inner + (p.sello ? shSello(p.sello) : '') + '</div>' +
+      '<footer class="shpie">' + (p.pie || '') + '</footer></article>';
+  }
+
+  // ---- las placas de cada fuente
+  function shCruceP(){
+    const h = shHoy(), w = shWk(h), lun = SH.mom === 'lun', wc = lun ? w - 1 : w, fin = lun ? w * SE_SEM : h, dd = shBan('dd'), rv = shBan(shRiv(wc));
+    const a = shPct(dd, wc, fin), c = shPct(rv, wc, fin), gano = a > c, q = 6 - sfDia(SH.now);
+    const lado = (b, p, yo) => '<span class="shlado' + (yo ? ' yo' : '') + '">' + shEmb(b.nom, yo ? 92 : 64, shSincro(b, h)) + '<b>' + b.nom + '</b>' +
+      '<span class="shpct ' + (yo ? 'cy' : 'mg') + '">' + p + ' %</span></span>';
+    const kick = lun ? 'EL CRUCE · LA SEMANA PASADA' : 'EL CRUCE · ESTA SEMANA';
+    const big = lun ? (gano ? 'GANARON ' + MV_RAYO : 'ESTA VEZ NO') : q === 0 ? 'SE DEFINE HOY' : 'QUEDAN ' + (q + 1) + ' DÍAS';
+    const sub = lun ? 'Esta semana, contra ' + shBan(SH_RIV0).nom + '.' : q === 0 ? 'Cada banda contra su propia meta. El resultado, mañana.' : 'Cada banda contra su propia meta.';
+    return { key:'cruce', fija:true, ins:shEmb(dd.nom, 36, shSincro(dd, h)), nom:dd.nom, sub:'tu banda', m:h, alt:'El cruce de la semana: ' + dd.nom + ' ' + a + ' % de su meta; ' + rv.nom + ' ' + c + ' %',
+      inner:'<span class="shkick">' + kick + '</span><div class="shvs">' + lado(dd, a, true) + '<span class="shvsx">VS</span>' + lado(rv, c, false) + '</div>' +
+        shBl(80, shG(big, 10.6) + shL(sub, true)), sello:lun ? 'PUERTA · semana cerrada' : 'PUERTA · hasta ayer',
+      pie:shRayoBtn('cruce', 'A tu banda') + '<span class="shsp"></span>' + shBtn('data-shver="dd"', shTr('der', '#eef2f8', 16), 'Ver el cruce') };
+  }
+  function shLuP(){   // la foto de Lu: nace en Vivapp con el marco, sale a su Instagram y vuelve desde ahí (simulada)
+    const h = shHoy(), id = 'lm0', M = shMeta(id); let m = null;
+    for (let w = shWk(h); w >= shWk(h) - 2 && m == null; w--) { const L = (shSim().M[id] || []).filter(x => x >= w * SE_SEM && x < (w + 1) * SE_SEM && x < h);
+      if (L.length >= M) m = Math.floor(L[M - 1] / SE_DIA) * SE_DIA + SE_DIA + 19 * 60; }
+    if (m == null || m > SH.now) return null;
+    return { key:'lu', ins:shPer('Lu', 36), nom:'Lu', sub:'Las del mediodía · Sarmiento', m:m, foto:'pub-01', alt:'Foto de Lu con el marco de Viva: semana cumplida, ' + M + ' de ' + M,
+      inner:shChipIg() + '<span class="shneon mg shsc">SEMANA CUMPLIDA</span>', sello:'PUERTA · ' + M + ' de ' + M,
+      pie:shRayoBtn('lu') + '<span class="shsp"></span>' + (SH.people && !shMen() ? shBtn('data-shchispa="lu"', shTr('chispa', SH.chispa.lu ? SH_C.m : SH_GR, 18), SH.chispa.lu ? 'Guardado' : 'Me interesa', SH.chispa.lu) : '') };
+  }
+  function shCrisP(){   // un momento de Inicio que Cris contó a su banda: VIVA Flow (4 semanas seguidas o más con su meta)
+    const h = shHoy(), n = shSeguidas('dd1', h); if (n < 4) return null;
+    return { key:'cris', ins:shPer('Cris', 36), nom:'Cris', sub:'de tu banda', m:shWk(h) * SE_SEM + 7 * 60, alt:'Cris: VIVA Flow, ' + n + ' semanas seguidas con su meta',
+      inner:'<div class="shflow">' + shLogo(250) + '<span class="shflowt"><span class="shesp">FLOW</span>' + shTr('rayo', SH_C.y, 38, 1, true) + '</span>' +
+        shL('viene a su meta todas las semanas') + shL('Cris · Sede Sarmiento', true) + '</div>', sello:'PUERTA · ' + n + ' semanas seguidas', pie:shRayoBtn('cris') };
+  }
+  function shSedeP(){
+    const h = shHoy(), w = shWk(h) - 1, r = shSedeMeta(w);
+    const nov = []; for (let x = -2; x < w; x++) nov.push(shSedeMeta(x).r);
+    const mejor = w >= -2 && nov.every(v => r.r > v);
+    return { key:'sede', ins:shEmb('Sarmiento', 36), nom:'Sarmiento', sub:'tu sede', m:shWk(h) * SE_SEM + 6 * 60, alt:r.de10 + ' de cada 10 socios de Sarmiento llegaron a su meta la semana pasada',
+      inner:shBl(25.7, shCartel('SARMIENTO') + shG(r.de10 + ' DE<br>CADA 10', 21.2) + shL('llegaron a su meta la semana pasada.') + (mejor ? shL('La mejor semana de noviembre en tu sede.', true) : '')),
+      sello:'PUERTA · sin nombres', pie:shRayoBtn('sede') + '<span class="shsp"></span>' + shIgBtn('sede') };
+  }
+  function shArrancP(){   // las altas son de EVO (no de la puerta): sin sello. Esta semana hasta ayer; si todavía son pocas, la pasada.
+    const h = shHoy(), w = shWk(h), n0 = shAltas(w, h).length, esta = n0 >= 3, n = esta ? n0 : shAltas(w - 1, Infinity).length, nueva = SH.perfil !== 'banda' && SH.dia === 1;
+    const t = (esta ? 'arrancaron esta semana' : 'arrancaron la semana pasada') + ' en tu sede.' + (nueva ? (esta ? ' Vos también.' : ' Esta semana, vos.') : '');
+    return { key:'arranc', ins:shEmb('Sarmiento', 36), nom:'Sarmiento', sub:'tu sede', m:h + 6 * 60, alt:n + ' socios ' + t,
+      inner:shBl(25.7, shCartel('SARMIENTO') + shG(String(n), 33.5) + shL(t) + shL('Es un número: nadie ve quién es quién.', true)),
+      pie:nueva ? '' : shRayoBtn('arranc', 'Mandales un rayo') };
+  }
+  function shVivaP(){ const mm = SH.perfil === 'banda' ? -1 * SE_SEM + 5 * SE_DIA + 11 * 60 : shHoy() - 2 * SE_DIA + 11 * 60;   // el sábado
+    return { key:'viva', ins:shViva(36), nom:'VIVA', sub:'cuenta oficial · ejemplo ilustrado', m:mm, foto:'pub-04', cuenta:false, alt:'Publicación de ejemplo de la cuenta oficial de Viva, ilustrada',
+      inner:shChipIg(), pie:shRayoBtn('viva') }; }
+  // la socia nueva
+  const shPar = der => '<div class="shpar">' + shPer('Sofi', 92) + '<span class="shparx">+</span>' + der + '</div>';
+  function shPuertaP(){
+    const t = SH.dia === 1 ? '¿VINISTE<br>CON ALGUIEN?' : '¿YA CONOCÉS<br>A ALGUIEN ACÁ?';
+    return { key:'puerta', ins:shPer('Sofi', 36), nom:'Tu arranque', sub:'solo lo ves vos', m:shHoy(), alt:'¿Viniste con alguien? Armen dúo',
+      inner:shPar(shHueco(92)) + shBl(57.5, shG(t, 11.2) + shL('Armen dúo: cada semana que cumplen, se enciende un tubo de su insignia.', true)),
+      pie:shBtn('data-shinv', shTr('wa', '#eef2f8', 16), 'Invitar por WhatsApp') + shBtn('data-shno', '', 'Ahora no') };
+  }
+  const shTubos = (n, on) => '<span class="shtubos" role="img" aria-label="' + on + ' de ' + n + ' tubos encendidos">' + Array.from({ length:n }, (_, k) => '<i' + (k < on ? ' class="on"' : '') + '></i>').join('') + '</span>';
+  function shDuoP(){
+    const h = shHoy(), sem = shWk(h) - (-2), both = w => shCuenta('sofi', w, h) >= 3 && shCuenta('cami', w, h) >= 2;
+    let on = 0; for (let w = -2; w < shWk(h); w++) if (both(w)) on++;
+    const ult = sem >= 1 && both(shWk(h) - 1);
+    const big = sem < 1 ? 'ARRANCAN<br>JUNTAS' : ult ? (on >= 3 ? 'TRES SEMANAS,<br>LAS DOS' : 'CUMPLIERON<br>LAS DOS') : 'SEMANA ' + (sem + 1) + '<br>DEL DÚO';
+    const sub = sem < 1 ? 'Cada semana que cumplen las dos, se enciende un tubo.' : 'Semana ' + (sem + 1) + ' del dúo: en marcha.';
+    return { key:'duo', fija:true, ins:shDuo(36), nom:'Sofi y Cami', sub:'tu dúo · lo ven ustedes dos', m:h, alt:'Tu dúo con Cami: ' + on + ' semanas cumplidas las dos',
+      inner:shPar(shPer('Cami', 92)) + shBl(54.7, shTubos(4, Math.min(4, on)) + shG(big, 11.2) + shL(sub, true)), sello:on > 1 ? 'PUERTA · ' + on + ' semanas' : on ? 'PUERTA · semana 1' : sem >= 1 ? 'PUERTA · hasta ayer' : null,
+      pie:shRayoBtn('duo', 'A Cami') + '<span class="shsp"></span>' + (shMen() ? '' : shBtn('data-shvoy', shTr('check', SH.voy ? SH_C.c : '#eef2f8', 16), SH.voy ? 'Vas mañana' : 'Voy mañana', SH.voy)) };
+  }
+  function shPropias(){   // los momentos de Inicio de Sofi (Semana cumplida, Mes cumplido): solo los ve ella; puede llevarlos a Instagram
+    const h = shHoy(), L = [];
+    if (SH.perfil === 'sola' && SH.dia === 8 && shCuenta('sofi', -2, h) >= 3)
+      L.push({ key:'sem1', ins:shPer('Sofi', 36), nom:'Tu semana 1', sub:'solo lo ves vos', m:-1 * SE_SEM + 6 * 60, alt:'Tu semana 1: semana cumplida, 3 de 3',
+        inner:shBl(41.9, '<span class="shneon mg" style="font-size:15.6cqw">SEMANA<br>CUMPLIDA</span>' + shL('La primera ya es tuya.')), sello:'PUERTA · 3 de 3', pie:shIgBtn('sem1') });
+    if (SH.perfil === 'sola' && SH.dia === 22)
+      L.push({ key:'nov', ins:shPer('Sofi', 36), nom:'Tu noviembre', sub:'solo lo ves vos', m:1 * SE_SEM + 6 * 60, alt:'Mes cumplido: noviembre, tu primer cartel',
+        inner:shBl(39.1, '<span class="shkick0">MES CUMPLIDO</span>' + shCartel('NOVIEMBRE', 'mg', 12.8) + shL('Tu primer cartel. Ya está en tu mural.')), sello:'PUERTA · 3 semanas', pie:shIgBtn('nov') });
+    return L;
+  }
+  function shCamadaP(){
+    if (!SH.comp) return null; const C = shCamada(); if (!C || !C.mayoria) return null;
+    const duo = SH.perfil === 'duo', ya = duo ? C.sofi && C.cami : C.sofi;
+    const t = (C.tres ? 'vinieron las tres semanas.' : 'vinieron dos veces o más en su primera semana.') + ' ' +
+      (ya ? (duo ? 'Ustedes también.' : 'Vos también.') : 'Tu semana ' + (shWk(shHoy()) + 3) + ' arranca hoy.');
+    return { key:'camada', ins:shEmb('Sarmiento', 36), nom:'Sarmiento', sub:'los que arrancaron con vos', m:shHoy() + 6 * 60, alt:C.n + ' de ' + C.N + ' ' + t,
+      inner:shBl(25.7, shCartel('SARMIENTO') + shG(C.n + ' DE ' + C.N, 21.2) + shL(t)), sello:'PUERTA · sin nombres', pie:'' };
+  }
+  function shRayosP(){
+    if (SH.dia !== 8) return null; const n = shSim().rayos;
+    return { key:'rayos', ins:shEmb('Sarmiento', 36), nom:'Sarmiento', sub:'tu sede', m:shHoy() - SE_DIA + 20 * 60, alt:n + ' rayos de socios de tu sede para los que arrancaron con vos',
+      inner:shBl(30.7, '<span class="shrow">' + shTr('rayo', SH_C.y, 84, 1, true) + shG(String(n), 33.5) + '</span>' + shL('rayos de socios de tu sede para los que arrancaron con vos.')), pie:'' };
+  }
+
+  // ---- el muro: la fijada primero; después por fecha, la más nueva arriba. Sin algoritmo.
+  function shPlacas(){
+    const nueva = SH.perfil !== 'banda', poco = SH.muro === 'poco', P = [];
+    let fija = null, resto = [];
+    if (!nueva) { fija = shCruceP(); resto = poco ? [shSedeP(), shVivaP()] : [shLuP(), shCrisP(), shSedeP(), shArrancP(), shVivaP()]; }
+    else {
+      const prop = shPropias(), duo = SH.perfil === 'duo' && !shMen();
+      const puerta = !duo && !SH.puertaNo && !shMen() && !prop.length && SH.dia !== 22 ? shPuertaP() : null;
+      fija = duo ? shDuoP() : prop.length ? Object.assign(prop.shift(), { fija:true }) : puerta && Object.assign(puerta, { fija:true });
+      resto = poco ? [shVivaP()] : prop.concat(SH.dia === 1 ? [shArrancP(), shVivaP()] : [shCamadaP(), shRayosP()]);
+    }
+    SH.prop.forEach(x => resto.push(x));
+    resto = resto.filter(Boolean).filter(p => p.m <= SH.now).sort((a, b) => b.m - a.m);
+    if (!fija && resto.length) fija = Object.assign(resto.shift(), { fija:true });
+    return (fija ? [fija] : []).concat(resto);
+  }
+
+  // ---- la tira: el socio · su banda o su dúo · su rival · las que tienen algo nuevo (por lo reciente) · su sede y VIVA, siempre
+  function shTira(){
+    const h = shHoy(), w = shWk(h), out = [], nueva = SH.perfil !== 'banda';
+    const on = (k, m) => m != null && m > (k in SH.visto ? SH.visto[k] : -1e9);
+    if (nueva && SH.dia === 1 && !SH.ins) out.push({ key:'elegir', elegir:true, nom:'Tu insignia', rol:'elegila' });
+    else out.push({ key:'yo', ins:shPer(nueva ? 'Sofi' : 'Martina', 44), nom:nueva ? 'Sofi' : 'Martina', rol:'vos', m:nueva ? shPropias().concat(SH.prop).reduce((a, p) => Math.max(a, p.m), null) : SH.prop.reduce((a, p) => Math.max(a, p.m), null) });
+    if (SH.perfil === 'duo' && !shMen()) out.push({ key:'duo', ins:shDuo(44), nom:'Sofi y Cami', rol:'tu dúo', m:shHoy() });
+    if (!nueva) {
+      const dd = shBan('dd'), rv = shBan(SH_RIV0), ev = b => { const e = shEv(b); return e.length ? e[e.length - 1].m : null; };
+      out.push({ key:'dd', b:dd, ins:shEmb(dd.nom, 44, shSincro(dd, h)), nom:dd.nom, rol:'tu banda', m:ev(dd) });
+      out.push({ key:SH_RIV0, b:rv, ins:shEmb(rv.nom, 44, shSincro(rv, h)), nom:rv.nom, rol:'tu rival', m:ev(rv) });
+      SH_BANDAS.filter(b => b.vis && b.key !== 'dd' && b.key !== SH_RIV0).map(b => ({ key:b.key, b:b, ins:shEmb(b.nom, 44, shSincro(b, h)), nom:b.nom, rol:b.sede, m:ev(b) }))
+        .filter(x => x.m != null).sort((p, q) => on(q.key, q.m) - on(p.key, p.m) || q.m - p.m).forEach(x => out.push(x));   // lo nuevo adelante; lo visto queda, en gris, hasta el lunes
+    }
+    out.push({ key:'sede', ins:shEmb('Sarmiento', 44), nom:'Sarmiento', rol:'tu sede', m:h + 6 * 60 });
+    out.push({ key:'viva', ins:shLogo(40), nom:'VIVA', rol:'oficial', m:shVivaP().m });
+    out.forEach(x => { x.on = on(x.key, x.m) && (x.key !== 'viva' || SH.now - x.m < 2 * SE_DIA); });
+    return out;
+  }
+  function shTiraHtml(L){
+    return '<div class="shtira" role="list">' + L.map(x => '<button class="shti" type="button" role="listitem" data-shti="' + x.key + '" aria-label="' + x.nom + ', ' + x.rol + (x.on ? ', con algo nuevo' : '') + '">' +
+      '<span class="sharo' + (x.elegir ? ' elegir' : x.on ? ' on' : '') + '">' + (x.elegir ? shTr('mas', '#eef2f8', 24) : x.ins) + '</span>' +
+      '<span class="shtn">' + x.nom + '</span><span class="shtr">' + x.rol + '</span></button>').join('') + '</div>';
+  }
+  function shBarra(){
+    const ppl = SH.people && !shMen();
+    return '<header class="shbar"><button class="shmas" type="button" data-shmas aria-label="Crear una placa">' + shTr('mas', '#fff', 24, 2.4) + '</button>' +
+      '<h1 class="shtit">SOCIAL</h1>' +
+      '<button class="shent" type="button" data-shdes>' + shTr('duelo', '#eef2f8', 22) + '<span>Desafíos</span></button>' +
+      (ppl ? '<button class="shent" type="button" data-shppl>' + shTr('chispa', '#eef2f8', 22) + '<span>People</span></button>' : '') + '</header>';
+  }
+  function shRender(){
+    const c = $('#shIn'); if (!c) return;
+    SH.now = shNow(); SH.L = shTira(); SH.P = shPlacas();
+    c.innerHTML = shBarra() + shTiraHtml(SH.L) + '<main class="shmuro">' + SH.P.map(shPlaca).join('') +
+      '<div class="shfin"><b>Estás al día' + shTr('rayo', SH_C.y, 18, 1, true) + '</b><span>Lo nuevo aparece cuando alguien entrena.</span></div></main>';
+  }
+
+  // ---- las historias: el patrón de la G (barras, tocar a los costados, se pasan solas cada 6 s, deslizar hacia abajo cierra)
+  const shCel = (ids, w, h) => { const d = [0, 0, 0, 0, 0, 0, 0].map(() => ({ on:false, q:[] }));
+    ids.forEach(id => (shSim().M[id] || []).forEach(m => { if (m >= w * SE_SEM && m < (w + 1) * SE_SEM && m < h) d[sfDia(m)].on = true; })); return d; };
+  function shSemCard(ids, quien){
+    const h = shHoy(), w = shWk(h), hoy = sfDia(SH.now), d = shCel(ids, w, h), n = d.filter(x => x.on).length;
+    return '<span class="sgkick">Esta semana</span>' + sg2Celdas(d, hoy, null) +
+      (n ? sg2Big(String(n), n === 1 ? 'día' : 'días') + '<span class="sgsub">' + quien + '. Cuenta hasta ayer.</span>' : sg2Big('Arranca', 'la semana') + '<span class="sgsub">Cuenta hasta ayer.</span>');
+  }
+  function shCruceCard(b){
+    const h = shHoy(), lun = SH.mom === 'lun', w = shWk(h) - (lun ? 1 : 0), fin = lun ? shWk(h) * SE_SEM : h, dd = shBan('dd'), rv = shBan(shRiv(w)), a = shPct(dd, w, fin), c = shPct(rv, w, fin);
+    return '<span class="sgkick">' + (b.key === 'dd' ? 'El cruce' : 'Contra ustedes') + (lun ? ' · la semana pasada' : '') + '</span>' +
+      (lun ? (a > c ? sg2Big('Ganaron', '', 1) : sg2Big('Esta vez', 'no')) : sg2Big('Van', a + ' %')) +
+      '<div class="sfx sgx">' + sgColRev(0, a, dd.nom, true) + sgColRev(0, c, rv.nom, false) + '</div>' +
+      '<span class="sgsub">' + (lun ? 'Esta semana, contra ' + shBan(SH_RIV0).nom + '.' : sfDia(SH.now) === 6 ? 'Se define hoy.' : 'Cada banda contra su propia meta.') + '</span>';
+  }
+  function shInsCard(b){ const n = shSincro(b, shHoy());
+    return '<span class="sgkick">La insignia</span><span class="shinsw">' + shEmb(b.nom, 180, n) + '</span>' + sg2Big(n === 1 ? '1 semana' : n + ' semanas', 'en sincro') +
+      '<span class="sgsub">' + (n >= 12 ? 'Tiene sus tres tubos encendidos. Nunca pierde nada.' : 'A las ' + (n < 4 ? 4 : 12) + ' semanas en sincro se enciende otro tubo.') + '</span>'; }
+  function shCards(x){
+    const h = shHoy(), C = [], nueva = SH.perfil !== 'banda';
+    if (x.key === 'yo') { const id = nueva ? 'sofi' : 'dd0', M = shMeta(id), n = shCuenta(id, shWk(h), h);
+      C.push(shSemCard([id], 'Tu meta: ' + M + ' por semana'));
+      C.push('<span class="sgkick">Tu insignia</span><span class="shinsw">' + shPer(nueva ? 'Sofi' : 'Martina', 180) + '</span>' + sg2Big(n >= M ? 'Semana' : 'Vas', n >= M ? 'cumplida' : n + ' de ' + M) +
+        '<span class="sgsub">La ves vos y quienes vos elegís.</span>'); return C; }
+    if (x.key === 'duo') { let on = 0; for (let w = -2; w < shWk(h); w++) if (shCuenta('sofi', w, h) >= 3 && shCuenta('cami', w, h) >= 2) on++;
+      C.push(shSemCard(['sofi', 'cami'], 'Con alguien del dúo'));
+      C.push('<span class="sgkick">Su insignia</span><span class="shinsw">' + shDuo(180) + '</span>' + shTubos(4, Math.min(4, on)) +
+        '<span class="sgsub">Cada semana que cumplen las dos, se enciende un tubo. La ven ustedes dos.</span>'); return C; }
+    if (x.key === 'sede') { const r = shSedeMeta(shWk(h) - 1);
+      C.push('<span class="shinsw">' + shEmb('Sarmiento', 180) + '</span>' + sg2Big(r.de10 + ' de', 'cada 10') + '<span class="sgsub">llegaron a su meta la semana pasada. Sin nombres.</span>');
+      const n = shAltas(shWk(h), h).length; if (n) C.push('<span class="sgkick">Esta semana</span>' + sg2Big(String(n), 'arrancaron', 1) + '<span class="sgsub">Un número: nadie ve quién es quién.</span>');
+      return C; }
+    if (x.key === 'viva') { C.push('<span class="sgkick">Cuenta oficial</span><span class="shvivaimg"><img src="img/social/pub-04.svg' + seV() + '" alt="Publicación de ejemplo, ilustrada"></span><span class="sgsub">Ejemplo ilustrado: en real, la cuenta de Instagram de Viva.</span>'); return C; }
+    const b = x.b, ev = shEv(b), nm = b.nom.split(' ');
+    if (b.key === 'dd') { C.push(shSemCard(b.ids, 'Con alguien de la banda')); C.push(shCruceCard(b)); C.push(shInsCard(b)); return C; }
+    C.push('<span class="shinsw">' + shEmb(b.nom, 180, shSincro(b, h)) + '</span>' + sg2Big(nm.slice(0, -1).join(' '), nm[nm.length - 1]) + '<span class="sgsub">' + b.sede + ' · ' + sgSemTxt(shSincro(b, h)) + '</span>');
+    if (b.key === SH_RIV0 && !nueva) C.push(shCruceCard(b));
+    ev.forEach(e => C.push(e.k === 'gano' ? '<span class="sgrafaga">' + shEmb(b.nom, 180, shSincro(b, h)) + '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>' + sg2Big('Ganaron', 'su cruce', 1) + '<span class="sgsub">' + shCuando(e.m) + '</span>'
+      : '<div class="sfx sgx sguno">' + sgColRev(0, 100, b.nom, true) + '</div>' + sg2Big('Entraron', 'en sincro', 1) + '<span class="sgsub">' + shCuando(e.m) + '</span>'));
+    C.push(shSemCard(b.ids, 'Con alguien de la banda'));
+    return C.slice(0, 4);
+  }
+  function shAbrir(key, i){
+    const x = SH.L.find(y => y.key === key); if (!x) return;
+    if (x.elegir) { shElegir(); return; }
+    SH.h = { x:x, C:shCards(x), i:0 }; SH.visto[key] = SH.now; $('#shHist').hidden = false; shPaso(i || 0);
+  }
+  function shPaso(i){
+    clearTimeout(SH.hT); const H = SH.h; if (!H) return;
+    if (i < 0) i = 0; if (i >= H.C.length) { shCerrar(); return; }
+    H.i = i; const x = H.x, otra = x.b && x.b.key !== 'dd', banda = SH.perfil === 'banda' && !shMen();
+    $('#shHist').style.setProperty('--hc', x.b ? SH_C[SH_EMB[x.b.nom][0][0]] : x.key === 'sede' ? SH_C.c : x.key === 'viva' ? '#10202c' : SH_C.m);
+    const des = otra && banda && x.b.key !== SH_RIV0;
+    $('#shHist').innerHTML = '<div class="sgbars">' + H.C.map((_, j) => '<i class="' + (j < i ? 'ya' : j === i ? 'ahora' : '') + '"></i>').join('') + '</div>' +
+      '<div class="sghcab">' + x.ins.replace('width="44" height="44"', 'width="40" height="40"') + '<span class="stack" style="gap:2px;flex:1;min-width:0"><b class="sghn">' + x.nom + '</b><span class="small sghs">' + x.rol + '</span></span>' +
+        '<button class="iconbtn sgx" data-shx type="button" aria-label="Cerrar">✕</button></div>' +
+      '<div class="sgcard" aria-live="polite">' + H.C[i] + '</div>' +
+      '<div class="shhfoot">' + (des ? (SH.desaf[x.b.key] ? '<span class="shdesok">Desafío enviado. Si aceptan, el cruce arranca el lunes.</span>'
+          : '<button class="shdesaf" type="button" data-shdesaf>' + shTr('duelo', '#fff', 22, 2.2) + '<span>Desafiar</span></button>') : '') +
+        (otra && SH.perfil === 'banda' && !shMen() || x.key === 'sede' ? '<span class="sgrayow"><button class="sgrayo" data-shhrayo type="button" aria-pressed="' + !!SH.rayo['h' + x.key] + '" aria-label="' + (SH.rayo['h' + x.key] ? 'Sacar el ⚡' : 'Mandar un ⚡') + '">' + MV_RAYO + '</button><span class="sgrw"><span class="a">Mandar</span><span class="b">Mandado</span></span></span>' : '') + '</div>';
+    SH.hT = setTimeout(() => shPaso(i + 1), SG2_DUR);
+  }
+  function shCerrar(){ clearTimeout(SH.hT); SH.h = null; $('#shHist').hidden = true; shRender(); }
+
+  // ---- las hojas: "+", Desafíos, People, elegir insignia, invitar
+  function shHoja(html){ $('#shHojaIn').innerHTML = html + '<button class="btn ghost sm" data-shhx type="button">Cerrar</button>'; $('#shHoja').hidden = false; }
+  const shOpc = (data, ic, t, d) => '<button class="shopc" type="button" ' + data + '>' + ic + '<span class="stack" style="gap:3px"><b>' + t + '</b><span class="small muted">' + d + '</span></span></button>';
+  function shMas(){
+    shHoja('<span class="mtitle sig"><b>Crear</b> <i>una placa</i></span>' +
+      (shMen() ? '' : shOpc('data-shfoto', shTr('camara', SH_C.m, 26), 'Foto con marco', 'Sale a tu Instagram etiquetando a Viva. No se guarda en Vivapp.')) +
+      shOpc('data-shmom', shTr('momento', SH_C.c, 26), 'Contar un momento', 'Uno de los tuyos de Inicio: aparece como placa en tu muro.'));
+  }
+  function shMios(){
+    const h = shHoy(), nueva = SH.perfil !== 'banda', id = nueva ? 'sofi' : 'dd0', M = shMeta(id), w = shWk(h), L = [];
+    if (shCuenta(id, w - 1, h) >= M) L.push({ k:'sem', t:'Semana cumplida', g:'SEMANA<br>CUMPLIDA', s:'PUERTA · ' + M + ' de ' + M });
+    const n = shSeguidas(id, h); if (n >= 2) L.push({ k:'seg', t:n + ' semanas seguidas', g:n + ' SEMANAS<br>SEGUIDAS', s:'PUERTA · ' + n + ' semanas seguidas' });
+    return L.filter(x => !SH.prop.some(p => p.mk === x.k));
+  }
+  function shMomento(){
+    const L = shMios(), aud = SH.perfil === 'banda' ? 'Lo ve tu banda.' : SH.perfil === 'duo' ? 'Lo ve tu dúo.' : 'Lo ves vos; si querés, lo llevás a Instagram.';
+    shHoja('<span class="mtitle sig"><b>Contar</b> <i>un momento</i></span>' + (L.length ? '<span class="small muted">' + aud + '</span>' + L.map(x => shOpc('data-shmomk="' + x.k + '"', shTr('rayo', SH_C.y, 24, 1.6), x.t, 'De tus entradas, hasta ayer.')).join('')
+      : '<span class="muted" style="line-height:1.45">Todavía no hay un momento para contar. Aparece cuando cumplís tu semana.</span>'));
+  }
+  function shFoto(){
+    const h = shHoy(), id = SH.perfil === 'banda' ? 'dd0' : 'sofi', M = shMeta(id), n = shCuenta(id, shWk(h) - 1, h), s = shSeguidas(id, h);
+    const d = n >= M ? [['Semana', 'cumplida'], M + ' de ' + M + ' · Sarmiento'] : s ? [[s + ' semanas', 'cumplidas'], 'en Viva · Sarmiento'] : [['Entreno', 'en Viva'], 'Sarmiento'];
+    shHoja('<span class="mtitle sig"><b>Foto</b> <i>con marco</i></span>' + mvFoto([SH_C.c, SH_C.m], d[0], d[1], true) +
+      '<span class="small muted" style="line-height:1.45">El filtro trabaja la luz, el color y el marco, no el cuerpo. Sale a tu Instagram etiquetando a @vivafithouse; si lo aceptaste, se ve acá desde allá.</span>' +
+      '<button class="btn sm" data-shfotoig type="button">' + SB_CAM + 'A Instagram</button>');
+  }
+  function shDesafios(){
+    const h = shHoy(), w = shWk(h), b = SH.perfil === 'banda';
+    const tu = b ? 'Esta semana: ' + shBan('dd').nom + ' contra ' + shBan(SH_RIV0).nom + '. Van ' + shPct(shBan('dd'), w, h) + ' % de su meta, hasta ayer.'
+      : SH.perfil === 'duo' && !shMen() ? 'Esta semana: Sofi y Cami, cada una contra su meta. Si cumplen las dos, se enciende un tubo.'
+      : 'Esta semana: vos contra tu meta, ' + shMeta('sofi') + ' veces. Vas ' + shCuenta('sofi', w, h) + ', hasta ayer.';
+    shHoja('<span class="mtitle sig"><b>Desafíos</b></span><span class="muted" style="line-height:1.45">Cada uno contra su propia meta semanal. Vale para vos, tu dúo, tu banda y tu sede.</span>' +
+      '<div class="card" style="gap:6px"><span class="lbl">Tu desafío</span><span style="line-height:1.4">' + tu + '</span></div>' +
+      (SH.perfil === 'sola' && !shMen() ? shOpc('data-shinv', shTr('wa', SH_C.c, 24), '¿Viniste con alguien?', 'Armen dúo: cada semana que cumplen las dos, se enciende un tubo.') : '') +
+      (b ? '<button class="btn sm" data-shver="dd" type="button">Ver el cruce</button>' : ''));
+  }
+  function shPeople(){
+    shHoja('<span class="mtitle sig"><b>People</b></span><span class="muted" style="line-height:1.45">Para conocer gente de Viva, si querés. La ves porque la activaste; nadie más sabe que la usás.</span>' +
+      '<div class="card" style="gap:6px"><span class="lbl">Cómo funciona (acordado con el dueño, 22/10)</span><span class="small" style="line-height:1.5">Solo mayores de 18, verificados. Nunca muestra si estás en la sede. ' +
+      'Marcás "Me interesa" en privado sobre alguien que ves en el muro: si es mutuo, les avisamos a los dos. Sin catálogo de personas.</span></div>' +
+      '<span class="small muted" style="line-height:1.45">Falta que el dueño defina el resto: plan o chat después del aviso, y quién atiende las denuncias.</span>');
+  }
+  function shElegir(){
+    const P = [['S', 'm', 'c'], ['S', 'c', 'y'], ['S', 'y', 'm']];
+    shHoja('<span class="mtitle sig"><b>Tu</b> <i>insignia</i></span><span class="muted" style="line-height:1.45">Tu inicial en neón. La ves vos y quienes vos elegís; crece con tus semanas cumplidas.</span>' +
+      '<div class="shelige">' + P.map((p, i) => '<button type="button" data-shins="' + i + '" aria-label="Insignia ' + (i + 1) + '">' + shMono(p[0], p[1], p[2], 72) + '</button>').join('') + '</div>');
+    SH.insOp = P;
+  }
+  function shInvitar(){
+    shHoja('<span class="mtitle sig"><b>Armen</b> <i>dúo</i></span><span class="muted" style="line-height:1.45">Le llega por WhatsApp con tu día y tu sede. Si se suma, arrancan su dúo: cada uno contra su meta, juntos.</span>' +
+      '<div class="card" style="gap:6px"><span class="lbl">El mensaje</span><span style="line-height:1.45">«Empecé en Viva Sarmiento. ¿Venís conmigo? Si te sumás, armamos dúo en la app.»</span></div>' +
+      '<span class="small muted">Vivapp no guarda el nombre ni el teléfono de a quién se lo mandás.</span><button class="btn sm" data-shwa type="button">' + SB_WA + 'Abrir WhatsApp</button>');
+  }
+
+  // ---- la pantalla y sus toques
+  $('#socialH').insertAdjacentHTML('beforeend', '<div class="sghist shhist" id="shHist" hidden role="dialog" aria-label="Historia"></div>');
+  $('#socialH').addEventListener('click', e => {
+    const q = s => e.target.closest(s); let b;
+    if (q('#shHist')) return;
+    if ((b = q('[data-shti]'))) { shAbrir(b.dataset.shti); return; }
+    if ((b = q('[data-shver]'))) { $('#shHoja').hidden = true; shAbrir(b.dataset.shver, 1); return; }
+    if ((b = q('[data-shrayo]'))) { const k = b.dataset.shrayo; SH.rayo[k] = !SH.rayo[k]; if (SH.rayo[k]) toast('Mandaste un ⚡'); shRender(); return; }
+    if ((b = q('[data-shchispa]'))) { const k = b.dataset.shchispa; SH.chispa[k] = !SH.chispa[k]; toast(SH.chispa[k] ? 'Guardado. Si es mutuo, les avisamos' : 'Listo, lo sacamos'); shRender(); return; }
+    if (q('[data-shvoy]')) { SH.voy = !SH.voy; toast(SH.voy ? 'Le avisamos a Cami: vas mañana' : 'Listo, lo sacamos'); shRender(); return; }
+    if ((b = q('[data-shig]'))) { toast('Se abre Instagram con la placa (en la demo, de ejemplo)'); return; }
+    if (q('[data-shinv]')) { shInvitar(); return; }
+    if (q('[data-shwa]')) { $('#shHoja').hidden = true; toast('Se abre WhatsApp con el mensaje (en la demo, de ejemplo)'); return; }
+    if (q('[data-shno]')) { SH.puertaNo = true; toast('Listo. Vuelve a aparecer el lunes'); shRender(); return; }
+    if (q('[data-shmas]')) { shMas(); return; }
+    if (q('[data-shdes]')) { shDesafios(); return; }
+    if (q('[data-shppl]')) { shPeople(); return; }
+    if (q('[data-shfoto]')) { shFoto(); return; }
+    if (q('[data-shfotoig]')) { $('#shHoja').hidden = true; toast('Se abre Instagram con tu foto y la etiqueta de Viva (en la demo, de ejemplo)'); return; }
+    if (q('[data-shmom]')) { shMomento(); return; }
+    if ((b = q('[data-shmomk]'))) { const x = shMios().find(y => y.k === b.dataset.shmomk), nueva = SH.perfil !== 'banda', yo = nueva ? 'Sofi' : 'Martina';
+      SH.prop.push({ key:'p' + SH.prop.length, mk:x.k, ins:shPer(yo, 36), nom:yo, sub:SH.perfil === 'banda' ? 'lo ve tu banda' : SH.perfil === 'duo' ? 'lo ve tu dúo' : 'solo lo ves vos', m:SH.now, alt:x.t,
+        inner:shBl(41.9, '<span class="shneon mg" style="font-size:13.4cqw">' + x.g + '</span>' + shL('Contado desde Inicio.', true)), sello:x.s, pie:shIgBtn('p' + SH.prop.length) });
+      $('#shHoja').hidden = true; toast('Listo: está en tu muro'); shRender(); return; }
+    if ((b = q('[data-shins]'))) { SH.ins = SH.insOp[+b.dataset.shins]; $('#shHoja').hidden = true; toast('Tu insignia ya está en la tira'); shRender(); return; }
+    if (q('[data-shhx]') || e.target.id === 'shHoja') { $('#shHoja').hidden = true; return; }
+  });
+  (function () {
+    const H = $('#shHist'); let y0 = null;
+    H.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive:true });
+    H.addEventListener('touchend', e => { if (y0 != null && e.changedTouches[0].clientY - y0 > 70) { y0 = null; shCerrar(); H.dataset.sw = '1'; setTimeout(() => delete H.dataset.sw, 400); } y0 = null; });
+    H.addEventListener('click', e => {
+      if (H.dataset.sw || !SH.h) return;
+      const q = s => e.target.closest(s), x = SH.h.x;
+      if (q('[data-shx]')) { shCerrar(); return; }
+      if (q('[data-shdesaf]')) { SH.desaf[x.b.key] = true; toast('Desafío enviado a ' + x.nom); shPaso(SH.h.i); return; }
+      if (q('[data-shhrayo]')) { const k = 'h' + x.key; SH.rayo[k] = !SH.rayo[k]; const b = q('[data-shhrayo]'); b.setAttribute('aria-pressed', !!SH.rayo[k]); if (SH.rayo[k]) toast('Les mandaste ⚡ a ' + x.nom); return; }
+      if (q('.shhfoot')) return;
+      const r = H.getBoundingClientRect(); shPaso(SH.h.i + (e.clientX - r.left < r.width / 3 ? -1 : 1));
+    });
+  })();

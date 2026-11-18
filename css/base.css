@@ -852,3 +852,97 @@ select.input{appearance:auto;-webkit-appearance:auto}
 .sgshd{font-size:17px;justify-content:center}
 .sgshs{font-size:11px;color:rgba(255,255,255,.7)}
 .sgcomp{width:auto;padding:0 22px}
+/* ===== T28 · Social H: la tira y las placas. Medidas del tablero del DIS (390 de ancho); dentro de la placa, en cqw (1cqw = 1 % del ancho de la placa) ===== */
+.shbody{padding:6px 0 24px;gap:0}
+.shbar{height:60px;box-sizing:border-box;padding:8px 12px 4px 16px;display:flex;align-items:center;gap:12px;color:#eef2f8}
+.shmas{width:44px;height:44px;flex:none;box-sizing:border-box;border-radius:50%;border:2px solid #f400a0;background:rgba(244,0,160,.14);box-shadow:0 0 12px rgba(244,0,160,.55);padding:0;display:grid;place-items:center;cursor:pointer}
+.shtit{margin:0;flex:1;font-family:var(--display);font-size:22px;font-weight:800;font-stretch:75%;letter-spacing:.04em;color:#eef2f8}
+.shent{min-width:56px;height:48px;padding:0 4px;border:0;background:none;color:#c3cad6;font:inherit;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.shtira{display:flex;gap:10px;padding:8px 16px 10px;overflow-x:auto;scrollbar-width:none;flex:none}
+.shtira::-webkit-scrollbar{display:none}
+.shti{flex:none;width:70px;padding:0;border:0;background:none;color:#eef2f8;font:inherit;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.sharo{width:62px;height:62px;box-sizing:border-box;border-radius:50%;border:2px solid #2c3544;background:rgba(13,17,25,.82);display:grid;place-items:center}
+.sharo.on{border-color:#eef2f8;box-shadow:0 0 10px rgba(238,242,248,.55)}
+.sharo.elegir{border:2px dashed #c3cad6}
+.shtn{width:70px;font-size:12px;font-weight:600;line-height:1.15;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shtr{font-size:11px;line-height:1;color:#8f99ab;white-space:nowrap}
+.shmuro{padding:8px 16px 0;display:flex;flex-direction:column;gap:28px}
+.shp{display:flex;flex-direction:column;gap:10px;color:#eef2f8}
+.shpcab{min-height:44px;display:flex;align-items:center;gap:10px;padding:0 2px}
+.shpcab .shemb,.shpcab .shvivai{flex:none}
+.shpq{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.shpq b{font-size:15px;font-weight:700;line-height:1.1}
+.shpq span{font-size:12px;line-height:1.15;color:#8f99ab}
+.shcu{font-size:12px;color:#8f99ab}
+.shfija{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;letter-spacing:.1em;color:#c3cad6}
+.shvivai{box-sizing:border-box;border-radius:50%;border:1.5px solid #2c3544;background:rgba(13,17,25,.82);display:grid;place-items:center}
+.shlogo{color:#fff;display:block}
+/* la placa: 4:5, marco fijo */
+.shlz{position:relative;width:100%;aspect-ratio:4/5;box-sizing:border-box;border-radius:22px;overflow:hidden;border:1px solid rgba(238,242,248,.16);container-type:inline-size;
+  background:radial-gradient(90% 60% at 100% 0%,rgba(244,0,160,.42),rgba(244,0,160,0) 70%),radial-gradient(95% 60% at 0% 100%,rgba(7,176,242,.42),rgba(7,176,242,0) 70%),#080b10}
+.shlz.foto{background:#080b10}
+.shlz>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.shvelo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,10,.5) 0%,rgba(5,7,10,0) 26%,rgba(5,7,10,0) 58%,rgba(5,7,10,.82) 100%)}
+.shsv{position:absolute;left:4.5cqw;top:3.9cqw;width:12.8cqw;height:14.5cqw;color:#fff;fill:#fff;opacity:.92}
+.shcta{position:absolute;right:4.5cqw;bottom:5.6cqw;font-size:3.1cqw;font-weight:600;letter-spacing:.04em;color:rgba(238,242,248,.78)}
+.shsello{position:absolute;left:4.5cqw;bottom:4.5cqw;display:flex;align-items:center;gap:1.7cqw;padding:1.7cqw 2.8cqw 1.7cqw 2.2cqw;border-radius:8px;background:#ffe94a;color:#14110a;
+  font-size:3.4cqw;font-weight:700;line-height:1;transform:rotate(-2deg);box-shadow:0 0 14px rgba(255,233,74,.45);white-space:nowrap}
+.shsello svg{width:4.5cqw;height:4.5cqw}
+.shbl{position:absolute;left:5.6cqw;right:5.6cqw;display:flex;flex-direction:column;gap:2.8cqw}
+.shg{font-family:var(--display);font-weight:900;font-stretch:75%;line-height:.95;letter-spacing:.01em;color:#eef2f8}
+.shg .bolt-ico{height:.8em;width:auto;color:#ffe94a;vertical-align:-.05em}
+.shl{font-size:4.75cqw;line-height:1.3;color:#eef2f8}
+.shl.sub{font-size:4.2cqw;color:#c3cad6}
+.shcartel{align-self:flex-start;padding:1.7cqw 3.9cqw;border:2px solid #5fd0ff;border-radius:10px;box-shadow:0 0 12px rgba(7,176,242,.7),inset 0 0 10px rgba(7,176,242,.35);font-family:var(--display);
+  font-weight:800;font-stretch:75%;letter-spacing:.12em;line-height:1.1;color:#f4fbff;-webkit-text-stroke:1px #5fd0ff;text-shadow:0 0 6px rgba(7,176,242,.95),0 0 18px rgba(7,176,242,.95)}
+.shcartel.mg{border-color:#ff5cc4;box-shadow:0 0 12px rgba(244,0,160,.7),inset 0 0 10px rgba(244,0,160,.35);-webkit-text-stroke-color:#ff5cc4;text-shadow:0 0 6px rgba(244,0,160,.95),0 0 18px rgba(244,0,160,.95)}
+.shneon{font-family:var(--display);font-weight:900;font-stretch:75%;line-height:1;color:#f4fbff;-webkit-text-stroke:1px #5fd0ff;text-shadow:0 0 6px rgba(7,176,242,.95),0 0 18px rgba(7,176,242,.95)}
+.shneon.mg{-webkit-text-stroke-color:#ff5cc4;text-shadow:0 0 6px rgba(244,0,160,.95),0 0 18px rgba(244,0,160,.95)}
+.shsc{position:absolute;left:5cqw;bottom:16.2cqw;font-size:9.5cqw}
+.shchip{position:absolute;right:3.9cqw;top:6.1cqw;display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:14px;background:rgba(5,7,10,.66);font-size:11px;font-weight:600;color:#eef2f8}
+.shkick{position:absolute;right:4.5cqw;top:8.4cqw;font-size:3.1cqw;font-weight:700;letter-spacing:.16em;color:#c3cad6}
+.shkick0{font-size:3.1cqw;font-weight:700;letter-spacing:.16em;color:#c3cad6}
+.shvs{position:absolute;left:0;right:0;top:22cqw;display:flex;align-items:center;justify-content:center;gap:2.8cqw}
+.shlado{width:37cqw;display:flex;flex-direction:column;align-items:center;gap:1.4cqw}
+.shlado b{font-size:3.6cqw;font-weight:700;line-height:1.1;text-align:center}
+.shlado .shemb{width:17.9cqw;height:17.9cqw}
+.shlado.yo .shemb{width:25.7cqw;height:25.7cqw}
+.shpct{font-family:var(--display);font-weight:800;font-stretch:75%;line-height:1;font-size:8.4cqw;color:#f4fbff;-webkit-text-stroke:1px #ff5cc4;text-shadow:0 0 6px rgba(244,0,160,.7);opacity:.8}
+.shlado.yo .shpct{font-size:12.3cqw;-webkit-text-stroke-color:#5fd0ff;text-shadow:0 0 6px rgba(7,176,242,.95),0 0 18px rgba(7,176,242,.95);opacity:1}
+.shvsx,.shesp{font-family:var(--display);font-weight:900;font-stretch:75%;background:linear-gradient(90deg,#ffe94a 0%,#07b0f2 50%,#f400a0 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.shvsx{font-size:5.6cqw;letter-spacing:.1em}
+.shflow{position:absolute;left:0;right:0;top:30cqw;display:flex;flex-direction:column;align-items:center;gap:2.8cqw;text-align:center}
+.shflow .shlogo{width:69.8cqw;height:34cqw}
+.shflowt{display:flex;align-items:center;gap:2.2cqw;font-family:var(--display);font-weight:900;font-stretch:75%;font-size:12.8cqw;line-height:1;letter-spacing:.04em}
+.shflowt svg{width:10.6cqw;height:10.6cqw}
+.shpar{position:absolute;left:0;right:0;top:23.5cqw;display:flex;align-items:center;justify-content:center;gap:3.9cqw}
+.shpar .shemb{width:25.7cqw;height:25.7cqw}
+.shparx{font-size:8.4cqw;font-weight:900;color:#c3cad6}
+.shtubos{display:flex;gap:6px}
+.shtubos i{width:12.3cqw;height:3.4cqw;border-radius:4px;background:rgba(255,255,255,.12)}
+.shtubos i.on{background:#f400a0;box-shadow:0 0 8px #f400a0}
+.shrow{display:flex;align-items:center;gap:2.8cqw}
+.shrow svg{width:23.5cqw;height:23.5cqw}
+.shpie{min-height:44px;display:flex;align-items:center;gap:8px}
+.shpie:empty{display:none}
+.shsp{flex:1}
+.shbtn{min-height:44px;box-sizing:border-box;padding:0 14px;border-radius:22px;border:1.5px solid #2c3544;background:rgba(13,17,25,.82);color:#eef2f8;font:inherit;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;cursor:pointer}
+.shbtn[aria-pressed="true"]{border-color:rgba(255,233,74,.6)}
+.shfin{height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#eef2f8}
+.shfin b{display:flex;align-items:center;gap:6px;font-size:17px;font-weight:700}
+.shfin span{font-size:13px;color:#8f99ab}
+/* la historia (el patrón de la G) */
+.shinsw{display:grid;place-items:center}
+.shinsw .shemb{width:min(48vw,180px);height:min(48vw,180px)}
+.shhist .sghcab .shemb{width:40px;height:40px;flex:none}
+.shhist .sgrafaga .shemb{width:min(48vw,180px);height:min(48vw,180px)}
+.shhist .shtubos i{width:44px;height:12px}
+.shvivaimg img{width:min(66vw,250px);aspect-ratio:4/5;object-fit:cover;border-radius:16px;display:block}
+.shhfoot{min-height:64px;display:flex;align-items:center;justify-content:center;gap:12px}
+.shdesaf{flex:1;max-width:260px;height:56px;box-sizing:border-box;border-radius:28px;border:2px solid #f400a0;background:rgba(244,0,160,.16);box-shadow:0 0 16px rgba(244,0,160,.55);color:#fff;font:inherit;font-size:17px;font-weight:800;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.shdesok{flex:1;font-size:14px;line-height:1.35;color:#c3cad6;text-align:center}
+/* las hojas */
+.shopc{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--txt);font:inherit;text-align:left;cursor:pointer}
+.shopc svg{flex:none}
+.shelige{display:flex;justify-content:center;gap:14px}
+.shelige button{width:88px;height:88px;border-radius:50%;border:1.5px solid #2c3544;background:rgba(13,17,25,.82);display:grid;place-items:center;cursor:pointer}
