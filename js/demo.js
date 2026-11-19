@@ -567,13 +567,14 @@
   var SI_PTXT = { banda:'Martina, miércoles 18/11, de Dúo dinamita (cinco), vinculada además con Lu. Arriba, quién de los suyos dijo voy hoy; abajo, el cruce con Las del mediodía.',
     duo:'Sofi, día 8 (lunes 9/11), en dúo con Cami y vinculada con Ana. Abajo, el dúo: un tubo por cada semana que cumplen las dos.',
     sin:'Alguien que todavía no se vinculó con nadie: su código de cuatro cifras para mostrar en la sala. Sin "voy": no lo vería nadie.' };
-  if (dmMem.socI) { const x = dmMem.socI; if (x.perfil in SI_PTXT) SI.perfil = x.perfil; }
+  if (dmMem.socI) { const x = dmMem.socI; if (x.perfil in SI_PTXT) SI.perfil = x.perfil; if (x.mom === 'mie' || x.mom === 'dom') SI.mom = x.mom; }
   else SOC_V = 'I';   // T29: la I abre por defecto, también para quien tenía guardada otra versión
-  function siSave(){ dmMem.socI = { perfil:SI.perfil }; dmSave(); }
+  function siSave(){ dmMem.socI = { perfil:SI.perfil, mom:SI.mom }; dmSave(); }
   function siSync(){
     const r = $('#socIRow'); if (!r || typeof SI_PTXT === 'undefined') return;   // socSync (bloque 345) llama antes de que exista
     r.hidden = SOC_V !== 'I';
     $$('#socIRow [data-sipf]').forEach(x => x.setAttribute('aria-pressed', x.dataset.sipf === SI.perfil));
+    $$('#socIRow [data-simo]').forEach(x => x.setAttribute('aria-pressed', x.dataset.simo === SI.mom)); $('#siRowMom').hidden = SI.perfil !== 'banda';
     $('#socITxt').textContent = SI_PTXT[SI.perfil];
     if (SOC_V === 'I') { if (SI.h) siCerrar(); $('#siHoja').hidden = true; siRender(); }
   }
@@ -582,6 +583,7 @@
   $('#demoSheet').addEventListener('click', e => { let b;
     const aI = msg => { SI.voy = false; SI.man = false; SI.franja = ''; SOC_V = 'I'; siSave(); socSave(); socSync(); return dmFin('social', msg); };
     if ((b = e.target.closest('[data-sipf]'))) { SI.perfil = b.dataset.sipf; SI.ok = null; return aI('Social I · ' + SI_PN[SI.perfil]); }
+    if ((b = e.target.closest('[data-simo]'))) { SI.perfil = 'banda'; SI.mom = b.dataset.simo; return aI(SI.mom === 'dom' ? 'Domingo 22/11: se define hoy' : 'Miércoles 18/11: cómo vamos'); }
     if (e.target.closest('[data-sireset]')) { SI.ok = null; return aI('El próximo voy vuelve a preguntar quién lo ve'); }
   });
 

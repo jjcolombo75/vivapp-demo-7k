@@ -2645,19 +2645,22 @@
   // nunca "está en la sede" ni la hora; sin fotos ni texto libre; no se comparan personas. Menores: sin tira, sin "voy" y sin vincularse (E11).
   // Datos: el cruce, las entradas y la puerta salen de la simulación de la H (forma EVO, hasta ayer), sin tocar su estado (siCon); el "voy",
   // el vínculo y el consentimiento son de Vivapp: no existen en EVO y acá están simulados.
-  var SI = { perfil:'banda', ok:null, voy:false, man:false, franja:'', h:null, hT:0, cod:'4817' };
+  var SI = { perfil:'banda', mom:'mie', ok:null, voy:false, man:false, franja:'', h:null, hT:0, cod:'4817' };
   const SI_GENTE = { banda:[['Cris', 'Noche'], ['Lu', 'Mediodía'], ['Pau', 'Noche'], ['Vero', ''], ['Juli', '']], duo:[['Cami', 'Tarde'], ['Ana', '']], sin:[] };
   const SI_FR = ['Temprano', 'Mediodía', 'Tarde', 'Noche'];
   const siGente = () => SI_GENTE[SI.perfil];
-  const siNow = () => SI.perfil === 'duo' ? -2 * SE_SEM + 7 * SE_DIA + 13 * 60 : SH_MOMV.mie;   // Martina, miércoles 18/11 · Sofi, día 8 (lunes 9/11)
+  const siNow = () => SI.perfil === 'duo' ? -2 * SE_SEM + 7 * SE_DIA + 13 * 60 : SH_MOMV[SI.mom];   // Martina, miércoles 18/11 o domingo 22/11 · Sofi, día 8 (lunes 9/11)
   // Corre una lectura de la H con el momento de la I y deja el estado de la H como estaba
-  function siCon(f){ const a = SH.now, p = SH.perfil, m = SH.mom; SH.now = siNow(); SH.perfil = SI.perfil === 'duo' ? 'duo' : 'banda'; SH.mom = 'mie';
+  function siCon(f){ const a = SH.now, p = SH.perfil, m = SH.mom; SH.now = siNow(); SH.perfil = SI.perfil === 'duo' ? 'duo' : 'banda'; SH.mom = SI.mom;
     try { return f(); } finally { SH.now = a; SH.perfil = p; SH.mom = m; } }
   const siMono = (n, s) => SH_PER[n] ? shPer(n, s) : shMono(n[0], n.length % 2 ? 'm' : 'c', n.length % 2 ? 'c' : 'm', s);
   // La tira, sin círculos: el hexágono de cada uno es el aro. Encendido (neón) = dijo voy hoy; apagado (gris) = no dijo nada.
   const siApag = (n, s) => '<svg class="shemb" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke="#3a4456" stroke-width="2.4">' + SH_HEX + '</g>' +
     '<text x="32" y="42" text-anchor="middle" style="font-family:var(--display);font-weight:800" font-size="27" fill="#8f99ab">' + n[0] + '</text></svg>';
   const siHueco = s => '<svg class="shemb" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke="#3a4456" stroke-width="2" stroke-dasharray="5 6">' + SH_HEX + '</g></svg>';
+  // El contorno de un grupo: un hexágono que se enciende cuando el grupo llegó a su meta de la semana (en sincro; hasta ayer)
+  const siMarco = (inner, on, s, lbl) => '<span class="sigr' + (on ? ' on' : '') + '" style="width:' + s + 'px;height:' + s + 'px"' + (lbl ? ' role="img" aria-label="' + lbl + (on ? ', en sincro esta semana' : '') + '"' : '') + '>' +
+    '<svg class="sigrh" viewBox="0 0 64 64" aria-hidden="true">' + SH_HEX + '</svg>' + inner + '</span>';
   const siVen = () => SI.ok ? siGente().filter(g => SI.ok[g[0]]).length : 0;
 
   function siBarra(m){
@@ -2681,15 +2684,15 @@
   function siCruce(){
     const h = shHoy(), w = shWk(h), dd = shBan('dd'), rv = shBan(SH_RIV0), a = shPct(dd, w, h), c = shPct(rv, w, h), d = sfDia(SH.now), q = 7 - d;
     const cuando = d === 6 ? 'Se define hoy' : q === 1 ? 'Queda 1 día' : 'Quedan ' + q + ' días';
-    const lado = (b, p, yo) => '<span class="silado' + (yo ? ' yo' : '') + '">' + shEmb(b.nom, yo ? 64 : 52, shSincro(b, h)) + '<b>' + b.nom + '</b><span class="sipct' + (yo ? '' : ' mg') + '">' + p + ' %</span></span>';
+    const lado = (b, p, yo) => '<span class="silado' + (yo ? ' yo' : '') + '">' + siMarco(shEmb(b.nom, yo ? 50 : 42, shSincro(b, h)), p >= 100, yo ? 84 : 70) + '<b>' + b.nom + '</b><span class="sipct' + (yo ? '' : ' mg') + '">' + p + ' %</span></span>';
     return '<section class="siplaca" aria-label="El cruce de esta semana"><span class="sipcab">El cruce</span>' +
       '<button class="silados" type="button" data-sicruce aria-label="Ver el cruce: ' + dd.nom + ' ' + a + ' por ciento de su meta, ' + rv.nom + ' ' + c + ' por ciento de la suya">' + lado(dd, a, true) + lado(rv, c, false) + '</button>' +
-      '<div class="sippie"><span class="sibig">' + cuando + '</span><button class="sipill" type="button" data-sibanda aria-label="' + dd.nom + ', tu banda: abre su hoja">' + shEmb(dd.nom, 24, shSincro(dd, h)) + shTr('der', '#eef2f8', 16, 2.2) + '</button></div></section>';
+      '<div class="sippie"><span class="sibig">' + cuando + '</span><button class="sipill" type="button" data-sibanda aria-label="' + dd.nom + ', tu banda: abre su hoja">' + siMarco(shEmb(dd.nom, 26, shSincro(dd, h)), false, 50) + '</button></div></section>';
   }
   function siDuoOn(){ const h = shHoy(); let on = 0; for (let w = -2; w < shWk(h); w++) if (shCuenta('sofi', w, h) >= 3 && shCuenta('cami', w, h) >= 2) on++; return on; }
   function siDuo(){
-    const h = shHoy(), w = shWk(h), ya = shCuenta('sofi', w - 1, h) >= 3 && shCuenta('cami', w - 1, h) >= 2;
-    return '<section class="siplaca siduo" aria-label="Tu dúo"><button class="sidcab" type="button" data-sidbanda aria-label="Sofi y Cami, tu dúo: abre su hoja">' + shDuo(64) +
+    const h = shHoy(), w = shWk(h), ya = shCuenta('sofi', w - 1, h) >= 3 && shCuenta('cami', w - 1, h) >= 2, ahora = shCuenta('sofi', w, h) >= 3 && shCuenta('cami', w, h) >= 2;
+    return '<section class="siplaca siduo" aria-label="Tu dúo"><button class="sidcab" type="button" data-sidbanda aria-label="Sofi y Cami, tu dúo: abre su hoja">' + siMarco(shDuo(50), ahora, 84) +
       '<span class="sidnom">Sofi y Cami' + shTr('der', '#eef2f8', 18, 2.2) + '</span></button>' + shTubos(4, Math.min(4, siDuoOn())) +
       (ya ? '<span class="sibig">Cumplieron las dos</span><span class="sidtx">La semana pasada.</span>' : '<span class="sibig">Su semana</span><span class="sidtx">Cuenta hasta ayer.</span>') + '</section>';
   }
