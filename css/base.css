@@ -1011,3 +1011,5 @@ select.input{appearance:auto;-webkit-appearance:auto}
 #socialI .siquien{flex:1;display:flex;align-items:center;gap:10px}
 #socialI .sipers{display:flex;align-items:center;gap:14px}
 #socialI .sicodin{height:64px;box-sizing:border-box;border-radius:14px;border:1.5px solid #2c3544;background:#111620;color:#eef2f8;text-align:center;font-family:var(--display);font-weight:800;font-size:40px;letter-spacing:.3em}
+#socialI .sihex{width:60px;height:60px;display:grid;place-items:center}
+#socialI .sihex.on svg{filter:drop-shadow(0 0 6px rgba(244,0,160,.9)) drop-shadow(0 0 14px rgba(7,176,242,.45))}

@@ -2654,6 +2654,10 @@
   function siCon(f){ const a = SH.now, p = SH.perfil, m = SH.mom; SH.now = siNow(); SH.perfil = SI.perfil === 'duo' ? 'duo' : 'banda'; SH.mom = 'mie';
     try { return f(); } finally { SH.now = a; SH.perfil = p; SH.mom = m; } }
   const siMono = (n, s) => SH_PER[n] ? shPer(n, s) : shMono(n[0], n.length % 2 ? 'm' : 'c', n.length % 2 ? 'c' : 'm', s);
+  // La tira, sin círculos: el hexágono de cada uno es el aro. Encendido (neón) = dijo voy hoy; apagado (gris) = no dijo nada.
+  const siApag = (n, s) => '<svg class="shemb" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke="#3a4456" stroke-width="2.4">' + SH_HEX + '</g>' +
+    '<text x="32" y="42" text-anchor="middle" style="font-family:var(--display);font-weight:800" font-size="27" fill="#8f99ab">' + n[0] + '</text></svg>';
+  const siHueco = s => '<svg class="shemb" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke="#3a4456" stroke-width="2" stroke-dasharray="5 6">' + SH_HEX + '</g></svg>';
   const siVen = () => SI.ok ? siGente().filter(g => SI.ok[g[0]]).length : 0;
 
   function siBarra(m){
@@ -2664,7 +2668,7 @@
     const L = siGente().slice().sort((a, b) => !!b[1] - !!a[1]);
     return '<p class="silbl">Dijeron voy hoy</p><div class="shtira sitira" role="list">' + L.map(([n, f]) =>
       '<button class="shti" type="button" role="listitem" data-sipers="' + n + '" aria-label="' + n + (f ? ', dijo voy hoy, a la ' + f.toLowerCase() : '') + '">' +
-      '<span class="sharo' + (f ? ' on' : ' siapag') + '">' + siMono(n, 44) + '</span><span class="shtn">' + n + '</span><span class="shtr">' + (f || '&nbsp;') + '</span></button>').join('') + '</div>';
+      '<span class="sihex' + (f ? ' on' : '') + '">' + (f ? siMono(n, 58) : siApag(n, 58)) + '</span><span class="shtn">' + n + '</span><span class="shtr">' + (f || '&nbsp;') + '</span></button>').join('') + '</div>';
   }
   function siVoy(){
     const h = shHoy(), yo = SI.perfil === 'duo' ? 'sofi' : 'dd0', vino = (shSim().M[yo] || []).some(m => m >= h - SE_DIA && m < h);
@@ -2690,7 +2694,7 @@
       (ya ? '<span class="sibig">Cumplieron las dos</span><span class="sidtx">La semana pasada.</span>' : '<span class="sibig">Su semana</span><span class="sidtx">Cuenta hasta ayer.</span>') + '</section>';
   }
   function siSin(){
-    return '<p class="silbl">Tu gente</p><div class="shtira sitira" aria-hidden="true">' + '<span class="shti"><span class="sharo sihueco"></span></span>'.repeat(5) + '</div>' +
+    return '<p class="silbl">Tu gente</p><div class="shtira sitira" aria-hidden="true">' + ('<span class="shti"><span class="sihex">' + siHueco(58) + '</span></span>').repeat(5) + '</div>' +
       '<section class="sivinc"><h2 class="sih2">Vincúlense en la sala</h2><p class="sitxt">Mostrale tu código a alguien que conocés de Viva.</p>' +
       '<div class="sicod" aria-label="Tu código: ' + SI.cod.split('').join(' ') + '">' + SI.cod + '</div><p class="sivence">Vence en 5 min</p>' +
       '<button class="sisec ancho" type="button" data-sicodigo>Tengo un código</button><p class="sinota">Tu voy lo ven solo los que aceptás.</p></section>';
