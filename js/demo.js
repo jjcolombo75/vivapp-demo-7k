@@ -337,8 +337,9 @@
   // ===== T21 · Versiones Social: la sección social en versiones completas e intercambiables =====
   // Agregar una versión = una fila en SOC_VERS, su pantalla (#social + la letra; la A es #social) y su nota (data-socnota) en html/demo.html.
   const SOC_VERS = [
+    ['I', 'Quién va hoy', 'I · Una pantalla que contesta "¿quién de los míos va hoy?": la tira de tu gente (aro = dijo voy hoy), el voy (hoy o mañana; la franja, opcional) y una pieza, el cruce o el dúo. Tres perfiles (abajo). Abre por defecto.'],
     ['F', 'Las puertas', 'F · Una pantalla, dos puertas para que nadie entrene solo: Traé a tu gente o Viva te presenta (abajo, Puerta). Con banda: la fecha, el cruce de la semana como protagonista y lo de Viva. Queda para comparar con la G.'],
-    ['H', 'La placa', 'H · Tres zonas: la barra ("+", Desafíos y People), la tira de insignias y el muro de placas, todas con el mismo marco. Tres socios: con banda, nueva y sola, nueva en dúo (abajo, Perfil). Abre por defecto.'],
+    ['H', 'La placa', 'H · Tres zonas: la barra ("+", Desafíos y People), la tira de insignias y el muro de placas, todas con el mismo marco. Tres socios: con banda, nueva y sola, nueva en dúo (abajo, Perfil). Queda para comparar con la I.'],
     ['G', 'Las insignias', 'G · Cuatro niveles: arriba, la fila de insignias de las bandas; tu banda con cuatro acciones (Voy · Foto · Chat · Sumar); el cruce; lo último. Tocás una insignia y ves su semana en piezas gráficas; el lunes, el resumen para compartir. Sin fotos ni nada que moderar.']
   ];
   const SOC_EE = { sin:['Sin banda', 'El que llega solo (Mica, 19 años, semana 2): el ecualizador apagado con su lugar latiendo y una sola acción, Tu primer jueves.'],
@@ -373,6 +374,7 @@
     if (typeof sfSync === 'function') sfSync();
     if (typeof sgSync === 'function') sgSync();
     if (typeof shSync === 'function') shSync();
+    if (typeof siSync === 'function') siSync();
     $$('#demoSheet [data-socnota]').forEach(n => n.hidden = n.dataset.socnota !== SOC_V);
     socNav();
   }
@@ -558,6 +560,29 @@
     if ((b = e.target.closest('[data-shcomp]'))) { SH.comp = b.dataset.shcomp === '1'; return aH(SH.comp ? 'Comparación con la camada: sí' : 'Comparación con la camada: no'); }
     if ((b = e.target.closest('[data-shpeo]'))) { SH.people = b.dataset.shpeo === '1'; return aH(SH.people ? 'People activada: la entrada aparece en la barra' : 'People: no'); }
     if ((b = e.target.closest('[data-shmuro]'))) { SH.muro = b.dataset.shmuro; return aH(SH.muro === 'poco' ? 'Muro casi vacío' : 'Muro lleno'); }
+  });
+
+//#bloque 350
+  // ===== T29 · la I en el panel: perfil (con banda, solo dúo, sin vínculos) y volver a preguntar quién ve el "voy" =====
+  var SI_PTXT = { banda:'Martina, miércoles 18/11, de Dúo dinamita (cinco), vinculada además con Lu. Arriba, quién de los suyos dijo voy hoy; abajo, el cruce con Las del mediodía.',
+    duo:'Sofi, día 8 (lunes 9/11), en dúo con Cami y vinculada con Ana. Abajo, el dúo: un tubo por cada semana que cumplen las dos.',
+    sin:'Alguien que todavía no se vinculó con nadie: su código de cuatro cifras para mostrar en la sala. Sin "voy": no lo vería nadie.' };
+  if (dmMem.socI) { const x = dmMem.socI; if (x.perfil in SI_PTXT) SI.perfil = x.perfil; }
+  else SOC_V = 'I';   // T29: la I abre por defecto, también para quien tenía guardada otra versión
+  function siSave(){ dmMem.socI = { perfil:SI.perfil }; dmSave(); }
+  function siSync(){
+    const r = $('#socIRow'); if (!r || typeof SI_PTXT === 'undefined') return;   // socSync (bloque 345) llama antes de que exista
+    r.hidden = SOC_V !== 'I';
+    $$('#socIRow [data-sipf]').forEach(x => x.setAttribute('aria-pressed', x.dataset.sipf === SI.perfil));
+    $('#socITxt').textContent = SI_PTXT[SI.perfil];
+    if (SOC_V === 'I') { if (SI.h) siCerrar(); $('#siHoja').hidden = true; siRender(); }
+  }
+  siSave(); socSync();
+  var SI_PN = { banda:'Con banda (Martina)', duo:'Solo dúo (Sofi y Cami)', sin:'Sin vínculos' };
+  $('#demoSheet').addEventListener('click', e => { let b;
+    const aI = msg => { SI.voy = false; SI.man = false; SI.franja = ''; SOC_V = 'I'; siSave(); socSave(); socSync(); return dmFin('social', msg); };
+    if ((b = e.target.closest('[data-sipf]'))) { SI.perfil = b.dataset.sipf; SI.ok = null; return aI('Social I · ' + SI_PN[SI.perfil]); }
+    if (e.target.closest('[data-sireset]')) { SI.ok = null; return aI('El próximo voy vuelve a preguntar quién lo ve'); }
   });
 
 //#bloque 985

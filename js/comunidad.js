@@ -2636,3 +2636,168 @@
       const r = H.getBoundingClientRect(); shPaso(SH.h.i + (e.clientX - r.left < r.width / 3 ? -1 : 1));
     });
   })();
+//#bloque 239
+  // ===== T29 · Social, versión I: quién va hoy (v118) =====
+  // La H restada según el briefing de Social (19/11), con su lenguaje visual (dibujo 3, "va" de Juanjo): la barra ("+" para vincularse y
+  // SOCIAL) · la tira = mi gente (solo personas vinculadas; aro encendido = dijo "voy" hoy, con la franja que eligió) · el "voy" (el único
+  // botón encendido: hoy o mañana; la franja, opcional) · una pieza: el cruce si tenés banda, el dúo si tenés dúo · "Estás al día".
+  // Piso: el "voy" lo ven solo los vínculos que el socio eligió (consentimiento aparte, por vínculo y revocable; se pregunta la primera vez);
+  // nunca "está en la sede" ni la hora; sin fotos ni texto libre; no se comparan personas. Menores: sin tira, sin "voy" y sin vincularse (E11).
+  // Datos: el cruce, las entradas y la puerta salen de la simulación de la H (forma EVO, hasta ayer), sin tocar su estado (siCon); el "voy",
+  // el vínculo y el consentimiento son de Vivapp: no existen en EVO y acá están simulados.
+  var SI = { perfil:'banda', ok:null, voy:false, man:false, franja:'', h:null, hT:0, cod:'4817' };
+  const SI_GENTE = { banda:[['Cris', 'Noche'], ['Lu', 'Mediodía'], ['Pau', 'Noche'], ['Vero', ''], ['Juli', '']], duo:[['Cami', 'Tarde'], ['Ana', '']], sin:[] };
+  const SI_FR = ['Temprano', 'Mediodía', 'Tarde', 'Noche'];
+  const siGente = () => SI_GENTE[SI.perfil];
+  const siNow = () => SI.perfil === 'duo' ? -2 * SE_SEM + 7 * SE_DIA + 13 * 60 : SH_MOMV.mie;   // Martina, miércoles 18/11 · Sofi, día 8 (lunes 9/11)
+  // Corre una lectura de la H con el momento de la I y deja el estado de la H como estaba
+  function siCon(f){ const a = SH.now, p = SH.perfil, m = SH.mom; SH.now = siNow(); SH.perfil = SI.perfil === 'duo' ? 'duo' : 'banda'; SH.mom = 'mie';
+    try { return f(); } finally { SH.now = a; SH.perfil = p; SH.mom = m; } }
+  const siMono = (n, s) => SH_PER[n] ? shPer(n, s) : shMono(n[0], n.length % 2 ? 'm' : 'c', n.length % 2 ? 'c' : 'm', s);
+  const siVen = () => SI.ok ? siGente().filter(g => SI.ok[g[0]]).length : 0;
+
+  function siBarra(m){
+    return '<header class="shbar"><button class="shmas" type="button" data-simas aria-label="Vincularte con alguien: tu código o el suyo"' + (m ? ' hidden' : '') + '>' +
+      shTr('mas', '#fff', 24, 2.4) + '</button><h1 class="shtit">SOCIAL</h1></header>';
+  }
+  function siTira(){
+    const L = siGente().slice().sort((a, b) => !!b[1] - !!a[1]);
+    return '<p class="silbl">Dijeron voy hoy</p><div class="shtira sitira" role="list">' + L.map(([n, f]) =>
+      '<button class="shti" type="button" role="listitem" data-sipers="' + n + '" aria-label="' + n + (f ? ', dijo voy hoy, a la ' + f.toLowerCase() : '') + '">' +
+      '<span class="sharo' + (f ? ' on' : ' siapag') + '">' + siMono(n, 44) + '</span><span class="shtn">' + n + '</span><span class="shtr">' + (f || '&nbsp;') + '</span></button>').join('') + '</div>';
+  }
+  function siVoy(){
+    const h = shHoy(), yo = SI.perfil === 'duo' ? 'sofi' : 'dd0', vino = (shSim().M[yo] || []).some(m => m >= h - SE_DIA && m < h);
+    const man = '<button class="sisec" type="button" data-siman aria-pressed="' + SI.man + '">' + (SI.man ? shTr('check', '#eef2f8', 18) : '') + 'Mañana</button>';
+    if (!SI.voy) return '<div class="sivoyrow"><button class="sivoy" type="button" data-sivoy aria-label="Voy hoy: lo ven solo los tuyos que elegiste">Voy hoy</button>' + man + '</div>' +
+      (vino ? '<p class="siayer"><span class="sisello">Puerta</span>Ayer dijiste voy y viniste.</p>' : '');
+    return '<div class="sivoyrow"><button class="sivoy hecho" type="button" data-sivoy aria-label="Dijiste voy hoy. Tocá para sacarlo">' + shTr('check', '#07b0f2', 22, 2.4) + 'Voy hoy</button>' + man + '</div>' +
+      '<div class="sichips" role="group" aria-label="Franja, opcional">' + SI_FR.map(x => '<button class="sichip" type="button" data-sifr="' + x + '" aria-pressed="' + (SI.franja === x) + '">' + x + '</button>').join('') + '</div>';
+  }
+  function siCruce(){
+    const h = shHoy(), w = shWk(h), dd = shBan('dd'), rv = shBan(SH_RIV0), a = shPct(dd, w, h), c = shPct(rv, w, h), d = sfDia(SH.now), q = 7 - d;
+    const cuando = d === 6 ? 'Se define hoy' : q === 1 ? 'Queda 1 día' : 'Quedan ' + q + ' días';
+    const lado = (b, p, yo) => '<span class="silado' + (yo ? ' yo' : '') + '">' + shEmb(b.nom, yo ? 64 : 52, shSincro(b, h)) + '<b>' + b.nom + '</b><span class="sipct' + (yo ? '' : ' mg') + '">' + p + ' %</span></span>';
+    return '<section class="siplaca" aria-label="El cruce de esta semana"><span class="sipcab">El cruce</span>' +
+      '<button class="silados" type="button" data-sicruce aria-label="Ver el cruce: ' + dd.nom + ' ' + a + ' por ciento de su meta, ' + rv.nom + ' ' + c + ' por ciento de la suya">' + lado(dd, a, true) + lado(rv, c, false) + '</button>' +
+      '<div class="sippie"><span class="sibig">' + cuando + '</span><button class="sipill" type="button" data-sibanda aria-label="' + dd.nom + ', tu banda: abre su hoja">' + shEmb(dd.nom, 24, shSincro(dd, h)) + shTr('der', '#eef2f8', 16, 2.2) + '</button></div></section>';
+  }
+  function siDuoOn(){ const h = shHoy(); let on = 0; for (let w = -2; w < shWk(h); w++) if (shCuenta('sofi', w, h) >= 3 && shCuenta('cami', w, h) >= 2) on++; return on; }
+  function siDuo(){
+    const h = shHoy(), w = shWk(h), ya = shCuenta('sofi', w - 1, h) >= 3 && shCuenta('cami', w - 1, h) >= 2;
+    return '<section class="siplaca siduo" aria-label="Tu dúo"><button class="sidcab" type="button" data-sidbanda aria-label="Sofi y Cami, tu dúo: abre su hoja">' + shDuo(64) +
+      '<span class="sidnom">Sofi y Cami' + shTr('der', '#eef2f8', 18, 2.2) + '</span></button>' + shTubos(4, Math.min(4, siDuoOn())) +
+      (ya ? '<span class="sibig">Cumplieron las dos</span><span class="sidtx">La semana pasada.</span>' : '<span class="sibig">Su semana</span><span class="sidtx">Cuenta hasta ayer.</span>') + '</section>';
+  }
+  function siSin(){
+    return '<p class="silbl">Tu gente</p><div class="shtira sitira" aria-hidden="true">' + '<span class="shti"><span class="sharo sihueco"></span></span>'.repeat(5) + '</div>' +
+      '<section class="sivinc"><h2 class="sih2">Vincúlense en la sala</h2><p class="sitxt">Mostrale tu código a alguien que conocés de Viva.</p>' +
+      '<div class="sicod" aria-label="Tu código: ' + SI.cod.split('').join(' ') + '">' + SI.cod + '</div><p class="sivence">Vence en 5 min</p>' +
+      '<button class="sisec ancho" type="button" data-sicodigo>Tengo un código</button><p class="sinota">Tu voy lo ven solo los que aceptás.</p></section>';
+  }
+  function siRender(){
+    const c = $('#siIn'); if (!c) return;
+    siCon(() => { const m = shMen(), sin = SI.perfil === 'sin';
+      c.innerHTML = siBarra(m) + '<div class="sicuerpo">' + (m ? '' : sin ? siSin() : siTira() + siVoy()) +
+        (sin ? '' : SI.perfil === 'duo' ? siDuo() : siCruce()) + '<p class="sifin">' + shTr('check', '#8f99ab', 16) + 'Estás al día</p></div>'; });
+  }
+
+  // ---- las hojas
+  function siHoja(html){ $('#siHojaIn').innerHTML = html + '<button class="btn ghost sm" data-sihx type="button">Cerrar</button>'; $('#siHoja').hidden = false; }
+  function siPermiso(){
+    const n = siGente().length;
+    siHoja('<span class="sih2">¿Quién ve tu voy?</span><span class="sitxt">Solo tu gente vinculada. Nunca dice si estás en la sede. Lo cambiás cuando quieras.</span>' +
+      '<button class="sivoy ancho" type="button" data-siokall>Que lo vean los ' + n + '</button><button class="sisec ancho" type="button" data-siokel>Elegir quién</button>' +
+      '<button class="silnk" type="button" data-siokyo>Solo para mí</button>');
+  }
+  function siElegir(){
+    siHoja('<span class="sih2">Quién ve tu voy</span><span class="sitxt">Marcá a quién. Nadie sabe a quién no.</span>' +
+      siGente().map(([n]) => '<label class="swrow"><span class="siquien">' + siMono(n, 32) + n + '</span><input class="sw" type="checkbox" data-sichk="' + n + '"' + (SI.ok && SI.ok[n] ? ' checked' : '') + '></label>').join('') +
+      '<button class="sivoy ancho" type="button" data-sioklisto>Listo</button>');
+  }
+  function siPersona(n){
+    const f = (siGente().find(g => g[0] === n) || [])[1];
+    siHoja('<div class="sipers">' + siMono(n, 56) + '<span class="stack" style="gap:3px"><span class="sih2">' + n + '</span>' +
+      (f ? '<span class="sitxt">Dijo «voy hoy, a la ' + f.toLowerCase() + '». Lo dice ' + n + ', no la puerta.</span>' : '<span class="sitxt">Vinculados en la sala.</span>') + '</span></div>' +
+      (SI.ok ? '<label class="swrow"><span style="flex:1">Ve tu voy</span><input class="sw" type="checkbox" data-sichk1="' + n + '"' + (SI.ok[n] ? ' checked' : '') + '></label>'
+        : '<span class="small muted">La primera vez que digas voy, elegís quién lo ve.</span>'));
+  }
+  function siMas(){
+    siHoja('<span class="sih2">Vincularte</span><span class="sitxt">Mostrale tu código a alguien que conocés de Viva, o tomá el suyo. Confirman los dos.</span>' +
+      '<div class="sicod" aria-label="Tu código: ' + SI.cod.split('').join(' ') + '">' + SI.cod + '</div><p class="sivence">Vence en 5 min</p>' +
+      '<button class="sisec ancho" type="button" data-sicodigo>Tengo un código</button>' + (shMen() || SI.perfil === 'sin' ? '' : '<button class="silnk" type="button" data-sielegir>Quién ve tu voy</button>'));
+  }
+  function siCodigo(){
+    siHoja('<span class="sih2">Su código</span><span class="sitxt">Las cuatro cifras que te muestra.</span>' +
+      '<input class="sicodin" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Código de cuatro cifras" placeholder="····">' +
+      '<button class="sivoy ancho" type="button" data-sicodok>Vincular</button>');
+  }
+  function siBandaHoja(duo){
+    siCon(() => { const h = shHoy(), b = shBan('dd'), m = shMen();
+      const nom = duo ? 'Sofi y Cami' : b.nom, ins = duo ? shDuo(56) : shEmb(b.nom, 56, shSincro(b, h));
+      const sub = duo ? 'Tu dúo · Sarmiento' : 'Tu banda · Sarmiento · ' + sgSemTxt(shSincro(b, h)).toLowerCase();
+      const mem = (duo ? ['Sofi', 'Cami'] : b.mem.map(x => x[0])).map((n, j) => '<span class="shmem">' + siMono(n, 44) + '<span>' + n + (j === 0 ? ' <i>vos</i>' : '') + '</span></span>').join('');
+      siHoja('<div class="shbh">' + ins + '<span class="stack" style="gap:3px;min-width:0"><span class="mtitle sig">' + nom + '</span><span class="small muted">' + sub + '</span></span></div>' +
+        '<div class="shmems">' + mem + '</div>' +
+        (m ? '' : '<div class="sgaccs shaccs" style="grid-template-columns:repeat(' + (duo ? 1 : 2) + ',minmax(0,1fr))">' + sg2Acc('chat', 'WhatsApp', duo ? 'de las dos' : 'de la banda', '', 'data-siwa') +
+          (duo ? '' : sg2Acc('sumar', 'Sumar', 'con tu código', '', 'data-simas')) + '</div>') +
+        '<span class="small muted" style="line-height:1.45">' + (duo ? 'Lo ven ustedes dos.' : 'Otras bandas ven el nombre, la insignia y lo que logra la banda; nunca quiénes son ni quién vino.') + '</span>'); });
+  }
+
+  // ---- la historia del cruce o del dúo: la de la H (barras, tocar a los costados, se pasa sola cada 6 s, deslizar hacia abajo cierra)
+  function siAbrir(duo, i){
+    const C = siCon(() => duo ? shCards({ key:'duo' }) : shCards({ key:'dd', b:shBan('dd') }));
+    SI.h = { duo:duo, C:C, i:0 }; $('#siHist').hidden = false; siPaso(i || 0);
+  }
+  function siPaso(i){
+    clearTimeout(SI.hT); const H = SI.h; if (!H) return;
+    if (i < 0) i = 0; if (i >= H.C.length) { siCerrar(); return; }
+    H.i = i; const nom = H.duo ? 'Sofi y Cami' : 'Dúo dinamita', ins = H.duo ? shDuo(40) : siCon(() => shEmb('Dúo dinamita', 40, shSincro(shBan('dd'), shHoy())));
+    $('#siHist').style.setProperty('--hc', SH_C.m);
+    $('#siHist').innerHTML = '<div class="sgbars">' + H.C.map((_, j) => '<i class="' + (j < i ? 'ya' : j === i ? 'ahora' : '') + '"></i>').join('') + '</div>' +
+      '<div class="sghcab">' + ins + '<span class="stack" style="gap:2px;flex:1;min-width:0"><b class="sghn">' + nom + '</b><span class="small sghs">' + (H.duo ? 'tu dúo' : 'tu banda') + '</span></span>' +
+      '<button class="iconbtn sgx" data-six type="button" aria-label="Cerrar">✕</button></div><div class="sgcard" aria-live="polite">' + H.C[i] + '</div>';
+    SI.hT = setTimeout(() => siPaso(i + 1), SG2_DUR);
+  }
+  function siCerrar(){ clearTimeout(SI.hT); SI.h = null; $('#siHist').hidden = true; siRender(); }
+
+  // ---- la pantalla y sus toques
+  $('#socialI').insertAdjacentHTML('beforeend', '<div class="sghist shhist" id="siHist" hidden role="dialog" aria-label="Historia"></div>');
+  $('#socialI').addEventListener('click', e => {
+    const q = s => e.target.closest(s); let b;
+    if (q('#siHist')) return;
+    if (q('[data-sivoy]') && !q('#siHoja')) {
+      if (SI.voy) { SI.voy = false; SI.franja = ''; toast('Listo, lo sacamos'); siRender(); return; }
+      if (SI.ok === null) { SI.voy = true; siRender(); siPermiso(); return; }
+      SI.voy = true; toast(siVen() ? 'Listo: lo ven ' + siVen() + ' de los tuyos' : 'Listo: tu voy queda para vos'); siRender(); return; }
+    if (q('[data-siman]')) { SI.man = !SI.man; toast(SI.man ? 'Mañana aparece en la tira de los tuyos' : 'Listo, lo sacamos'); siRender(); return; }
+    if ((b = q('[data-sifr]'))) { SI.franja = SI.franja === b.dataset.sifr ? '' : b.dataset.sifr; siRender(); return; }
+    if (q('[data-siokall]')) { SI.ok = {}; siGente().forEach(g => SI.ok[g[0]] = true); $('#siHoja').hidden = true; toast('Listo: lo ven los ' + siVen()); siRender(); return; }
+    if (q('[data-siokel]') || q('[data-sielegir]')) { if (SI.ok === null && !SI.voy) { toast('Te lo preguntamos la primera vez que digas voy'); return; } siElegir(); return; }
+    if (q('[data-siokyo]')) { SI.ok = {}; $('#siHoja').hidden = true; toast('Tu voy queda para vos'); siRender(); return; }
+    if (q('[data-sioklisto]')) { SI.ok = {}; $$('#siHojaIn [data-sichk]').forEach(x => SI.ok[x.dataset.sichk] = x.checked); $('#siHoja').hidden = true;
+      toast(siVen() ? 'Listo: lo ven ' + siVen() + ' de los tuyos' : 'Tu voy queda para vos'); siRender(); return; }
+    if ((b = q('[data-sipers]'))) { siPersona(b.dataset.sipers); return; }
+    if (q('[data-sicruce]')) { siAbrir(false, 1); return; }
+    if (q('[data-sibanda]')) { siBandaHoja(false); return; }
+    if (q('[data-sidbanda]')) { siBandaHoja(true); return; }
+    if (q('[data-simas]')) { siMas(); return; }
+    if (q('[data-sicodigo]')) { siCodigo(); return; }
+    if (q('[data-sicodok]')) { const v = ($('#siHojaIn .sicodin') || {}).value || '';
+      if (!/^\d{4}$/.test(v)) { toast('Son cuatro cifras'); return; } $('#siHoja').hidden = true; toast('Le pedimos que confirme. Si acepta, aparece en tu tira'); return; }
+    if (q('[data-siwa]')) { $('#siHoja').hidden = true; toast('Se abre el grupo de WhatsApp (en la demo, de ejemplo)'); return; }
+    if (q('[data-sihx]') || e.target.id === 'siHoja') { $('#siHoja').hidden = true; if (SI.voy && SI.ok === null) { SI.voy = false; siRender(); } return; }
+  });
+  $('#socialI').addEventListener('change', e => { const x = e.target.closest('[data-sichk1]'); if (!x) return;
+    SI.ok[x.dataset.sichk1] = x.checked; toast(x.checked ? x.dataset.sichk1 + ' ve tu voy' : x.dataset.sichk1 + ' deja de ver tu voy'); });
+  (function () {
+    const H = $('#siHist'); let y0 = null;
+    H.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive:true });
+    H.addEventListener('touchend', e => { if (y0 != null && e.changedTouches[0].clientY - y0 > 70) { y0 = null; siCerrar(); H.dataset.sw = '1'; setTimeout(() => delete H.dataset.sw, 400); } y0 = null; });
+    H.addEventListener('click', e => {
+      if (H.dataset.sw || !SI.h) return;
+      if (e.target.closest('[data-six]')) { siCerrar(); return; }
+      const r = H.getBoundingClientRect(); siPaso(SI.h.i + (e.clientX - r.left < r.width / 3 ? -1 : 1));
+    });
+  })();
+  siRender();
