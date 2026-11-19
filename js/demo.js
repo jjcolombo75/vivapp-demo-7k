@@ -316,6 +316,7 @@
     if ((b = t.closest('[data-aus]'))) { setAus(+b.dataset.aus); return dmFin('inicio', AUS_N ? 'La socia no viene hace ' + AUS_N + ' días' : 'La socia viene seguido'); }
     if ((b = t.closest('[data-objd]'))) { setObj(b.dataset.objd); return dmFin('inicio', 'Objetivo: ' + b.textContent); }
     if ((b = t.closest('[data-plan]'))) { setPlan(b.dataset.plan === 'vence'); return dmFin('inicio', venceCorto() ? 'El plan vence en 3 días: aviso en Inicio' : 'Plan al día'); }
+    if ((b = t.closest('[data-debito]'))) { DEBITO = b.dataset.debito === '1'; renderClub(); $$('#debPick .opt').forEach(x => x.setAttribute('aria-pressed', x === b)); return dmFin('beneficios', DEBITO ? 'Con débito: entra al Club VIVA' : 'Sin débito: Club VIVA lo invita a adherirse'); }
     if ((b = t.closest('[data-saldo]'))) { setSaldo(b.dataset.saldo === '1'); return dmFin('inicio', deuda ? 'Con saldo pendiente' : 'Sin saldo pendiente'); }
     if ((b = t.closest('[data-nv]'))) { const k = +b.dataset.nv;   // T11 · semana del programa de las primeras 8 semanas
       if (k >= 0) { if (ETAPA !== 'normal') dmB('[data-etg="etapa"] [data-et="normal"]').click(); setAnt('nueva'); dmTap('[data-exp="arranco"]'); dmTap('[data-fit="0"]'); }

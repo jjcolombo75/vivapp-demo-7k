@@ -5,7 +5,7 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
   let modo = 'socio';
-  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','socialB','socialC','socialD','socialE','socialF','socialH','plan'];
+  const withNav = ['inicio','hoy','rutinas','progreso','muralScr','beneficios','social','socialB','socialC','socialD','socialE','socialF','socialH'];
   let curScr = 'login', prevScr = 'login';
 
 //#bloque 015
