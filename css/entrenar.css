@@ -355,7 +355,7 @@
 .pfdot{display:block;width:9px;height:9px;border-radius:5px;background:var(--muted);flex-shrink:0}
 .cjb2 .pfdot{position:absolute;top:8px;right:8px}
 .pf-env .pfdot{background:var(--yel)}
-.pf-va .pfdot,.pf-recep .pfdot{background:var(--lime)}
+.pf-va .pfdot,.pf-cer .pfdot{background:var(--lime)}
 .pf-nadie .pfdot{background:var(--orange)}
 .pf-emerg .pfdot{background:var(--pink)}
 @media (prefers-reduced-motion: no-preference){.pf-env .pfdot,.pf-emerg .pfdot{animation:pfLate 1.1s ease-in-out infinite alternate}}
