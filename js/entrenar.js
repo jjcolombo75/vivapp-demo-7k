@@ -1100,7 +1100,7 @@
   }
   function exCue(f, i){
     const L = exLib(i), F = SALA.F[i], ctl = f.ctl || (L ? L.tip : ''), t = f.tempo || TEMPO_DEF;
-    return '<div class="scue' + (exArr() ? ' big' : '') + '"><p><b>' + (actual === 'profe' ? 'Lucas' : 'Tu profe') + ':</b> ' + ctl + '</p>' +
+    return '<div class="scue' + (exArr() ? ' big' : '') + '"><p><b>' + (f.ctl ? (actual === 'profe' ? 'Lucas' : 'Tu profe') : 'Equipo de Viva') + ':</b> ' + ctl + '</p>' +
       '<div class="sctl"><span class="stmp">' + tempoTxt(t) + '</span><button class="stbtn" data-mtr="1" aria-pressed="' + !!F.ritmo + '">' + (F.ritmo ? 'Apagar ritmo' : 'Ritmo') + '</button></div>' +
       (F.ritmo ? mtrHtml(t) : '') + '</div>';
   }
@@ -1198,7 +1198,7 @@
     const v = e.target.closest('[data-ver]'); if (v) { RUT_VER = RUT_VER === v.dataset.ver ? null : v.dataset.ver; renderRoutines(); return true; }
     const k = e.target.closest('[data-rk]'); if (k) { const [x, d, b] = k.dataset.rk.split(':'); RUT_AJ[x] = Object.assign(RUT_AJ[x] || {}, { kg:Math.max(0, +b + +d) }); renderRoutines(); renderEntHoy(); return true; }
     const r = e.target.closest('[data-rd]'); if (r) { const [x, d, b] = r.dataset.rd.split(':'); RUT_AJ[x] = Object.assign(RUT_AJ[x] || {}, { desc:Math.min(300, Math.max(30, +b + +d)) }); renderRoutines(); return true; }
-    if (e.target.closest('[data-rpide]')) { toast('Le avisamos a Lucas. Lo ven juntos en la sala.'); return true; }
+    if (e.target.closest('[data-rpide]')) { toast('Recepción le avisa a Lucas. Te contesta en su próximo turno y, cuando lo cierre, lo ves acá.'); return true; }
     return false;
   }
   // ---- v54 · Empezar ejercicio y transición cronometrada (entrenar-propuesta.md § 11.5) ----
@@ -1665,13 +1665,13 @@
 //#bloque 312
   // ===== T18 · Llamar a mi profe (docs/tickets/T18-llamar-a-mi-profe.md) =====
   // Un botón con palabra: en la sesión es el tercer botón de la caja ("Profe"); en Hoy, flotante, solo con la entrada de hoy o la sesión abierta.
-  // La respuesta simula el tablero del profe (E6, tablero-del-profe.md § 2): su profe → a los 60 s, los de sala → a los 3 min, "Nadie pudo venir ahora"
-  // y recepción como otra salida. Nunca una promesa sin respuesta: el estado vive en el botón y en una línea de la caja; cada cambio llega como aviso.
-  // Lo que se dice sale de un dato: "Lucas te vio. Ya va" (el profe tocó Voy); nunca un tiempo que el profe no dijo.
-  var PF = null, PF_TURNO = true, PF_RESP = 'su';
+  // Sin celular en la sala (decisiones 22 y 23/11): el pedido va siempre a recepción, que le avisa a un profe. El socio lee "Avisamos a recepción" y,
+  // cuando recepción marca Avisé, "Recepción ya le avisó a un profe"; si no hay respuesta, lo dice sin tiempo. Nunca una promesa de minutos ni "te vio".
+  // Lo que se dice sale de un dato (el Avisé de recepción); el estado vive en el botón y en una línea de la caja.
+  var PF = null, PF_TURNO = true, PF_RESP = 'avise';
   var PF_SALA = 'Sofi', PF_SALA2 = 'Dani';   // profes de sala de la demo
   var PF_MOT = [['mirar', '¿Me mirás?', 'Que te mire cómo lo hacés'], ['busco', 'No encuentro algo', 'Una máquina, un accesorio'], ['anda', 'No funciona', 'También le avisamos a Viva'], ['molesta', 'Me molesta', 'Algo duele o molesta']];
-  var PF_LLEGA = { su:30, otro:90, nadie:null }, PF_ESCALA = 60, PF_NADIE = 180, PF_VA_FIN = 600, PF_EMERG = 20;   // segundos (simulados)
+  var PF_LLEGA = { avise:30, nadie:null }, PF_NADIE = 180, PF_VA_FIN = 600, PF_EMERG = 20;   // segundos (simulados, solo mueven el panel de demo; nunca se le dicen al socio)
   var ACC_ICO = {
     barra:'<svg viewBox="0 0 64 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22l7-8h42l7 8"/><path d="M32 14V4"/><circle cx="32" cy="4" r="1.6" fill="currentColor"/></svg>',
     tri:'<svg viewBox="0 0 64 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M32 4v5M32 9L20 28h24z"/><path d="M24 22h16"/></svg>',
@@ -1683,26 +1683,26 @@
   function pfMotN(k){ const m = PF_MOT.find(x => x[0] === k); return m ? m[1] : 'Ayuda ya'; }
   function pfTxt(){
     if (!PF) return ''; const e = PF.est;
-    if (e === 'env') return 'Le avisamos a ' + (PF.t >= PF_ESCALA ? 'los profes en sala' : PF.a) + ' · ' + pfMotN(PF.mot);
-    if (e === 'va') return PF.quien + ' te vio. Ya va.';
-    if (e === 'nadie') return 'Nadie pudo venir ahora.';
+    if (e === 'env') return 'Avisamos a recepción · ' + pfMotN(PF.mot);
+    if (e === 'va') return 'Recepción ya le avisó a un profe.';
+    if (e === 'nadie') return 'Todavía no tenemos respuesta. Si podés, acercate al mostrador.';
     if (e === 'recep') return 'Recepción ya sabe. Si podés, acercate al mostrador.';
-    return PF.quien ? PF.quien + ' va para allá. Recepción también sabe.' : 'Les avisamos a los profes en sala y a recepción.';
+    return PF.quien ? 'Recepción ya le avisó a un profe.' : 'Avisamos a recepción.';
   }
   function pfLinea(){
     if (!PF) return ''; const e = PF.est;
-    const A = e === 'env' ? [['cancel', 'Cancelar']] : e === 'va' ? [['vino', 'Ya vino']] : e === 'nadie' ? [['recep', 'Avisar a recepción'], ['deja', 'Dejalo']] : e === 'recep' ? [['listo', 'Listo']] : [['emerg', 'Ver']];
+    const A = e === 'env' ? [['cancel', 'Cancelar']] : e === 'va' ? [['vino', 'Ya vino']] : e === 'nadie' ? [['deja', 'Cerrar']] : e === 'recep' ? [['listo', 'Listo']] : [['emerg', 'Ver']];
     return '<div class="cjped pf-' + e + ' pfest" role="status"><i class="pfdot" aria-hidden="true"></i><span class="cjpt">' + pfTxt() + '</span><span class="pfacts">' + A.map(x => '<button data-pfx="' + x[0] + '">' + x[1] + '</button>').join('') + '</span></div>';
   }
   // La hoja de motivos: un toque elige y además confirma (evita el pedido por error)
   function pfHoja(){
     const otro = !PF_TURNO;
     $('#salaSheetIn').innerHTML = '<span class="h2">Llamar a mi profe</span>' +
-      (otro ? '<p class="pfturno">Lucas no está en este turno. Viene ' + PF_SALA + ', de sala; a Lucas le dejamos el aviso.</p>' : '') +
-      '<span class="small muted" style="line-height:1.45">' + (otro ? PF_SALA : 'Lucas') + (pfEnSesion() ? ' ve dónde estás: ' + pfDonde() : ' sabe que estás en la sala') + '.</span>' +
+      (otro ? '<p class="pfturno">Lucas no está en este turno. Recepción le avisa a un profe de sala y le deja el aviso a Lucas.</p>' : '') +
+      '<span class="small muted" style="line-height:1.45">Recepción ve dónde estás' + (pfEnSesion() ? ': ' + pfDonde() : ' en la sala') + '.</span>' +
       PF_MOT.map(m => '<button class="scmb" data-pfm="' + m[0] + '"><b>' + m[1] + '</b><span>' + m[2] + '</span></button>').join('') +
-      '<button class="pfemerg" data-pfm="emerg"><b>Necesito ayuda ya</b><span>Dolor de pecho, mareo o falta de aire: pará y avisá ya.</span></button>' +
-      '<span class="small muted pfsim">En la demo, la respuesta del profe es simulada.</span>' +
+      '<button class="pfemerg" data-pfm="emerg"><b>Necesito ayuda ya</b><span>Dolor de pecho, mareo o falta de aire: pará y avisá ya. Va a recepción.</span></button>' +
+      '<span class="small muted pfsim">En la demo, la respuesta de recepción es simulada.</span>' +
       '<button class="btn ghost" data-close>Ahora no</button>';
     $('#salaSheet').hidden = false;
   }
@@ -1712,8 +1712,8 @@
     $('#salaSheet').hidden = false;
   }
   function pfEmergHoja(){
-    $('#salaSheetIn').innerHTML = '<div class="pfem pfest"><span class="h2">' + (PF.quien ? PF.quien + ' va para allá' : 'Ya avisamos') + '</span>' +
-      '<span>Les avisamos a los profes en sala y a recepción, a la vez' + (pfEnSesion() ? '. Tu sesión quedó en pausa' : '') + '.</span>' +
+    $('#salaSheetIn').innerHTML = '<div class="pfem pfest"><span class="h2">' + (PF.quien ? 'Recepción ya le avisó a un profe' : 'Avisamos a recepción') + '</span>' +
+      '<span>Recepción recibió tu pedido ahora' + (pfEnSesion() ? '. Tu sesión quedó en pausa' : '') + '.</span>' +
       '<p>Con dolor de pecho, mareo o falta de aire: pará y avisá ya a quien tengas cerca.</p></div>' +
       '<button class="btn" data-pfx="bien">Ya estoy bien</button><button class="link" data-pfx="cancel" style="min-height:44px">Fue sin querer</button>';
     $('#salaSheet').hidden = false;
@@ -1726,7 +1726,7 @@
       if (pfEnSesion() && !SALA.pausa) { SALA.pausa = true; SALA.pausaT0 = Date.now(); callar(); }
       pfPintar(); return pfEmergHoja();
     }
-    toast('Le avisamos a ' + a + (mot === 'anda' ? ' y a Viva' : '') + (PF_TURNO ? '' : '. Lucas lo ve después'));
+    toast('Avisamos a recepción' + (mot === 'anda' ? ' y a Viva' : ''));
     pfPintar();
     if (sinHoja) return;
     const fi = pfEnSesion() ? curF() : -1, st = pfEnSesion() ? steps()[SALA.step] : '';
@@ -1752,7 +1752,7 @@
     const b = $('#profeFab'); if (!b) return;
     const on = curScr === 'hoy' && enSala() && !(CAJA && CAJA.abierta && !CAJA.chica) && !$('#nav').hidden;
     if (b.hidden === on) b.hidden = !on; if (!on) return;
-    const lbl = !PF ? 'Llamar a mi profe' : PF.est === 'env' ? 'Avisado' : PF.est === 'va' ? PF.quien + ' ya va' : PF.est === 'nadie' ? 'Sin respuesta' : PF.est === 'recep' ? 'Recepción sabe' : 'Ayuda pedida';
+    const lbl = !PF ? 'Llamar a mi profe' : PF.est === 'env' ? 'Avisamos a recepción' : PF.est === 'va' ? 'Recepción avisó' : PF.est === 'nadie' ? 'Sin respuesta' : PF.est === 'recep' ? 'Recepción sabe' : 'Ayuda pedida';
     const cls = 'profefab' + (PF ? ' pf-' + PF.est : ''), h = ICO_PROFE + '<span>' + lbl + '</span>' + (PF ? '<i class="pfdot" aria-hidden="true"></i>' : '');
     if (b.className !== cls) b.className = cls;
     if (b.dataset.h !== h) { b.innerHTML = h; b.dataset.h = h; b.setAttribute('aria-label', PF ? 'Llamar a mi profe. ' + pfTxt() : 'Llamar a mi profe'); }
@@ -1778,10 +1778,10 @@
     if (PF && MOM !== 'sala' && MOM !== 'sesion') PF = null;
     if (PF) {
       PF.t += mtVel(); const t = PF.t, llega = PF_LLEGA[PF_RESP];
-      if (PF.est === 'env' && llega != null && t >= llega) { PF.est = 'va'; PF.quien = PF_RESP === 'su' ? PF.a : PF.a === 'Lucas' ? PF_SALA : PF_SALA2; PF.tva = t; toast(PF.quien + ' te vio. Ya va'); pfPintar(); }
-      else if (PF.est === 'env' && llega == null && t >= PF_NADIE) { PF.est = 'nadie'; toast('Nadie pudo venir ahora'); pfPintar(); }
+      if (PF.est === 'env' && llega != null && t >= llega) { PF.est = 'va'; PF.quien = true; PF.tva = t; toast('Recepción ya le avisó a un profe'); pfPintar(); }
+      else if (PF.est === 'env' && llega == null && t >= PF_NADIE) { PF.est = 'nadie'; toast('Todavía no tenemos respuesta'); pfPintar(); }
       else if (PF.est === 'va' && t - PF.tva >= PF_VA_FIN) { PF = null; pfPintar(); }   // en el tablero, "Atendiendo" se cierra solo a los 10 min
-      else if (PF.est === 'emerg' && !PF.quien && t >= PF_EMERG) { PF.quien = PF_SALA; toast(PF_SALA + ' va para allá'); pfPintar(); }
+      else if (PF.est === 'emerg' && !PF.quien && t >= PF_EMERG) { PF.quien = true; toast('Recepción ya le avisó a un profe'); pfPintar(); }
     }
     pfFab();
   }, 1000);
@@ -1800,8 +1800,8 @@
     $$('#pfTurno [data-pft]').forEach(x => x.setAttribute('aria-pressed', (x.dataset.pft === '1') === PF_TURNO));
     $$('#pfResp [data-pfr]').forEach(x => x.setAttribute('aria-pressed', x.dataset.pfr === PF_RESP));
   }
-  $('#pfTurno').addEventListener('click', e => { const b = e.target.closest('[data-pft]'); if (!b) return; PF_TURNO = b.dataset.pft === '1'; PF = null; pfSync(); pfPintar(); toast(PF_TURNO ? 'Lucas está en el turno' : 'Lucas no está en el turno: viene ' + PF_SALA + ', de sala'); });
+  $('#pfTurno').addEventListener('click', e => { const b = e.target.closest('[data-pft]'); if (!b) return; PF_TURNO = b.dataset.pft === '1'; PF = null; pfSync(); pfPintar(); toast(PF_TURNO ? 'Lucas está en el turno' : 'Lucas no está en el turno: recepción avisa a un profe de sala'); });
   $('#pfResp').addEventListener('click', e => { const b = e.target.closest('[data-pfr]'); if (!b) return; PF_RESP = b.dataset.pfr; PF = null; pfSync(); pfPintar();
-    toast({ su:'Contesta a los 30 s', otro:'Contesta un profe de sala, pasado el minuto', nadie:'Nadie contesta: a los 3 min, la otra salida' }[PF_RESP]); });
+    toast({ avise:'Recepción marca Avisé', nadie:'Recepción no marca Avisé' }[PF_RESP]); });
   $('#pfVer').addEventListener('click', () => { $('#demoSheet').hidden = true; if (MOM !== 'sesion') setMom('sesion'); go('hoy'); if (SEG === null) { SEG = 'guiame'; sgSync(); } renderSala(); cajaAbrir(); pfHoja(); });
   pfSync();

@@ -389,13 +389,12 @@
     let c = $('#nvCard'); if (!c) { c = document.createElement('div'); c.className = 'card'; c.id = 'nvCard'; c.style.gap = '10px'; $('#mesCard').insertAdjacentElement('beforebegin', c); }
     const dp = nvDisp(); c.hidden = NUEVO == null || dp === 'silencio'; if (c.hidden) return;
     const s = NUEVO, P = 'tu profe <b>' + NV_PROFE + '</b>', rev = s === 4 || s === 8;
-    const arriba = !!dp || rev || s === 3, ref = arriba ? $('#formaCard') : $('#mesCard'); if (c.nextElementSibling !== ref) ref.insertAdjacentElement('beforebegin', c);   // con algo que hacer o leer hoy, arriba de Tu ritmo
+    const arriba = !!dp || rev, ref = arriba ? $('#formaCard') : $('#mesCard'); if (c.nextElementSibling !== ref) ref.insertAdjacentElement('beforebegin', c);   // con algo que hacer o leer hoy, arriba de Tu ritmo
     const t = dp === 'alta' ? '<b>Te damos la bienvenida a Viva ⚡</b> En tu primera visita, ' + P + ' te recibe, te muestra la sala y te deja la rutina lista. Tu meta: <b>' + META_SEM + ' por semana</b>. Tu profe sabe cuando llegás, para recibirte.'
       : dp === 'sin7' || dp === 'sin14' ? 'Tu rutina está lista y ' + P + ' te espera para tu primera visita, el día que te quede bien.'
       : dp === 'falta' ? 'Cuando quieras volver, tu rutina está lista y ' + P + ' también.'
       : dp === 'volvio' ? '<b>Volviste ⚡</b> Tu rutina sigue lista y ' + P + ' sabe que llegaste.'
       : rev ? '<b>Tu revisión de la semana ' + s + '</b> con ' + P + ': ' + nvRev(s) + ', en tu sede. Tu resumen ya está armado.'
-      : s === 3 ? '<b>' + NV_PROFE + ':</b> “' + NV_COM + '”'
       : s === 6 ? 'Tus primeras 3 semanas: <b>' + nvSemCount(22, 42) + ' visitas</b>. Las últimas 3: <b>' + nvSemCount(0, 21) + '</b>. Tu próxima revisión: semana 8, ' + nvRev(8) + '.'
       : s < 4 ? 'Tu profe <b>' + NV_PROFE + '</b> te acompaña en tus primeras visitas. Tu revisión con él: <b>semana 4</b>, ' + nvRev(4) + '.'
       : 'Tu próxima revisión con ' + P + ': <b>semana 8</b>, ' + nvRev(8) + '.';
@@ -436,8 +435,8 @@
     mp.hidden = !ve; $('#prEq').hidden = !ve; if (!ve) { $('#prVol').hidden = true; mp.before(pf); mp.before(bc); bc.hidden = false; } else { NV_ANC[0].after(pf); NV_ANC[1].after(bc); }
     if (NUEVO != null) {
       $$('#pvList > div > .small').forEach(e => e.textContent = '');   // las fechas de la demo son anteriores al alta simulada: se omiten antes que mostrar algo que no pasó
-      $('#prProfeF').textContent = NUEVO >= 3 ? 'semana 3' : '';
-      $('#prProfeTxt').textContent = NUEVO >= 3 ? NV_COM : 'En tu semana 3, tu profe te deja un comentario sobre lo que registraste.';
+      $('#prProfeF').textContent = '';
+      $('#prProfeTxt').textContent = 'Tu profe ve lo que registrás y lo conversan en tu revisión.';
       $('#prProfeRev').innerHTML = NUEVO < 8 ? '<b>Tu revisión: semana ' + (NUEVO < 4 ? 4 : 8) + '</b><span>Con ' + NV_PROFE + ', en tu sede · ' + nvRev(NUEVO < 4 ? 4 : 8) + '.</span>' : '<b>Tu próxima revisión: semana 12</b><span>Con ' + NV_PROFE + ', ya agendada.</span>';
     }
     let vb = $('#vmnBtn'); if (!vb) { vb = document.createElement('button'); vb.className = 'link lime'; vb.id = 'vmnBtn'; vb.style.cssText = 'min-height:44px;align-self:center'; bc.parentElement.lastElementChild.insertAdjacentElement('beforebegin', vb); }
