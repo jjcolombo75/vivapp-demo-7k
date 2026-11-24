@@ -12,6 +12,9 @@
 #formaCard{gap:10px!important}
 #formaCard .gauge{max-width:272px;margin:0 auto;display:block}
 #formaCard .fhito{font-size:40px}
+/* T32 · Tu ritmo en letras: la letra apagada queda como vidrio, sin luz */
+.fhito .lt.off{color:var(--line2)!important;-webkit-text-fill-color:var(--line2);-webkit-text-stroke-color:var(--line2);text-shadow:none!important}
+.app[data-mode="light"] .fhito .lt.off{color:#c9ced8!important;-webkit-text-fill-color:#c9ced8;-webkit-text-stroke-color:#c9ced8}
 #formaCard .wkq{padding-top:10px;gap:4px}
 #formaCard .eqsvg{max-height:92px}
 #formaCard .fgoal{margin-top:-2px}
@@ -232,7 +235,11 @@
 .nav .navacc[data-ce="off"]{--cf:rgba(255,255,255,.03)}
 .app:not([data-est="v122"]):not([data-crel="no"]) .nav .navacc .nai{background:linear-gradient(var(--cf),var(--cf)),var(--nav)}
 .app:not([data-est="v122"]):not([data-crel="no"]) .nav .navacc.ring .nai{background:linear-gradient(var(--cf),var(--cf)) padding-box,linear-gradient(var(--nav),var(--nav)) padding-box,conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a) border-box!important}
-.nav .navacc .nai{flex:none}   /* v124: con la pastilla de la sesión la barra se achicaba y el círculo quedaba aplastado */
+.nav .navacc .nai{flex:none}
+/* T-R v127 · DIS D6 C (Juanjo, 24/11): con "Comenzar" (hoy toca), espectro tenue que entra desde el borde y centro oscuro, para que
+   el ícono y la palabra conserven contraste. Quieto (ángulo fijo, no var(--aa)): lo que gira es el halo de T31. Los otros estados, sin cambios.
+   Panel · Layout · "Relleno de Comenzar": Espectro desde el borde ✓ (por defecto) · Cian (v125) = data-cfill="cian". */
+.app:not([data-est="v122"]):not([data-crel="no"]):not([data-cfill="cian"]) .nav .navacc.ring[data-ce="toca"] .nai{background:radial-gradient(circle closest-side,var(--nav) 0,var(--nav) 48%,color-mix(in srgb,var(--nav) 55%,transparent) 74%,transparent 100%) padding-box,conic-gradient(from 200deg,rgba(255,233,74,.42),rgba(7,176,242,.42),rgba(244,0,160,.42),rgba(255,233,74,.42)) padding-box,linear-gradient(var(--nav),var(--nav)) padding-box,conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a) border-box!important}   /* v124: con la pastilla de la sesión la barra se achicaba y el círculo quedaba aplastado */
 /* T31 · v125: halo por estado (Juanjo, 24/11). Comenzar: halo del espectro que gira (el anillo sigue quieto); en sesión, el halo que ya giraba; hecha, halo del color del dato; semana cumplida, apenas; apagado, sin halo */
 .app:not([data-est="v122"]):not([data-chalo="no"]) .nav .navacc[data-ce="toca"] .nai::after{content:"";position:absolute;inset:-4px;border-radius:inherit;z-index:-1;filter:blur(10px);opacity:.6;pointer-events:none;background:conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a)}
 .app:not([data-est="v122"]):not([data-chalo="no"]) .nav .navacc.hspin .nai::after{animation:accSpin 4s linear infinite}

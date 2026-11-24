@@ -171,18 +171,23 @@
   // Firma del manual: la primera palabra en Archivo Black, el resto en Archivo Expanded Light
   function firma(t){ const i = t.indexOf(' '); return i < 0 ? '<b>' + t + '</b>' : '<b>' + t.slice(0, i) + '</b> <i>' + t.slice(i + 1) + '</i>'; }
   function renderForma(){
-    const s = serie(), v = s[s.length - 1].f, dv = v - s[s.length - 8].f, z = zona(v, s), vt = tv(v, s), g = metaSemana(v), zs = zonas(), nom = V().nom;
+    const s = serie(), v0 = s[s.length - 1].f, dv0 = v0 - s[s.length - 8].f, g = metaSemana(v0), zs = zonas(), nom = V().nom;
+    let v = v0, dv = dv0, z = zona(v0, s), vt = tv(v0, s); const LT = LET_ON ? letEstado() : null; // T32 · En letras
+    if (LT) { v = vt = LT.v; z = [zs[LT.ci][1], zs[LT.ci][2]]; dv = LT.dv > 0 ? 2 : LT.dv < 0 ? -2 : 0; }
+    const W0 = LT ? letWord(LT) : z[0];
     $$('[data-mname]').forEach(e => e.innerHTML = firma(nom)); $$('#estPick [data-est]').forEach((b, i) => b.textContent = zonas()[i][1]); $$('[data-mtu]').forEach(e => e.textContent = V().tu); $$('[data-msub]').forEach(e => e.textContent = V().sub); $$('[data-msubaja]').forEach(e => e.textContent = Cap(V().tu.replace('tu', 'su')) + ' ' + V().baja); $('#altaLbl').textContent = nom + vb(' arranca hoy', ' arrancan hoy'); $('#altaZ').textContent = zonas()[0][1]; $('#onbPaso2').textContent = V().paso2;
     const delta = '<span class="fdelta" style="color:' + (dv >= 0 ? 'var(--dat)' : 'var(--orange)') + '">' + (dv > 0 ? '▲ +' + dv + ' contra la semana pasada' : dv < 0 ? '▼ ' + dv + ' contra la semana pasada' : '= igual que la semana pasada') + '</span>';
-    const aria = nom + ': ' + z[0] + ', ' + v + ' de 100. ' + (dv >= 0 ? 'Subió ' : 'Bajó ') + Math.abs(dv) + ' contra la semana pasada. ' + V().sub + '.';
+    const delL = LT ? (LT.dv ? '<span class="fdelta" style="color:' + (LT.dv > 0 ? 'var(--dat)' : 'var(--orange)') + '">' + (LT.dv > 0 ? '▲ +' : '▼ −') + Math.abs(LT.dv) + (Math.abs(LT.dv) === 1 ? ' letra' : ' letras') + ' esta semana</span>' : '') : null;
+    const aria = LT ? nom + ': ' + z[0] + ', ' + LT.lit + ' de ' + LET_T[LT.ci] + ' letras prendidas.' + (LT.dv ? (LT.dv > 0 ? ' Se prendieron ' : ' Se apagaron ') + Math.abs(LT.dv) + ' esta semana.' : '') : nom + ': ' + z[0] + ', ' + v + ' de 100. ' + (dv >= 0 ? 'Subió ' : 'Bajó ') + Math.abs(dv) + ' contra la semana pasada. ' + V().sub + '.';
     const top = vt >= zs[zs.length - 1][0], tr = dv > 1 ? 'tup' : dv < -1 ? 'tdown' : 'tflat', hc = 'fhito ' + tr + (top ? ' flow' : '');
-    const num = '<span class="fnumsm">' + v + '<small> de 100</small></span>';
-    const big = () => '<div class="between" style="align-items:flex-end"><span class="' + hc + '" style="color:' + z[1] + '" role="img" aria-label="' + aria + '">' + z[0] + '</span><span class="stack" style="gap:4px;align-items:flex-end;flex-shrink:0">' + num + delta + '</span></div>';
+    const num = LT ? '' : '<span class="fnumsm">' + v + '<small> de 100</small></span>';
+    const sub = LT ? delL : '<strong style="color:var(--txt)">' + v + '</strong> de 100 · ' + delta;
+    const big = () => '<div class="between" style="align-items:flex-end"><span class="' + hc + '" style="color:' + z[1] + '" role="img" aria-label="' + aria + '">' + W0 + '</span><span class="stack" style="gap:4px;align-items:flex-end;flex-shrink:0">' + num + (LT ? delL : delta) + '</span></div>';
     let h = '';
     if (fFmt === 'anillo') {
       const C = 2 * Math.PI * 52;
       h = '<div class="frow"><svg class="fring" viewBox="0 0 128 128" role="img" aria-label="' + aria + '"><circle cx="64" cy="64" r="52" class="fbg"/><circle cx="64" cy="64" r="52" class="farc" style="stroke:' + z[1] + ';stroke-dasharray:' + C.toFixed(1) + ';stroke-dashoffset:' + (C * (1 - v / 100)).toFixed(1) + '"/>' + goalTick(64, 64, 42, 62, g.meta) + '<text x="64" y="74" text-anchor="middle" class="fnum" style="font-size:30px">' + v + '</text></svg>' +
-        '<span class="stack" style="gap:6px"><span class="' + hc + '" style="color:' + z[1] + ';font-size:36px">' + z[0] + '</span>' + delta + '<span class="small muted">' + v + ' de 100 · la marca es tu objetivo del domingo</span></span></div>';
+        '<span class="stack" style="gap:6px"><span class="' + hc + '" style="color:' + z[1] + ';font-size:36px">' + W0 + '</span>' + (LT ? delL : delta + '<span class="small muted">' + v + ' de 100 · la marca es tu objetivo del domingo</span>') + '</span></div>';
     } else if (fFmt === 'barra') {
       let bg = [], lab = '';
       zs.forEach((q, i) => { const t = i < zs.length - 1 ? zs[i + 1][0] : 100; bg.push((i % 2 ? 'var(--line)' : 'var(--panel2)') + ' ' + q[0] + '% ' + t + '%'); lab += '<span style="width:' + (t - q[0]) + '%">' + q[1] + '</span>'; });
@@ -208,9 +213,9 @@
           : P_('halo', ' filter="url(#nfB1)"') + P_('halo2', ' filter="url(#nfB2)"') + P_('body') + '<path class="core" d="' + d + '"/>') + '</g>';
       });
       h = '<svg class="gauge ' + tr + '" viewBox="0 -10 240 142" role="img" aria-label="' + aria + '">' + defs + arcs + labs +
-        '<line x1="' + gi[0].toFixed(1) + '" y1="' + gi[1].toFixed(1) + '" x2="' + gt[0].toFixed(1) + '" y2="' + gt[1].toFixed(1) + '" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round"/>' +
+        (LT ? '' : '<line x1="' + gi[0].toFixed(1) + '" y1="' + gi[1].toFixed(1) + '" x2="' + gt[0].toFixed(1) + '" y2="' + gt[1].toFixed(1) + '" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round"/>') +
         '<g class="boltn" transform="translate(120 122) rotate(' + (posV(vt) * 1.8 - 90).toFixed(1) + ')"><g class="boltglow ' + tr + '" style="color:' + (ci === last ? 'var(--z3)' : z[1]) + '"><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG3)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG)"/><path d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="currentColor" filter="url(#nfBG2)" opacity=".8"/></g><path filter="url(#nfBolt)" d="M12.3 -14.5 L-12.3 1.1 L-8.3 -39.8 L-20.7 -33.3 L0.0 -112.0 L-0.6 -62.8 L11.6 -69.7 Z" fill="var(--txt)" stroke="var(--panel)" stroke-width="3" stroke-linejoin="round" paint-order="stroke"/></g></svg>' +
-        '<div class="stack" style="align-items:center;gap:6px;margin-top:-2px;text-align:center"><span class="' + hc + '" style="color:' + z[1] + '">' + z[0] + '</span><span class="small muted"><strong style="color:var(--txt)">' + v + '</strong> de 100 · ' + delta + '</span></div>';
+        '<div class="stack" style="align-items:center;gap:6px;margin-top:-2px;text-align:center"><span class="' + hc + '" style="color:' + z[1] + '">' + W0 + '</span><span class="small muted">' + sub + '</span></div>';
     } else if (fFmt === 'vumetro') {
       // Vúmetro: 20 segmentos de 5 puntos, agrupados por tramo; el rayo al final es la meta
       const N = 20, SW = 8.6, GP = 4.4, GG = 7, BX = 26, H0 = 14, HS = 40, last = zs.length - 1;
@@ -237,7 +242,7 @@
         vl += '<text class="zl' + (i === vci ? ' cur' : i < vci ? ' on' : '') + '" x="' + cx.toFixed(1) + '" y="' + (H0 + HS + 26) + '" text-anchor="middle" aria-hidden="true">' + q[1] + '</text>'; });
       h = '<svg class="vumeter ' + tr + '" viewBox="0 0 ' + W.toFixed(0) + ' 84" role="img" aria-label="' + aria + '">' + defs + segs + bolt + vl +
         '<path d="M' + mx.toFixed(1) + ' ' + (H0 + HS + 5) + ' l-4 6 h8 z" fill="var(--muted)"/></svg>' +
-        '<div class="stack" style="align-items:center;gap:6px;margin-top:6px;text-align:center"><span class="' + hc + '" style="color:' + z[1] + '">' + z[0] + '</span><span class="small muted"><strong style="color:var(--txt)">' + v + '</strong> de 100 · ' + delta + '</span></div>';
+        '<div class="stack" style="align-items:center;gap:6px;margin-top:6px;text-align:center"><span class="' + hc + '" style="color:' + z[1] + '">' + W0 + '</span><span class="small muted">' + sub + '</span></div>';
     } else if (fFmt === 'camino') {
       // Paradas equidistantes; el punto avanza dentro de cada tramo según el número
       const n = zs.length, pos = val => { let i = 0; zs.forEach((q, k) => { if (val >= q[0]) i = k; }); if (i === n - 1) return 100; const lo = zs[i][0], hi = zs[i + 1][0]; return (i + (val - lo) / (hi - lo)) * 100 / (n - 1); };
@@ -266,20 +271,21 @@
         cells += '<i class="' + (on ? 'on' : '') + (cerrado.has(d) ? ' cerr' : '') + (d === 0 ? ' hoy' : '') + '"' + (on ? ' style="opacity:' + op + '"' : '') + '></i>';
       }
       h = '<div class="frow" style="align-items:flex-start"><div class="fgrid" role="img" aria-label="' + aria + ' Cada punto es un día de las últimas 6 semanas.">' + cells + '</div>' +
-        '<span class="stack" style="gap:6px;width:116px;flex-shrink:0"><span class="' + hc + '" style="color:' + z[1] + ';font-size:30px">' + z[0] + '</span>' + num + delta + '</span></div>' +
+        '<span class="stack" style="gap:6px;width:116px;flex-shrink:0"><span class="' + hc + '" style="color:' + z[1] + ';font-size:30px">' + W0 + '</span>' + num + (LT ? delL : delta) + '</span></div>' +
         '<span class="small muted">Cada día que venís se prende y se va apagando con las semanas. Los círculos vacíos son feriados: no cuentan.</span>';
     }
     $('#formaViz').innerHTML = h;
     const rec = recupera(s[s.length - 8].f);
     renderSemana(z[1], top && !!V().flow);
     const wmsg = EQ_ON ? semMsg(dv, rec) : null;
-    $('#formaGoal').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>' + (nvGoal(dv) !== null ? nvGoal(dv) : wmsg !== null ? wmsg :
+    $('#formaGoal').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dat)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>' + (LT ? letMsg(LT) : nvGoal(dv) !== null ? nvGoal(dv) : wmsg !== null ? wmsg :
       (dv < 0 ? V().down(rec) : top && V().flow ? '<strong>¡Estás en VIVA Flow! ⚡</strong> Sostenelo viniendo a tu meta.' : g.sube ? (g.n ? 'Venís <strong>' + vez(g.n) + ' más</strong> esta semana y llegás a <strong>' + g.meta + '</strong> el domingo.' : 'Vas bien: llegás a <strong>' + g.meta + '</strong> el domingo.')
         : (g.n ? 'Venís <strong>' + vez(g.n) + ' más</strong> esta semana y ' + V().tu + vb(' se mantiene', ' se mantienen') + ' en ' + g.meta + '.' : 'Esta semana ya cumpliste. Descansar también suma.'))) + '</span>';
     $('#flowShare').hidden = !top;
     $('#varZonas').textContent = nom + ': ' + zs.map(q => q[1]).join(' · ');
     const fb = $('#fitBadge'); fb.hidden = true; $('#fitBox').hidden = nIB === 0; $('#fitTrend').innerHTML = fitTrendTxt(); $('#fitPromo').hidden = nIB !== 0 || fitPromoNo; avisosLater(); fb.innerHTML = '<span class="fbw">Índice</span><b>FIT</b>' + (nIB === 1 ? 'Tu punto de partida' : nIB + ' mediciones') + ' <span aria-hidden="true">›</span>';
-    return { v:v, g:g, dv:dv, rec:rec };
+    if (LET_ON && typeof letPrev === 'function') letPrev();
+    return { v:v0, g:g, dv:dv0, rec:rec };
   }
   $('#fmtPick').addEventListener('click', e => { const b = e.target.closest('[data-fmt]'); if (!b) return; fFmt = b.dataset.fmt; $$('#fmtPick [data-fmt]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderForma(); if (curScr === 'forma') renderFormaDet(); });
   $('#varPick').addEventListener('click', e => { const b = e.target.closest('[data-var]'); if (!b) return; VAR = b.dataset.var; $$('#varPick .varopt').forEach(x => x.setAttribute('aria-pressed', x === b)); renderForma(); renderHoy(); if (curScr === 'forma') renderFormaDet(); });
@@ -589,6 +595,45 @@
     $$('#eqPick [data-eq]').forEach(x => x.setAttribute('aria-pressed', x === b));
     $('#demoSheet').hidden = true; renderForma(); go('inicio');
   });
+
+//#bloque 232
+  // ===== T32 · Tu ritmo en letras (decisiones.md 24/11, DIS D1 a D3; conceptos/tu-ritmo-en-letras.md) =====
+  // Detrás del panel de demo ("Tu ritmo: Como hoy ✓ · En letras"). Con "Como hoy" nada de esto se usa.
+  // La palabra del estado se prende letra por letra: Tranqui 7 · Parejo 6 · Firme 5 · VIVA Flow 8 = 26.
+  var LET_ON = false;
+  var LET = { modo:'tira', n:16, sem:Array(26).fill(2), mira:8, nuevo:true, cad:'c2' };
+  const LET_T = [7, 6, 5, 8], LET_A = [0, 7, 13, 18, 26];
+  // La regla, una sola función: recibe las entradas de cada semana y devuelve las letras al cierre de cada una.
+  // Cada semana prende hasta 2 (una por entrada; la tercera no prende) · una semana entera sin venir apaga 3 ·
+  // en las primeras 13 semanas del socio no se apaga ninguna · semana congelada (pausa, feriados, sede cerrada; null o 'P') no mueve nada · entre 0 y 26.
+  function letrasRegla(sem, nuevo, ini){
+    let L = ini || 0; return sem.map((e, i) => {
+      if (e === null || e === 'P') return L;
+      L = e > 0 ? Math.min(26, L + Math.min(2, e)) : (nuevo && i < 13 ? L : Math.max(0, L - 3));
+      return L; });
+  }
+  const letIni = () => LET.nuevo ? 0 : 26; // sin "Socio nuevo": la socia ya tenía la palabra completa
+  const letSerie = () => letrasRegla(LET.sem, LET.nuevo, letIni());
+  const letEn = k => k <= 0 ? letIni() : letSerie()[k - 1];
+  const letTramo = n => n <= 7 ? 0 : n <= 13 ? 1 : n <= 18 ? 2 : 3;
+  // Estado para dibujar: v es la posición equivalente en la escala de los tramos, para que la aguja diga lo mismo que la palabra
+  function letEstado(){
+    const n = LET.modo === 'barra' ? LET.n : letEn(LET.mira), prev = LET.modo === 'barra' ? n : letEn(LET.mira - 1);
+    const ci = letTramo(n), lit = n - LET_A[ci], zs = zonas(), a = zs[ci][0], b = ci < zs.length - 1 ? zs[ci + 1][0] : 100;
+    const v = lit >= LET_T[ci] ? (ci === zs.length - 1 ? 100 : b - 0.01) : a + (b - a) * lit / LET_T[ci];
+    return { n:n, ci:ci, lit:lit, v:v, dv:LET.modo === 'barra' ? 0 : n - prev };
+  }
+  // La palabra con sus letras prendidas y apagadas (con otros nombres de tramo, proporcional a su largo)
+  function letWord(LT){
+    const w = zonas()[LT.ci][1].toUpperCase(), nL = w.replace(/ /g, '').length, on = Math.round(LT.lit * nL / LET_T[LT.ci]); let k = 0;
+    return '<span class="ltw" aria-hidden="true">' + w.split('').map(ch => ch === ' ' ? ' ' : '<span class="lt' + (k++ < on ? '' : ' off') + '">' + ch + '</span>').join('') + '</span>';
+  }
+  function letMsg(LT){
+    if (LT.n === 26) return '<strong>¡VIVA Flow completo! ⚡</strong> Una semana en que venís no apaga ninguna letra.';
+    if (LT.dv < 0) return 'Una semana sin venir apaga tres letras. Cada entrada de esta semana prende una, hasta dos ⚡';
+    const prot = LET.modo === 'tira' ? LET.nuevo && LET.mira <= 13 : NUEVO != null;
+    return 'Cada semana prendés hasta <strong>dos letras</strong>, una por entrada.' + (prot ? ' En tus primeros tres meses no se apaga ninguna.' : ' Una semana sin venir apaga tres.');
+  }
 
 //#bloque 330
   renderEx();

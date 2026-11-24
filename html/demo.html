@@ -25,6 +25,21 @@
 .demopanel .opt[disabled]{opacity:.45}
 .demopanel .opt small{display:block;font-size:10px;font-weight:400;letter-spacing:.08em;text-transform:uppercase}
 .dmayu{font-size:12px;color:var(--muted);line-height:1.4}
+/* T32 · simulador de Tu ritmo en letras */
+#letBox{display:flex;flex-direction:column;gap:6px;margin:12px 0;padding:10px 0;border-top:1px dashed var(--line2);border-bottom:1px dashed var(--line2)}
+.letprev{position:sticky;top:0;z-index:2;background:var(--panel);border-radius:12px;padding:6px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.letprev .gauge{max-width:200px;width:100%}
+.letprev .fhito{font-size:30px}
+.letprev .small{font-size:12px}
+.letrng{width:100%;height:44px;accent-color:var(--lime)}
+.letchk{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px;flex-wrap:wrap}
+.letchk input{width:22px;height:22px;accent-color:var(--lime)}
+.lettira{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:2px}
+.lettira button{min-height:52px;padding:0;border-radius:6px;border:1px solid var(--line2);background:var(--panel2);color:var(--txt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:15px;font-weight:700;line-height:1}
+.lettira button small{font-size:10px;font-weight:400;color:var(--muted)}
+.lettira button.fut{opacity:.38}
+.lettira button.cur{border-color:var(--lime);box-shadow:inset 0 0 0 1px var(--lime)}
+.lettira button i{display:block;width:70%;height:3px;border-radius:2px}
 </style>
 <div class="sheet" id="demoSheet" hidden role="dialog" style="z-index:29" aria-labelledby="dmTitle">
   <div class="sheetin demopanel">
@@ -90,9 +105,26 @@
         <div class="opts g2"><button class="opt" data-ac="rap1" aria-pressed="true">Rápido ×10</button><button class="opt" data-ac="rap0" aria-pressed="false">Real</button></div></div>
     </details>
     <details class="dmdet" data-k="ritmo" open><summary>Tu ritmo y Tu semana</summary>
+      <div class="dmrow"><span class="dmk">Tu ritmo</span>
+        <div class="opts g2" id="letPick"><button class="opt" data-let="0" aria-pressed="true">Como hoy ✓</button><button class="opt" data-let="1" aria-pressed="false">En letras</button></div>
+        <span class="dmayu">Como hoy: la lógica del 13/11, la que vale. En letras (DIS, 24/11): cada entrada prende una letra de la palabra del estado, hasta dos por semana; una semana sin venir apaga tres; en las primeras 13 semanas no se apaga ninguna. El arco no cambia.</span></div>
+      <div id="letBox" hidden>
+        <div class="letprev" id="letPrev" aria-hidden="true"></div>
+        <span class="dmayu" id="letManda"></span>
+        <div class="dmrow" style="margin-top:12px"><span class="dmk">Letras prendidas · <b id="letNv"></b></span>
+          <input type="range" class="letrng" id="letRng" min="0" max="26" step="1" value="16" aria-label="Letras prendidas, de 0 a 26">
+          <span class="dmayu">Pone el estado, sin la regla: recorre los 27 dibujos.</span></div>
+        <div class="dmrow" style="margin-top:12px"><span class="dmk">Semana a semana</span>
+          <div class="opts g2" id="letCad"><button class="opt" data-cad="c2">2 por semana</button><button class="opt" data-cad="c4">4 por semana</button><button class="opt" data-cad="c1">1 por semana</button><button class="opt" data-cad="alt">Semana por medio</button><button class="opt" data-cad="f4">Falta 1 de cada 4</button><button class="opt" data-cad="vac">Vacaciones (2 semanas)</button><button class="opt" data-cad="deja" style="grid-column:1 / -1">Deja de venir</button></div>
+          <label class="letchk"><input type="checkbox" id="letNuevo" checked> Socio nuevo <span class="dmayu">(13 semanas sin apagar; arranca en 0. Sin tilde: ya tenía la palabra completa)</span></label>
+          <div class="lettira" id="letTira"></div>
+          <span class="dmayu">Cada casilla es una semana: arriba las entradas (tocala: 0 · 1 · 2 · 3+ · P, pausa o sede cerrada), abajo las letras al cierre. La primera fila son las 13 semanas de socio nuevo.</span>
+          <span class="dmk" style="margin-top:6px">Semana que mirás · <b id="letMiraV"></b></span>
+          <input type="range" class="letrng" id="letMira" min="0" max="26" step="1" value="8" aria-label="Semana que mirás, de 0 (el alta) a 26"></div>
+      </div>
       <div class="dmrow"><span class="dmk">Tramo de Tu ritmo</span>
         <div class="opts g2" id="estPick"><button class="opt" data-est="0" aria-pressed="false">Tranqui</button><button class="opt" data-est="1" aria-pressed="false">Parejo</button><button class="opt" data-est="2" aria-pressed="true">Firme</button><button class="opt" data-est="3" aria-pressed="false">VIVA Flow</button></div>
-        <span class="dmayu">Cambia sus entradas de los últimos 120 días (simuladas).</span></div>
+        <span class="dmayu" id="estAyu">Cambia sus entradas de los últimos 120 días (simuladas).</span></div>
       <div class="dmrow"><span class="dmk">Punto de la semana</span>
         <div class="opts g2" id="semPick"><button class="opt" data-sem="lunes" aria-pressed="false">Lunes</button><button class="opt" data-sem="mitad" aria-pressed="true">A mitad</button><button class="opt" data-sem="cumplida" aria-pressed="false">Cumplida</button><button class="opt" data-sem="completa" aria-pressed="false">Completa</button><button class="opt" data-sem="sinreg" aria-pressed="false" style="grid-column:1 / -1">Sin registros en Entrenar</button></div></div>
       <div class="dmrow"><span class="dmk">Cierre del mes</span>
@@ -116,7 +148,10 @@
         <div class="opts g3" id="aniPick"><button class="opt" data-ani="sesion" aria-pressed="true">En sesión ✓</button><button class="opt" data-ani="siempre" aria-pressed="false">Gira siempre</button><button class="opt" data-ani="quieto" aria-pressed="false">Quieto</button></div></div>
       <div class="dmrow"><span class="dmk">Relleno del círculo</span>
         <div class="opts g2" id="crelPick"><button class="opt" data-crel="si" aria-pressed="true">Tenue por estado ✓</button><button class="opt" data-crel="no" aria-pressed="false">Sin relleno</button></div>
-        <span class="dmayu">Juanjo, 24/11: un relleno tenue, no pleno. Cian si hoy toca, amarillo en sesión, magenta con la sesión hecha, casi nada sin sesión.</span></div>
+        <span class="dmayu">Juanjo, 24/11: un relleno tenue, no pleno. Cian si hoy toca, amarillo en sesión, magenta con la sesión hecha, casi nada sin sesión. "Comenzar" lleva el relleno que elijas abajo.</span></div>
+      <div class="dmrow"><span class="dmk">Relleno de Comenzar</span>
+        <div class="opts g2" id="cfillPick"><button class="opt" data-cfill="borde" aria-pressed="true">Espectro desde el borde ✓</button><button class="opt" data-cfill="cian" aria-pressed="false">Cian (v125)</button></div>
+        <span class="dmayu">Juanjo, 24/11 (D6): con "Comenzar", espectro tenue que entra desde el borde y el centro oscuro, para que el ícono se lea. Quieto: gira el halo. Cian = como en la v125, para comparar. Los otros estados no cambian.</span></div>
       <div class="dmrow"><span class="dmk">Halo del círculo</span>
         <div class="opts g2" id="chaloPick"><button class="opt" data-chalo="si" aria-pressed="true">Con halo ✓</button><button class="opt" data-chalo="no" aria-pressed="false">Sin halo</button></div>
         <span class="dmayu">Juanjo, 24/11: Comenzar con halo del espectro que gira (el anillo queda quieto; con Anillo "Quieto" tampoco gira el halo); en sesión, el que ya tenía; hecha, magenta; semana cumplida, apenas; apagado, sin halo.</span></div>

@@ -115,7 +115,7 @@
     if (MURK === 'nueva') { toast('La socia nueva todavía no tiene un mes entero: elegí 3 meses o 1 año'); return; }
     $('#demoSheet').hidden = true;
     const now = HOY_D, id = 'm' + now.getFullYear() + '-' + now.getMonth();
-    const v = tv(serie().slice(-1)[0].f); let ti = 0; zonas().forEach((q, k) => { if (v >= q[0]) ti = k; });
+    const v = tv(serie().slice(-1)[0].f); let ti = 0; zonas().forEach((q, k) => { if (v >= q[0]) ti = k; }); if (LET_ON) ti = letEstado().ci; // T32
     const prevM = MUR.meses.find(m => m.m === now.getMonth() && m.y === now.getFullYear());
     if (!prevM) { MUR.meses.push({ m:now.getMonth(), y:now.getFullYear(), t:ti }); MUR.sem += Math.max(0, 3 - MUR.prevMes - (semCumplida() ? 1 : 0)); }
     MUR.cerrado = true; muralNuevo = id;
@@ -294,7 +294,7 @@
     for (const k in LIM) delete LIM[k];
     setAnt(c.ant); dmTap('[data-exp="' + (c.exp || ANT_EXP[c.ant]) + '"]');
     if (ETAPA !== c.et) dmB('[data-et="' + c.et + '"]').click();
-    setAus(0); dmB('[data-est="' + c.est + '"]').click(); setAus(c.aus);
+    setAus(0); { const e = dmB('[data-est="' + c.est + '"]'), d = e.disabled; e.disabled = false; e.click(); e.disabled = d; } setAus(c.aus);
     if (MOM !== 'antes') setMom('antes', true);
     dmB('[data-sem="' + c.sem + '"]').click();
     if (c.mom !== 'antes') dmB('[data-mom="' + c.mom + '"]').click();
@@ -303,6 +303,7 @@
     dmTap('[data-ds="' + c.ds + '"]'); dmTap('[data-fit="' + c.fit + '"]');
     setObj(c.obj); setDia(c.dia); setPlan(c.plan); setSaldo(c.saldo);
     if (c.nv != null) { dmTap('[data-exp="arranco"]'); nvAplicar(c.nv); setAus(c.aus); }
+    if (LET_ON) letEsc(c);
   }
   $('#escPick').innerHTML = ESCENARIOS.map((s, i) => '<button data-esc="' + i + '" aria-pressed="false">' + s[0] + '</button>').join('');
   $('#escPick').addEventListener('click', e => { const b = e.target.closest('[data-esc]'); if (!b) return; const s = ESCENARIOS[+b.dataset.esc];
@@ -587,6 +588,51 @@
     if (e.target.closest('[data-sireset]')) { SI.ok = null; return aI('El próximo voy vuelve a preguntar quién lo ve'); }
   });
 
+//#bloque 352
+  // ===== T32 · Tu ritmo en letras en el panel: "Como hoy ✓ · En letras", la barra de letras y la tira de semanas =====
+  // Cadencias de 26 semanas; [entradas por semana, socio nuevo]. 3 = "3 o más" (la tercera no prende).
+  const LET_CAD = { c2:[() => 2, true], c4:[() => 3, true], c1:[() => 1, true], alt:[i => i % 2 ? 0 : 2, true],
+    f4:[i => i % 4 ? 2 : 0, false], vac:[i => i < 2 ? 0 : 2, false], deja:[() => 0, false] };
+  const LET_NOM = { c2:'2 por semana', c4:'4 por semana', c1:'1 por semana', alt:'Semana por medio', f4:'Falta 1 de cada 4', vac:'Vacaciones (2 semanas)', deja:'Deja de venir' };
+  function letCad(k, mira){ const c = LET_CAD[k]; LET.cad = k; LET.sem = Array.from({ length:26 }, (_, i) => c[0](i)); LET.nuevo = c[1]; LET.modo = 'tira'; if (mira != null) LET.mira = mira; }
+  // Escenarios con "En letras" (cuál a cuál, en el ticket T32)
+  function letEsc(c){
+    if (c.nv != null) { if (c.aus >= 7) letCad('deja', c.nv); else letCad('c2', c.nv); LET.nuevo = true; }
+    else if (c.est === 3) letCad('c2', 26), LET.nuevo = false;
+    else if (c.aus >= 7) letCad('deja', c.aus >= 28 ? 4 : c.aus >= 14 ? 2 : 1);
+    else letCad('c2', 8);
+    renderForma();
+  }
+  function letPrev(){
+    const LT = letEstado(), zs = zonas(), nom = zs[LT.ci][1];
+    $('#letPrev').innerHTML = $('#formaViz').innerHTML;
+    $('#letNv').textContent = LT.n + ' · ' + nom + ' ' + LT.lit + ' de ' + LET_T[LT.ci];
+    $('#letRng').value = LT.n;
+    $('#letManda').innerHTML = LET.modo === 'barra' ? 'Manda <b>la barra</b>: la tira queda sin efecto hasta que la toques.' : 'Manda <b>la tira</b>' + (LET.cad ? ' (' + LET_NOM[LET.cad] + ')' : '') + ': la barra solo muestra el resultado.';
+    $('#letMira').value = LET.mira; $('#letMiraV').textContent = LET.mira ? 'semana ' + LET.mira : 'el alta';
+    const ser = letSerie();
+    $('#letTira').innerHTML = LET.sem.map((e, i) => { const n = ser[i], c = zs[letTramo(n)][2];
+      return '<button data-ls="' + i + '" class="' + (i + 1 > LET.mira ? 'fut' : '') + (i + 1 === LET.mira && LET.modo === 'tira' ? ' cur' : '') + '" aria-label="Semana ' + (i + 1) + ': ' + (e === 'P' ? 'en pausa' : e === 3 ? '3 o más entradas' : e + (e === 1 ? ' entrada' : ' entradas')) + ', cierra con ' + n + ' letras">' +
+        (e === 'P' ? 'P' : e === 3 ? '3+' : e) + '<small>' + n + '</small><i style="background:' + (letTramo(n) === zs.length - 1 && n ? 'var(--zflow)' : n ? c : 'transparent') + '"></i></button>'; }).join('');
+    $('#letNuevo').checked = LET.nuevo;
+    $$('#letCad [data-cad]').forEach(x => x.setAttribute('aria-pressed', LET.modo === 'tira' && x.dataset.cad === LET.cad));
+  }
+  function letSet(on){
+    LET_ON = on; $$('#letPick [data-let]').forEach(x => x.setAttribute('aria-pressed', (x.dataset.let === '1') === on));
+    $('#letBox').hidden = !on; $$('#estPick [data-est]').forEach(x => x.disabled = on);
+    $('#estAyu').textContent = on ? 'Sin efecto con "En letras": el tramo lo dan las letras (la barra o la tira de arriba).' : 'Cambia sus entradas de los últimos 120 días (simuladas).';
+    renderForma(); renderHoy(); if (curScr === 'forma') renderFormaDet();
+  }
+  const letAct = () => { renderForma(); if (curScr === 'forma') renderFormaDet(); };
+  $('#letPick').addEventListener('click', e => { const b = e.target.closest('[data-let]'); if (b) letSet(b.dataset.let === '1'); });
+  $('#letRng').addEventListener('input', e => { LET.modo = 'barra'; LET.n = +e.target.value; letAct(); });
+  $('#letMira').addEventListener('input', e => { LET.modo = 'tira'; LET.mira = +e.target.value; letAct(); });
+  $('#letNuevo').addEventListener('change', e => { LET.modo = 'tira'; LET.nuevo = e.target.checked; letAct(); });
+  $('#letCad').addEventListener('click', e => { const b = e.target.closest('[data-cad]'); if (!b) return; letCad(b.dataset.cad); letAct(); });
+  $('#letTira').addEventListener('click', e => { const b = e.target.closest('[data-ls]'); if (!b) return; const i = +b.dataset.ls, o = [0, 1, 2, 3, 'P'];
+    LET.sem[i] = o[(o.indexOf(LET.sem[i]) + 1) % o.length]; LET.cad = null; LET.modo = 'tira'; letAct(); });
+  window.letrasRegla = letrasRegla; window.letDemo = () => ({ on:LET_ON, modo:LET.modo, n:letEstado().n, mira:LET.mira, nuevo:LET.nuevo, cad:LET.cad, serie:letSerie() }); // para pruebas
+
 //#bloque 985
   // T16 · gancho de prueba para tools/barrido.py: abre pantallas que necesitan estado. Ninguna pantalla lo usa.
   window.VK_PRUEBA = { abrir: function (id) {
@@ -667,6 +713,11 @@
     const b = e.target.closest('[data-crel]'); if (!b) return; $('.app').dataset.crel = b.dataset.crel;
     $$('#crelPick [data-crel]').forEach(x => x.setAttribute('aria-pressed', x === b));
     dmFin('inicio', b.dataset.crel === 'si' ? 'Círculo con relleno tenue' : 'Círculo sin relleno');
+  });
+  $('#cfillPick').addEventListener('click', e => {   // T-R v127 · D6: relleno del estado "Comenzar"
+    const b = e.target.closest('[data-cfill]'); if (!b) return; $('.app').dataset.cfill = b.dataset.cfill;
+    $$('#cfillPick [data-cfill]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    dmFin('inicio', b.dataset.cfill === 'cian' ? 'Comenzar con relleno cian (v125)' : 'Comenzar con espectro tenue desde el borde');
   });
   $('#chaloPick').addEventListener('click', e => {
     const b = e.target.closest('[data-chalo]'); if (!b) return; $('.app').dataset.chalo = b.dataset.chalo;
