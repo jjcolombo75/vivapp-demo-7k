@@ -224,3 +224,12 @@
 .arrgo{width:100%;min-height:54px;font-size:17px}
 .app:has(#arrSheet:not([hidden])) .demofab{bottom:auto;top:12px;left:auto;right:64px}
 .app:not([data-est="v122"]) .scr .body{padding-bottom:44px}   /* el círculo sobresale 30 px de la barra: lo último de cada pantalla no queda debajo */
+/* T31 · v124: relleno tenue por estado (Juanjo, 24/11): cian si toca, amarillo en sesión, el color del dato con la sesión hecha, casi nada sin sesión */
+.nav .navacc[data-ce="toca"]{--cf:rgba(7,176,242,.16)}
+.nav .navacc[data-ce="curso"]{--cf:rgba(255,233,74,.14)}
+.nav .navacc[data-ce="hecha"]{--cf:color-mix(in srgb,var(--dat) 16%,transparent)}
+.nav .navacc[data-ce="nada"]{--cf:rgba(255,255,255,.06)}
+.nav .navacc[data-ce="off"]{--cf:rgba(255,255,255,.03)}
+.app:not([data-est="v122"]):not([data-crel="no"]) .nav .navacc .nai{background:linear-gradient(var(--cf),var(--cf)),var(--nav)}
+.app:not([data-est="v122"]):not([data-crel="no"]) .nav .navacc.ring .nai{background:linear-gradient(var(--cf),var(--cf)) padding-box,linear-gradient(var(--nav),var(--nav)) padding-box,conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a) border-box!important}
+.nav .navacc .nai{flex:none}   /* v124: con la pastilla de la sesión la barra se achicaba y el círculo quedaba aplastado */

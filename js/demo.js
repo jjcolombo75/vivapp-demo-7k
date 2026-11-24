@@ -663,3 +663,8 @@
     renderAcc(); renderEntHoy();
     dmFin('inicio', { toca:'Hoy toca entrenar: anillo quieto', curso:'Sesión en curso: el anillo gira', hecha:'Hecha hoy: tilde', nada:'Nada para hoy: semana cumplida', off:'Sin rutina firmada: círculo apagado' }[v] + (pausa && v !== 'off' ? ' (el plan sigue en pausa: apagado)' : ''));
   });
+  $('#crelPick').addEventListener('click', e => {
+    const b = e.target.closest('[data-crel]'); if (!b) return; $('.app').dataset.crel = b.dataset.crel;
+    $$('#crelPick [data-crel]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    dmFin('inicio', b.dataset.crel === 'si' ? 'Círculo con relleno tenue' : 'Círculo sin relleno');
+  });
