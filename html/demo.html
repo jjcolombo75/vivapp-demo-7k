@@ -105,6 +105,25 @@
 
     <!-- Nivel 3 · Por sección (plegado) -->
     <span class="dmh">Por sección</span>
+    <details class="dmdet" data-k="layout"><summary>Layout</summary>
+      <div class="dmrow"><span class="dmk">Estructura</span>
+        <div class="opts g2" id="estuPick"><button class="opt" data-estu="unica" aria-pressed="true">Única ✓</button><button class="opt" data-estu="v122" aria-pressed="false">Como en la v122</button></div>
+        <span class="dmayu">Única (Juanjo, 24/11): en las cuatro secciones, título y Tu cuenta arriba; barra con el círculo en el centro; un solo arranque, la hoja. Como en la v122: encabezados distintos y los botones fijos "Empezar" (Inicio) y "Comenzar rutina" (Hoy). Para comparar con socios.</span></div>
+      <div class="dmrow"><span class="dmk">Tu cuenta</span>
+        <div class="opts g2" id="ctaPick"><button class="opt" data-cta="av" aria-pressed="true">Avatar ✓</button><button class="opt" data-cta="ini" aria-pressed="false">Inicial</button></div>
+        <span class="dmayu">Inicial = todavía no eligió. Los 8 avatares son provisorios (los define el brainstorming de Social); se eligen en Tu cuenta. Sin foto (19/11). El punto aparece con el plan por vencer o saldo pendiente.</span></div>
+      <div class="dmrow"><span class="dmk">Anillo del círculo</span>
+        <div class="opts g3" id="aniPick"><button class="opt" data-ani="sesion" aria-pressed="true">En sesión ✓</button><button class="opt" data-ani="siempre" aria-pressed="false">Gira siempre</button><button class="opt" data-ani="quieto" aria-pressed="false">Quieto</button></div></div>
+      <div class="dmrow"><span class="dmk">Estado del círculo</span>
+        <div class="opts g2" id="cePick"><button class="opt" data-ce="toca" aria-pressed="true">Hoy toca</button><button class="opt" data-ce="curso" aria-pressed="false">Sesión en curso</button><button class="opt" data-ce="hecha" aria-pressed="false">Hecha hoy</button><button class="opt" data-ce="nada" aria-pressed="false">Nada para hoy</button><button class="opt" data-ce="off" aria-pressed="false" style="grid-column:1 / -1">Sin rutina firmada</button></div>
+        <span class="dmayu">Sale de la rutina firmada y de las sesiones, nunca de la entrada: "Antes de ir" y "En la sala" dan el mismo círculo. Cada toque pone a la socia en ese caso (mueve "Momento"). El plan en pausa también lo apaga.</span></div>
+      <div class="dmrow"><span class="dmk">Tu semana en Inicio</span>
+        <div class="opts g2" id="eqPick"><button class="opt" data-eq="1" aria-pressed="true">Ecualizador: mostrar</button><button class="opt" data-eq="0" aria-pressed="false">Ocultar</button></div>
+      </div>
+      <div class="dmrow"><span class="dmk">Barra del espectro del cuerpo (Progreso)</span>
+        <div class="opts g2" id="mapaLayPick"><button class="opt" data-lay="abajo" aria-pressed="true">Abajo</button><button class="opt" data-lay="lat" aria-pressed="false">Al costado</button></div>
+      </div>
+    </details>
     <details class="dmdet" data-k="apariencia"><summary>Apariencia (toda la app)</summary>
       <div class="dmrow"><span class="dmk">Botones</span>
         <div class="opts g3" id="btnPick"><button class="opt" data-btn="rellenos" aria-pressed="false">Rellenos</button><button class="opt" data-btn="tubos" aria-pressed="true">Tubos ✓</button><button class="opt" data-btn="cartel" aria-pressed="false">Neón</button></div>
@@ -131,13 +150,7 @@
         <span class="dmayu">Dónde: podés prender varios a la vez; cada toque prende o apaga ese lugar sin cerrar el panel. La primera entrada se ve una sola vez y solo con una entrada registrada.</span></div>
     </details>
     <details class="dmdet" data-k="inicio"><summary>Inicio</summary>
-      <div class="dmrow"><span class="dmk">Empezar</span>
-        <div class="opts g2" id="haloPick"><button class="opt" data-ah="quieto" aria-pressed="false">Quieto</button><button class="opt" data-ah="respira" aria-pressed="false">Halo que respira</button><button class="opt" data-ah="gira" aria-pressed="false">Luz cian que gira</button><button class="opt" data-ah="espectro" aria-pressed="true">Espectro que gira ✓</button></div>
-        <span class="dmayu">Espectro que gira es lo predeterminado (Juanjo, 12/11): el botón Empezar, abajo y a todo el ancho, es lo único de Inicio que se mueve sin parar.</span></div>
-      <div class="dmrow"><span class="dmk">Botón de acción</span>
-        <div class="opts g2" id="accPick"><button class="opt" data-acc="abajo" aria-pressed="true">Fijo abajo</button><button class="opt" data-acc="centro" aria-pressed="false">Centro de la barra</button></div></div>
-      <div class="dmrow"><span class="dmk">Tu semana</span>
-        <div class="opts g2" id="eqPick"><button class="opt" data-eq="1" aria-pressed="true">Ecualizador: mostrar</button><button class="opt" data-eq="0" aria-pressed="false">Ocultar</button></div>
+      <div class="dmrow"><span class="dmk">Tu semana: estilo</span>
         <div class="opts g2" id="eqEst"><button class="opt" data-ee="real" aria-pressed="true">Realista</button><button class="opt" data-ee="barras" aria-pressed="false">Barritas de neón</button></div></div>
       <div class="dmrow"><span class="dmk">Métrica</span>
         <div class="opts g3" id="varPick"><button class="varopt" data-var="P" aria-pressed="false"><b>1</b><svg class="batico" viewBox="0 0 57.3 110.3" aria-hidden="true"><use href="#vBat"/></svg><small>Tus pilas VIVA</small></button><button class="varopt" data-var="R" aria-pressed="false"><b>2</b><small>Tu ritmo VIVA</small></button><button class="varopt" data-var="F" aria-pressed="true"><b>2+3</b><small>Tu ritmo VIVA con VIVA Flow</small></button></div>
@@ -175,8 +188,7 @@
         <span class="dmayu">Con la rutina en curso, la socia sigue la sesión desde el bloqueo: ejercicio, serie, descanso y Listo, sin desbloquear. Muestra "Tu sede" y nada de salud; Cambiar pide desbloquear. Tocá "Tocá para desbloquear" para volver a la app.</span></div>
     </details>
     <details class="dmdet" data-k="progreso"><summary>Progreso</summary>
-      <div class="dmrow"><span class="dmk">Barra del espectro del cuerpo</span>
-        <div class="opts g2" id="mapaLayPick"><button class="opt" data-lay="abajo" aria-pressed="true">Abajo</button><button class="opt" data-lay="lat" aria-pressed="false">Al costado</button></div>
+      <div class="dmrow"><span class="dmk">El cuerpo</span>
         <span class="dmayu" id="genMs">Cuerpo de Progreso: el género sale de EVO y nunca se pregunta.</span>
         <span class="dmayu" id="verCnt">"Ver" el cuerpo: Hoy 0 · ficha 0 · sesión 0</span></div>
     </details>

@@ -639,3 +639,27 @@
     toast(!on.length ? 'Cartel apagado' : on.length > 2 ? 'Cartel en ' + on.length + ' lugares' : 'Cartel en ' + on.join(' y ')); }, true);
   $('#wttcSim').addEventListener('click', () => { WTTC.entrada = true; wttcSync(); setAnt('nueva'); dmFin('inicio', null); wttcPrimera(); });
   wttcSync();
+
+//#bloque 351
+  // ===== T31 · Panel de demo, grupo Layout: estructura, Tu cuenta, anillo y estados del círculo =====
+  $('#estuPick').addEventListener('click', e => {
+    const b = e.target.closest('[data-estu]'); if (!b) return; EST = b.dataset.estu;
+    $$('#estuPick [data-estu]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    renderAcc(); renderEntHoy(); dmFin('inicio', estUni() ? 'Estructura única' : 'Estructura como en la v122');
+  });
+  $('#ctaPick').addEventListener('click', e => {
+    const b = e.target.closest('[data-cta]'); if (!b) return; CTA_AV = b.dataset.cta; cuentaRender();
+    dmFin('inicio', CTA_AV === 'av' ? 'Tu cuenta con avatar' : 'Tu cuenta con la inicial: todavía no eligió avatar');
+  });
+  $('#aniPick').addEventListener('click', e => {
+    const b = e.target.closest('[data-ani]'); if (!b) return; ANI = b.dataset.ani;
+    $$('#aniPick [data-ani]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderAcc();
+    dmFin('inicio', { sesion:'El anillo gira solo con la sesión en curso', siempre:'El anillo gira siempre', quieto:'El anillo no gira nunca' }[ANI]);
+  });
+  $('#cePick').addEventListener('click', e => {
+    const b = e.target.closest('[data-ce]'); if (!b) return; const v = b.dataset.ce;
+    SIN_RUT = v === 'off';
+    setMom({ toca:'antes', curso:'sesion', hecha:'despues', nada:'descanso', off:'antes' }[v]);
+    renderAcc(); renderEntHoy();
+    dmFin('inicio', { toca:'Hoy toca entrenar: anillo quieto', curso:'Sesión en curso: el anillo gira', hecha:'Hecha hoy: tilde', nada:'Nada para hoy: semana cumplida', off:'Sin rutina firmada: círculo apagado' }[v] + (pausa && v !== 'off' ? ' (el plan sigue en pausa: apagado)' : ''));
+  });

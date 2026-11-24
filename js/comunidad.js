@@ -2706,7 +2706,7 @@
     const c = $('#siIn'); if (!c) return;
     siCon(() => { const m = shMen(), sin = SI.perfil === 'sin';
       c.innerHTML = siBarra(m) + '<div class="sicuerpo">' + (m ? '' : sin ? siSin() : siTira() + siVoy()) +
-        (sin ? '' : SI.perfil === 'duo' ? siDuo() : siCruce()) + '<p class="sifin">' + shTr('check', '#8f99ab', 16) + 'Estás al día</p></div>'; });
+        (sin ? '' : SI.perfil === 'duo' ? siDuo() : siCruce()) + '<p class="sifin">' + shTr('check', '#8f99ab', 16) + 'Estás al día</p></div>'; if (typeof cuentaPoner === 'function') cuentaPoner(); });
   }
 
   // ---- las hojas

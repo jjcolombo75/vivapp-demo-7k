@@ -605,10 +605,11 @@
     obHoy();
     $('#hCorto').innerHTML = CORTO ? 'Volver a la versión completa' : '¿Poco tiempo? <b>Hacé la versión de 30 min</b>'; $('#hCorto').hidden = MOM === 'sesion';
     const b = $('#hEmpezar'), ses = MOM === 'sesion';
-    b.parentElement.hidden = !!pausa;
+    b.parentElement.hidden = !!pausa || (typeof estUni === 'function' && estUni());   // T31: un solo arranque, el círculo de la barra
     b.className = 'accbtn' + (ses ? ' on' : ' go');
     b.innerHTML = (ses ? ICO_SES : ICO_PLAY).replace('<svg ', '<svg width="20" height="20" ') + '<span>' + (ses ? 'Volver a tu sesión' : 'Comenzar rutina · Día ' + d.k) + '</span>';
     hbRender(P, d, tot);
+    if (typeof arrRefresh === 'function') arrRefresh();
   }
   // T15 · Hoy = la herramienta de la sala: la sesión (barras, cambiar de día), tu cuerpo hoy, para hoy (solo si hay algo), tu rutina hoy (la misma lista que el motor)
   function hbRender(P, d, tot){
@@ -1388,7 +1389,7 @@
     const r = e.target.closest('[data-hr]'); if (r) { HR = HR === +r.dataset.hr ? -1 : +r.dataset.hr; HPAN = null; renderEntHoy(); return true; }
     const pn = e.target.closest('[data-hpan]'); if (pn) { HPAN = HPAN === pn.dataset.hpan ? null : pn.dataset.hpan; renderEntHoy(); return true; }
     const dd = e.target.closest('[data-hdia]'); if (dd) { const R = rutinas[actual]; R.next = +dd.dataset.hdia; HR = -1; renderEntHoy(); renderToday(); renderRoutines(); toast('Hoy hacés el Día ' + R.dias[R.next].k + ' · ' + R.dias[R.next].n.toLowerCase()); return true; }
-    const st = e.target.closest('[data-hstart]'); if (st) { const i = +st.dataset.hstart; salaStart(); if (SALA) { SALA.step = Math.max(0, steps().indexOf('f' + i)); SALA.saludo = false; renderSala(); } return true; }
+    const st = e.target.closest('[data-hstart]'); if (st) { const i = +st.dataset.hstart; if (estUni()) { arrAbrir({ ex:i }); return true; } salaStart(); if (SALA) { SALA.step = Math.max(0, steps().indexOf('f' + i)); SALA.saludo = false; renderSala(); } return true; }
     const P = planHoy(), ses = esSes(), dk = rutinas[actual].dias[rutinas[actual].next].k;
     const hk = e.target.closest('[data-hk]'); if (hk) { const [i, j, d] = hk.dataset.hk.split(':').map(Number), f = P.fue[i]; if (ses) { const F = SALA.F[i]; if (!F.kgs) F.kgs = Array(f.sr).fill(F.kg); F.kgs[j] = Math.max(0, F.kgs[j] + d); F.kg = F.kgs[0]; } else { const a = ajusteDia(f, fNuevo(f)); a.kgs[j] = Math.max(0, a.kgs[j] + d); } renderEntHoy(); return true; }
     const hr = e.target.closest('[data-hrp]'); if (hr) { const [i, j, d] = hr.dataset.hrp.split(':').map(Number), f = P.fue[i], paso = f.seg ? 5 : 1; if (ses) { const F = SALA.F[i]; F.reps[j] = Math.max(1, F.reps[j] + d * paso); } else { const a = ajusteDia(f, fNuevo(f)); a.reps[j] = Math.max(1, a.reps[j] + d * paso); } renderEntHoy(); return true; }

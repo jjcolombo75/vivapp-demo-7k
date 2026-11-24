@@ -3,12 +3,12 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
-<link rel="stylesheet" href="css/base.css?v=122">
-<link rel="stylesheet" href="css/marca.css?v=122">
-<link rel="stylesheet" href="css/inicio.css?v=122">
-<link rel="stylesheet" href="css/entrenar.css?v=122">
-<link rel="stylesheet" href="css/fondos.css?v=122">
-<link rel="stylesheet" href="css/sistema.css?v=122">
+<link rel="stylesheet" href="css/base.css?v=123">
+<link rel="stylesheet" href="css/marca.css?v=123">
+<link rel="stylesheet" href="css/inicio.css?v=123">
+<link rel="stylesheet" href="css/entrenar.css?v=123">
+<link rel="stylesheet" href="css/fondos.css?v=123">
+<link rel="stylesheet" href="css/sistema.css?v=123">
 
 <div class="shell">
 <div class="app" id="app" data-trama="fondo" data-esq="fondo">
@@ -32,8 +32,8 @@
 <nav class="nav" id="nav" hidden aria-label="Principal">
   <button data-go="inicio"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Inicio</button>
   <button data-go="hoy"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg>Entrenar</button>
+  <button class="navacc" id="navAcc" hidden type="button"><span class="nai"></span><span class="nal">Comenzar</span></button>
   <button data-go="beneficios"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18v4H3zM5 13v8h14v-8M12 9v12M12 9C10 5 6 5 6 7.5S12 9 12 9zM12 9c2-4 6-4 6-1.5S12 9 12 9z"/></svg>Club</button>
-  <button class="navacc" id="navAcc" hidden><span class="nai"></span><span class="nal">Entrenar</span></button>
   <button data-go="social"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M16 14.2a5.5 5.5 0 0 1 5.5 5.8"/></svg>Mural</button>
 </nav>
 
@@ -45,6 +45,8 @@
 <template data-b="h15"></template>
 <template data-b="h16"></template>
 <div class="notif" id="notif" hidden role="alert"></div>
+<!-- T31 · La hoja de arranque: el único lugar donde empieza una sesión (conceptos/estructura-unica.md, punto 5) -->
+<div class="sheet" id="arrSheet" hidden role="dialog" aria-labelledby="arrT"><div class="sheetin" id="arrIn"></div></div>
 
 <template data-b="h18"></template>
 <template data-b="h19"></template>
@@ -54,5 +56,5 @@
 </div>
 
 <template data-b="svg"></template>
-<script src="js/cargar.js?v=122"></script>
+<script src="js/cargar.js?v=123"></script>
 </body></html>

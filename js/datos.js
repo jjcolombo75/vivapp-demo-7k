@@ -76,7 +76,7 @@
     if (u) { actual = u.dataset.use; renderRoutines(); renderToday(); toast('Ahora seguís: ' + rutinas[actual].nombre); return; }
     if (rutClick(e)) return;
     const s = e.target.closest('[data-start]');
-    if (s) { const [rid, i] = s.dataset.start.split(':'); startDay(rid, +i); }
+    if (s) { const [rid, i] = s.dataset.start.split(':'); if (modo === 'socio' && estUni()) { arrAbrir({ rid:rid, dia:+i }); return; } startDay(rid, +i); }
   });
 
   function renderToday(){

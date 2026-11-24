@@ -260,7 +260,7 @@
 
 //#bloque 320
   // ===== v38 · Inicio por momentos (claude/ficha-seccion-inicio.md, 2.1 y 3) =====
-  var MOM = 'antes', ACC_POS = 'abajo', visHoy = false, sesHecha = false, FIT_NOV = 'medicion', PREM_N = PREM_N || 0, PLAN_AV = !!PLAN_AV, avT = null;
+  var MOM = 'antes', visHoy = false, sesHecha = false, FIT_NOV = 'medicion', PREM_N = PREM_N || 0, PLAN_AV = !!PLAN_AV, avT = null;
   const ICO_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>';
   const ICO_SES = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/></svg>';
   const ICO_ENT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg>';
@@ -285,34 +285,22 @@
       if (MOM === 'antes' || MOM === 'sala') { lbl = 'Empezar · ' + dk; cls = 'on go'; ico = ICO_PLAY; }
       else if (MOM === 'sesion') { lbl = 'Volver a tu sesión'; cls = 'on'; ico = ICO_SES; }
     }
-    const cen = ACC_POS === 'centro';
-    $('#accBar').hidden = !lbl || cen;
+    const uni = typeof estUni === 'function' && estUni();   // T31: en la estructura única no hay botón fijo de arranque
+    $('#accBar').hidden = !lbl || uni;
     if (lbl) { const b = $('#accBtn'); b.className = 'accbtn ' + cls; b.innerHTML = ico.replace('<svg ', '<svg width="20" height="20" ') + '<span>' + lbl + '</span>'; b.setAttribute('aria-label', lbl.replace(' ⚡', '')); }
-    const na = $('#navAcc'), tab = $('#nav [data-go="hoy"]');
-    na.hidden = !cen; tab.hidden = cen;
-    const on = MOM === 'sala' || MOM === 'sesion';
-    na.className = 'navacc' + (on ? ' on' : '') + (MOM === 'sala' ? ' go' : '');
-    na.querySelector('.nai').innerHTML = MOM === 'sala' ? ICO_PLAY : MOM === 'sesion' ? ICO_SES : ICO_ENT;
-    na.querySelector('.nal').textContent = MOM === 'sala' ? 'Empezar' : MOM === 'sesion' ? 'Tu sesión' : 'Entrenar';
+    if (typeof circRender === 'function') circRender();
     $('.app').dataset.accbar = !$('#accBar').hidden && curScr === 'inicio' ? '1' : '0';
     if (typeof pfFab === 'function') pfFab();   // T18: el botón del profe sigue al momento y a la pantalla
-    if (['hoy', 'rutinas', 'progreso', 'ia', 'entrenando', 'sala', 'cierre'].includes(curScr)) na.setAttribute('aria-current', 'page'); else na.removeAttribute('aria-current');
   }
   function accGo(){ if (MOM === 'sesion') { if (!SALA) salaDemo(); renderSala(); go('sala'); } else go('hoy'); }
   $('#accBtn').addEventListener('click', accGo);
-  $('#navAcc').addEventListener('click', accGo);
+  $('#navAcc').addEventListener('click', () => circGo());
   $('#momPick').addEventListener('click', e => {
     const b = e.target.closest('[data-mom]'); if (!b) return; setMom(b.dataset.mom);
     $('#demoSheet').hidden = true; go('inicio');
     toast({ antes:'Antes de ir: todavía no vino hoy', sala:'En la sala: entró por el molinete', sesion:'Sesión abierta: está entrenando', despues:'Después: ya entrenó hoy', descanso:'Día sin entrenar: la semana ya está cumplida' }[MOM]);
   });
   $('.app').dataset.ah = 'espectro';
-  $('#haloPick').addEventListener('click', e => { const b = e.target.closest('[data-ah]'); if (!b) return; $('.app').dataset.ah = b.dataset.ah; $$('#haloPick [data-ah]').forEach(x => x.setAttribute('aria-pressed', x === b)); if (MOM !== 'sala') setMom('sala'); $('#demoSheet').hidden = true; go('inicio'); });
-  $('#accPick').addEventListener('click', e => {
-    const b = e.target.closest('[data-acc]'); if (!b) return; ACC_POS = b.dataset.acc;
-    $$('#accPick [data-acc]').forEach(x => x.setAttribute('aria-pressed', x === b));
-    $('#demoSheet').hidden = true; renderAcc(); go('inicio');
-  });
   // Ocupación: el chip de la sede abre el detalle
   $('#sedeChip').addEventListener('click', () => { renderOcc(); $('#occSheet').hidden = false; });
   $('#occX').addEventListener('click', () => { $('#occSheet').hidden = true; });
@@ -460,3 +448,134 @@
     L.push('Avisos a la socia esta semana: ' + (s === 0 ? 'ninguno; la bienvenida está en la app.' : s <= 2 ? 'hasta 2 (la víspera del día que eligió y la pregunta del lunes).' : '1 (la pregunta del lunes).') + ' Nunca el fin de semana.');
     return L.join('<br>');
   }
+
+//#bloque 326
+  // ===== T31 · Estructura única (docs/conceptos/estructura-unica.md; decisiones 24/11, DIS D1 a D5) =====
+  // Tres niveles: las cuatro secciones llevan título + círculo de Tu cuenta, y la barra con el círculo de acción en el centro;
+  // lo que se abre desde ellas, flecha y título; la sesión, pantalla completa. Un solo arranque: la hoja de arranque.
+  // El círculo sale de la rutina firmada y de las sesiones, nunca de la entrada (el molinete llega de noche).
+  var EST = 'unica', CTA_AV = 'av', AV_K = 'rayo', ANI = 'sesion', SIN_RUT = false, ARR = null, T31_OK = false;   // T31_OK: renderAcc corre antes de este bloque al arrancar
+  // Set provisorio de avatares neón (lo define el brainstorming de Social): [color, trazo]
+  const AVS = {
+    rayo:['#ffe94a', 'M13 2 4 14h7l-1 8 9-12h-7z'],
+    estrella:['#07b0f2', 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6l-5.4 2.9 1.2-6-4.5-4.2 6.1-.7z'],
+    onda:['#f400a0', 'M2 13c2-3.5 4.5-3.5 6.5 0s4.5 3.5 6.5 0 4.5-3.5 6.5 0'],
+    montana:['#07b0f2', 'M2.5 19l6.5-11 4 6.5 2.5-3.5 6 8z'],
+    llama:['#ff8a3d', 'M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2.5-5 .5 2 1.5 2.5 2.5 2.5C12 8 11 6 12 3z'],
+    hoja:['#8cff6a', 'M5 19C5 10 10 5 19 5c0 9-5 14-14 14zM5 19l8-8'],
+    luna:['#ffe94a', 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'],
+    corona:['#f400a0', 'M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z']
+  };
+  const AV_ORD = Object.keys(AVS);
+  const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  function estUni(){ return EST !== 'v122'; }
+  function avSvg(k, s){ const a = AVS[k]; return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="' + a[0] + '" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + a[1] + '"/></svg>'; }
+  // ---- Encabezado de sección: título a la izquierda, Tu cuenta a la derecha (nivel 1: Inicio, Entrenar ×3 pestañas, Club, Social I)
+  const SECC = ['inicio', 'hoy', 'rutinas', 'progreso', 'beneficios'];
+  const CTA_HTML = '<button class="cuentac" data-go="plan" type="button"></button>';
+  function cuentaPoner(){
+    if (!T31_OK) return;
+    SECC.forEach(id => {
+      const sec = $('#' + id); if (!sec || sec.querySelector('.cuentac')) return;
+      if (id === 'inicio') { $('.inihead').insertAdjacentHTML('beforeend', CTA_HTML); return; }
+      const h = sec.querySelector('.body > .h1'); if (!h) return;
+      const w = document.createElement('div'); w.className = 'sechead'; h.parentNode.insertBefore(w, h); w.appendChild(h); w.insertAdjacentHTML('beforeend', CTA_HTML);
+    });
+    const sb = $('#socialI .shbar'); if (sb && !sb.querySelector('.cuentac')) sb.insertAdjacentHTML('beforeend', CTA_HTML);
+    cuentaRender();
+  }
+  // El punto: plan que vence en 5 días o saldo pendiente (PLAN_AV, de EVO vía Viva Gestión; simulado). "Falta un permiso": sin caso en la maqueta.
+  function cuentaRender(){
+    if (!T31_OK) return;
+    const av = CTA_AV === 'av', p = !!PLAN_AV, c = AVS[AV_K][0];
+    $$('.cuentac').forEach(b => {
+      b.innerHTML = av ? avSvg(AV_K, 24) : '<span>M</span>';
+      b.classList.toggle('av', av); b.style.setProperty('--avc', av ? c : 'var(--line2)'); b.classList.toggle('dot', p);
+      b.setAttribute('aria-label', 'Tu cuenta: plan, datos y permisos' + (p ? '. Hay algo para mirar' : ''));
+    });
+    const pk = $('#avPick');
+    if (pk) pk.innerHTML = AV_ORD.map(k => '<button class="avopt" type="button" data-av="' + k + '" style="--avc:' + AVS[k][0] + '" aria-pressed="' + (av && k === AV_K) + '" aria-label="Avatar ' + k + '">' + avSvg(k, 24) + '</button>').join('') +
+      '<button class="avopt" type="button" data-av="ini" aria-pressed="' + !av + '" aria-label="Tu inicial"><span>M</span></button>';
+    $$('#ctaPick [data-cta]').forEach(x => x.setAttribute('aria-pressed', x.dataset.cta === CTA_AV));
+  }
+  $('#avPick').addEventListener('click', e => {
+    const b = e.target.closest('[data-av]'); if (!b) return;
+    if (b.dataset.av === 'ini') CTA_AV = 'ini'; else { CTA_AV = 'av'; AV_K = b.dataset.av; }
+    cuentaRender(); toast(CTA_AV === 'ini' ? 'Listo: se ve tu inicial' : 'Listo: ese es tu avatar');
+  });
+  // ---- El círculo de la barra: cinco estados, de la rutina y las sesiones
+  function circEstado(){
+    if (pausa || SIN_RUT) return 'off';
+    if (MOM === 'sesion') return 'curso';
+    if (MOM === 'despues' || sesHecha) return 'hecha';
+    if (MOM === 'descanso') return 'nada';
+    return 'toca';   // "Antes de ir" y "En la sala" son el mismo estado: la app no lee la entrada
+  }
+  function circRender(){
+    const na = $('#navAcc'); if (!na || !T31_OK) return;
+    const uni = estUni(); na.hidden = !uni; $('.app').dataset.est = EST;
+    if (uni) {
+      const e = circEstado(), ring = e === 'toca' || e === 'curso';
+      const spin = ring && (ANI === 'siempre' || (ANI === 'sesion' && e === 'curso'));
+      na.className = 'navacc' + (ring ? ' ring' : '') + (spin ? ' spin' : ''); na.dataset.ce = e;
+      na.querySelector('.nai').innerHTML = e === 'curso' ? ICO_SES : e === 'hecha' ? ICO_OK : ICO_PLAY;
+      na.querySelector('.nal').textContent = e === 'curso' ? 'Seguir' : e === 'hecha' ? 'Listo' : 'Comenzar';
+      na.setAttribute('aria-label', { toca:'Comenzar: tu sesión de hoy', curso:'Seguir con tu sesión', hecha:'Listo: lo que hiciste hoy', nada:'Comenzar: tu semana ya está cumplida', off:'Comenzar: todavía no hay rutina para hoy' }[e]);
+      na.removeAttribute('aria-current');
+      $$('#cePick [data-ce]').forEach(x => x.setAttribute('aria-pressed', x.dataset.ce === e));
+    }
+    cuentaPoner();
+  }
+  function circGo(){
+    if (circEstado() === 'curso') { if (curScr !== 'hoy') go('hoy'); if (!SALA) salaDemo(); renderSala(); cajaAbrir(); return; }   // Seguir: vuelve a la sesión, sin hoja
+    arrAbrir({});
+  }
+  // ---- La hoja de arranque: el día y cómo cambiarlo, la duración, Tu cuerpo hoy si falta, y el botón que comienza
+  function arrAbrir(o){
+    const rid = o.rid || actual;
+    ARR = { rid:rid, dia:o.dia != null ? o.dia : rutinas[rid].next, ex:o.ex != null ? o.ex : null };
+    arrRender(); $('#arrSheet').hidden = false;
+  }
+  function arrCerrar(){ $('#arrSheet').hidden = true; ARR = null; }
+  function arrRefresh(){ if (ARR && !$('#arrSheet').hidden) arrRender(); }
+  function arrRender(){
+    const e = circEstado(), R = rutinas[ARR.rid], d = R.dias[ARR.dia], X = '<button class="btn ghost sm" data-arrx type="button">Cerrar</button>';
+    let h;
+    if (e === 'off') h = '<span class="h2" id="arrT">Todavía no hay sesión para comenzar</span><span class="muted arrtx">' +
+      (pausa ? 'Tu plan está en pausa. Cuando vuelvas, tu rutina te espera acá.' : 'Tu profe todavía no te armó la rutina. Cuando la firme, la ves acá.') + '</span>' +
+      (pausa ? '<button class="btn sm" data-go="plan" data-arrx type="button">Ver tu cuenta</button>' : '') + X;
+    else if (e === 'hecha') h = '<span class="h2" id="arrT">Hoy ya entrenaste</span><span class="muted arrtx">Día ' + d.k + ' · ' + d.n.toLowerCase() + '. Lo que registraste está en Progreso.</span>' +
+      '<button class="btn sm" data-arrprog type="button">Ver en Progreso</button>' + X;
+    else {
+      // El plan del día elegido, sin cambiar todavía la rutina (se aplica al tocar Comenzar)
+      const sv = [actual, R.next, CORTO]; actual = ARR.rid; R.next = ARR.dia; CORTO = false;
+      const P = salaPlan(), tot = planMin(P); actual = sv[0]; R.next = sv[1]; CORTO = sv[2];
+      const ex = ARR.ex != null && P.fue[ARR.ex] ? P.fue[ARR.ex].n : '';
+      h = '<span class="small muted arrpre">' + (e === 'nada' ? 'Tu semana ya está cumplida. Si venís igual, este es tu día.' : 'Tu sesión de hoy') + '</span>' +
+        '<span class="h2" id="arrT">Día ' + d.k + ' · ' + d.n + '</span>' +
+        '<span class="small muted">' + P.fue.length + ' ejercicios · ' + (R.tipo === 'profe' ? 'firmada por Lucas' : 'generada con IA') + '</span>' +
+        (ex ? '<span class="arrdesde">Empezás por ' + ex + '</span>' : '') +
+        '<div class="arrdias"><span class="small muted">Cambiar de día</span>' + R.dias.map((x, i) => '<button class="hday' + (i === ARR.dia ? ' cur' : '') + '" type="button" data-arrdia="' + i + '" aria-pressed="' + (i === ARR.dia) + '" aria-label="Día ' + x.k + ', ' + x.n + '">' + x.k + '</button>').join('') + '</div>' +
+        '<div class="opts g2 arrdur"><button class="opt" type="button" data-arrcorto="0" aria-pressed="' + !CORTO + '">Completa · ~' + tot + ' min</button><button class="opt" type="button" data-arrcorto="1" aria-pressed="' + CORTO + '">30 min</button></div>' +
+        (!prep.done ? '<div class="arrcue"><span class="lbl">Tu cuerpo hoy</span>' + chkHtml(true) + '</div>' : '') +
+        '<button class="accbtn go arrgo" type="button" data-arrgo>' + ICO_PLAY.replace('<svg ', '<svg width="20" height="20" ') + '<span>Comenzar</span></button>' + X;
+    }
+    $('#arrIn').innerHTML = h;
+  }
+  function arrComenzar(){
+    const A = ARR; arrCerrar();
+    actual = A.rid; rutinas[actual].next = A.dia; HR = -1;
+    renderToday(); renderRoutines();
+    if (curScr !== 'hoy') go('hoy');
+    salaStart();
+    if (A.ex != null && SALA) { SALA.step = Math.max(0, steps().indexOf('f' + A.ex)); SALA.saludo = false; renderSala(); }
+  }
+  $('#arrSheet').addEventListener('click', e => {
+    if (e.target.id === 'arrSheet' || e.target.closest('[data-arrx]')) { arrCerrar(); return; }
+    const dd = e.target.closest('[data-arrdia]'); if (dd) { ARR.dia = +dd.dataset.arrdia; ARR.ex = null; arrRender(); return; }
+    const c = e.target.closest('[data-arrcorto]'); if (c) { CORTO = c.dataset.arrcorto === '1'; renderEntHoy(); renderToday(); arrRender(); return; }
+    if (e.target.closest('[data-arrprog]')) { arrCerrar(); go('progreso'); return; }
+    if (e.target.closest('[data-arrgo]')) { arrComenzar(); return; }
+    if (typeof chkClick === 'function' && chkClick(e)) arrRefresh();
+  });
+  $('.app').dataset.est = EST; T31_OK = true; renderAcc();

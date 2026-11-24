@@ -183,3 +183,44 @@
 .inihead .title{grid-column:1;grid-row:2}
 .inihead .cuentabtn{grid-column:2;grid-row:1;justify-self:end;width:36px;height:36px;border-radius:18px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:inherit;font-weight:700;font-size:14px;cursor:pointer}
 .inihead .sedebox{grid-column:2;grid-row:2;margin-left:0}
+
+/* ===== T31 · Estructura única (conceptos/estructura-unica.md) ===== */
+/* Encabezado de sección: título a la izquierda, círculo de Tu cuenta (44 px) a la derecha, a la altura del título */
+.sechead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sechead>.h1{min-width:0}
+.cuentac{flex:none;position:relative;width:44px;height:44px;box-sizing:border-box;border-radius:50%;border:1.5px solid var(--avc,var(--line2));background:var(--panel);color:var(--txt);display:grid;place-items:center;padding:0;font:inherit;font-weight:700;font-size:17px;cursor:pointer}
+.cuentac.av{background:#0b1119;box-shadow:0 0 10px color-mix(in srgb,var(--avc) 45%,transparent),inset 0 0 8px color-mix(in srgb,var(--avc) 22%,transparent)}
+.cuentac.av svg{filter:drop-shadow(0 0 3px var(--avc))}
+.cuentac.dot::after{content:"";position:absolute;top:-1px;right:-1px;width:12px;height:12px;border-radius:50%;background:var(--yel);border:2px solid var(--bg)}
+.app[data-est="v122"] .cuentac{display:none}
+.app:not([data-est="v122"]) .inihead .cuentabtn{display:none}
+.app:not([data-est="v122"]) .inihead .cuentac{grid-column:2;grid-row:2;align-self:center}
+.app:not([data-est="v122"]) .inihead .sedebox{grid-column:1 / -1;grid-row:3;justify-self:start;margin-top:8px}
+.shbar .cuentac{margin-left:auto}
+/* Tu avatar, en Tu cuenta */
+.avpick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;justify-items:center}
+.avopt{width:48px;height:48px;box-sizing:border-box;border-radius:50%;border:1.5px solid var(--line);background:#0b1119;color:var(--txt);display:grid;place-items:center;padding:0;font:inherit;font-weight:700;font-size:17px;cursor:pointer}
+.avopt svg{filter:drop-shadow(0 0 3px var(--avc))}
+.avopt[aria-pressed="true"]{border:2px solid var(--avc,var(--lime));box-shadow:0 0 12px color-mix(in srgb,var(--avc,var(--lime)) 55%,transparent)}
+/* El círculo de la barra: único elemento elevado; anillo del espectro quieto, girando solo con la sesión en curso */
+.app:not([data-est="v122"]) .nav .navacc .nai{border:1.5px solid var(--line2);color:var(--muted);background:var(--nav);box-shadow:none}
+.app:not([data-est="v122"]) .nav .navacc .nal{color:var(--muted);font-weight:600}
+.nav .navacc.ring .nai{position:relative;border:2.5px solid transparent!important;color:var(--txt)!important;background:linear-gradient(var(--nav),var(--nav)) padding-box,conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a) border-box!important}
+.app:not([data-est="v122"]) .nav .navacc.ring .nal{color:var(--txt);font-weight:700}
+.nav .navacc.spin .nai{animation:accSpin 4s linear infinite}
+.nav .navacc.spin .nai::after{content:"";position:absolute;inset:-4px;border-radius:inherit;z-index:-1;filter:blur(10px);opacity:.7;pointer-events:none;background:conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a);animation:accSpin 4s linear infinite}
+.app:not([data-est="v122"]) .nav .navacc[data-ce="hecha"] .nai{border-color:var(--dat);color:var(--dat)}
+.app:not([data-est="v122"]) .nav .navacc[data-ce="hecha"] .nal{color:var(--dat)}
+.nav .navacc[data-ce="off"]{opacity:.5}
+/* La hoja de arranque (debajo de la hoja de la sesión, para que "Con algo para cuidar" se vea encima) */
+#arrSheet{z-index:14}
+#arrIn{max-height:88%;overflow-y:auto;gap:12px}
+#arrIn .h2{font-size:22px;line-height:1.15}
+.arrtx{line-height:1.45}
+.arrdias{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.arrdias .small{margin-right:4px}
+.arrdesde{font-weight:700;color:var(--lime)}
+.arrcue{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px}
+.arrgo{width:100%;min-height:54px;font-size:17px}
+.app:has(#arrSheet:not([hidden])) .demofab{bottom:auto;top:12px;left:auto;right:64px}
+.app:not([data-est="v122"]) .scr .body{padding-bottom:44px}   /* el círculo sobresale 30 px de la barra: lo último de cada pantalla no queda debajo */
