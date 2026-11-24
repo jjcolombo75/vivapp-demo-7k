@@ -233,3 +233,9 @@
 .app:not([data-est="v122"]):not([data-crel="no"]) .nav .navacc .nai{background:linear-gradient(var(--cf),var(--cf)),var(--nav)}
 .app:not([data-est="v122"]):not([data-crel="no"]) .nav .navacc.ring .nai{background:linear-gradient(var(--cf),var(--cf)) padding-box,linear-gradient(var(--nav),var(--nav)) padding-box,conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a) border-box!important}
 .nav .navacc .nai{flex:none}   /* v124: con la pastilla de la sesión la barra se achicaba y el círculo quedaba aplastado */
+/* T31 · v125: halo por estado (Juanjo, 24/11). Comenzar: halo del espectro que gira (el anillo sigue quieto); en sesión, el halo que ya giraba; hecha, halo del color del dato; semana cumplida, apenas; apagado, sin halo */
+.app:not([data-est="v122"]):not([data-chalo="no"]) .nav .navacc[data-ce="toca"] .nai::after{content:"";position:absolute;inset:-4px;border-radius:inherit;z-index:-1;filter:blur(10px);opacity:.6;pointer-events:none;background:conic-gradient(from var(--aa),#ffe94a,#07b0f2,#f400a0,#ffe94a)}
+.app:not([data-est="v122"]):not([data-chalo="no"]) .nav .navacc.hspin .nai::after{animation:accSpin 4s linear infinite}
+.app[data-chalo="no"] .nav .navacc.spin .nai::after{display:none}
+.app:not([data-est="v122"]):not([data-chalo="no"]) .nav .navacc[data-ce="hecha"] .nai{box-shadow:0 0 16px color-mix(in srgb,var(--dat) 55%,transparent),inset 0 0 10px color-mix(in srgb,var(--dat) 22%,transparent)}
+.app:not([data-est="v122"]):not([data-chalo="no"]) .nav .navacc[data-ce="nada"] .nai{box-shadow:0 0 12px rgba(255,255,255,.12)}

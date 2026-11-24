@@ -517,7 +517,7 @@
     if (uni) {
       const e = circEstado(), ring = e === 'toca' || e === 'curso';
       const spin = ring && (ANI === 'siempre' || (ANI === 'sesion' && e === 'curso'));
-      na.className = 'navacc' + (ring ? ' ring' : '') + (spin ? ' spin' : ''); na.dataset.ce = e;
+      na.className = 'navacc' + (ring ? ' ring' : '') + (spin ? ' spin' : '') + (e === 'toca' && ANI !== 'quieto' ? ' hspin' : ''); na.dataset.ce = e;   // v125: con hoy toca, el halo del espectro gira y el anillo queda quieto
       na.querySelector('.nai').innerHTML = e === 'curso' ? ICO_SES : e === 'hecha' ? ICO_OK : ICO_PLAY;
       na.querySelector('.nal').textContent = e === 'curso' ? 'Seguir' : e === 'hecha' ? 'Listo' : 'Comenzar';
       na.setAttribute('aria-label', { toca:'Comenzar: tu sesión de hoy', curso:'Seguir con tu sesión', hecha:'Listo: lo que hiciste hoy', nada:'Comenzar: tu semana ya está cumplida', off:'Comenzar: todavía no hay rutina para hoy' }[e]);

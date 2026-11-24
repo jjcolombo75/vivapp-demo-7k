@@ -668,3 +668,8 @@
     $$('#crelPick [data-crel]').forEach(x => x.setAttribute('aria-pressed', x === b));
     dmFin('inicio', b.dataset.crel === 'si' ? 'Círculo con relleno tenue' : 'Círculo sin relleno');
   });
+  $('#chaloPick').addEventListener('click', e => {
+    const b = e.target.closest('[data-chalo]'); if (!b) return; $('.app').dataset.chalo = b.dataset.chalo;
+    $$('#chaloPick [data-chalo]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    dmFin('inicio', b.dataset.chalo === 'si' ? 'Círculo con halo' : 'Círculo sin halo');
+  });
