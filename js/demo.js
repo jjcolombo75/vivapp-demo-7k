@@ -715,9 +715,9 @@
     dmFin('inicio', b.dataset.crel === 'si' ? 'Círculo con relleno tenue' : 'Círculo sin relleno');
   });
   $('#cfillPick').addEventListener('click', e => {   // T-R v127 · D6: relleno del estado "Comenzar"
-    const b = e.target.closest('[data-cfill]'); if (!b) return; $('.app').dataset.cfill = b.dataset.cfill;
+    const b = e.target.closest('[data-cfill]'); if (!b) return; if (b.dataset.cfill === 'gira') delete $('.app').dataset.cfill; else $('.app').dataset.cfill = b.dataset.cfill;
     $$('#cfillPick [data-cfill]').forEach(x => x.setAttribute('aria-pressed', x === b));
-    dmFin('inicio', b.dataset.cfill === 'cian' ? 'Comenzar con relleno cian (v125)' : 'Comenzar con espectro tenue desde el borde');
+    dmFin('inicio', { gira:'Comenzar con el espectro que gira', borde:'Comenzar con el espectro quieto (v128)', cian:'Comenzar con relleno cian (v125)' }[b.dataset.cfill]);
   });
   $('#chaloPick').addEventListener('click', e => {
     const b = e.target.closest('[data-chalo]'); if (!b) return; $('.app').dataset.chalo = b.dataset.chalo;
