@@ -633,6 +633,32 @@
     LET.sem[i] = o[(o.indexOf(LET.sem[i]) + 1) % o.length]; LET.cad = null; LET.modo = 'tira'; letAct(); });
   window.letrasRegla = letrasRegla; window.letDemo = () => ({ on:LET_ON, modo:LET.modo, n:letEstado().n, mira:LET.mira, nuevo:LET.nuevo, cad:LET.cad, serie:letSerie() }); // para pruebas
 
+//#bloque 353
+  // ===== T34 · Galería de piezas: cada pieza por su función real, con datos de muestra (la meta de la demo: 4 visitas, 90 min de cardio). =====
+  // No hay dibujo propio acá: solo llamadas a eqSemanaSvg, eqMesSvg y eqColumnas, y barras .bar/.occ que dibuja eqHidratar. El kit copia este DOM.
+  function pzGaleria(){
+    let u = 0; const P = () => 'pz' + (++u) + '_';
+    const S = (v, a, f, c, reg) => [{ k:'vis', n:'Visitas', N:4, on:v }, { k:'act', n:'Activación', N:4, on:a }, { k:'fue', n:'Fuerza', N:4, on:f }, { k:'car', n:'Cardio', N:6, on:c }];
+    const SEM = { 'Sin sesión registrada':[S(2,0,0,0), false, false], 'Lunes (vacía)':[S(0,0,0,0), true, false], 'A mitad (la de la demo)':[S(2,1,2,3), true, false], 'Cumplida':[S(4,4,4,4), true, false], 'Completa':[S(4,4,4,6), true, true] };
+    const it = (tit, fn, cuerpo) => '<div class="card pzi"><div class="pzh"><span class="lbl">' + tit + '</span><code class="pzf">' + fn + '</code></div>' + cuerpo + '</div>';
+    const sem = (tit, k, o) => { const d = SEM[k]; return it(tit, 'eqSemanaSvg · ' + (o.est === 'barras' ? 'barritas' : 'realista') + (o.halo ? ' · halo' : '') + (o.flow ? ' · flow' : ''), '<div class="pzv">' + eqSemanaSvg(d[0], Object.assign({ reg:d[1], comp:d[2], visto:null, p:P() }, o)) + '</div>'); };
+    const mes = (tit, L, o) => it(tit, 'eqMesSvg · ' + (o.est === 'barras' ? 'barritas' : 'realista') + (o.flow ? ' · flow' : ''), '<span class="mesbar pzmes">' + eqMesSvg(L, Object.assign({ p:P() }, o)) + '</span>');
+    const H = t => '<h2 class="pzt">' + t + '</h2>';
+    const R = { est:'real', col:'var(--z3)' };
+    let h = H('Tu semana · Realista (por defecto)') + Object.keys(SEM).map(k => sem(k, k, R)).join('');
+    h += H('Tu semana · por tramo (a mitad)') + [['Tramo 1 · amarillo', 'var(--z1)'], ['Tramo 2 · cian', 'var(--z2)'], ['Tramo 3 · magenta', 'var(--z3)']].map(t => sem(t[0], 'A mitad (la de la demo)', { est:'real', col:t[1] })).join('') + sem('Flow · los tres colores', 'A mitad (la de la demo)', { est:'real', col:'', flow:true });
+    h += H('Tu semana · opciones del panel') + sem('Con halo · a mitad', 'A mitad (la de la demo)', { est:'real', col:'var(--z3)', halo:true }) + sem('Con halo · completa', 'Completa', { est:'real', col:'var(--z3)', halo:true }) +
+         sem('Barritas de neón · a mitad', 'A mitad (la de la demo)', { est:'barras', col:'var(--z3)' }) + sem('Barritas de neón · completa', 'Completa', { est:'barras', col:'var(--z3)' });
+    h += H('Tu semana · encendido de los LEDs nuevos (0,7 s, al abrir)') + it('A mitad, con lo último sin ver', 'eqSemanaSvg · visto', '<div class="pzv">' + eqSemanaSvg(SEM['A mitad (la de la demo)'][0], { est:'real', col:'var(--z3)', reg:true, comp:false, visto:{ vis:1, act:0, fue:1, car:1 }, p:P() }) + '</div>');
+    h += H('Tu mes') + [['Ninguna semana todavía', []], ['Una cumplida', [false]], ['Una cumplida y una completa', [false, true]], ['Mes cumplido (3 semanas)', [false, true, false]], ['Las cuatro, completas', [true, true, true, true]]].map(t => mes(t[0], t[1], R)).join('') +
+         mes('Barritas de neón · mes cumplido', [false, true, false], { est:'barras', col:'var(--z3)' }) + mes('Flow · mes cumplido', [false, true, false], { est:'real', col:'', flow:true });
+    h += H('Barras con LEDs (el resto de la app)') +
+         it('Barra de plan, 60 %', '.bar → eqHidratar → eqFila', '<span class="bar pzbar" style="height:8px"><i style="width:60%"></i></span>') +
+         it('Ocupación, 35 %', '.occ → eqHidratar → eqFila', '<span class="occ pzbar"><i style="width:35%"></i></span>') +
+         it('Constancia, 8 semanas (meta 4)', 'eqColumnas', '<div class="chart pzchart" aria-hidden="true"><span class="eqcolbox" style="height:120px">' + eqColumnas(4, [2, 4, 5, 1, 3, 4, 0, 2].map((n, i) => ({ on:Math.min(4, n), col:i === 7 ? 'var(--dat-dim)' : n >= 4 ? 'var(--dat)' : '#8f99ab' })), 120) + '</span></div>');
+    return h;
+  }
+  document.addEventListener('click', e => { if (e.target.closest('[data-go="piezas"]')) $('#pzBody').innerHTML = pzGaleria(); });
 //#bloque 985
   // T16 · gancho de prueba para tools/barrido.py: abre pantallas que necesitan estado. Ninguna pantalla lo usa.
   window.VK_PRUEBA = { abrir: function (id) {
@@ -724,3 +750,52 @@
     $$('#chaloPick [data-chalo]').forEach(x => x.setAttribute('aria-pressed', x === b));
     dmFin('inicio', b.dataset.chalo === 'si' ? 'Círculo con halo' : 'Círculo sin halo');
   });
+
+//#bloque 354
+  // ===== T35 · v131 · Panel · Layout: dock, encabezado de íconos, mensajes (solo dibujo) y vidrio. Todo apagado por defecto (css/layout.css).
+  var T35 = { barra:'hoy', enc:'hoy', msj:'0', vid:'0', dT:27, dB:22, cT:52, cB:1 };
+  const T35_ATR = { barra:['barra', 'hoy'], enc:['enc', 'hoy'], msj:['msj', '0'], vid:['vidrio', '0'] };
+  function t35Vars(){   // receta del vidrio (T33): f = (100 − transparencia) / 100; saturación = 100 + 3,6 · desenfoque
+    const s = (k, v) => $('.app').style.setProperty(k, v), f = (100 - T35.cT) / 100, g = (100 - T35.dT) / 100, n = x => x.toFixed(3);
+    s('--vdL0', n((1 - .8 * f) * .30)); s('--vdL30', n((1 - .86 * f) * .08)); s('--vdLb', n((1 - f) * .12));
+    s('--vdG0', n(.8 * f)); s('--vdG66', n(.92 * f)); s('--vdGb', n(f)); s('--vdBl', T35.cB + 'px'); s('--vdSa', (100 + 3.6 * T35.cB).toFixed(1) + '%');
+    s('--vdDG0', n(.8 * g)); s('--vdDG66', n(.92 * g)); s('--vdDGb', n(g)); s('--vdDBl', T35.dB + 'px'); s('--vdDSa', (100 + 3.6 * T35.dB).toFixed(1) + '%');
+  }
+  function t35Aplicar(){
+    const d = $('.app').dataset;
+    Object.keys(T35_ATR).forEach(k => { const [a, def] = T35_ATR[k]; if (T35[k] === def) delete d[a]; else d[a] = T35[k];
+      $$('#t35Rows [data-t35="' + k + '"] [data-v]').forEach(x => x.setAttribute('aria-pressed', x.dataset.v === T35[k])); });
+    if (T35.vid === '1') t35Vars();
+    $('#t35Sl').hidden = T35.vid !== '1';
+    $('#t35Prop').setAttribute('aria-pressed', T35.barra === 'dock' && T35.enc === 'iconos' && T35.vid === '1');
+    renderAcc();   // "Seguir" cambia de ícono con el dock
+    t35Mas();
+  }
+  // Con los íconos, el "+" de Social sale del encabezado y flota arriba de la barra (Social se vuelve a dibujar: lo sigue un observador)
+  function t35Mas(){
+    const si = $('#socialI'), fl = si.querySelector(':scope > .shmas'), bar = si.querySelector('#siIn .shbar');
+    if (T35.enc === 'iconos') { const m = bar && bar.querySelector('.shmas'); if (m) { if (fl) fl.remove(); si.appendChild(m); } }
+    else if (fl) { if (bar && !bar.querySelector('.shmas')) bar.prepend(fl); else fl.remove(); }
+  }
+  new MutationObserver(t35Mas).observe($('#siIn'), { childList:true, subtree:true });
+  function t35Uni(){   // el dock y los íconos son de la estructura única
+    if (!estUni()) { EST = 'unica'; $$('#estuPick [data-estu]').forEach(x => x.setAttribute('aria-pressed', x.dataset.estu === 'unica')); renderEntHoy(); return ' (pasa a la estructura única)'; }
+    return '';
+  }
+  const T35_SEC = ['inicio', 'hoy', 'rutinas', 'beneficios', 'social', 'socialI'];
+  const t35Dest = () => T35_SEC.includes(curScr) ? null : 'inicio';
+  $('#t35Rows').addEventListener('click', e => {
+    if (e.target.closest('#t35Prop')) { T35.barra = 'dock'; T35.enc = 'iconos'; T35.vid = '1'; const u = t35Uni(); t35Aplicar(); dmFin('inicio', 'La propuesta del 27/11: dock, íconos y vidrio' + u); return; }
+    const b = e.target.closest('[data-v]'), g = b && b.closest('[data-t35]'); if (!g) return;
+    const k = g.dataset.t35; T35[k] = b.dataset.v; let u = '';
+    if ((k === 'barra' && T35.barra === 'dock') || (k === 'enc' && T35.enc === 'iconos')) u = t35Uni();
+    if (k === 'msj' && T35.msj === '1' && T35.enc !== 'iconos') { T35.enc = 'iconos'; u = t35Uni() + ' (con el encabezado de íconos)'; }
+    if (k === 'enc' && T35.enc === 'hoy') T35.msj = '0';
+    t35Aplicar();
+    if (k === 'vid') { toast(T35.vid === '1' ? 'Estética vidrio: los deslizadores están abajo' : 'Estética como hoy'); return; }   // el panel queda abierto para los deslizadores
+    dmFin(t35Dest(), { barra:{ hoy:'Barra como hoy', dock:'Barra: dock' }, enc:{ hoy:'Encabezado como hoy', iconos:'Encabezado: íconos sueltos' }, msj:{ '0':'Mensajes oculto', '1':'Mensajes: solo dibujo para el dueño' } }[k][T35[k]] + u);
+  });
+  $('#t35Sl').addEventListener('input', e => { const x = e.target.closest('[data-t35sl]'); if (!x) return;
+    T35[x.dataset.t35sl] = +x.value; x.nextElementSibling.textContent = x.value + (x.dataset.t35sl.endsWith('T') ? ' %' : ' px'); t35Vars(); });
+  $('#estuPick').addEventListener('click', e => { if (e.target.closest('[data-estu="v122"]') && (T35.barra !== 'hoy' || T35.enc !== 'hoy')) { T35.barra = 'hoy'; T35.enc = 'hoy'; T35.msj = '0'; t35Aplicar(); } });
+  document.addEventListener('click', e => { if (e.target.closest('[data-encsede]')) { renderOcc(); $('#occSheet').hidden = false; } });

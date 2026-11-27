@@ -377,6 +377,7 @@
   // Lo que ya vio la socia: los segmentos nuevos se encienden uno por uno al abrir Inicio (arranca con la última sesión sin ver)
   let semVisto = { vis:WK.vis - 1, act:WK.act - 1, fue:WK.fue - 1, car:Math.max(0, Math.floor(WK.car / CARD_SEG) - 2) };
   function semMarcarVisto(){ semSegs().forEach(b => semVisto[b.k] = b.on); }
+  // [kit:eq] · T34: de acá a [/kit:eq] lo copia tal cual tools/kit_piezas.py al kit portable. Solo funciones de dibujo, sin estado de la app.
   // Intensidad de cada barra según cuánto se llenó: arranca casi como vidrio apagado y llega a pleno al completarla
   const eqLuz = p => ({ bd:(0.32 + 0.68 * p).toFixed(2), co:(0.12 + 0.66 * p).toFixed(2), ha:(0.06 + 0.6 * p).toFixed(2), hb:(2.5 + 4 * p).toFixed(1) });
 
@@ -416,6 +417,70 @@
     });
     return '<svg class="eqx eqcols" viewBox="0 -6 ' + W + ' ' + (H + 12) + '" preserveAspectRatio="none" aria-hidden="true"><defs>' + defs + '</defs>' + g + '</svg>';
   }
+  // T34 · Tu semana como pieza: el dibujo del ecualizador, una sola vez (Inicio, Entrenar y la galería de piezas). Sin estado de la app.
+  // B = [{k, n, N, on}] (lo de semSegs). o: est ('real' | 'barras'), halo, col (color), flow (degradé del tramo), reg (con sesión registrada: las cuatro barras),
+  // comp (semana completa: rayo encendido), visto ({k: cuántas ya vio}; los LEDs nuevos hacen el encendido) o null, p (prefijo de los id; '' en la app).
+  function eqSemanaSvg(B, o){
+    const p = o.p || '', EQ_HALO = !!o.halo, F = o.flow ? 'url(#eqFlowG' + p + ')' : o.col;
+    const showBars = o.reg ? B : B.slice(0, 1);
+    // Geometría: columnas angostas con aire para el rótulo; Visitas un poco aparte; el rayo al final
+    const BAR = o.est === 'barras', PX = 64, CW = BAR ? 30 : 20, H0 = 6, HB = 46, BOLT = 26;
+    const xs = [0]; for (let i = 1; i < 4; i++) xs.push(xs[i - 1] + PX + (i === 1 ? 8 : 0));
+    const W = o.reg ? xs[3] + PX + BOLT : PX, cxc = i => xs[i] + PX / 2;
+    let segs = '', labs = '', delay = 0;
+    showBars.forEach((b, i) => {
+      const full = b.on >= b.N, L = eqLuz(b.on / b.N), x0 = cxc(i) - CW / 2;
+      let g = '<g class="bar' + (full ? ' full' : '') + '">';
+      // Realista: una ranura oscura con LEDs finos adentro, como un medidor de verdad (sin imitar materiales)
+      if (!BAR) g += '<rect class="rl-slot" x="' + (x0 - 4) + '" y="' + (H0 - 4) + '" width="' + (CW + 8) + '" height="' + (HB + 8) + '" rx="5"/>';
+      const GP = BAR ? Math.max(3, Math.min(6, 24 / b.N)) : 2.2, sh = (HB - GP * (b.N - 1)) / b.N;
+      for (let j = 0; j < b.N; j++) {
+        const y = H0 + HB - (j + 1) * sh - j * GP, on = j < b.on, nw = on && !!o.visto && j >= Math.max(0, o.visto[b.k]);
+        let el;
+        if (!BAR) {
+          el = eqCeldaCol(x0, y, CW, sh, on, F, L, 'eqBl' + p + i, EQ_HALO);   // T16: la misma celda que usan los demás medidores
+        } else {
+          // Barritas: tubos de neón cortos, con las mismas capas que los tubos del dial
+          const cy = (y + sh / 2).toFixed(1), sw = Math.min(8.5, sh * .95), x1 = (x0 + sw / 2).toFixed(1), x2 = (x0 + CW - sw / 2).toFixed(1);
+          const ln = (c, w, ex) => '<line class="' + c + '" x1="' + x1 + '" x2="' + x2 + '" y1="' + cy + '" y2="' + cy + '" stroke-width="' + w.toFixed(1) + '" stroke-linecap="round"' + ex + '/>';
+          el = on ? ln('nb-ha', sw + 5, ' stroke="' + F + '" opacity="' + (L.ha * (EQ_HALO ? 1.3 : .8)).toFixed(2) + '" filter="url(#eqBl' + p + i + ')"') + ln('nb-bd', sw, ' stroke="' + F + '" opacity="' + L.bd + '"') + ln('nb-co', Math.max(1, sw * .32), ' stroke="#fff" opacity="' + L.co + '"')
+                  : ln('nb-gl', sw, ' stroke="' + F + '" stroke-opacity=".34"') + ln('nb-gi', Math.max(1, sw - 2.4), ' stroke="var(--panel)" stroke-opacity=".55"') + ln('nb-gh', Math.max(.8, sw * .2), ' stroke="#fff" stroke-opacity=".12"');
+        }
+        g += '<g class="sg ' + (on ? 'on' : 'off') + (nw ? ' nw' : '') + '"' + (nw ? ' style="animation-delay:' + (delay * 0.14).toFixed(2) + 's"' : '') + '>' + el + '</g>';
+        if (nw) delay++;
+      }
+      segs += g + '</g>';
+      labs += '<text class="el' + (full ? ' full' : '') + '" x="' + cxc(i) + '" y="' + (H0 + HB + 17) + '" text-anchor="middle">' + b.n + '</text>';
+    });
+    const bolt = o.reg ? '<g class="eqbolt' + (o.comp ? ' on' : '') + '" transform="translate(' + (xs[3] + PX + 6) + ' ' + (H0 + HB / 2 - 12) + ') scale(1)"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z"/></g>' : '';
+    const fl = showBars.map((b, i) => '<filter id="eqBl' + p + i + '" filterUnits="userSpaceOnUse" x="-30" y="-30" width="' + (W + 60) + '" height="' + (H0 + HB + 60) + '"><feGaussianBlur stdDeviation="' + (eqLuz(b.on / b.N).hb * (BAR ? .7 : .45)).toFixed(1) + '"/></filter>').join('');
+    const gr = '<linearGradient id="eqFlowG' + p + '" gradientUnits="userSpaceOnUse" x1="0" y1="' + (H0 + HB) + '" x2="0" y2="' + H0 + '"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient>';
+    return '<svg class="eqsvg" data-halo="' + (EQ_HALO ? 1 : 0) + '" viewBox="-4 0 ' + (W + 8) + ' ' + (H0 + HB + 21) + '" style="max-width:' + (W + 8) + 'px" aria-hidden="true"><defs>' + fl + gr + '</defs>' + segs + bolt + labs + '</svg>';
+  }
+  // T34 · Tu mes como pieza: la fila de cuatro semanas, una sola vez (Inicio y la galería de piezas). Sin estado de la app.
+  // L = una entrada por semana cumplida (true = completa, false = cumplida), hasta 4. o: est, col, flow, p (como eqSemanaSvg).
+  function eqMesSvg(L, o){
+    const p = o.p || '', n = L.length, BAR = o.est === 'barras', W = 340, H = BAR ? 16 : 18, GP = BAR ? 10 : 6, sw = (W - 3 * GP) / 4, F = o.flow ? 'url(#msFlow' + p + ')' : o.col;
+    let g = '<defs><linearGradient id="msFlow' + p + '" x1="0" x2="1"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient>' +
+      '<filter id="msBl' + p + '" filterUnits="userSpaceOnUse" x="-20" y="-20" width="' + (W + 40) + '" height="' + (H + 40) + '"><feGaussianBlur stdDeviation="3.2"/></filter><filter id="msBl2' + p + '" filterUnits="userSpaceOnUse" x="-20" y="-20" width="' + (W + 40) + '" height="' + (H + 40) + '"><feGaussianBlur stdDeviation="1.6"/></filter></defs>';
+    // Realista: una ranura oscura con 4 LEDs; cumplida = encendida a media luz; completa = plena, con halo y rayo
+    if (!BAR) g += '<rect class="rl-slot" x="-4" y="-4" width="' + (W + 8) + '" height="' + (H + 8) + '" rx="6"/>';
+    const BOLT = 'M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z';
+    for (let i = 0; i < 4; i++) {
+      const st = i >= n ? 'off' : L[i] ? 'full' : 'half', x = i * (sw + GP), Lz = eqLuz(st === 'full' ? 1 : st === 'half' ? .45 : 0);
+      if (!BAR) {
+        g += eqCeldaFila(x, 0, sw, H, st !== 'off', F, Lz, 'msBl' + p);   // T16: la misma celda que usan los demás medidores
+      } else {
+        const y = H / 2, x1 = (x + H / 2).toFixed(1), x2 = (x + sw - H / 2).toFixed(1), ln = (w, ex) => '<line x1="' + x1 + '" x2="' + x2 + '" y1="' + y + '" y2="' + y + '" stroke-width="' + w.toFixed(1) + '" stroke-linecap="round"' + ex + '/>';
+        g += st === 'off'
+          ? ln(H * .62, ' stroke="' + F + '" stroke-opacity=".34"') + ln(H * .62 - 2.4, ' stroke="var(--panel)" stroke-opacity=".55"') + ln(H * .14, ' stroke="#fff" stroke-opacity=".12"')
+          : ln(H * .62 + 6, ' stroke="' + F + '" opacity="' + (Lz.ha * 1.2).toFixed(2) + '" filter="url(#msBl' + p + ')"') + ln(H * .62, ' stroke="' + F + '" opacity="' + Lz.bd + '"') + ln(H * .2, ' stroke="#fff" opacity="' + Lz.co + '"');
+      }
+      if (st === 'full') g += '<path d="' + BOLT + '" transform="translate(' + (x + sw / 2 - 5.2).toFixed(1) + ' ' + (H / 2 - 7.8).toFixed(1) + ') scale(.65)" fill="#06080c"' + (BAR ? ' stroke="#fff" stroke-width="1.4" paint-order="stroke"' : '') + '/>';
+    }
+    return '<svg class="mssvg" viewBox="-6 -6 ' + (W + 12) + ' ' + (H + 12) + '" aria-hidden="true">' + g + '</svg>';
+  }
+  // [/kit:eq]
   // Barras sueltas (.k-barra, .k-barra-dato): en Ecualizador se dibujan con eqFila sobre el mismo elemento; la barra lisa queda debajo (Lisas).
   // Cantidad de celdas: data-n en la barra, o una cada 10 % (ocupación, plan, partes de la rutina). La sesión (salaprog) es de T17: no se toca.
   function eqHidratar(){
@@ -442,43 +507,9 @@
     if (pausa) { box.innerHTML = '<div class="wkqh"><span class="wktit"><span class="sig"><b>Tu</b> <i>semana</i></span></span>' + (MH_POS === 'no' ? mesHtml() : '') + '</div><span class="wkpausa">Semana en pausa: no perdés ninguna semana ni ficha</span>'; return; }
     const B = semSegs(), comp = semCompleta(), cump = semCumplida();
     const leg = comp ? '<span class="tagi sm"><span>Completa</span></span>' : cump ? '<span class="wkleg2" style="color:' + (eqFlow ? 'var(--txt)' : eqCol) + '">· Cumplida</span>' : '';
-    const F = eqFlow ? 'url(#eqFlowG)' : eqCol;
-    const showBars = WK.reg ? B : B.slice(0, 1);
-    // Geometría: columnas angostas con aire para el rótulo; Visitas un poco aparte; el rayo al final
-    const BAR = EQ_EST === 'barras', PX = 64, CW = BAR ? 30 : 20, H0 = 6, HB = 46, BOLT = 26;
-    const xs = [0]; for (let i = 1; i < 4; i++) xs.push(xs[i - 1] + PX + (i === 1 ? 8 : 0));
-    const W = WK.reg ? xs[3] + PX + BOLT : PX, cxc = i => xs[i] + PX / 2;
     const onIns = curScr === 'inicio' && !$('#inicio').hidden;
-    let segs = '', labs = '', delay = 0;
-    showBars.forEach((b, i) => {
-      const full = b.on >= b.N, L = eqLuz(b.on / b.N), x0 = cxc(i) - CW / 2;
-      let g = '<g class="bar' + (full ? ' full' : '') + '">';
-      // Realista: una ranura oscura con LEDs finos adentro, como un medidor de verdad (sin imitar materiales)
-      if (!BAR) g += '<rect class="rl-slot" x="' + (x0 - 4) + '" y="' + (H0 - 4) + '" width="' + (CW + 8) + '" height="' + (HB + 8) + '" rx="5"/>';
-      const GP = BAR ? Math.max(3, Math.min(6, 24 / b.N)) : 2.2, sh = (HB - GP * (b.N - 1)) / b.N;
-      for (let j = 0; j < b.N; j++) {
-        const y = H0 + HB - (j + 1) * sh - j * GP, on = j < b.on, nw = on && j >= Math.max(0, semVisto[b.k]);
-        let el;
-        if (!BAR) {
-          el = eqCeldaCol(x0, y, CW, sh, on, F, L, 'eqBl' + i, EQ_HALO);   // T16: la misma celda que usan los demás medidores
-        } else {
-          // Barritas: tubos de neón cortos, con las mismas capas que los tubos del dial
-          const cy = (y + sh / 2).toFixed(1), sw = Math.min(8.5, sh * .95), x1 = (x0 + sw / 2).toFixed(1), x2 = (x0 + CW - sw / 2).toFixed(1);
-          const ln = (c, w, ex) => '<line class="' + c + '" x1="' + x1 + '" x2="' + x2 + '" y1="' + cy + '" y2="' + cy + '" stroke-width="' + w.toFixed(1) + '" stroke-linecap="round"' + ex + '/>';
-          el = on ? ln('nb-ha', sw + 5, ' stroke="' + F + '" opacity="' + (L.ha * (EQ_HALO ? 1.3 : .8)).toFixed(2) + '" filter="url(#eqBl' + i + ')"') + ln('nb-bd', sw, ' stroke="' + F + '" opacity="' + L.bd + '"') + ln('nb-co', Math.max(1, sw * .32), ' stroke="#fff" opacity="' + L.co + '"')
-                  : ln('nb-gl', sw, ' stroke="' + F + '" stroke-opacity=".34"') + ln('nb-gi', Math.max(1, sw - 2.4), ' stroke="var(--panel)" stroke-opacity=".55"') + ln('nb-gh', Math.max(.8, sw * .2), ' stroke="#fff" stroke-opacity=".12"');
-        }
-        g += '<g class="sg ' + (on ? 'on' : 'off') + (nw ? ' nw' : '') + '"' + (nw ? ' style="animation-delay:' + (delay * 0.14).toFixed(2) + 's"' : '') + '>' + el + '</g>';
-        if (nw) delay++;
-      }
-      segs += g + '</g>';
-      labs += '<text class="el' + (full ? ' full' : '') + '" x="' + cxc(i) + '" y="' + (H0 + HB + 17) + '" text-anchor="middle">' + b.n + '</text>';
-    });
-    const bolt = WK.reg ? '<g class="eqbolt' + (comp ? ' on' : '') + '" transform="translate(' + (xs[3] + PX + 6) + ' ' + (H0 + HB / 2 - 12) + ') scale(1)"><path d="M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z"/></g>' : '';
+    const svg = eqSemanaSvg(B, { est:EQ_EST, halo:EQ_HALO, col:eqCol, flow:eqFlow, reg:WK.reg, comp:comp, visto:semVisto });
     const aria = 'Tu semana. ' + (WK.reg ? B : B.slice(0, 1)).map(b => b.n + ': ' + Math.min(b.val, b.meta) + ' de ' + b.meta + (b.min ? ' minutos' : '')).join('. ') + '.' + (comp ? ' Semana completa.' : cump ? ' Semana cumplida.' : '');
-    const fl = showBars.map((b, i) => '<filter id="eqBl' + i + '" filterUnits="userSpaceOnUse" x="-30" y="-30" width="' + (W + 60) + '" height="' + (H0 + HB + 60) + '"><feGaussianBlur stdDeviation="' + (eqLuz(b.on / b.N).hb * (BAR ? .7 : .45)).toFixed(1) + '"/></filter>').join('');
-    const gr = '<linearGradient id="eqFlowG" gradientUnits="userSpaceOnUse" x1="0" y1="' + (H0 + HB) + '" x2="0" y2="' + H0 + '"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient>';
-    const svg = '<svg class="eqsvg" data-halo="' + (EQ_HALO ? 1 : 0) + '" viewBox="-4 0 ' + (W + 8) + ' ' + (H0 + HB + 21) + '" style="max-width:' + (W + 8) + 'px" aria-hidden="true"><defs>' + fl + gr + '</defs>' + segs + bolt + labs + '</svg>';
     box.innerHTML = '<div class="wkqh"><span class="wktit"><span class="sig"><b>Tu</b> <i>semana</i></span>' + leg + '</span>' + (MH_POS === 'no' ? mesHtml() : '') + '</div>' +
       (WK.reg ? '<button class="eqhit" id="eqHit" aria-label="' + aria + ' Ver el detalle de tu semana.">' + svg + '</button>'
               : '<div style="display:flex;align-items:flex-end;gap:16px"><button class="eqhit" id="eqHit" style="width:auto" aria-label="' + aria + ' Ver el detalle de tu semana.">' + svg + '</button>' +

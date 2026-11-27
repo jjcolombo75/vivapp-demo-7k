@@ -138,6 +138,23 @@
     <!-- Nivel 3 · Por sección (plegado) -->
     <span class="dmh">Por sección</span>
     <details class="dmdet" data-k="layout"><summary>Layout</summary>
+      <div id="t35Rows">
+      <div class="dmrow"><span class="dmk">Barra</span>
+        <div class="opts g2" data-t35="barra"><button class="opt" data-v="hoy" aria-pressed="true">Como hoy ✓</button><button class="opt" data-v="dock" aria-pressed="false">Dock</button></div>
+        <span class="dmayu">Dock (Juanjo, 27/11): barra flotante con el círculo de 54 adentro, sin palabra; el ícono y el anillo dicen el estado y el contenido pasa por detrás. Pide la estructura única. No es el defecto: lo decide Juanjo con el dueño y después de E16.</span></div>
+      <div class="dmrow"><span class="dmk">Encabezado</span>
+        <div class="opts g2" data-t35="enc"><button class="opt" data-v="hoy" aria-pressed="true">Como hoy ✓</button><button class="opt" data-v="iconos" aria-pressed="false">Íconos</button></div>
+        <span class="dmayu">Íconos (Juanjo, 27/11): arriba a la derecha, sueltos y sin caja, sedes y Tu cuenta, en las cuatro secciones. Sedes abre la hoja de las sedes; en Inicio sale el chip de la sede.</span></div>
+      <div class="dmrow"><span class="dmk">Mensajes</span>
+        <div class="opts g2" data-t35="msj"><button class="opt" data-v="0" aria-pressed="true">Oculto ✓</button><button class="opt" data-v="1" aria-pressed="false">Visible</button></div>
+        <span class="dmayu">Solo un dibujo para mostrarle al dueño: no se toca ni abre nada, y no entra en el beta. Va con el encabezado de íconos.</span></div>
+      <div class="dmrow"><span class="dmk">Estética</span>
+        <div class="opts g2" data-t35="vid"><button class="opt" data-v="0" aria-pressed="true">Como hoy ✓</button><button class="opt" data-v="1" aria-pressed="false">Vidrio</button></div>
+        <span class="dmayu">Vidrio (lienzo T33, 27/11): cajas planas con espesor de vidrio y, con el dock, dock de vidrio y botón convexo. Cambia el aspecto que eligió el dueño (Tubos, 26/10).</span>
+        <div class="stack" id="t35Sl" hidden style="gap:0"><label class="esqint"><span class="small">Dock · transparencia</span><input type="range" data-t35sl="dT" min="0" max="95" step="1" value="27"><b>27 %</b></label><label class="esqint"><span class="small">Dock · desenfoque</span><input type="range" data-t35sl="dB" min="0" max="30" step="1" value="22"><b>22 px</b></label><label class="esqint"><span class="small">Cajas · transparencia</span><input type="range" data-t35sl="cT" min="0" max="95" step="1" value="52"><b>52 %</b></label><label class="esqint"><span class="small">Cajas · desenfoque</span><input type="range" data-t35sl="cB" min="0" max="30" step="1" value="1"><b>1 px</b></label></div></div>
+      <div class="dmrow"><button class="opt" type="button" id="t35Prop" aria-pressed="false">Ver la propuesta del 27/11</button>
+        <span class="dmayu">Prende juntos el dock, los íconos y el vidrio (mensajes queda como esté).</span></div>
+      </div>
       <div class="dmrow"><span class="dmk">Estructura</span>
         <div class="opts g2" id="estuPick"><button class="opt" data-estu="unica" aria-pressed="true">Única ✓</button><button class="opt" data-estu="v122" aria-pressed="false">Como en la v122</button></div>
         <span class="dmayu">Única (Juanjo, 24/11): en las cuatro secciones, título y Tu cuenta arriba; barra con el círculo en el centro; un solo arranque, la hoja. Como en la v122: encabezados distintos y los botones fijos "Empezar" (Inicio) y "Comenzar rutina" (Hoy). Para comparar con socios.</span></div>
@@ -438,6 +455,7 @@
         <span class="dmayu">Pendiente de E3. El botón se puede arrastrar.</span></div>
     </details>
     <div class="grid2" style="gap:8px"><!--sin-gestion--><button class="btn ghost sm" id="dmReset">Reiniciar la demo</button></div>
+    <button class="btn ghost sm" data-go="piezas">Ver las piezas (para diseñar)</button>
 
     <!-- Motor: controles viejos que la app todavía usa por dentro; el panel los maneja desde Antigüedad, Días sin venir y Plan -->
     <div id="dmMotor" hidden>

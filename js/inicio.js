@@ -95,25 +95,7 @@
     const L = mesSemanas(), n = L.length, mes = meses[HOY_D.getMonth()];
     const col = eqFlow ? 'var(--z2)' : eqCol;
     $('#mesNm').textContent = MES_ABR[HOY_D.getMonth()];
-    const BAR = EQ_EST === 'barras', W = 340, H = BAR ? 16 : 18, GP = BAR ? 10 : 6, sw = (W - 3 * GP) / 4, F = eqFlow ? 'url(#msFlow)' : eqCol;
-    let g = '<defs><linearGradient id="msFlow" x1="0" x2="1"><stop offset="0" stop-color="var(--z1)"/><stop offset=".5" stop-color="var(--z2)"/><stop offset="1" stop-color="var(--z3)"/></linearGradient>' +
-      '<filter id="msBl" filterUnits="userSpaceOnUse" x="-20" y="-20" width="' + (W + 40) + '" height="' + (H + 40) + '"><feGaussianBlur stdDeviation="3.2"/></filter><filter id="msBl2" filterUnits="userSpaceOnUse" x="-20" y="-20" width="' + (W + 40) + '" height="' + (H + 40) + '"><feGaussianBlur stdDeviation="1.6"/></filter></defs>';
-    // Realista: una ranura oscura con 4 LEDs; cumplida = encendida a media luz; completa = plena, con halo y rayo
-    if (!BAR) g += '<rect class="rl-slot" x="-4" y="-4" width="' + (W + 8) + '" height="' + (H + 8) + '" rx="6"/>';
-    const BOLT = 'M6.93 1.64 L13.48 0.00 L9.62 8.71 L12.82 8.18 L2.52 24.00 L6.24 13.20 L3.05 13.83 Z';
-    for (let i = 0; i < 4; i++) {
-      const st = i >= n ? 'off' : L[i] ? 'full' : 'half', x = i * (sw + GP), Lz = eqLuz(st === 'full' ? 1 : st === 'half' ? .45 : 0);
-      if (!BAR) {
-        g += eqCeldaFila(x, 0, sw, H, st !== 'off', F, Lz, 'msBl');   // T16: la misma celda que usan los demás medidores
-      } else {
-        const y = H / 2, x1 = (x + H / 2).toFixed(1), x2 = (x + sw - H / 2).toFixed(1), ln = (w, ex) => '<line x1="' + x1 + '" x2="' + x2 + '" y1="' + y + '" y2="' + y + '" stroke-width="' + w.toFixed(1) + '" stroke-linecap="round"' + ex + '/>';
-        g += st === 'off'
-          ? ln(H * .62, ' stroke="' + F + '" stroke-opacity=".34"') + ln(H * .62 - 2.4, ' stroke="var(--panel)" stroke-opacity=".55"') + ln(H * .14, ' stroke="#fff" stroke-opacity=".12"')
-          : ln(H * .62 + 6, ' stroke="' + F + '" opacity="' + (Lz.ha * 1.2).toFixed(2) + '" filter="url(#msBl)"') + ln(H * .62, ' stroke="' + F + '" opacity="' + Lz.bd + '"') + ln(H * .2, ' stroke="#fff" opacity="' + Lz.co + '"');
-      }
-      if (st === 'full') g += '<path d="' + BOLT + '" transform="translate(' + (x + sw / 2 - 5.2).toFixed(1) + ' ' + (H / 2 - 7.8).toFixed(1) + ') scale(.65)" fill="#06080c"' + (BAR ? ' stroke="#fff" stroke-width="1.4" paint-order="stroke"' : '') + '/>';
-    }
-    const bar = $('#mesBar'); bar.innerHTML = '<svg class="mssvg" viewBox="-6 -6 ' + (W + 12) + ' ' + (H + 12) + '" aria-hidden="true">' + g + '</svg>';
+    const bar = $('#mesBar'); bar.innerHTML = eqMesSvg(L, { est:EQ_EST, col:eqCol, flow:eqFlow });
     const nc = L.filter(x => x).length;
     bar.setAttribute('aria-label', 'Tu mes, ' + mes + ': ' + (n >= 3 ? 'Mes cumplido, ' + n + ' semanas cumplidas' : n + ' de 3 semanas cumplidas') + (nc ? ', ' + nc + (nc === 1 ? ' completa' : ' completas') : '') + '. Ver tu mural.');
     $('#mesTxt').innerHTML = pausa ? 'Plan en pausa: tu mes no pierde nada.'
@@ -468,12 +450,16 @@
     corona:['#f400a0', 'M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z']
   };
   const AV_ORD = Object.keys(AVS);
+  const ICO_SEG2 = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5.5 6.5 5.5 5.5-5.5 5.5M12.5 6.5l5.5 5.5-5.5 5.5"/></svg>';   // T35: Seguir en el dock
   const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   function estUni(){ return EST !== 'v122'; }
   function avSvg(k, s){ const a = AVS[k]; return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="' + a[0] + '" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + a[1] + '"/></svg>'; }
   // ---- Encabezado de sección: título a la izquierda, Tu cuenta a la derecha (nivel 1: Inicio, Entrenar ×3 pestañas, Club, Social I)
   const SECC = ['inicio', 'hoy', 'rutinas', 'progreso', 'beneficios'];
-  const CTA_HTML = '<button class="cuentac" data-go="plan" type="button"></button>';
+  // T35: sedes (abre la hoja de ocupación que ya existe) y mensajes de Viva (solo dibujo para el dueño: no se toca, no abre nada).
+  // Ocultos salvo con data-enc="iconos" (css/layout.css).
+  const ENC_HTML = '<span class="encic"><button class="encb" type="button" data-encsede aria-label="Sedes y gente por hora"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.5s-7-6.2-7-11.8a7 7 0 0 1 14 0c0 5.6-7 11.8-7 11.8z"/><circle cx="12" cy="9.7" r="2.6"/></svg></button><span class="encb encmsj" role="img" aria-label="Mensajes de Viva: solo dibujo para mostrar al dueño"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m3.8 7 8.2 6 8.2-6"/></svg></span></span>';
+  const CTA_HTML = ENC_HTML + '<button class="cuentac" data-go="plan" type="button"></button>';
   function cuentaPoner(){
     if (!T31_OK) return;
     SECC.forEach(id => {
@@ -519,7 +505,7 @@
       const e = circEstado(), ring = e === 'toca' || e === 'curso';
       const spin = ring && (ANI === 'siempre' || (ANI === 'sesion' && e === 'curso'));
       na.className = 'navacc' + (ring ? ' ring' : '') + (spin ? ' spin' : '') + (e === 'toca' && ANI !== 'quieto' ? ' hspin' : ''); na.dataset.ce = e;   // v125: con hoy toca, el halo del espectro gira y el anillo queda quieto
-      na.querySelector('.nai').innerHTML = e === 'curso' ? ICO_SES : e === 'hecha' ? ICO_OK : ICO_PLAY;
+      na.querySelector('.nai').innerHTML = (e === 'curso' ? ($('.app').dataset.barra === 'dock' ? ICO_SEG2 : ICO_SES) : e === 'hecha' ? ICO_OK : ICO_PLAY) + '<i class="nvx" aria-hidden="true"></i>';
       na.querySelector('.nal').textContent = e === 'curso' ? 'Seguir' : e === 'hecha' ? 'Listo' : 'Comenzar';
       na.setAttribute('aria-label', { toca:'Comenzar: tu sesión de hoy', curso:'Seguir con tu sesión', hecha:'Listo: lo que hiciste hoy', nada:'Comenzar: tu semana ya está cumplida', off:'Comenzar: todavía no hay rutina para hoy' }[e]);
       na.removeAttribute('aria-current');

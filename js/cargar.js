@@ -3,7 +3,7 @@
    img/*.svg: símbolos (logo, sello, íconos, patrón) dentro de un único <svg> oculto.
    js/*.js: bloques //#bloque NNN, ordenados por número, dentro de la función principal; después js/halo.js. */
 (function () {
-  var V = '129';
+  var V = '131';
   // Marco de escritorio (css/base.css): escala para que la pantalla de 393×852 entre entera, con 24 px de aire
   function marco() {
     var z = innerWidth >= 600 ? Math.min(1, (innerHeight - 48) / 872, (innerWidth - 48) / 413) : 1;
@@ -23,7 +23,7 @@
     }).catch(function () {});
   }
   nueva(); document.addEventListener('visibilitychange', function () { if (!document.hidden) nueva(); });
-  var HTML = ["captacion", "inicio", "entrenar", "progreso", "club", "gestion", "comunidad", "demo"], SVG = ["logo", "sello", "iconos", "patron"], JS = ["datos", "comun", "inicio", "entrenar", "progreso", "club", "comunidad", "captacion", "demo"];
+  var HTML = ["captacion", "inicio", "entrenar", "progreso", "club", "gestion", "comunidad", "demo", "piezas"], SVG = ["logo", "sello", "iconos", "patron"], JS = ["datos", "comun", "inicio", "entrenar", "progreso", "club", "comunidad", "captacion", "demo"];
   var SVG_A = '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>', SVG_B = '</defs></svg>';
   function get(u) {
     return new Promise(function (ok, ko) {

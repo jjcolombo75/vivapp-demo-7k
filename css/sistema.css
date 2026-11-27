@@ -180,3 +180,11 @@
    Solo se mueve lo que acaba de cambiar, una vez. Excepción (Juanjo, v85): Empezar, abajo, con el espectro que gira.
    El tramo del dial se enciende una vez al dibujarse y queda encendido (antes respiraba sin parar). */
 .app :is(.gauge,.vumeter) .tube.tz :is(.halo,.halo2){ animation-iteration-count:1!important; animation-fill-mode:forwards!important }
+
+/* ===== T34 · Galería de piezas (panel de demo). Solo el marco de la galería: las piezas traen sus propias clases. ===== */
+.pzt{ margin:10px 0 0; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted) }
+.pzi{ gap:10px!important }
+.pzh{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap }
+.pzf{ font-size:11px; color:var(--muted); font-family:ui-monospace,Menlo,monospace }
+.pzv .eqsvg{ max-height:92px }
+.pzbar{ display:block; width:100% }

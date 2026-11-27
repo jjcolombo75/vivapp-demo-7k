@@ -1,0 +1,92 @@
+/* T35 · v131 (27/11) · Dock, encabezado de íconos, mensajes (solo dibujo) y estética vidrio: alternativas del panel · Layout.
+   Decisiones de Juanjo del 27/11 (DIS D1 y D2, T33); receta del vidrio en docs/tickets/T33-lienzo-de-diseno.md.
+   REGLA: cada selector empieza por uno de estos atributos de .app, que por defecto no existen; sin ellos, nada de este archivo aplica.
+     data-barra="dock" · data-enc="iconos" · data-msj="1" · data-vidrio="1"
+   Lo que este archivo agrega al DOM por defecto (.encic, .nvx) queda en display:none salvo con su atributo. */
+
+.encic,.nav .navacc .nai>.nvx{display:none}
+
+/* ===== 1 · Dock (D1): barra flotante, cinco columnas iguales, el círculo de 54 adentro y sin palabra ===== */
+.app[data-barra="dock"] #nav{position:absolute;left:14px;right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:12;height:64px;box-sizing:border-box;padding:0;
+  display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;border:1px solid rgba(255,255,255,.12);border-radius:32px;
+  background:rgba(17,22,32,.78);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.app[data-barra="dock"] #nav[hidden]{display:none}
+.app[data-barra="dock"] #nav>button{min-width:0;width:62px;height:52px;box-sizing:border-box;padding:0;gap:3px;justify-content:center;border-radius:26px;font-size:10.5px}
+.app[data-barra="dock"] #nav>button:not(.navacc)[aria-current="page"]{background:rgba(7,176,242,.14)}
+.app[data-barra="dock"] #nav>.navacc{margin:0;width:54px;height:54px;min-width:0;gap:0}
+.app[data-barra="dock"] #nav>.navacc .nai{width:54px;height:54px;border-radius:27px}
+.app[data-barra="dock"] #nav>.navacc .nai svg{width:22px;height:22px}
+.app[data-barra="dock"] #nav>.navacc .nal{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}   /* sin palabra: queda como nombre accesible */
+/* El halo, corto (7 px): más largo mancha Entrenar y Club */
+.app[data-barra="dock"] #nav>.navacc .nai::after{inset:-2px!important;filter:blur(5px)!important}
+.app[data-barra="dock"]:not([data-chalo="no"]) #nav>.navacc[data-ce="hecha"] .nai{box-shadow:0 0 7px color-mix(in srgb,var(--dat) 55%,transparent),inset 0 0 8px color-mix(in srgb,var(--dat) 22%,transparent)}
+.app[data-barra="dock"]:not([data-chalo="no"]) #nav>.navacc[data-ce="nada"] .nai{box-shadow:0 0 6px rgba(255,255,255,.12)}
+/* El contenido pasa por detrás: 96 px libres al pie de cada sección; lo flotante sube por encima del dock */
+.app[data-barra="dock"]:has(#nav:not([hidden])) .scr .body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.app[data-barra="dock"]:has(#nav:not([hidden])) .cajapill{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+.app[data-barra="dock"]:has(#nav:not([hidden])) .profefab{bottom:calc(158px + env(safe-area-inset-bottom,0px))}
+
+/* ===== 2 · Encabezado (D2): íconos sueltos, sin caja, a la derecha: sedes y Tu cuenta (y mensajes, solo dibujo) ===== */
+.app[data-enc="iconos"] .encic{display:flex;align-items:center;gap:4px;flex:none}
+.app[data-enc="iconos"] .encb{width:40px;height:40px;padding:0;border:0;background:none;color:var(--txt);display:grid;place-items:center;position:relative;cursor:pointer}
+.app[data-enc="iconos"] .encb svg{width:24px;height:24px}
+.app[data-enc="iconos"] .encmsj{display:none;cursor:default}
+.app[data-enc="iconos"][data-msj="1"] .encmsj{display:grid}
+.app[data-enc="iconos"] .encmsj::after{content:"";position:absolute;top:7px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--yel);border:2px solid var(--bg)}
+.app[data-enc="iconos"] .sechead,.app[data-enc="iconos"] .shbar{gap:4px}
+.app[data-enc="iconos"] .sechead>.h1,.app[data-enc="iconos"] .shbar .shtit{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app[data-enc="iconos"] .shbar .cuentac{margin-left:0}
+.app[data-enc="iconos"] .shbar .encic{margin-left:auto}
+/* Social: con los íconos, el "+" deja el encabezado y flota arriba de la barra, a la derecha (lienzo T33); lo mueve el bloque 354 */
+.app[data-enc="iconos"] #socialI>.shmas{position:absolute;right:14px;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:13;width:52px;height:52px;background:#14060f}
+/* Inicio: fecha arriba en chico, el saludo y los íconos en la misma línea; sale el chip de la sede y el contenido sube */
+.app[data-enc="iconos"] .inihead{grid-template-columns:minmax(0,1fr) auto auto;column-gap:4px}
+.app[data-enc="iconos"] .inihead .title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app[data-enc="iconos"] .inihead .encic{grid-column:2;grid-row:2;align-self:center}
+.app[data-enc="iconos"]:not([data-est="v122"]) .inihead .cuentac{grid-column:3;grid-row:2}
+.app[data-enc="iconos"] .inihead .sedebox{display:none}
+
+/* ===== 3 · Vidrio (T33, receta del 27/11): cajas planas con espesor de vidrio, dock de vidrio y botón central convexo =====
+   Todo en medidas fijas: nada en porcentaje del tamaño de la caja, o los reflejos se estiran. Las alfas las calcula el panel (bloque 354)
+   desde la transparencia (f) y el desenfoque (B): --vdL* luz, --vdG* gris, --vdBl desenfoque, --vdSa saturación; --vdD* lo mismo del dock. */
+.app[data-vidrio="1"]{--vdT:255,255,255;--vdBd:rgba(255,255,255,.50) rgba(255,255,255,.10) rgba(255,255,255,.28);--vdGl:0 0 0 transparent}
+.app[data-vidrio="1"] :is(:is(#inicio,#hoy,#rutinas,#beneficios) .body>.k-caja,#socialI .sicuerpo>.siplaca){position:relative;isolation:isolate;border:1px solid;border-color:var(--vdBd)!important;border-radius:18px;
+  background:linear-gradient(180deg,rgba(var(--vdT),var(--vdL0)) 0,rgba(var(--vdT),var(--vdL30)) 30px,rgba(var(--vdT),0) 64px,rgba(var(--vdT),0) calc(100% - 36px),rgba(var(--vdT),var(--vdLb)) 100%) padding-box,
+    linear-gradient(180deg,rgba(44,50,62,var(--vdG0)) 0,rgba(22,27,37,var(--vdG66)) 66px,rgba(22,27,37,var(--vdG66)) calc(100% - 54px),rgba(14,18,26,var(--vdGb)) 100%) padding-box!important;
+  -webkit-backdrop-filter:blur(var(--vdBl)) saturate(var(--vdSa));backdrop-filter:blur(var(--vdBl)) saturate(var(--vdSa));
+  box-shadow:0 18px 36px rgba(0,0,0,.45),0 3px 8px rgba(0,0,0,.35),inset 0 1px 0 rgba(var(--vdT),.24),inset 0 -1px 0 rgba(var(--vdT),.06),inset 0 14px 18px -12px rgba(var(--vdT),.10),inset 0 -16px 20px -12px rgba(0,0,0,.5),var(--vdGl)!important}
+.app[data-vidrio="1"] :is(:is(#inicio,#hoy,#rutinas,#beneficios) .body>.k-caja,#socialI .sicuerpo>.siplaca)::before{content:"";position:absolute;left:18px;right:18px;top:2px;height:20px;border-radius:16px 16px 60% 60%;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(var(--vdT),.10),rgba(var(--vdT),0));opacity:var(--vdR,1)}
+/* Destacada (magenta) y encendida (cian, opción "Cajas encendidas") */
+.app[data-vidrio="1"] :is(:is(#inicio,#hoy,#rutinas,#beneficios) .body>.k-caja,#socialI .sicuerpo>.siplaca):is(.dest,.fitbox,.fitpromo){--vdBd:rgba(255,92,196,.85) rgba(244,0,160,.30) rgba(244,0,160,.55);--vdGl:0 0 18px rgba(244,0,160,.22)}
+.app[data-vidrio="1"][data-cajas="on"] :is(:is(#inicio,#hoy,#rutinas,#beneficios) .body>.k-caja,#socialI .sicuerpo>.siplaca).lit{--vdBd:rgba(120,214,255,.85) rgba(7,176,242,.30) rgba(7,176,242,.55);--vdGl:0 0 22px rgba(7,176,242,.30)}
+/* Tu evolución: reflejos ligeramente magenta (tinte 50: k = 0,35) */
+.app[data-vidrio="1"] #inicio .body>.k-caja:is(.fitbox,.fitpromo){--vdT:251,166,222}
+.app[data-vidrio="1"] #inicio .body>.k-caja:is(.fitbox,.fitpromo)::before{background:linear-gradient(180deg,rgba(var(--vdT),.16),rgba(var(--vdT),0))}
+
+/* Dock de vidrio: borde en degradé (165°), relleno de tres tramos, franja de luz; la pestaña activa también vidriada */
+.app[data-vidrio="1"][data-barra="dock"] #nav{border:1px solid transparent;
+  background:linear-gradient(180deg,rgba(44,50,62,var(--vdDG0)),rgba(22,27,37,var(--vdDG66)) 55%,rgba(14,18,26,var(--vdDGb))) padding-box,
+    linear-gradient(165deg,rgba(255,255,255,.50),rgba(255,255,255,.10) 28%,rgba(255,255,255,.03) 55%,rgba(255,255,255,.10) 80%,rgba(255,255,255,.28)) border-box;
+  -webkit-backdrop-filter:blur(var(--vdDBl)) saturate(var(--vdDSa));backdrop-filter:blur(var(--vdDBl)) saturate(var(--vdDSa));
+  box-shadow:0 18px 36px rgba(0,0,0,.45),0 3px 8px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(255,255,255,.06),inset 0 14px 18px -12px rgba(255,255,255,.10),inset 0 -16px 20px -12px rgba(0,0,0,.5)}
+.app[data-vidrio="1"][data-barra="dock"] #nav::before{content:"";position:absolute;left:22px;right:22px;top:2px;height:22px;border-radius:16px 16px 60% 60%;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.02))}
+.app[data-vidrio="1"][data-barra="dock"] #nav>button:not(.navacc)[aria-current="page"]{background:linear-gradient(180deg,rgba(7,176,242,.24),rgba(7,176,242,.10));border:1px solid rgba(7,176,242,.30);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(0,0,0,.25),0 0 12px rgba(7,176,242,.18)}
+/* Botón central convexo (volumen 60: v = .6), en una capa propia (.nvx) para no tocar el relleno (::before) ni el halo (::after) */
+.app[data-vidrio="1"][data-barra="dock"] #nav>.navacc .nai>.nvx{display:block;position:absolute!important;inset:0;border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle at 50% 118%,rgba(0,0,0,.36),transparent 58%),radial-gradient(circle at 36% 28%,rgba(255,255,255,.27),transparent 46%);
+  box-shadow:0 6px 14px rgba(0,0,0,.55),0 2px 3px rgba(0,0,0,.5),inset 0 -6px 10px rgba(0,0,0,.36),inset 0 3px 6px rgba(255,255,255,.24)}
+.app[data-vidrio="1"][data-barra="dock"] #nav>.navacc .nai>.nvx::before{content:"";position:absolute;top:4px;left:9px;width:30px;height:15px;border-radius:50%;transform:rotate(-18deg);
+  background:radial-gradient(ellipse at 50% 35%,rgba(255,255,255,.51),transparent 72%)}
+.app[data-vidrio="1"][data-barra="dock"] #nav>.navacc .nai>.nvx::after{content:"";position:absolute;inset:3px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.24),inset 0 -1px 1px rgba(0,0,0,.4)}
+.app[data-vidrio="1"][data-barra="dock"] #nav>.navacc .nai>svg{position:relative;z-index:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.65))}
+
+/* ===== Respaldos: reducir transparencia (opaco, sin desenfoque) y reducir movimiento (nada gira) ===== */
+@media (prefers-reduced-transparency: reduce){   /* las variables llevan !important porque el panel las pone en línea en .app */
+  .app[data-vidrio="1"]{--vdL0:.06!important;--vdL30:.02!important;--vdLb:0!important;--vdG0:1!important;--vdG66:1!important;--vdGb:1!important;--vdBl:0px!important;--vdSa:100%!important;--vdDG0:1!important;--vdDG66:1!important;--vdDGb:1!important;--vdDBl:0px!important;--vdDSa:100%!important}
+  .app[data-barra="dock"] #nav{background:#111620;-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .app[data-barra="dock"] #nav>.navacc .nai,.app[data-barra="dock"] #nav>.navacc .nai::before,.app[data-barra="dock"] #nav>.navacc .nai::after{animation:none!important}
+}
