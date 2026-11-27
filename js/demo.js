@@ -753,13 +753,16 @@
 
 //#bloque 354
   // ===== T35 · v131 · Panel · Layout: dock, encabezado de íconos, mensajes (solo dibujo) y vidrio. Todo apagado por defecto (css/layout.css).
-  var T35 = { barra:'hoy', enc:'hoy', msj:'0', vid:'0', dT:27, dB:22, cT:52, cB:1 };
+  var T35 = { barra:'hoy', enc:'hoy', msj:'0', vid:'0', dT:27, dB:22, dR:100, cT:52, cB:1, cR:100 };
   const T35_ATR = { barra:['barra', 'hoy'], enc:['enc', 'hoy'], msj:['msj', '0'], vid:['vidrio', '0'] };
   function t35Vars(){   // receta del vidrio (T33): f = (100 − transparencia) / 100; saturación = 100 + 3,6 · desenfoque
     const s = (k, v) => $('.app').style.setProperty(k, v), f = (100 - T35.cT) / 100, g = (100 - T35.dT) / 100, n = x => x.toFixed(3);
     s('--vdL0', n((1 - .8 * f) * .30)); s('--vdL30', n((1 - .86 * f) * .08)); s('--vdLb', n((1 - f) * .12));
     s('--vdG0', n(.8 * f)); s('--vdG66', n(.92 * f)); s('--vdGb', n(f)); s('--vdBl', T35.cB + 'px'); s('--vdSa', (100 + 3.6 * T35.cB).toFixed(1) + '%');
     s('--vdDG0', n(.8 * g)); s('--vdDG66', n(.92 * g)); s('--vdDGb', n(g)); s('--vdDBl', T35.dB + 'px'); s('--vdDSa', (100 + 3.6 * T35.dB).toFixed(1) + '%');
+    s('--vdDR', n(T35.dR / 100)); s('--vdDin', 'rgba(255,255,255,' + n(.10 * T35.dR / 100) + ')'); s('--vdR', n(T35.cR / 100));   // v132: reflejos
+    const k = T35.dR / 100, mx = (a, b) => a.map((x, i) => Math.round(b[i] + (x - b[i]) * k)).join(',');
+    s('--vdDc0', mx([44, 50, 62], [14, 18, 26])); s('--vdDc55', mx([22, 27, 37], [14, 18, 26]));   // el gris claro de arriba del dock va al oscuro de abajo
   }
   function t35Aplicar(){
     const d = $('.app').dataset;
@@ -796,6 +799,6 @@
     dmFin(t35Dest(), { barra:{ hoy:'Barra como hoy', dock:'Barra: dock' }, enc:{ hoy:'Encabezado como hoy', iconos:'Encabezado: íconos sueltos' }, msj:{ '0':'Mensajes oculto', '1':'Mensajes: solo dibujo para el dueño' } }[k][T35[k]] + u);
   });
   $('#t35Sl').addEventListener('input', e => { const x = e.target.closest('[data-t35sl]'); if (!x) return;
-    T35[x.dataset.t35sl] = +x.value; x.nextElementSibling.textContent = x.value + (x.dataset.t35sl.endsWith('T') ? ' %' : ' px'); t35Vars(); });
+    T35[x.dataset.t35sl] = +x.value; x.nextElementSibling.textContent = x.value + (/[TR]$/.test(x.dataset.t35sl) ? ' %' : ' px'); t35Vars(); });
   $('#estuPick').addEventListener('click', e => { if (e.target.closest('[data-estu="v122"]') && (T35.barra !== 'hoy' || T35.enc !== 'hoy')) { T35.barra = 'hoy'; T35.enc = 'hoy'; T35.msj = '0'; t35Aplicar(); } });
   document.addEventListener('click', e => { if (e.target.closest('[data-encsede]')) { renderOcc(); $('#occSheet').hidden = false; } });
